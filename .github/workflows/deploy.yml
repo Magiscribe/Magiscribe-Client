@@ -1,0 +1,61 @@
+name: Deploy 🚀
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  workflow_dispatch:
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read # This is required for actions/checkout
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout GitHub Action'
+        uses: actions/checkout@main
+
+      - name: Assume AWS Role
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Create .env file
+        run: |
+          cat > .env << EOL
+          # GraphQL
+          VITE_APP_WS_SERVER_URL=${{ secrets.VITE_APP_WS_SERVER_URL }}
+          VITE_APP_HTTP_SERVER_URL=${{ secrets.VITE_APP_HTTP_SERVER_URL }}
+          VITE_APP_CLERK_PK=${{ secrets.VITE_APP_CLERK_PK }}
+          EOL
+
+      - name: Build
+        run: |
+          pnpm build --mode ${{ github.ref == 'refs/heads/main' && 'production' || 'development' }}
+        env:
+          NODE_ENV: ${{ github.ref == 'refs/heads/main' && 'production' || 'development' }}
+
+      - name: Deploy
+        run: |
+          # Upload to S3
+          aws s3 sync dist/ s3://${{ secrets.S3_BUCKET }} --delete
+
+          # Invalidate CloudFront cache
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
