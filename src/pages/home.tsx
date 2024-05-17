@@ -1,91 +1,35 @@
+import ContentSection from "../components/content-section";
 import { SignupForm } from "../components/forms/alpha";
-import Footer from "../components/nav/Footer";
-import { NavBar } from "../components/nav/NavBar";
-import { GradientWaveBottom } from "../components/shapes/GradientWaveBottom";
-import { GradientWaveTop } from "../components/shapes/GradientWaveTop";
-import PencilShape from "../components/shapes/Pencil";
-import SandcastleShape from "../components/shapes/SandCastle";
-import WizardShape from "../components/shapes/Wizard";
+import Footer from "../components/nav/footer";
+import { NavBar } from "../components/nav/nav-bar";
+import {
+  GradientWaveBottom,
+  GradientWaveTop,
+} from "../components/shapes/gradient-wave";
+import PencilShape from "../components/shapes/drawing";
+import SandcastleShape from "../components/shapes/beach";
 import { SectionTemplate } from "../components/templates/section";
+import Hero from "../components/hero";
+import { motion } from "framer-motion";
 
-function Hero() {
-  return (
-    <div className="pt-24">
-      <div className="container px-12 mx-auto flex flex-wrap flex-col md:flex-row items-center">
-        <div className="flex flex-col w-full md:w-3/5 justify-center items-start text-left">
-          <h1 className="my-4 text-4xl md:text-5xl font-bold leading-tight">
-            Write your ideas, <br />
-            let magic take care of the rest.
-          </h1>
-          <p className="leading-normal text-xl md:text-2xl mb-8">
-            With Magiscribe, you can focus on your ideas and let the magic of
-            technology take care of the rest through multi-modal automation.
-          </p>
-          <a
-            href="#signup"
-            className="mx-auto lg:mx-0 hover:underline bg-white text-gray-800 font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
-          >
-            Get Pre-Alpha Access
-          </a>
-        </div>
-        <div className="w-full md:w-2/5 max-w-lg py-6 mb-12 text-center ml-auto">
-          <WizardShape />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ContentSection component
-function ContentSection({
-  content,
-  title,
-  description,
-  reversed,
-}: {
-  content?: React.ReactNode;
-  title: string;
-  description: string;
-  reversed: boolean;
-}) {
-  return (
-    <div
-      className={`flex flex-wrap ${content && reversed ? "flex-col-reverse sm:flex-row" : ""}`}
-    >
-      <div
-        className={`w-full sm:w-3/5 p-6 mt-6 ${content && reversed ? "order-2 sm:order-1" : ""}`}
-      >
-        <div className="object-cover object-center w-full h-full">
-          {content}
-        </div>
-      </div>
-      <div
-        className={`w-${content ? "full sm:w-2/5" : "5/6 sm:w-1/2"} p-6 ${content ? "mt-6" : ""}`}
-      >
-        <div className="align-middle">
-          <h3 className="text-3xl text-gray-800 font-bold leading-none mb-3">
-            {title}
-          </h3>
-          <p className="text-gray-600 mb-8">{description}</p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// SectionOne component
 function AboutSection() {
   return (
     <SectionTemplate>
-      <h2 className="w-full my-2 text-5xl font-bold leading-tight text-center text-gray-800">
+      <motion.h2
+        className="w-full my-2 text-5xl font-bold leading-tight text-center text-gray-800"
+        initial={{ opacity: 0, x: 20 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5, delay: 0.25 }}
+        viewport={{ once: true }}
+      >
         What is Magicscribe?
-      </h2>
+      </motion.h2>
       <div className="w-full mb-4">
         <div className="h-1 mx-auto gradient w-64 opacity-50 my-0 py-0 rounded-t"></div>
       </div>
       <ContentSection
         content={
-          <div className="pt-8 w-full max-h-64 bg-indigo-700 flex flex-row rounded-2xl">
+          <div className="pt-8 min-h-64 max-h-64 bg-indigo-700 flex flex-row rounded-2xl">
             <PencilShape />
           </div>
         }
@@ -131,7 +75,7 @@ function Home() {
         <div className="w-full mb-4">
           <div className="h-1 mx-auto bg-white w-1/6 opacity-50 my-0 py-0 rounded-t"></div>
         </div>
-        <h3 className="my-4 text-3xl leading-tight">
+        <h3 className="my-4 text-2xl leading-tight pb-4">
           Looking to learn more about Magiscribe, have a question, or just want
           to say hi?
           <br />

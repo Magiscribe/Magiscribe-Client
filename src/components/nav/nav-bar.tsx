@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Logo } from "../Logo";
+import { Logo } from "../logo";
 
 export function NavBar() {
   const [atTop, setAtTop] = useState(true);

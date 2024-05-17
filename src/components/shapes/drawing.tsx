@@ -1,8 +1,7 @@
 export default function PencilShape() {
   return (
     <svg
-      id="Layer_2"
-      data-name="Layer 2"
+      className="w-full"
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 161.72 220.2"
     >

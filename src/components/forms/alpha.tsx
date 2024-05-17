@@ -23,17 +23,35 @@ export function SignupForm() {
 
   return (
     <SectionTemplate>
-      <h2 className="w-full my-2 text-5xl font-bold leading-tight text-center text-gray-800">
+      <motion.h2
+        className="w-full my-2 text-5xl font-bold leading-tight text-center text-gray-800"
+        initial={{ opacity: 0, x: 20 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5, delay: 0.25 }}
+        viewport={{ once: true }}
+      >
         Get Pre-Alpha Access
-      </h2>
-      <div className="w-full mb-4">
+      </motion.h2>
+      <motion.div
+        className="w-full mb-4"
+        initial={{ opacity: 0, x: 20 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5, delay: 0.25 }}
+        viewport={{ once: true }}
+      >
         <div className="h-1 mx-auto gradient w-64 opacity-50 my-0 py-0 rounded-t"></div>
         <p className="text-center text-gray-600 mt-4">
           Want to be the first to try out Magiscribe? Let us know and we'll get
           you on the list!
         </p>
-      </div>
-      <div className="w-full max-w-3xl p-6 mx-auto">
+      </motion.div>
+      <motion.div
+        className="w-full max-w-3xl p-6 mx-auto"
+        initial={{ opacity: 0, x: 20 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5, delay: 0.25 }}
+        viewport={{ once: true }}
+      >
         {/* Form */}
         <form onSubmit={handleSubmit} className="px-8 pt-6 pb-8 mb-4">
           <input type="hidden" name="zf_referrer_name" value="" />
@@ -97,7 +115,7 @@ export function SignupForm() {
             </motion.p>
           )}
         </form>
-      </div>
+      </motion.div>
     </SectionTemplate>
   );
 }
