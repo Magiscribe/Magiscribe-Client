@@ -21,3 +21,10 @@ body {
 .gradient {
   background: linear-gradient(90deg, #7133d5 0%, #0508be 100%);
 }
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+}

@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 export default function Hero() {
   return (
-    <div className="pt-24">
+    <div>
       <div className="container px-12 mx-auto flex flex-wrap flex-col md:flex-row items-center">
         <div className="flex flex-col w-full md:w-3/5 justify-center items-start text-left">
           <motion.h1

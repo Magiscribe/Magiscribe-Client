@@ -1,4 +1,11 @@
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  UserButton,
+} from "@clerk/clerk-react";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { Logo } from "../logo";
 
 export function NavBar() {
@@ -25,17 +32,14 @@ export function NavBar() {
       className={`fixed w-full z-30 top-0 ${!atTop ? "bg-white shadow-lg text-indigo-800" : "text-white"} transition-all duration-300 ease-in-out`}
     >
       <div className="w-full container mx-auto flex flex-wrap items-center justify-between mt-0 py-2">
-        <div className="pl-4 flex items-center">
+        <Link to="/" className="pl-4 flex items-center">
           <Logo />
-        </div>
+        </Link>
         <div
           className={`w-full flex-grow lg:flex lg:items-center lg:w-auto hidden mt-2 lg:mt-0 p-4 lg:p-0 z-20 bg-white lg:bg-transparent`}
         >
           <ul className="list-reset lg:flex justify-end flex-1 items-center">
             {/* <li className="mr-3">
-              <a className="inline-block py-2 px-4 text-black font-bold no-underline" href="#">Active</a>
-            </li>
-            <li className="mr-3">
               <a className="inline-block text-black no-underline hover:text-gray-800 hover:text-underline py-2 px-4" href="#">link</a>
             </li>
             <li className="mr-3">
@@ -50,6 +54,23 @@ export function NavBar() {
           >
             Get Pre-Alpha Access
           </a>
+          <SignedIn>
+            <UserButton
+              appearance={{
+                elements: {
+                  rootBox: "w-12 h-12 px-4",
+                  userButtonAvatarBox: "w-12 h-12",
+                  userButtonAvatar: "w-12 h-12",
+                  userButtonTrigger: "w-12 h-12",
+                },
+              }}
+            />
+          </SignedIn>
+          <SignedOut>
+            <SignInButton forceRedirectUrl={"/dashboard"}>
+              <button className="px-4">Sign In</button>
+            </SignInButton>
+          </SignedOut>
         </div>
       </div>
       <hr className="border-b border-gray-100 opacity-25 my-0 py-0" />

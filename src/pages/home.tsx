@@ -1,16 +1,14 @@
+import { motion } from "framer-motion";
 import ContentSection from "../components/content-section";
 import { SignupForm } from "../components/forms/alpha";
-import Footer from "../components/nav/footer";
-import { NavBar } from "../components/nav/nav-bar";
+import Hero from "../components/hero";
+import SandcastleShape from "../components/shapes/beach";
+import PencilShape from "../components/shapes/drawing";
 import {
   GradientWaveBottom,
   GradientWaveTop,
 } from "../components/shapes/gradient-wave";
-import PencilShape from "../components/shapes/drawing";
-import SandcastleShape from "../components/shapes/beach";
 import { SectionTemplate } from "../components/templates/section";
-import Hero from "../components/hero";
-import { motion } from "framer-motion";
 
 function AboutSection() {
   return (
@@ -53,8 +51,7 @@ function AboutSection() {
 
 function Home() {
   return (
-    <div className="leading-normal tracking-normal text-white gradient">
-      <NavBar />
+    <>
       <Hero />
 
       <div className="relative -mt-12 lg:-mt-24 pointer-events-none">
@@ -88,9 +85,7 @@ function Home() {
           Contact Us
         </a>
       </section>
-
-      <Footer />
-    </div>
+    </>
   );
 }
 
