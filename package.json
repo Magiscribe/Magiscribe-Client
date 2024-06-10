@@ -14,9 +14,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@apollo/client": "3.10.4",
     "@tailwindcss/typography": "^0.5.13",
+    "graphql": "16.8.1",
+    "graphql-ws": "5.16.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-markdown": "^9.0.1",
     "react-router-dom": "^6.23.1"
   },
   "devDependencies": {
