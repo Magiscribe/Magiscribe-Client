@@ -46,14 +46,26 @@ export function NavBar() {
               <a className="inline-block text-black no-underline hover:text-gray-800 hover:text-underline py-2 px-4" href="#">link</a>
             </li> */}
           </ul>
-          <a
-            href="#signup"
-            className={`mx-auto lg:mx-0 hover:underline font-bold rounded-full mt-4 lg:mt-0 py-3 px-5 shadow opacity-75 focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out ${
-              atTop ? "bg-white text-slate-800" : "bg-indigo-800 text-white"
-            }`}
-          >
-            Get Pre-Alpha Access
-          </a>
+          <SignedOut>
+            <a
+              href="#signup"
+              className={`mx-auto lg:mx-0 hover:underline font-bold rounded-full mt-4 lg:mt-0 py-3 px-5 shadow opacity-75 focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out ${
+                atTop ? "bg-white text-slate-800" : "bg-indigo-800 text-white"
+              }`}
+            >
+              Get Pre-Alpha Access
+            </a>
+          </SignedOut>
+          <SignedIn>
+            <Link
+              to="/dashboard"
+              className={`mx-auto lg:mx-0 hover:underline font-bold rounded-full mt-4 lg:mt-0 py-3 px-5 shadow opacity-75 focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out ${
+                atTop ? "bg-white text-slate-800" : "bg-indigo-800 text-white"
+              }`}
+            >
+              Dashboard
+            </Link>
+          </SignedIn>
           <SignedIn>
             <UserButton
               appearance={{

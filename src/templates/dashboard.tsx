@@ -8,6 +8,7 @@ import {
 import { Outlet } from "react-router-dom";
 import LinkCard from "../components/card";
 import { ApolloProviderWrapper } from "../clients/graphqlClient";
+import NotReadyHero from "../components/heroes/not-ready";
 
 export default function DashboardTemplate() {
   const { session } = useSession();
@@ -15,15 +16,13 @@ export default function DashboardTemplate() {
   return (
     <Protect
       condition={() =>
-        session?.user.organizationMemberships[0].role === "org:admin"
+        session?.user.organizationMemberships[0]?.role === "org:admin"
       }
       fallback={
         <>
           <SignedIn>
-            <div className="container max-w-12xl mx-auto px-4 py-8">
-              <p className="text-3xl font-bold">
-                You do not have permission to view this page.
-              </p>
+            <div className="mt-36">
+              <NotReadyHero />
             </div>
           </SignedIn>
           <SignedOut>
@@ -35,17 +34,23 @@ export default function DashboardTemplate() {
       <ApolloProviderWrapper>
         <div className="container max-w-12xl mx-auto px-4 py-8">
           <h1 className="text-3xl font-bold">Dashboard</h1>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 my-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-8">
             <LinkCard
               title="Agents"
               description="View and manage your agents."
               to="/dashboard/agents"
-              gradient="purple"
+              gradient="red"
             />
             <LinkCard
               title="Capabilities"
               description="What can your agents do?"
               to="/dashboard/capabilities"
+              gradient="purple"
+            />
+            <LinkCard
+              title="Whiteboard"
+              description="Go draw something!"
+              to={import.meta.env.VITE_BOARD_LINK as string}
               gradient="blue"
             />
           </div>

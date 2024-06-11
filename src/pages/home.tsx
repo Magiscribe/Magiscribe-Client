@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import ContentSection from "../components/content-section";
 import { SignupForm } from "../components/forms/alpha";
-import Hero from "../components/hero";
+import HomeHero from "../components/heroes/home-hero";
 import SandcastleShape from "../components/shapes/beach";
 import PencilShape from "../components/shapes/drawing";
 import {
@@ -52,7 +52,7 @@ function AboutSection() {
 function Home() {
   return (
     <>
-      <Hero />
+      <HomeHero />
 
       <div className="relative -mt-12 lg:-mt-24 pointer-events-none">
         <GradientWaveTop />

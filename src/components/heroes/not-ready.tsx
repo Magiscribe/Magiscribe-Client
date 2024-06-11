@@ -1,7 +1,7 @@
-import WizardShape from "./shapes/wizard";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
-export default function Hero() {
+export default function NotReadyHero() {
   return (
     <div>
       <div className="container px-12 mx-auto flex flex-wrap flex-col md:flex-row items-center">
@@ -12,8 +12,9 @@ export default function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            Write your ideas, <br />
-            let magic take care of the rest.
+            Sorry...
+            <br />
+            We aren't quite ready for you yet.
           </motion.h1>
           <motion.p
             className="leading-normal text-xl md:text-2xl mb-8"
@@ -21,27 +22,22 @@ export default function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.25 }}
           >
-            With Magiscribe, you can focus on your ideas and let the magic of
-            technology take care of the rest through multi-modal automation.
+            Magiscribe is undergoing active development and we are making sure
+            that everything is settled before we open the doors.
           </motion.p>
-          <motion.a
-            href="#signup"
-            className="border-2 border-white rounded-full my-6 py-4 px-8 text-white font-bold hover:bg-white hover:text-black transition duration-300"
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.5 }}
           >
-            Get Pre-Alpha Access
-          </motion.a>
+            <Link
+              to="/"
+              className="border-2 border-white rounded-full my-6 py-4 px-8 text-white font-bold hover:bg-white hover:text-black transition duration-300"
+            >
+              Back to Home
+            </Link>
+          </motion.div>
         </div>
-        <motion.div
-          className="w-full md:w-2/5 max-w-lg py-6 mb-12 text-center ml-auto"
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 1, delay: 0.75 }}
-        >
-          <WizardShape />
-        </motion.div>
       </div>
     </div>
   );

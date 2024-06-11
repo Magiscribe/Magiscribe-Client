@@ -12,7 +12,8 @@ export default function LinkCard({
   gradient?: string;
 }) {
   const gradients = {
-    purple: "from-purple-600 to-red-400",
+    red: "from-pink-600 to-purple-400",
+    purple: "from-purple-600 to-blue-400",
     blue: "from-blue-600 to-blue-400",
   };
 

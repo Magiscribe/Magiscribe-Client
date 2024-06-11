@@ -3,8 +3,10 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ADD_UPDATE_CAPABILITIES } from "../../../clients/mutations";
 import { GET_CAPABILITY } from "../../../clients/queries";
+import { useAddAlert } from "../../../hooks/AlertHooks";
 
 export default function CapabilityEdit() {
+  const addAlert = useAddAlert();
   const [form, setForm] = useState({
     id: "",
     name: "",
@@ -44,8 +46,6 @@ export default function CapabilityEdit() {
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    console.log(form);
-
     try {
       await addUpdateCapability({
         variables: {
@@ -58,6 +58,7 @@ export default function CapabilityEdit() {
         },
       });
 
+      addAlert("Capability saved successfully", "success");
       navigate("/dashboard/capabilities");
     } catch (error) {
       console.error(error);
@@ -70,7 +71,9 @@ export default function CapabilityEdit() {
         <Link to="/dashboard/capabilities">Back</Link>
       </button>
       <div className="bg-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl text-slate-700">
-        <h1 className="text-3xl font-bold">{form.id ? "Edit" : "Add"} Capability</h1>
+        <h1 className="text-3xl font-bold">
+          {form.id ? "Edit" : "Add"} Capability
+        </h1>
         <form className="mt-8" onSubmit={handleSave}>
           <div className="mb-4">
             <label className="block text-sm font-bold mb-2" htmlFor="name">
@@ -105,6 +108,7 @@ export default function CapabilityEdit() {
             <textarea
               className="border-2 border-gray-200 p-2 rounded-lg w-full"
               id="prompt"
+              rows={30}
               value={form.prompt}
               onChange={handleChange}
             />

@@ -15,6 +15,14 @@ export const ADD_UPDATE_AGENTS = gql`
   }
 `;
 
+export const DELETE_AGENT = gql`
+  mutation Mutation($agentId: String!) {
+    deleteAgent(agentId: $agentId) {
+      id
+    }
+  }
+`;
+
 export const ADD_UPDATE_CAPABILITIES = gql`
   mutation Mutation($capability: CapabilityInput!) {
     addUpdateCapability(capability: $capability) {
