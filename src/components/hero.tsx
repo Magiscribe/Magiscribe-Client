@@ -26,7 +26,7 @@ export default function Hero() {
           </motion.p>
           <motion.a
             href="#signup"
-            className="mx-auto lg:mx-0 hover:underline bg-white text-gray-800 font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+            className="border-2 border-white rounded-full my-6 py-4 px-8 text-white font-bold hover:bg-white hover:text-black transition duration-300"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.5 }}

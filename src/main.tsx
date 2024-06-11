@@ -8,6 +8,8 @@ import Capabilities from "./pages/dashboard/capabilities";
 import Home from "./pages/home";
 import DashboardTemplate from "./templates/dashboard";
 import Main from "./templates/main";
+import AgentEdit from "./pages/dashboard/agents/edit";
+import CapabilityEdit from "./pages/dashboard/capabilities/edit";
 
 const router = createBrowserRouter([
   {
@@ -31,8 +33,16 @@ const router = createBrowserRouter([
             element: <Agents />,
           },
           {
+            path: "/dashboard/agents/edit",
+            element: <AgentEdit />,
+          },
+          {
             path: "/dashboard/capabilities",
             element: <Capabilities />,
+          },
+          {
+            path: "/dashboard/capabilities/edit",
+            element: <CapabilityEdit />,
           },
         ],
       },

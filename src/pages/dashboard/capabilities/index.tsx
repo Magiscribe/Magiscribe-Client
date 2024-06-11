@@ -1,32 +1,10 @@
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { Link } from "react-router-dom";
+import { DELETE_CAPABILITY } from "../../../clients/mutations";
+import { GET_CAPABILITIES } from "../../../clients/queries";
+import { Capability } from "../../../types/agents";
 
-interface Capability {
-  id: string;
-  name: string;
-  description: string;
-  prompt: string;
-}
-
-const GET_CAPABILITY = gql`
-  query Query {
-    getAllCapabilities {
-      id
-      name
-      prompt
-    }
-  }
-`;
-
-const DELETE_CAPABILITY = gql`
-  mutation Mutation($capabilityId: String!) {
-    deleteCapability(capabilityId: $capabilityId) {
-      id
-    }
-  }
-`;
-
-function Capability({
+function CapabilityCard({
   capability,
   onUpdate,
 }: {
@@ -55,7 +33,7 @@ function Capability({
       <p className="text-sm">{capability.description}</p>
       <div className="absolute top-4 right-4 flex gap-2">
         <Link
-          to={`/dashboard/capabilities/${capability.id}`}
+          to={`/dashboard/capabilities/edit?id=${capability.id}`}
           className="text-sm bg-blue-500 text-white px-2 py-1 rounded-lg"
         >
           Edit
@@ -69,15 +47,19 @@ function Capability({
 }
 
 export default function CapabilityDashboard() {
-  const { data, refetch } = useQuery(GET_CAPABILITY);
+  const { data, refetch } = useQuery(GET_CAPABILITIES);
 
   return (
     <div className="bg-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl text-slate-700">
-      <h1 className="text-3xl font-bold">Agents</h1>
-      <hr className="my-4" />
+      <div className="flex items-center">
+      <h1 className="text-3xl font-bold">Capabilities</h1>
+      <Link to="/dashboard/capabilities/edit" className="bg-blue-500 text-sm text-white px-2 py-1 rounded-lg ml-auto">
+        Add Capability
+      </Link>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-8">
         {data?.getAllCapabilities.map((capability: Capability) => (
-          <Capability
+          <CapabilityCard
             key={capability.id}
             capability={capability}
             onUpdate={refetch}

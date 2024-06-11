@@ -35,7 +35,7 @@ export default function DashboardTemplate() {
       <ApolloProviderWrapper>
         <div className="container max-w-12xl mx-auto px-4 py-8">
           <h1 className="text-3xl font-bold">Dashboard</h1>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 my-8">
             <LinkCard
               title="Agents"
               description="View and manage your agents."

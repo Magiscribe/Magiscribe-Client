@@ -71,7 +71,7 @@ function Agent({ agent, onUpdate }: { agent: Agent; onUpdate?: () => void }) {
       </div>
       <div className="absolute top-4 right-4 flex gap-2">
         <Link
-          to={`/dashboard/agents/${agent.id}`}
+          to={`/dashboard/agents/edit?id=${agent.id}`}
           className="text-sm bg-blue-500 text-white px-2 py-1 rounded-lg"
         >
           Edit
@@ -89,7 +89,12 @@ export default function AgentDashboard() {
 
   return (
     <div className="bg-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl text-slate-700">
+      <div className="flex items-center">
       <h1 className="text-3xl font-bold">Agents</h1>
+      <Link to="/dashboard/agents/edit" className="bg-blue-500 text-sm text-white px-2 py-1 rounded-lg ml-auto">
+        Add Agent
+      </Link>
+      </div>
       <hr className="my-4" />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-8">
         {data?.getAllAgents.map((agent: Agent) => (
