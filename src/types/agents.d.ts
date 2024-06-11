@@ -8,6 +8,7 @@ export interface Capability {
 export interface Agent {
   id: string;
   name: string;
+  alias: string;
   description: string;
   aiModel: string;
   capabilities: Capability[];

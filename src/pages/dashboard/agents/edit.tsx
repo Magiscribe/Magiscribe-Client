@@ -4,11 +4,14 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ADD_UPDATE_AGENTS } from "../../../clients/mutations";
 import { GET_AGENT, GET_CAPABILITIES } from "../../../clients/queries";
 import { Capability } from "../../../types/agents";
+import { useAddAlert } from "../../../hooks/AlertHooks";
 
 export default function AgentEdit() {
+  const addAlert = useAddAlert();
   const [form, setForm] = useState({
     id: null,
     name: "",
+    alias: "",
     description: "",
     aiModel: "",
     capabilities: [""],
@@ -29,6 +32,7 @@ export default function AgentEdit() {
       setForm({
         id: agent.getAgent.id,
         name: agent.getAgent.name,
+        alias: agent.getAgent.alias,
         description: agent.getAgent.description,
         aiModel: agent.getAgent.aiModel,
         capabilities: agent.getAgent.capabilities.map(
@@ -50,13 +54,12 @@ export default function AgentEdit() {
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    console.log(form);
-
     try {
       await addUpdateAgent({
         variables: {
           agent: {
             id: form.id,
+            alias: form.alias,
             name: form.name,
             description: form.description,
             aiModel: form.aiModel,
@@ -65,6 +68,7 @@ export default function AgentEdit() {
         },
       });
 
+      addAlert("Agent saved successfully", "success");
       navigate("/dashboard/agents");
     } catch (error) {
       console.error(error);
@@ -92,6 +96,18 @@ export default function AgentEdit() {
             />
           </div>
           <div className="mb-4">
+            <label className="block text-sm font-bold mb-2" htmlFor="name">
+              Alias
+            </label>
+            <input
+              className="border-2 border-gray-200 p-2 rounded-lg w-full"
+              id="alias"
+              type="text"
+              value={form.alias}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="mb-4">
             <label
               className="block text-sm font-bold mb-2"
               htmlFor="description"
@@ -107,15 +123,30 @@ export default function AgentEdit() {
           </div>
           <div className="mb-4">
             <label className="block text-sm font-bold mb-2" htmlFor="aiModel">
-              AI Model
+              AI Model{" "}
+              <span className="font-normal">
+                (not currently used, but will be in the future)
+              </span>
             </label>
-            <input
+            <select
               className="border-2 border-gray-200 p-2 rounded-lg w-full"
               id="aiModel"
-              type="text"
               value={form.aiModel}
-              onChange={handleChange}
-            />
+              onChange={(e) => {
+                setForm({
+                  ...form,
+                  capabilities: Array.from(
+                    e.target.selectedOptions,
+                    (option) => option.value,
+                  ),
+                });
+              }}
+            >
+              <option value="">None</option>
+              <option value="haiku">Haiku</option>
+              <option value="sonnet">Sonnet</option>
+              <option value="opus">Opus</option>
+            </select>
           </div>
           <div className="mb-4">
             <label

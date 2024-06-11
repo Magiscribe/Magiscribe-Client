@@ -5,11 +5,12 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./assets/styles/index.css";
 import Agents from "./pages/dashboard/agents";
 import Capabilities from "./pages/dashboard/capabilities";
-import Home from "./pages/home";
+import HomeHero from "./pages/home";
 import DashboardTemplate from "./templates/dashboard";
 import Main from "./templates/main";
 import AgentEdit from "./pages/dashboard/agents/edit";
 import CapabilityEdit from "./pages/dashboard/capabilities/edit";
+import AlertProvider from "./providers/AlertProvider";
 
 const router = createBrowserRouter([
   {
@@ -18,7 +19,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <Home />,
+        element: <HomeHero />,
       },
       {
         path: "/dashboard",
@@ -53,7 +54,9 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <ClerkProvider publishableKey={import.meta.env.VITE_APP_CLERK_PK as string}>
-      <RouterProvider router={router} />
+      <AlertProvider>
+        <RouterProvider router={router} />
+      </AlertProvider>
     </ClerkProvider>
   </React.StrictMode>,
 );

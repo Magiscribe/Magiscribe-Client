@@ -1,5 +1,20 @@
 import { gql } from "@apollo/client";
 
+export const GET_ALL_AGENTS = gql`
+  query Query {
+    getAllAgents {
+      id
+      capabilities {
+        name
+        id
+      }
+      alias
+      name
+      description
+    }
+  }
+`;
+
 export const GET_AGENT = gql`
   query Query($agentId: String!) {
     getAgent(agentId: $agentId) {
@@ -11,6 +26,7 @@ export const GET_AGENT = gql`
       description
       id
       name
+      alias
     }
   }
 `;

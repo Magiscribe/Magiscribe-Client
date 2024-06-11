@@ -41,6 +41,8 @@ jobs:
       - name: Build
         run: |
           pnpm build
+        env:
+          NODE_ENV: ${{ github.ref == 'refs/heads/main' && 'production' || 'development' }}
 
       - name: Deploy
         run: |
