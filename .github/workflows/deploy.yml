@@ -3,7 +3,9 @@ name: Deploy
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: ["main"]
+    branches:
+      - main
+      - dev
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -23,7 +25,7 @@ jobs:
       - name: Assume AWS Role
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ vars.AWS_ROLE_TO_ASSUME }}
+          role-to-assume: ${{ github.ref == 'refs/heads/main' && 'arn:aws:iam::211125562192:role/GitHubAssumeRole' || 'arn:aws:iam::891377366124:role/GitHubAssumeRole' }}
           aws-region: us-east-1
 
       - uses: pnpm/action-setup@v4
@@ -40,14 +42,12 @@ jobs:
 
       - name: Build
         run: |
-          pnpm build
-        env:
-          NODE_ENV: ${{ github.ref == 'refs/heads/main' && 'production' || 'development' }}
+          pnpm build --mode ${{ github.ref == 'refs/heads/main' && 'production' || 'development' }}
 
       - name: Deploy
         run: |
           # Upload to S3
-          aws s3 sync dist/ s3://${{ vars.AWS_S3_BUCKET_NAME }}/ --delete
+          aws s3 sync dist/ s3://${{ github.ref == 'refs/heads/main' && 'client-dashboard-bucket-20240612194953021800000001' || 'client-dashboard-bucket-20240612193909644100000001' }} --delete
 
           # Invalidate CloudFront cache
-          aws cloudfront create-invalidation --distribution-id ${{ vars.AWS_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
+          aws cloudfront create-invalidation --distribution-id ${{ github.ref == 'refs/heads/main' && 'E18WT1BH9N6CZG' || 'EEUTUZS1J24KA' }} --paths "/*"
