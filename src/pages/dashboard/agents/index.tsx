@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { DELETE_AGENT } from "../../../clients/mutations";
 import { GET_ALL_AGENTS } from "../../../clients/queries";
 import { Agent, Capability } from "../../../types/agents";
+import { motion } from "framer-motion";
 
 function AgentCard({
   agent,
@@ -39,7 +40,7 @@ function AgentCard({
       <div className="flex flex-wrap gap-2 mt-2">
         {agent.capabilities.map((capability: Capability) => (
           <span
-            className="text-sm font-bold bg-blue-200 text-blue-800 p-2 rounded-full"
+            className="text-xs font-bold bg-blue-200 text-blue-800 py-1 px-2 rounded-full"
             key={capability.id}
           >
             {capability.name}
@@ -77,8 +78,15 @@ export default function AgentDashboard() {
       </div>
       <hr className="my-4" />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-8">
-        {data?.getAllAgents.map((agent: Agent) => (
-          <AgentCard key={agent.id} agent={agent} onUpdate={refetch} />
+        {data?.getAllAgents.map((agent: Agent, i: number) => (
+          <motion.div
+            key={agent.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2, delay: 0.05 * i }}
+          >
+            <AgentCard key={agent.id} agent={agent} onUpdate={refetch} />
+          </motion.div>
         ))}
       </div>
     </div>

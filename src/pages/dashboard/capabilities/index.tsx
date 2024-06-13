@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { DELETE_CAPABILITY } from "../../../clients/mutations";
 import { GET_CAPABILITIES } from "../../../clients/queries";
 import { Capability } from "../../../types/agents";
+import { motion } from "framer-motion";
 
 function CapabilityCard({
   capability,
@@ -60,13 +61,21 @@ export default function CapabilityDashboard() {
           Add Capability
         </Link>
       </div>
+      <hr className="my-4" />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-8">
-        {data?.getAllCapabilities.map((capability: Capability) => (
-          <CapabilityCard
+        {data?.getAllCapabilities.map((capability: Capability, i: number) => (
+          <motion.div
             key={capability.id}
-            capability={capability}
-            onUpdate={refetch}
-          />
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2, delay: 0.05 * i }}
+          >
+            <CapabilityCard
+              key={capability.id}
+              capability={capability}
+              onUpdate={refetch}
+            />
+          </motion.div>
         ))}
       </div>
     </div>

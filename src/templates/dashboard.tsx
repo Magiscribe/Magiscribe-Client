@@ -5,9 +5,9 @@ import {
   SignedOut,
   useSession,
 } from "@clerk/clerk-react";
-import { Outlet } from "react-router-dom";
-import LinkCard from "../components/card";
 import { ApolloProviderWrapper } from "../clients/graphqlClient";
+import AnimatedOutlet from "../components/animated/animated-outlet";
+import LinkCard from "../components/card";
 import NotReadyHero from "../components/heroes/not-ready";
 
 export default function DashboardTemplate() {
@@ -54,7 +54,7 @@ export default function DashboardTemplate() {
               gradient="blue"
             />
           </div>
-          <Outlet />
+          <AnimatedOutlet />
         </div>
       </ApolloProviderWrapper>
     </Protect>
