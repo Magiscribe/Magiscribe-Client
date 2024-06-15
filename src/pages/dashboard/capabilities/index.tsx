@@ -1,9 +1,9 @@
 import { useMutation, useQuery } from "@apollo/client";
+import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { DELETE_CAPABILITY } from "../../../clients/mutations";
-import { GET_CAPABILITIES } from "../../../clients/queries";
-import { Capability } from "../../../types/agents";
-import { motion } from "framer-motion";
+import { GET_ALL_CAPABILITIES } from "../../../clients/queries";
+import { Capability, Prompt } from "../../../types/agents";
 
 function CapabilityCard({
   capability,
@@ -30,8 +30,23 @@ function CapabilityCard({
 
   return (
     <div className="relative bg-gray-100 p-4 rounded-lg shadow-md">
-      <h2 className="text-xl font-bold">{capability.name}</h2>
+      <h2 className="text-xl font-bold">
+        {capability.name}{" "}
+        <span className="text-sm font-normal text-slate-700">
+          ({capability.alias})
+        </span>
+      </h2>
       <p className="text-sm">{capability.description}</p>
+      <div className="flex flex-wrap gap-2 mt-2">
+        {capability.prompts.map((capability: Prompt) => (
+          <span
+            className="text-xs font-bold bg-blue-200 text-blue-800 py-1 px-2 rounded-full"
+            key={capability.id}
+          >
+            {capability.name}
+          </span>
+        ))}
+      </div>
       <div className="absolute top-4 right-4 flex gap-2">
         <Link
           to={`/dashboard/capabilities/edit?id=${capability.id}`}
@@ -48,7 +63,7 @@ function CapabilityCard({
 }
 
 export default function CapabilityDashboard() {
-  const { data, refetch } = useQuery(GET_CAPABILITIES);
+  const { data, refetch } = useQuery(GET_ALL_CAPABILITIES);
 
   return (
     <div className="bg-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl text-slate-700">
@@ -62,7 +77,7 @@ export default function CapabilityDashboard() {
         </Link>
       </div>
       <hr className="my-4" />
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 my-8">
         {data?.getAllCapabilities.map((capability: Capability, i: number) => (
           <motion.div
             key={capability.id}

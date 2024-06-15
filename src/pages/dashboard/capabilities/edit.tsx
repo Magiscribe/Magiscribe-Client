@@ -1,20 +1,24 @@
 import { useMutation, useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { ADD_UPDATE_CAPABILITIES } from "../../../clients/mutations";
-import { GET_CAPABILITY } from "../../../clients/queries";
+import { ADD_UPDATE_CAPABILITY } from "../../../clients/mutations";
+import { GET_ALL_PROMPTS, GET_CAPABILITY } from "../../../clients/queries";
+import ListBoxMultiple from "../../../components/list/ListBoxMultiple";
 import { useAddAlert } from "../../../hooks/AlertHooks";
+import { Prompt } from "../../../types/agents";
 
 export default function CapabilityEdit() {
   const addAlert = useAddAlert();
   const [form, setForm] = useState({
-    id: "",
+    id: null,
     name: "",
+    alias: "",
     description: "",
-    prompt: "",
+    prompts: [""],
   });
   const [searchParams] = useSearchParams();
-  const [addUpdateCapability] = useMutation(ADD_UPDATE_CAPABILITIES);
+  const [addUpdateCapability] = useMutation(ADD_UPDATE_CAPABILITY);
+  const { data: prompts } = useQuery(GET_ALL_PROMPTS);
   const { data: capability } = useQuery(GET_CAPABILITY, {
     skip: !searchParams.has("id"),
     variables: {
@@ -28,8 +32,11 @@ export default function CapabilityEdit() {
       setForm({
         id: capability.getCapability.id,
         name: capability.getCapability.name,
+        alias: capability.getCapability.alias,
         description: capability.getCapability.description,
-        prompt: capability.getCapability.prompt,
+        prompts: capability.getCapability.prompts.map(
+          (prompt: Prompt) => prompt.id,
+        ),
       });
     }
   }, [capability]);
@@ -47,16 +54,22 @@ export default function CapabilityEdit() {
     e.preventDefault();
 
     try {
-      await addUpdateCapability({
+      const result = await addUpdateCapability({
         variables: {
           capability: {
             id: form.id,
+            alias: form.alias,
             name: form.name,
             description: form.description,
-            prompt: form.prompt,
+            prompts: form.prompts,
           },
         },
       });
+
+      if (result.errors) {
+        addAlert("Error saving capability", "error");
+        return;
+      }
 
       addAlert("Capability saved successfully", "success");
       navigate("/dashboard/capabilities");
@@ -88,6 +101,18 @@ export default function CapabilityEdit() {
             />
           </div>
           <div className="mb-4">
+            <label className="block text-sm font-bold mb-2" htmlFor="name">
+              Alias
+            </label>
+            <input
+              className="border-2 border-gray-200 p-2 rounded-lg w-full"
+              id="alias"
+              type="text"
+              value={form.alias}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="mb-4">
             <label
               className="block text-sm font-bold mb-2"
               htmlFor="description"
@@ -102,15 +127,25 @@ export default function CapabilityEdit() {
             />
           </div>
           <div className="mb-4">
-            <label className="block text-sm font-bold mb-2" htmlFor="prompt">
-              Prompt
+            <label className="block text-sm font-bold mb-2" htmlFor="prompts">
+              Prompts
             </label>
-            <textarea
-              className="border-2 border-gray-200 p-2 rounded-lg w-full"
-              id="prompt"
-              rows={30}
-              value={form.prompt}
-              onChange={handleChange}
+            <ListBoxMultiple
+              setSelected={(value) =>
+                setForm({
+                  ...form,
+                  prompts: value.map((capability) => capability.id),
+                })
+              }
+              selected={(prompts?.getAllPrompts ?? []).filter(
+                (capability: Prompt) => form.prompts.includes(capability.id),
+              )}
+              values={(prompts?.getAllPrompts ?? []).map(
+                (capability: Prompt) => ({
+                  name: capability.name ?? "",
+                  id: capability.id,
+                }),
+              )}
             />
           </div>
           <button className="bg-blue-500 text-white px-4 py-2 rounded-lg">

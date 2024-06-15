@@ -48,9 +48,9 @@ export default function DashboardTemplate() {
               gradient="purple"
             />
             <LinkCard
-              title="Whiteboard"
-              description="Go draw something!"
-              to={import.meta.env.VITE_BOARD_LINK as string}
+              title="Prompts"
+              description="Create and manage prompts."
+              to="/dashboard/prompts"
               gradient="blue"
             />
           </div>

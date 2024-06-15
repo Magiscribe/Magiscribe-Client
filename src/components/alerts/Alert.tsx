@@ -6,7 +6,21 @@ interface AlertProps {
 }
 
 export function AlertComponent({ alert, unmountSelf }: AlertProps) {
-  const color = "bg-green-50 text-green-700";
+  let color = "";
+  switch (alert.type) {
+    case "error":
+      color = "bg-red-50 text-red-700";
+      break;
+    case "success":
+      color = "bg-green-50 text-green-700";
+      break;
+    case "warning":
+      color = "bg-yellow-50 text-yellow-700";
+      break;
+    default:
+      color = "bg-blue-50 text-blue-700";
+      break;
+  }
 
   return (
     <div className={`${color} shadow-xl rounded-lg p-4`}>

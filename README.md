@@ -11,8 +11,8 @@
 
 - [Overview](#overview)
 - [Zero to Hero](#zero-to-hero)
-    - [Pre-requisites](#pre-requisites)
-    - [General Setup](#general-setup)
+  - [Pre-requisites](#pre-requisites)
+  - [General Setup](#general-setup)
 
 # Overview
 
@@ -28,6 +28,7 @@ This repository contains a Node.js Vite application that serves as the dashboard
 - [ ] [Docker](https://www.docker.com/get-started)
 
 ### General Setup
+
 > The following steps are required to setup the project for local development and deployment.
 
 1. Configure AWS CLI. You can do this with `aws configure`. If the environment you working with is managed by AWS SSO, you can run `aws configure sso`. For more on this see [AWS CLI Configuration](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html).

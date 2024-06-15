@@ -1,15 +1,21 @@
+export interface Prompt {
+  id: string;
+  name: string;
+  text: string;
+}
+
 export interface Capability {
   id: string;
   name: string;
+  alias: string;
   description: string;
-  prompt: string;
+  prompts: Prompt[];
 }
 
 export interface Agent {
   id: string;
   name: string;
-  alias: string;
   description: string;
-  aiModel: string;
+  reasoningPrompt: string;
   capabilities: Capability[];
 }

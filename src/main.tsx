@@ -3,14 +3,16 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./assets/styles/index.css";
-import Agents from "./pages/dashboard/agents";
-import Capabilities from "./pages/dashboard/capabilities";
+import AgentDashboard from "./pages/dashboard/agents";
 import HomeHero from "./pages/home";
 import DashboardTemplate from "./templates/dashboard";
 import Main from "./templates/main";
 import AgentEdit from "./pages/dashboard/agents/edit";
-import CapabilityEdit from "./pages/dashboard/capabilities/edit";
 import AlertProvider from "./providers/AlertProvider";
+import PromptDashboard from "./pages/dashboard/prompts";
+import PromptEdit from "./pages/dashboard/prompts/edit";
+import CapabilityDashboard from "./pages/dashboard/capabilities";
+import CapabilityEdit from "./pages/dashboard/capabilities/edit";
 
 const router = createBrowserRouter([
   {
@@ -31,7 +33,7 @@ const router = createBrowserRouter([
           },
           {
             path: "/dashboard/agents",
-            element: <Agents />,
+            element: <AgentDashboard />,
           },
           {
             path: "/dashboard/agents/edit",
@@ -39,11 +41,19 @@ const router = createBrowserRouter([
           },
           {
             path: "/dashboard/capabilities",
-            element: <Capabilities />,
+            element: <CapabilityDashboard />,
           },
           {
             path: "/dashboard/capabilities/edit",
             element: <CapabilityEdit />,
+          },
+          {
+            path: "/dashboard/prompts",
+            element: <PromptDashboard />,
+          },
+          {
+            path: "/dashboard/prompts/edit",
+            element: <PromptEdit />,
           },
         ],
       },
