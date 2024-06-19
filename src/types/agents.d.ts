@@ -1,3 +1,9 @@
+export interface Model {
+  id: string;
+  name: string;
+  region: string;
+}
+
 export interface Prompt {
   id: string;
   name: string;

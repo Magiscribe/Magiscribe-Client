@@ -2,10 +2,15 @@ import { useMutation, useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ADD_UPDATE_CAPABILITY } from "../../../clients/mutations";
-import { GET_ALL_PROMPTS, GET_CAPABILITY } from "../../../clients/queries";
+import {
+  GET_ALL_MODELS,
+  GET_ALL_PROMPTS,
+  GET_CAPABILITY,
+} from "../../../clients/queries";
 import ListBoxMultiple from "../../../components/list/ListBoxMultiple";
 import { useAddAlert } from "../../../hooks/AlertHooks";
 import { Prompt } from "../../../types/agents";
+import ListBox from "../../../components/list/ListBox";
 
 export default function CapabilityEdit() {
   const addAlert = useAddAlert();
@@ -14,11 +19,13 @@ export default function CapabilityEdit() {
     name: "",
     alias: "",
     description: "",
+    llmModel: "",
     prompts: [""],
   });
   const [searchParams] = useSearchParams();
   const [addUpdateCapability] = useMutation(ADD_UPDATE_CAPABILITY);
   const { data: prompts } = useQuery(GET_ALL_PROMPTS);
+  const { data: models } = useQuery(GET_ALL_MODELS);
   const { data: capability } = useQuery(GET_CAPABILITY, {
     skip: !searchParams.has("id"),
     variables: {
@@ -34,6 +41,7 @@ export default function CapabilityEdit() {
         name: capability.getCapability.name,
         alias: capability.getCapability.alias,
         description: capability.getCapability.description,
+        llmModel: capability.getCapability.llmModel,
         prompts: capability.getCapability.prompts.map(
           (prompt: Prompt) => prompt.id,
         ),
@@ -61,6 +69,7 @@ export default function CapabilityEdit() {
             alias: form.alias,
             name: form.name,
             description: form.description,
+            llmModel: form.llmModel,
             prompts: form.prompts,
           },
         },
@@ -124,6 +133,33 @@ export default function CapabilityEdit() {
               id="description"
               value={form.description}
               onChange={handleChange}
+            />
+          </div>
+          <div className="mb-4">
+            <label
+              className="block text-sm font-bold mb-2"
+              htmlFor="capabilities"
+            >
+              LLM Model
+            </label>
+            <ListBox
+              setSelected={(value) => {
+                setForm({
+                  ...form,
+                  llmModel: value.id,
+                });
+              }}
+              selected={
+                models?.getAllModels.find(
+                  (model: any) => model.id === form.llmModel,
+                ) ?? { name: "", id: "" }
+              }
+              values={
+                models?.getAllModels.map((model: any) => ({
+                  name: model.name,
+                  id: model.id,
+                })) ?? []
+              }
             />
           </div>
           <div className="mb-4">

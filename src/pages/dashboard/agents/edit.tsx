@@ -2,10 +2,15 @@ import { useMutation, useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ADD_UPDATE_AGENT } from "../../../clients/mutations";
-import { GET_AGENT, GET_ALL_CAPABILITIES } from "../../../clients/queries";
+import {
+  GET_AGENT,
+  GET_ALL_CAPABILITIES,
+  GET_ALL_MODELS,
+} from "../../../clients/queries";
 import ListBoxMultiple from "../../../components/list/ListBoxMultiple";
 import { useAddAlert } from "../../../hooks/AlertHooks";
 import { Capability } from "../../../types/agents";
+import ListBox from "../../../components/list/ListBox";
 
 export default function AgentEdit() {
   const addAlert = useAddAlert();
@@ -13,11 +18,13 @@ export default function AgentEdit() {
     id: null,
     name: "",
     description: "",
+    reasoningLLMModel: "",
     reasoningPrompt: "",
     capabilities: [""],
   });
   const [searchParams] = useSearchParams();
   const [addUpdateAgent] = useMutation(ADD_UPDATE_AGENT);
+  const { data: models } = useQuery(GET_ALL_MODELS);
   const { data: capabilities } = useQuery(GET_ALL_CAPABILITIES);
   const { data: agent } = useQuery(GET_AGENT, {
     skip: !searchParams.has("id"),
@@ -33,6 +40,7 @@ export default function AgentEdit() {
         id: agent.getAgent.id,
         name: agent.getAgent.name,
         description: agent.getAgent.description,
+        reasoningLLMModel: agent.getAgent.reasoningLLMModel,
         reasoningPrompt: agent.getAgent.reasoningPrompt,
         capabilities: agent.getAgent.capabilities.map(
           (capability: Capability) => capability.id,
@@ -60,6 +68,7 @@ export default function AgentEdit() {
             id: form.id,
             name: form.name,
             description: form.description,
+            reasoningLLMModel: form.reasoningLLMModel,
             reasoningPrompt: form.reasoningPrompt,
             capabilities: form.capabilities,
           },
@@ -136,6 +145,33 @@ export default function AgentEdit() {
                   id: capability.id,
                 }),
               )}
+            />
+          </div>
+          <div className="mb-4">
+            <label
+              className="block text-sm font-bold mb-2"
+              htmlFor="capabilities"
+            >
+              LLM Model
+            </label>
+            <ListBox
+              setSelected={(value) => {
+                setForm({
+                  ...form,
+                  reasoningLLMModel: value.id,
+                });
+              }}
+              selected={
+                models?.getAllModels.find(
+                  (model: any) => model.id === form.reasoningLLMModel,
+                ) ?? { name: "", id: "" }
+              }
+              values={
+                models?.getAllModels.map((model: any) => ({
+                  name: model.name,
+                  id: model.id,
+                })) ?? []
+              }
             />
           </div>
           <div className="mb-4">

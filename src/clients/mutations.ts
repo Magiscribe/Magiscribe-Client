@@ -6,6 +6,7 @@ export const ADD_UPDATE_AGENT = gql`
       id
       name
       description
+      reasoningLLMModel
       reasoningPrompt
       capabilities {
         id
@@ -29,6 +30,7 @@ export const ADD_UPDATE_CAPABILITY = gql`
       name
       alias
       description
+      llmModel
       prompts {
         id
       }

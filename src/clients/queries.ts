@@ -1,11 +1,21 @@
 import { gql } from "@apollo/client";
 
+export const GET_ALL_MODELS = gql`
+  query Query {
+    getAllModels {
+      id
+      name
+    }
+  }
+`;
+
 export const GET_ALL_AGENTS = gql`
   query Query {
     getAllAgents {
       id
       name
       description
+      reasoningLLMModel
       reasoningPrompt
       capabilities {
         name
@@ -21,6 +31,7 @@ export const GET_AGENT = gql`
       id
       name
       description
+      reasoningLLMModel
       reasoningPrompt
       capabilities {
         name
@@ -34,6 +45,7 @@ export const GET_ALL_CAPABILITIES = gql`
   query Query {
     getAllCapabilities {
       id
+      llmModel
       prompts {
         name
         id
@@ -49,6 +61,7 @@ export const GET_CAPABILITY = gql`
   query Query($capabilityId: String!) {
     getCapability(capabilityId: $capabilityId) {
       id
+      llmModel
       prompts {
         name
         id
