@@ -1,5 +1,22 @@
 import { gql } from "@apollo/client";
 
+export const ADD_VISUAL_PREDICTION = gql`
+  # Increments a back-end counter and gets its resulting value
+  mutation AddVisualPrediction(
+    $subscriptionId: String!
+    $agentId: String!
+    $prompt: String!
+    $context: String!
+  ) {
+    addVisualPrediction(
+      subscriptionId: $subscriptionId
+      agentId: $agentId
+      prompt: $prompt
+      context: $context
+    )
+  }
+`;
+
 export const ADD_UPDATE_AGENT = gql`
   mutation Mutation($agent: AgentInput!) {
     addUpdateAgent(agent: $agent) {

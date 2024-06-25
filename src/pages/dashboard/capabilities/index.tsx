@@ -40,8 +40,8 @@ function CapabilityCard({
       <div className="flex flex-wrap gap-2 mt-2">
         {capability.prompts.map((prompt: Prompt) => (
           <Link
-          to={`/dashboard/prompts/edit?id=${prompt.id}`}
-          className="text-xs font-bold bg-blue-200 text-blue-800 py-1 px-2 rounded-full"
+            to={`/dashboard/prompts/edit?id=${prompt.id}`}
+            className="text-xs font-bold bg-blue-200 text-blue-800 py-1 px-2 rounded-full"
           >
             {prompt.name}
           </Link>

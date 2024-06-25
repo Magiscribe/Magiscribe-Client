@@ -13,6 +13,7 @@ import PromptDashboard from "./pages/dashboard/prompts";
 import PromptEdit from "./pages/dashboard/prompts/edit";
 import CapabilityDashboard from "./pages/dashboard/capabilities";
 import CapabilityEdit from "./pages/dashboard/capabilities/edit";
+import PlaygroundDashboard from "./pages/dashboard/playground";
 
 const router = createBrowserRouter([
   {
@@ -30,6 +31,10 @@ const router = createBrowserRouter([
           {
             path: "/dashboard",
             element: <></>,
+          },
+          {
+            path: "/dashboard/playground",
+            element: <PlaygroundDashboard />,
           },
           {
             path: "/dashboard/agents",

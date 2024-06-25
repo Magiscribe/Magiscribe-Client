@@ -1,16 +1,16 @@
 import { useMutation, useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { ADD_UPDATE_CAPABILITY } from "../../../clients/mutations";
 import {
   GET_ALL_MODELS,
   GET_ALL_PROMPTS,
   GET_CAPABILITY,
 } from "../../../clients/queries";
+import ListBox from "../../../components/list/ListBox";
 import ListBoxMultiple from "../../../components/list/ListBoxMultiple";
 import { useAddAlert } from "../../../hooks/AlertHooks";
 import { Prompt } from "../../../types/agents";
-import ListBox from "../../../components/list/ListBox";
 
 export default function CapabilityEdit() {
   const addAlert = useAddAlert();
@@ -148,14 +148,16 @@ export default function CapabilityEdit() {
               }}
               selected={
                 models?.getAllModels.find(
-                  (model: any) => model.id === form.llmModel,
+                  (model: { id: string }) => model.id === form.llmModel,
                 ) ?? { name: "", id: "" }
               }
               values={
-                models?.getAllModels.map((model: any) => ({
-                  name: model.name,
-                  id: model.id,
-                })) ?? []
+                models?.getAllModels.map(
+                  (model: { name: string; id: string }) => ({
+                    name: model.name,
+                    id: model.id,
+                  }),
+                ) ?? []
               }
             />
           </div>

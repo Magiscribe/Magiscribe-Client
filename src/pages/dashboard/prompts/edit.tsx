@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { ADD_UPDATE_PROMPT } from "../../../clients/mutations";
 import { GET_PROMPT } from "../../../clients/queries";
 import { useAddAlert } from "../../../hooks/AlertHooks";
