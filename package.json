@@ -17,12 +17,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@apollo/client": "3.10.6",
-    "@aws-sdk/client-transcribe-streaming": "^3.600.0",
+    "@apollo/client": "3.10.7",
+    "@aws-sdk/client-transcribe-streaming": "^3.605.0",
     "@fortawesome/fontawesome-svg-core": "^6.5.2",
     "@fortawesome/free-solid-svg-icons": "^6.5.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
-    "@headlessui/react": "^2.0.4",
+    "@headlessui/react": "^2.1.1",
     "@tailwindcss/typography": "^0.5.13",
     "@types/node": "^20.14.9",
     "clsx": "^2.1.1",
