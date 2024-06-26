@@ -34,12 +34,12 @@ function AgentCard({
       <p className="text-sm">{agent.description}</p>
       <div className="flex flex-wrap gap-2 mt-2">
         {agent.capabilities.map((capability: Capability) => (
-          <span
+          <Link
+            to={`/dashboard/capabilities/edit?id=${capability.id}`}
             className="text-xs font-bold bg-blue-200 text-blue-800 py-1 px-2 rounded-full"
-            key={capability.id}
           >
-            {capability.name}
-          </span>
+          {capability.name}
+          </Link>
         ))}
       </div>
       <div className="absolute top-4 right-4 flex gap-2">
