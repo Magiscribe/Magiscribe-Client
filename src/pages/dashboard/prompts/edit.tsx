@@ -1,23 +1,23 @@
-import { useMutation, useQuery } from "@apollo/client";
-import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { ADD_UPDATE_PROMPT } from "../../../clients/mutations";
-import { GET_PROMPT } from "../../../clients/queries";
-import { useAddAlert } from "../../../hooks/AlertHooks";
+import { useMutation, useQuery } from '@apollo/client';
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { ADD_UPDATE_PROMPT } from '../../../clients/mutations';
+import { GET_PROMPT } from '../../../clients/queries';
+import { useAddAlert } from '../../../hooks/AlertHooks';
 
 export default function PromptEdit() {
   const addAlert = useAddAlert();
   const [form, setForm] = useState({
-    id: "",
-    name: "",
-    text: "",
+    id: '',
+    name: '',
+    text: '',
   });
   const [searchParams] = useSearchParams();
   const [addUpdatePrompt] = useMutation(ADD_UPDATE_PROMPT);
   const { data: prompt } = useQuery(GET_PROMPT, {
-    skip: !searchParams.has("id"),
+    skip: !searchParams.has('id'),
     variables: {
-      promptId: searchParams.get("id"),
+      promptId: searchParams.get('id'),
     },
   });
   const navigate = useNavigate();
@@ -56,12 +56,12 @@ export default function PromptEdit() {
       });
 
       if (result.errors) {
-        addAlert("Error saving prompt", "error");
+        addAlert('Error saving prompt', 'error');
         return;
       }
 
-      addAlert("Prompt saved successfully", "success");
-      navigate("/dashboard/prompts");
+      addAlert('Prompt saved successfully', 'success');
+      navigate('/dashboard/prompts');
     } catch (error) {
       console.error(error);
     }
@@ -71,7 +71,7 @@ export default function PromptEdit() {
     <>
       <div className="bg-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl text-slate-700">
         <h1 className="text-3xl font-bold">
-          {form.id ? "Edit" : "Add"} Prompt
+          {form.id ? 'Edit' : 'Add'} Prompt
         </h1>
         <form className="mt-8" onSubmit={handleSave}>
           <div className="mb-4">

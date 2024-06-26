@@ -1,13 +1,13 @@
-import { faCheck, faChevronDown } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCheck, faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   Listbox,
   ListboxButton,
   ListboxOption,
   ListboxOptions,
   Transition,
-} from "@headlessui/react";
-import clsx from "clsx";
+} from '@headlessui/react';
+import clsx from 'clsx';
 
 interface ListBoxProps {
   selected: { id: string; name: string }[] | undefined;
@@ -24,11 +24,11 @@ export default function ListBoxMultiple({
     <Listbox value={selected} onChange={setSelected} multiple>
       <ListboxButton
         className={clsx(
-          "border-2 border-gray-200 p-2 rounded-lg w-full text-left relative overflow-hidden",
-          "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25",
+          'border-2 border-gray-200 p-2 rounded-lg w-full text-left relative overflow-hidden',
+          'focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25',
         )}
       >
-        {selected?.map((person) => person.name).join(", ") || "Select..."}
+        {selected?.map((person) => person.name).join(', ') || 'Select...'}
         <FontAwesomeIcon
           icon={faChevronDown}
           className="absolute right-3 top-1/2 -translate-y-1/2 size-4 fill-white"

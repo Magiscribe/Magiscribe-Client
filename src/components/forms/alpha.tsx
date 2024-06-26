@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { SectionTemplate } from "../templates/section";
-import { motion } from "framer-motion";
+import { useState } from 'react';
+import { SectionTemplate } from '../templates/section';
+import { motion } from 'framer-motion';
 
 export function SignupForm() {
   const [formSubmitted, setFormSubmitted] = useState(false);
@@ -13,9 +13,9 @@ export function SignupForm() {
     setFormSubmitted(true);
 
     await fetch(
-      "https://forms.zohopublic.com/magiscribe/form/BetaSignup/formperma/YL1QuMc8RT8_SVhvX0UrPDz78OTj6gyaWqELdoC0SRo/htmlRecords/submit",
+      'https://forms.zohopublic.com/magiscribe/form/BetaSignup/formperma/YL1QuMc8RT8_SVhvX0UrPDz78OTj6gyaWqELdoC0SRo/htmlRecords/submit',
       {
-        method: "POST",
+        method: 'POST',
         body: formData,
       },
     );
@@ -97,12 +97,12 @@ export function SignupForm() {
             disabled={formSubmitted}
             className={`${
               formSubmitted
-                ? "bg-green-500"
-                : "bg-indigo-600 hover:bg-indigo-800"
+                ? 'bg-green-500'
+                : 'bg-indigo-600 hover:bg-indigo-800'
             } w-full text-white font-bold mt-2 py-2 px-4 rounded-full focus:outline-none focus:shadow-outline transition duration-300 ease-in-out`}
             type="submit"
           >
-            {formSubmitted ? "Submitted!" : "Submit"}
+            {formSubmitted ? 'Submitted!' : 'Submit'}
           </button>
           {formSubmitted && (
             <motion.p

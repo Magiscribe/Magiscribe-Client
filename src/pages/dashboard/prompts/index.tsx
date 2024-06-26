@@ -1,9 +1,9 @@
-import { useMutation, useQuery } from "@apollo/client";
-import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
-import { DELETE_PROMPT } from "../../../clients/mutations";
-import { GET_ALL_PROMPTS } from "../../../clients/queries";
-import { Prompt } from "../../../types/agents";
+import { useMutation, useQuery } from '@apollo/client';
+import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { DELETE_PROMPT } from '../../../clients/mutations';
+import { GET_ALL_PROMPTS } from '../../../clients/queries';
+import { Prompt } from '../../../types/agents';
 
 function PromptCard({
   prompt,

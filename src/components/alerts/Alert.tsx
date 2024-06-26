@@ -1,4 +1,4 @@
-import { Alert } from "../../providers/AlertProvider";
+import { Alert } from '../../providers/AlertProvider';
 
 interface AlertProps {
   alert: Alert;
@@ -6,19 +6,19 @@ interface AlertProps {
 }
 
 export function AlertComponent({ alert, unmountSelf }: AlertProps) {
-  let color = "";
+  let color = '';
   switch (alert.type) {
-    case "error":
-      color = "bg-red-50 text-red-700";
+    case 'error':
+      color = 'bg-red-50 text-red-700';
       break;
-    case "success":
-      color = "bg-green-50 text-green-700";
+    case 'success':
+      color = 'bg-green-50 text-green-700';
       break;
-    case "warning":
-      color = "bg-yellow-50 text-yellow-700";
+    case 'warning':
+      color = 'bg-yellow-50 text-yellow-700';
       break;
     default:
-      color = "bg-blue-50 text-blue-700";
+      color = 'bg-blue-50 text-blue-700';
       break;
   }
 

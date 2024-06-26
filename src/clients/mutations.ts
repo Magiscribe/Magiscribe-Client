@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 
 export const ADD_VISUAL_PREDICTION = gql`
   # Increments a back-end counter and gets its resulting value

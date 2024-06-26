@@ -1,5 +1,5 @@
-import WizardShape from "../shapes/wizard";
-import { motion } from "framer-motion";
+import WizardShape from '../shapes/wizard';
+import { motion } from 'framer-motion';
 
 export default function HomeHero() {
   return (

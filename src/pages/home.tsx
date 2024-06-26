@@ -1,14 +1,14 @@
-import { motion } from "framer-motion";
-import ContentSection from "../components/content-section";
-import { SignupForm } from "../components/forms/alpha";
-import HomeHero from "../components/heroes/home-hero";
-import SandcastleShape from "../components/shapes/beach";
-import PencilShape from "../components/shapes/drawing";
+import { motion } from 'framer-motion';
+import ContentSection from '../components/content-section';
+import { SignupForm } from '../components/forms/alpha';
+import HomeHero from '../components/heroes/home-hero';
+import SandcastleShape from '../components/shapes/beach';
+import PencilShape from '../components/shapes/drawing';
 import {
   GradientWaveBottom,
   GradientWaveTop,
-} from "../components/shapes/gradient-wave";
-import { SectionTemplate } from "../components/templates/section";
+} from '../components/shapes/gradient-wave';
+import { SectionTemplate } from '../components/templates/section';
 
 function AboutSection() {
   return (
@@ -60,7 +60,7 @@ function Home() {
 
       <AboutSection />
 
-      <a id="signup" style={{ position: "relative", top: "-100px" }}></a>
+      <a id="signup" style={{ position: 'relative', top: '-100px' }}></a>
       <SignupForm />
 
       <GradientWaveBottom />

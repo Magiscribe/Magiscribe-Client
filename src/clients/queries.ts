@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 
 export const GET_TRANSCRIPTION_CREDENTIALS = gql`
   query Query {
@@ -9,7 +9,6 @@ export const GET_TRANSCRIPTION_CREDENTIALS = gql`
     }
   }
 `;
-
 
 export const GET_ALL_MODELS = gql`
   query Query {

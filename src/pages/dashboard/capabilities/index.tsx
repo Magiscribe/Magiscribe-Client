@@ -1,9 +1,9 @@
-import { useMutation, useQuery } from "@apollo/client";
-import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
-import { DELETE_CAPABILITY } from "../../../clients/mutations";
-import { GET_ALL_CAPABILITIES } from "../../../clients/queries";
-import { Capability, Prompt } from "../../../types/agents";
+import { useMutation, useQuery } from '@apollo/client';
+import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { DELETE_CAPABILITY } from '../../../clients/mutations';
+import { GET_ALL_CAPABILITIES } from '../../../clients/queries';
+import { Capability, Prompt } from '../../../types/agents';
 
 function CapabilityCard({
   capability,
@@ -31,7 +31,7 @@ function CapabilityCard({
   return (
     <div className="relative bg-gray-100 p-4 rounded-lg shadow-md">
       <h2 className="text-xl font-bold">
-        {capability.name}{" "}
+        {capability.name}{' '}
         <span className="text-sm font-normal text-slate-700">
           ({capability.alias})
         </span>

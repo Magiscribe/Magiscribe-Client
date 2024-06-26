@@ -4,11 +4,11 @@ import {
   SignedIn,
   SignedOut,
   useSession,
-} from "@clerk/clerk-react";
-import { ApolloProviderWrapper } from "../clients/graphqlClient";
-import AnimatedOutlet from "../components/animated/animated-outlet";
-import LinkCard from "../components/card";
-import NotReadyHero from "../components/heroes/not-ready";
+} from '@clerk/clerk-react';
+import { ApolloProviderWrapper } from '../clients/graphqlClient';
+import AnimatedOutlet from '../components/animated/animated-outlet';
+import LinkCard from '../components/card';
+import NotReadyHero from '../components/heroes/not-ready';
 
 export default function DashboardTemplate() {
   const { session } = useSession();
@@ -16,7 +16,7 @@ export default function DashboardTemplate() {
   return (
     <Protect
       condition={() =>
-        session?.user.organizationMemberships[0]?.role === "org:admin"
+        session?.user.organizationMemberships[0]?.role === 'org:admin'
       }
       fallback={
         <>

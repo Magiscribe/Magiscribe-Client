@@ -1,9 +1,9 @@
-import { useMutation, useQuery } from "@apollo/client";
-import { Link } from "react-router-dom";
-import { DELETE_AGENT } from "../../../clients/mutations";
-import { GET_ALL_AGENTS } from "../../../clients/queries";
-import { Agent, Capability } from "../../../types/agents";
-import { motion } from "framer-motion";
+import { useMutation, useQuery } from '@apollo/client';
+import { Link } from 'react-router-dom';
+import { DELETE_AGENT } from '../../../clients/mutations';
+import { GET_ALL_AGENTS } from '../../../clients/queries';
+import { Agent, Capability } from '../../../types/agents';
+import { motion } from 'framer-motion';
 
 function AgentCard({
   agent,
@@ -38,7 +38,7 @@ function AgentCard({
             to={`/dashboard/capabilities/edit?id=${capability.id}`}
             className="text-xs font-bold bg-blue-200 text-blue-800 py-1 px-2 rounded-full"
           >
-          {capability.name}
+            {capability.name}
           </Link>
         ))}
       </div>

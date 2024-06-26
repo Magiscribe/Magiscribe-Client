@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
 
 export default function LinkCard({
   to,
@@ -12,14 +12,14 @@ export default function LinkCard({
   gradient?: string;
 }) {
   const gradients = {
-    red: "from-red-600 to-pink-400",
-    green: "from-green-600 to-green-400",
-    purple: "from-purple-600 to-purple-400",
-    blue: "from-blue-400 to-blue-600",
+    red: 'from-red-600 to-pink-400',
+    green: 'from-green-600 to-green-400',
+    purple: 'from-purple-600 to-purple-400',
+    blue: 'from-blue-400 to-blue-600',
   };
 
   const bg =
-    gradients[gradient as keyof typeof gradients] || gradients["purple"];
+    gradients[gradient as keyof typeof gradients] || gradients['purple'];
 
   return (
     <div

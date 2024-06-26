@@ -1,17 +1,17 @@
-import { AnimatePresence, motion } from "framer-motion";
-import React, { createContext, useState } from "react";
-import { AlertComponent } from "../components/alerts/Alert";
-import { useAlertContext } from "../hooks/AlertHooks";
+import { AnimatePresence, motion } from 'framer-motion';
+import React, { createContext, useState } from 'react';
+import { AlertComponent } from '../components/alerts/Alert';
+import { useAlertContext } from '../hooks/AlertHooks';
 
 export type Alert = {
   id: string;
-  type: "success" | "error" | "info" | "warning";
+  type: 'success' | 'error' | 'info' | 'warning';
   message: string;
 };
 
 interface AlertContextProps {
   alerts: Alert[];
-  addAlert: (message: string, type: Alert["type"], timeout?: number) => void;
+  addAlert: (message: string, type: Alert['type'], timeout?: number) => void;
   removeAlert: (id: string) => void;
 }
 
@@ -51,7 +51,7 @@ const AlertWrapper = ({ children }: { children: React.ReactNode }) => {
 const AlertProvider = ({ children }: { children: React.ReactNode }) => {
   const [alerts, setAlerts] = useState<Alert[]>([]);
 
-  const addAlert = (message: string, type: Alert["type"], timeout = 5000) => {
+  const addAlert = (message: string, type: Alert['type'], timeout = 5000) => {
     const alertId = Math.random().toString(36).substring(2, 9);
     setAlerts((alerts) => [...alerts, { id: alertId, message, type }]);
 

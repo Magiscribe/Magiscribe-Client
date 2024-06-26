@@ -1,4 +1,4 @@
-import type { DefaultOptions } from "@apollo/client";
+import type { DefaultOptions } from '@apollo/client';
 import {
   ApolloClient,
   ApolloProvider,
@@ -6,27 +6,27 @@ import {
   HttpLink,
   InMemoryCache,
   split,
-} from "@apollo/client";
-import { setContext } from "@apollo/client/link/context";
-import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
-import { useAuth } from "@clerk/clerk-react";
-import { createClient } from "graphql-ws";
+} from '@apollo/client';
+import { setContext } from '@apollo/client/link/context';
+import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
+import { useAuth } from '@clerk/clerk-react';
+import { createClient } from 'graphql-ws';
 
-import { getMainDefinition } from "@apollo/client/utilities";
-import React, { useMemo } from "react";
+import { getMainDefinition } from '@apollo/client/utilities';
+import React, { useMemo } from 'react';
 
 const defaultOptions: DefaultOptions = {
   watchQuery: {
-    fetchPolicy: "no-cache",
-    errorPolicy: "ignore",
+    fetchPolicy: 'no-cache',
+    errorPolicy: 'ignore',
   },
   query: {
-    fetchPolicy: "no-cache",
-    errorPolicy: "all",
+    fetchPolicy: 'no-cache',
+    errorPolicy: 'all',
   },
   mutate: {
-    fetchPolicy: "no-cache", // Since all requests are currently used to update the board state, we shouldn't cache any responses.
-    errorPolicy: "all",
+    fetchPolicy: 'no-cache', // Since all requests are currently used to update the board state, we shouldn't cache any responses.
+    errorPolicy: 'all',
   },
 };
 
@@ -74,8 +74,8 @@ export const ApolloProviderWrapper = ({
       ({ query }) => {
         const definition = getMainDefinition(query);
         return (
-          definition.kind === "OperationDefinition" &&
-          definition.operation === "subscription"
+          definition.kind === 'OperationDefinition' &&
+          definition.operation === 'subscription'
         );
       },
       wsLink,
