@@ -5,13 +5,7 @@ import { GET_ALL_AGENTS } from '../../../clients/queries';
 import { Agent, Capability } from '../../../types/agents';
 import { motion } from 'framer-motion';
 
-function AgentCard({
-  agent,
-  onUpdate,
-}: {
-  agent: Agent;
-  onUpdate?: () => void;
-}) {
+function AgentCard({ agent, onUpdate }: { agent: Agent; onUpdate?: () => void }) {
   const [deleteCapability] = useMutation(DELETE_AGENT);
 
   const handleDelete = async () => {
@@ -64,10 +58,7 @@ export default function AgentDashboard() {
     <div className="bg-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl text-slate-700">
       <div className="flex items-center">
         <h1 className="text-3xl font-bold">Agents</h1>
-        <Link
-          to="/dashboard/agents/edit"
-          className="bg-blue-500 text-sm text-white px-2 py-1 rounded-lg ml-auto"
-        >
+        <Link to="/dashboard/agents/edit" className="bg-blue-500 text-sm text-white px-2 py-1 rounded-lg ml-auto">
           Add Agent
         </Link>
       </div>

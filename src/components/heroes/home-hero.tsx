@@ -21,8 +21,8 @@ export default function HomeHero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.25 }}
           >
-            With Magiscribe, you can focus on your ideas and let the magic of
-            technology take care of the rest through multi-modal automation.
+            With Magiscribe, you can focus on your ideas and let the magic of technology take care of the rest through
+            multi-modal automation.
           </motion.p>
           <motion.a
             href="#signup"

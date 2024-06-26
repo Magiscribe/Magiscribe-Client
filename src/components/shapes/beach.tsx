@@ -1,11 +1,6 @@
 export default function SandcastleShape() {
   return (
-    <svg
-      id="Layer_2"
-      data-name="Layer 2"
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 395.53 234.83"
-    >
+    <svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 395.53 234.83">
       <defs>
         <style>
           {`
@@ -132,10 +127,7 @@ export default function SandcastleShape() {
               className="sls-11"
               d="M303.37,181.89c-.83,5.83-14.93,15.12-20.06,17.97-7.59,4.22-15.94,6.64-23.83,10.03-.15.06-.68-.21-1.25.63l1.67.21c-.4.11,1.89.81-7.32,2.93-7.59,1.75-12.51,1.16-13.17,1.25.88-2.65,1.65-5.17,2.09-7.94.62-3.87.71-7.8,1.25-11.7.63.15.68.82,1.46.84,1.1.03,19.16-2.85,21.74-3.34,12.7-2.44,25.3-6.39,37.41-10.87Z"
             />
-            <path
-              className="sls-12"
-              d="M259.47,209.9l.42.84-1.67-.21c.57-.84,1.11-.56,1.25-.63Z"
-            />
+            <path className="sls-12" d="M259.47,209.9l.42.84-1.67-.21c.57-.84,1.11-.56,1.25-.63Z" />
           </g>
           <path
             className="sls-11"

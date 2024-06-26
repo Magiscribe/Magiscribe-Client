@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { createContext, useState } from 'react';
 import { AlertComponent } from '../components/alerts/Alert';
-import { useAlertContext } from '../hooks/AlertHooks';
+import { useContext } from 'react';
 
 export type Alert = {
   id: string;
@@ -15,9 +15,7 @@ interface AlertContextProps {
   removeAlert: (id: string) => void;
 }
 
-export const AlertContext = createContext<AlertContextProps | undefined>(
-  undefined,
-);
+export const AlertContext = createContext<AlertContextProps | undefined>(undefined);
 
 const AlertWrapper = ({ children }: { children: React.ReactNode }) => {
   const { alerts, removeAlert } = useAlertContext();
@@ -34,10 +32,7 @@ const AlertWrapper = ({ children }: { children: React.ReactNode }) => {
                 animate={{ opacity: 1, y: 0, rotate: 0 }}
                 exit={{ opacity: 0, height: 0 }}
               >
-                <AlertComponent
-                  alert={alert}
-                  unmountSelf={() => removeAlert(alert.id)}
-                />
+                <AlertComponent alert={alert} unmountSelf={() => removeAlert(alert.id)} />
               </motion.div>
             ))}
           </AnimatePresence>
@@ -72,5 +67,19 @@ const AlertProvider = ({ children }: { children: React.ReactNode }) => {
     </AlertContext.Provider>
   );
 };
+
+export const useAlertContext = () => {
+  const context = useContext(AlertContext);
+  if (!context) {
+    throw new Error('useAlertContext must be used within an AlertProvider');
+  }
+  return context;
+};
+
+export const useAlert = () => useAlertContext().alerts;
+
+export const useAddAlert = () => useAlertContext().addAlert;
+
+export const useRemoveAlert = () => useAlertContext().removeAlert;
 
 export default AlertProvider;

@@ -14,6 +14,7 @@ import PromptEdit from './pages/dashboard/prompts/edit';
 import CapabilityDashboard from './pages/dashboard/capabilities';
 import CapabilityEdit from './pages/dashboard/capabilities/edit';
 import PlaygroundDashboard from './pages/dashboard/playground';
+import { TitleProvider } from './hooks/TitleHook';
 
 const router = createBrowserRouter([
   {
@@ -69,9 +70,11 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ClerkProvider publishableKey={import.meta.env.VITE_APP_CLERK_PK as string}>
-      <AlertProvider>
-        <RouterProvider router={router} />
-      </AlertProvider>
+      <TitleProvider>
+        <AlertProvider>
+          <RouterProvider router={router} />
+        </AlertProvider>
+      </TitleProvider>
     </ClerkProvider>
   </React.StrictMode>,
 );

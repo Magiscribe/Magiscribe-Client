@@ -1,7 +1,7 @@
 import { gql } from '@apollo/client';
 
-export const GET_TRANSCRIPTION_CREDENTIALS = gql`
-  query Query {
+export const GENERATE_TRANSCRIPTION_CREDENTIALS = gql`
+  query Mutation {
     generateTranscriptionStreamingCredentials {
       accessKeyId
       secretAccessKey

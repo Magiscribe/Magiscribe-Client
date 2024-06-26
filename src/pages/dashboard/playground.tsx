@@ -7,10 +7,7 @@ import ListBox from '../../components/list/ListBox';
 import { useTranscribe } from '../../hooks/AudioHooks';
 import { Agent } from '../../types/agents';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faMicrophone,
-  faMicrophoneSlash,
-} from '@fortawesome/free-solid-svg-icons';
+import { faMicrophone, faMicrophoneSlash } from '@fortawesome/free-solid-svg-icons';
 
 interface VisualPredictionAdded {
   context: string;
@@ -38,8 +35,7 @@ export default function PlaygroundDashboard() {
   const [addVisualPrediction] = useMutation(ADD_VISUAL_PREDICTION);
 
   // Transcribe
-  const { isTranscribing, transcript, startTranscribing, stopTranscribing } =
-    useTranscribe();
+  const { isTranscribing, transcript, startTranscribing, stopTranscribing } = useTranscribe();
 
   /**
    * Handles the form submission event.
@@ -115,19 +111,14 @@ export default function PlaygroundDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-8">
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label
-              className="block text-sm font-bold mb-2"
-              htmlFor="subscriptionId"
-            >
+            <label className="block text-sm font-bold mb-2" htmlFor="subscriptionId">
               Subscription ID
             </label>
             <input
               className="border-2 border-gray-200 p-2 rounded-lg w-full"
               id="subscriptionId"
               value={form.subscriptionId}
-              onChange={(e) =>
-                setForm({ ...form, subscriptionId: e.target.value })
-              }
+              onChange={(e) => setForm({ ...form, subscriptionId: e.target.value })}
             />
           </div>
           <div className="mb-4">
@@ -141,9 +132,7 @@ export default function PlaygroundDashboard() {
                   agent: value.id,
                 })
               }
-              selected={(agents?.getAllAgents ?? []).find(
-                (agent: Agent) => agent.id === form.agent,
-              )}
+              selected={(agents?.getAllAgents ?? []).find((agent: Agent) => agent.id === form.agent)}
               values={(agents?.getAllAgents ?? []).map((agent: Agent) => ({
                 name: agent.name ?? '',
                 id: agent.id,
@@ -174,9 +163,7 @@ export default function PlaygroundDashboard() {
             onClick={handleTranscribe}
           >
             {isTranscribing ? 'Stop' : 'Transcribe'}{' '}
-            <FontAwesomeIcon
-              icon={isTranscribing ? faMicrophoneSlash : faMicrophone}
-            />
+            <FontAwesomeIcon icon={isTranscribing ? faMicrophoneSlash : faMicrophone} />
           </button>
           <button
             type="button"
@@ -189,24 +176,14 @@ export default function PlaygroundDashboard() {
         <div className="mt-6 h-full max-h-96 w-full bg-gray-100 rounded-lg">
           <code className="h-full w-full block p-4 overflow-y-auto">
             {[...responses].reverse().map((response, index) => {
-              const fields: Array<keyof VisualPredictionAdded> = [
-                'context',
-                'prompt',
-                'result',
-                'type',
-              ];
+              const fields: Array<keyof VisualPredictionAdded> = ['context', 'prompt', 'result', 'type'];
               return (
-                <div
-                  key={index}
-                  className="mb-4 border-2 border-gray-200 p-2 rounded-lg text-sm"
-                >
+                <div key={index} className="mb-4 border-2 border-gray-200 p-2 rounded-lg text-sm">
                   {fields.map((field) => {
                     const value = response.visualPredictionAdded[field];
                     return value ? (
                       <p key={field}>
-                        <span className="font-bold">
-                          {field.charAt(0).toUpperCase() + field.slice(1)}:{' '}
-                        </span>
+                        <span className="font-bold">{field.charAt(0).toUpperCase() + field.slice(1)}: </span>
                         {value}
                       </p>
                     ) : null;

@@ -1,19 +1,14 @@
-import { useState, useCallback } from 'react';
-import MicrophoneStream from 'microphone-stream';
-import {
-  TranscribeStreamingClient,
-  StartStreamTranscriptionCommand,
-} from '@aws-sdk/client-transcribe-streaming';
+import { useMutation } from '@apollo/client';
+import { StartStreamTranscriptionCommand, TranscribeStreamingClient } from '@aws-sdk/client-transcribe-streaming';
 import { Buffer } from 'buffer';
-import { GET_TRANSCRIPTION_CREDENTIALS } from '../clients/queries';
-import { useQuery } from '@apollo/client';
+import MicrophoneStream from 'microphone-stream';
+import { useCallback, useState } from 'react';
+import { GENERATE_TRANSCRIPTION_CREDENTIALS } from '../clients/mutations';
 
 const SAMPLE_RATE = 44100;
 
 export const useTranscribe = () => {
-  const { data: transcribeCredentials } = useQuery(
-    GET_TRANSCRIPTION_CREDENTIALS,
-  );
+  const [generateTranscriptionStreamingCredentials] = useMutation(GENERATE_TRANSCRIPTION_CREDENTIALS);
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [transcript, setTranscript] = useState('');
 
@@ -31,9 +26,10 @@ export const useTranscribe = () => {
     );
   };
 
-  const createTranscribeClient = () => {
-    const { accessKeyId, secretAccessKey, sessionToken } =
-      transcribeCredentials.generateTranscriptionCredentials;
+  const createTranscribeClient = async () => {
+    const result = await generateTranscriptionStreamingCredentials();
+
+    const { accessKeyId, secretAccessKey, sessionToken } = result.data.generateTranscriptionStreamingCredentials;
 
     transcribeClient = new TranscribeStreamingClient({
       region: 'us-east-1',
@@ -88,11 +84,7 @@ export const useTranscribe = () => {
 
     for await (const event of data.TranscriptResultStream) {
       const results = event.TranscriptEvent?.Transcript?.Results ?? [];
-      if (
-        results.length &&
-        !results[0]?.IsPartial &&
-        results[0]?.Alternatives
-      ) {
+      if (results.length && !results[0]?.IsPartial && results[0]?.Alternatives) {
         const newTranscript = results[0].Alternatives[0].Transcript;
         if (newTranscript) {
           setTranscript(newTranscript);

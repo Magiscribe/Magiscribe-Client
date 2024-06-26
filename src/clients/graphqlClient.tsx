@@ -1,12 +1,5 @@
 import type { DefaultOptions } from '@apollo/client';
-import {
-  ApolloClient,
-  ApolloProvider,
-  from,
-  HttpLink,
-  InMemoryCache,
-  split,
-} from '@apollo/client';
+import { ApolloClient, ApolloProvider, from, HttpLink, InMemoryCache, split } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
 import { useAuth } from '@clerk/clerk-react';
@@ -30,11 +23,7 @@ const defaultOptions: DefaultOptions = {
   },
 };
 
-export const ApolloProviderWrapper = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
+export const ApolloProviderWrapper = ({ children }: { children: React.ReactNode }) => {
   const { getToken } = useAuth();
 
   const client = useMemo(() => {
@@ -73,10 +62,7 @@ export const ApolloProviderWrapper = ({
     const splitLink = split(
       ({ query }) => {
         const definition = getMainDefinition(query);
-        return (
-          definition.kind === 'OperationDefinition' &&
-          definition.operation === 'subscription'
-        );
+        return definition.kind === 'OperationDefinition' && definition.operation === 'subscription';
       },
       wsLink,
       from([httpAuthMiddleware, httpLink]),

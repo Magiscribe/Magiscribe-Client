@@ -1,15 +1,13 @@
-import {
-  SignedIn,
-  SignedOut,
-  SignInButton,
-  UserButton,
-} from '@clerk/clerk-react';
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Logo } from '../logo';
+import { useTitle } from '../../hooks/TitleHook';
+import { AnimatePresence, motion } from 'framer-motion';
 
 export function NavBar() {
   const [atTop, setAtTop] = useState(true);
+  const title = useTitle();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -34,6 +32,20 @@ export function NavBar() {
       <div className="w-full container mx-auto flex flex-wrap items-center justify-between mt-0 py-2">
         <Link to="/" className="pl-4 flex items-center">
           <Logo />
+          <AnimatePresence mode="wait">
+            {title.title && (
+              <motion.span
+                key={title.title}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.5 }}
+                className="text-2xl lg:text-3xl font-display pl-2"
+              >
+                | {title.title}
+              </motion.span>
+            )}
+          </AnimatePresence>
         </Link>
         <div
           className={`w-full flex-grow lg:flex lg:items-center lg:w-auto hidden mt-2 lg:mt-0 p-4 lg:p-0 z-20 bg-white lg:bg-transparent`}

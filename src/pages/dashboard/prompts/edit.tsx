@@ -32,9 +32,7 @@ export default function PromptEdit() {
     }
   }, [prompt]);
 
-  const handleChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({
       ...form,
       [event.target.id]: event.target.value,
@@ -70,9 +68,7 @@ export default function PromptEdit() {
   return (
     <>
       <div className="bg-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl text-slate-700">
-        <h1 className="text-3xl font-bold">
-          {form.id ? 'Edit' : 'Add'} Prompt
-        </h1>
+        <h1 className="text-3xl font-bold">{form.id ? 'Edit' : 'Add'} Prompt</h1>
         <form className="mt-8" onSubmit={handleSave}>
           <div className="mb-4">
             <label className="block text-sm font-bold mb-2" htmlFor="name">
@@ -98,9 +94,7 @@ export default function PromptEdit() {
               onChange={handleChange}
             />
           </div>
-          <button className="bg-blue-500 text-white px-4 py-2 rounded-lg">
-            Save
-          </button>
+          <button className="bg-blue-500 text-white px-4 py-2 rounded-lg">Save</button>
         </form>
       </div>
     </>
