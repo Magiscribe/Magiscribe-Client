@@ -38,13 +38,13 @@ function CapabilityCard({
       </h2>
       <p className="text-sm">{capability.description}</p>
       <div className="flex flex-wrap gap-2 mt-2">
-        {capability.prompts.map((capability: Prompt) => (
-          <span
-            className="text-xs font-bold bg-blue-200 text-blue-800 py-1 px-2 rounded-full"
-            key={capability.id}
+        {capability.prompts.map((prompt: Prompt) => (
+          <Link
+          to={`/dashboard/prompts/edit?id=${prompt.id}`}
+          className="text-xs font-bold bg-blue-200 text-blue-800 py-1 px-2 rounded-full"
           >
-            {capability.name}
-          </span>
+            {prompt.name}
+          </Link>
         ))}
       </div>
       <div className="absolute top-4 right-4 flex gap-2">

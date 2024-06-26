@@ -69,9 +69,6 @@ export default function PromptEdit() {
 
   return (
     <>
-      <button className="border-2 border-white rounded-full px-6 py-2 text-white font-bold hover:bg-white hover:text-black transition duration-300 mb-4">
-        <Link to="/dashboard/prompts">Back</Link>
-      </button>
       <div className="bg-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl text-slate-700">
         <h1 className="text-3xl font-bold">
           {form.id ? "Edit" : "Add"} Prompt
