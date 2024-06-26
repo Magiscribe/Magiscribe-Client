@@ -6,20 +6,20 @@
 version: 2
 updates:
   # Root
-  - package-ecosystem: "github-actions"
-    directory: "/"
+  - package-ecosystem: 'github-actions'
+    directory: '/'
     groups:
       github-actions:
         patterns:
-          - "*"
+          - '*'
     schedule:
-      interval: "weekly"
+      interval: 'weekly'
 
-  - package-ecosystem: "npm"
-    directory: "/"
+  - package-ecosystem: 'npm'
+    directory: '/'
     groups:
       app:
         patterns:
-          - "*"
+          - '*'
     schedule:
-      interval: "weekly"
+      interval: 'weekly'

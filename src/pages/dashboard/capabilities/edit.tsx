@@ -1,35 +1,31 @@
-import { useMutation, useQuery } from "@apollo/client";
-import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { ADD_UPDATE_CAPABILITY } from "../../../clients/mutations";
-import {
-  GET_ALL_MODELS,
-  GET_ALL_PROMPTS,
-  GET_CAPABILITY,
-} from "../../../clients/queries";
-import ListBox from "../../../components/list/ListBox";
-import ListBoxMultiple from "../../../components/list/ListBoxMultiple";
-import { useAddAlert } from "../../../hooks/AlertHooks";
-import { Prompt } from "../../../types/agents";
+import { useMutation, useQuery } from '@apollo/client';
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { ADD_UPDATE_CAPABILITY } from '../../../clients/mutations';
+import { GET_ALL_MODELS, GET_ALL_PROMPTS, GET_CAPABILITY } from '../../../clients/queries';
+import ListBox from '../../../components/list/ListBox';
+import ListBoxMultiple from '../../../components/list/ListBoxMultiple';
+import { useAddAlert } from '../../../hooks/AlertHooks';
+import { Prompt } from '../../../types/agents';
 
 export default function CapabilityEdit() {
   const addAlert = useAddAlert();
   const [form, setForm] = useState({
     id: null,
-    name: "",
-    alias: "",
-    description: "",
-    llmModel: "",
-    prompts: [""],
+    name: '',
+    alias: '',
+    description: '',
+    llmModel: '',
+    prompts: [''],
   });
   const [searchParams] = useSearchParams();
   const [addUpdateCapability] = useMutation(ADD_UPDATE_CAPABILITY);
   const { data: prompts } = useQuery(GET_ALL_PROMPTS);
   const { data: models } = useQuery(GET_ALL_MODELS);
   const { data: capability } = useQuery(GET_CAPABILITY, {
-    skip: !searchParams.has("id"),
+    skip: !searchParams.has('id'),
     variables: {
-      capabilityId: searchParams.get("id"),
+      capabilityId: searchParams.get('id'),
     },
   });
   const navigate = useNavigate();
@@ -42,16 +38,12 @@ export default function CapabilityEdit() {
         alias: capability.getCapability.alias,
         description: capability.getCapability.description,
         llmModel: capability.getCapability.llmModel,
-        prompts: capability.getCapability.prompts.map(
-          (prompt: Prompt) => prompt.id,
-        ),
+        prompts: capability.getCapability.prompts.map((prompt: Prompt) => prompt.id),
       });
     }
   }, [capability]);
 
-  const handleChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({
       ...form,
       [event.target.id]: event.target.value,
@@ -76,12 +68,12 @@ export default function CapabilityEdit() {
       });
 
       if (result.errors) {
-        addAlert("Error saving capability", "error");
+        addAlert('Error saving capability', 'error');
         return;
       }
 
-      addAlert("Capability saved successfully", "success");
-      navigate("/dashboard/capabilities");
+      addAlert('Capability saved successfully', 'success');
+      navigate('/dashboard/capabilities');
     } catch (error) {
       console.error(error);
     }
@@ -90,9 +82,7 @@ export default function CapabilityEdit() {
   return (
     <>
       <div className="bg-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl text-slate-700">
-        <h1 className="text-3xl font-bold">
-          {form.id ? "Edit" : "Add"} Capability
-        </h1>
+        <h1 className="text-3xl font-bold">{form.id ? 'Edit' : 'Add'} Capability</h1>
         <form className="mt-8" onSubmit={handleSave}>
           <div className="mb-4">
             <label className="block text-sm font-bold mb-2" htmlFor="name">
@@ -119,10 +109,7 @@ export default function CapabilityEdit() {
             />
           </div>
           <div className="mb-4">
-            <label
-              className="block text-sm font-bold mb-2"
-              htmlFor="description"
-            >
+            <label className="block text-sm font-bold mb-2" htmlFor="description">
               Description
             </label>
             <textarea
@@ -133,10 +120,7 @@ export default function CapabilityEdit() {
             />
           </div>
           <div className="mb-4">
-            <label
-              className="block text-sm font-bold mb-2"
-              htmlFor="capabilities"
-            >
+            <label className="block text-sm font-bold mb-2" htmlFor="capabilities">
               LLM Model
             </label>
             <ListBox
@@ -147,17 +131,13 @@ export default function CapabilityEdit() {
                 });
               }}
               selected={
-                models?.getAllModels.find(
-                  (model: { id: string }) => model.id === form.llmModel,
-                ) ?? { name: "", id: "" }
+                models?.getAllModels.find((model: { id: string }) => model.id === form.llmModel) ?? { name: '', id: '' }
               }
               values={
-                models?.getAllModels.map(
-                  (model: { name: string; id: string }) => ({
-                    name: model.name,
-                    id: model.id,
-                  }),
-                ) ?? []
+                models?.getAllModels.map((model: { name: string; id: string }) => ({
+                  name: model.name,
+                  id: model.id,
+                })) ?? []
               }
             />
           </div>
@@ -172,20 +152,16 @@ export default function CapabilityEdit() {
                   prompts: value.map((capability) => capability.id),
                 })
               }
-              selected={(prompts?.getAllPrompts ?? []).filter(
-                (capability: Prompt) => form.prompts.includes(capability.id),
+              selected={(prompts?.getAllPrompts ?? []).filter((capability: Prompt) =>
+                form.prompts.includes(capability.id),
               )}
-              values={(prompts?.getAllPrompts ?? []).map(
-                (capability: Prompt) => ({
-                  name: capability.name ?? "",
-                  id: capability.id,
-                }),
-              )}
+              values={(prompts?.getAllPrompts ?? []).map((capability: Prompt) => ({
+                name: capability.name ?? '',
+                id: capability.id,
+              }))}
             />
           </div>
-          <button className="bg-blue-500 text-white px-4 py-2 rounded-lg">
-            Save
-          </button>
+          <button className="bg-blue-500 text-white px-4 py-2 rounded-lg">Save</button>
         </form>
       </div>
     </>

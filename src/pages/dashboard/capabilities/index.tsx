@@ -1,17 +1,11 @@
-import { useMutation, useQuery } from "@apollo/client";
-import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
-import { DELETE_CAPABILITY } from "../../../clients/mutations";
-import { GET_ALL_CAPABILITIES } from "../../../clients/queries";
-import { Capability, Prompt } from "../../../types/agents";
+import { useMutation, useQuery } from '@apollo/client';
+import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { DELETE_CAPABILITY } from '../../../clients/mutations';
+import { GET_ALL_CAPABILITIES } from '../../../clients/queries';
+import { Capability, Prompt } from '../../../types/agents';
 
-function CapabilityCard({
-  capability,
-  onUpdate,
-}: {
-  capability: Capability;
-  onUpdate?: () => void;
-}) {
+function CapabilityCard({ capability, onUpdate }: { capability: Capability; onUpdate?: () => void }) {
   const [deleteCapability] = useMutation(DELETE_CAPABILITY);
 
   const handleDelete = async () => {
@@ -31,10 +25,7 @@ function CapabilityCard({
   return (
     <div className="relative bg-gray-100 p-4 rounded-lg shadow-md">
       <h2 className="text-xl font-bold">
-        {capability.name}{" "}
-        <span className="text-sm font-normal text-slate-700">
-          ({capability.alias})
-        </span>
+        {capability.name} <span className="text-sm font-normal text-slate-700">({capability.alias})</span>
       </h2>
       <p className="text-sm">{capability.description}</p>
       <div className="flex flex-wrap gap-2 mt-2">
@@ -69,10 +60,7 @@ export default function CapabilityDashboard() {
     <div className="bg-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl text-slate-700">
       <div className="flex items-center">
         <h1 className="text-3xl font-bold">Capabilities</h1>
-        <Link
-          to="/dashboard/capabilities/edit"
-          className="bg-blue-500 text-sm text-white px-2 py-1 rounded-lg ml-auto"
-        >
+        <Link to="/dashboard/capabilities/edit" className="bg-blue-500 text-sm text-white px-2 py-1 rounded-lg ml-auto">
           Add Capability
         </Link>
       </div>
@@ -85,11 +73,7 @@ export default function CapabilityDashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2, delay: 0.05 * i }}
           >
-            <CapabilityCard
-              key={capability.id}
-              capability={capability}
-              onUpdate={refetch}
-            />
+            <CapabilityCard key={capability.id} capability={capability} onUpdate={refetch} />
           </motion.div>
         ))}
       </div>

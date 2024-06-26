@@ -1,12 +1,8 @@
-import { motion } from "framer-motion";
+import { motion } from 'framer-motion';
 
 export function GradientWaveTop() {
   return (
-    <svg
-      viewBox="0 0 1428 174"
-      version="1.1"
-      xmlns="http://www.w3.org/2000/svg"
-    >
+    <svg viewBox="0 0 1428 174" version="1.1" xmlns="http://www.w3.org/2000/svg">
       <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <motion.g
           transform="translate(-2.000000, 44.000000)"
@@ -17,7 +13,7 @@ export function GradientWaveTop() {
             scaleX: [1, 2, 1],
             scaleY: [1, 3, 1],
           }}
-          transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+          transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
         >
           <path
             d="M0,0 C90.7283404,0.927527913 147.912752,27.187927 291.910178,59.9119003 C387.908462,81.7278826 543.605069,89.334785 759,82.7326078 C469.336065,156.254352 216.336065,153.6679 0,74.9732496"
@@ -53,11 +49,7 @@ export function GradientWaveTop() {
 
 export function GradientWaveBottom() {
   return (
-    <svg
-      viewBox="0 0 1439 120"
-      version="1.1"
-      xmlns="http://www.w3.org/2000/svg"
-    >
+    <svg viewBox="0 0 1439 120" version="1.1" xmlns="http://www.w3.org/2000/svg">
       <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g transform="translate(-1.000000, -14.000000)" fill-rule="nonzero">
           <g className="wave" fill="#ffffff">
@@ -71,7 +63,7 @@ export function GradientWaveBottom() {
               scaleX: [1, 1.5, 1],
               scaleY: [1, 3, 1],
             }}
-            transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+            transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
           >
             <g transform="translate(719.500000, 68.500000) rotate(-180.000000) translate(-719.500000, -68.500000) ">
               <path

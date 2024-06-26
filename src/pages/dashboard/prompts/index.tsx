@@ -1,17 +1,11 @@
-import { useMutation, useQuery } from "@apollo/client";
-import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
-import { DELETE_PROMPT } from "../../../clients/mutations";
-import { GET_ALL_PROMPTS } from "../../../clients/queries";
-import { Prompt } from "../../../types/agents";
+import { useMutation, useQuery } from '@apollo/client';
+import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { DELETE_PROMPT } from '../../../clients/mutations';
+import { GET_ALL_PROMPTS } from '../../../clients/queries';
+import { Prompt } from '../../../types/agents';
 
-function PromptCard({
-  prompt,
-  onUpdate,
-}: {
-  prompt: Prompt;
-  onUpdate?: () => void;
-}) {
+function PromptCard({ prompt, onUpdate }: { prompt: Prompt; onUpdate?: () => void }) {
   const [deleteCapability] = useMutation(DELETE_PROMPT);
 
   const handleDelete = async () => {
@@ -53,10 +47,7 @@ export default function PromptDashboard() {
     <div className="bg-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl text-slate-700">
       <div className="flex items-center">
         <h1 className="text-3xl font-bold">Prompts</h1>
-        <Link
-          to="/dashboard/prompts/edit"
-          className="bg-blue-500 text-sm text-white px-2 py-1 rounded-lg ml-auto"
-        >
+        <Link to="/dashboard/prompts/edit" className="bg-blue-500 text-sm text-white px-2 py-1 rounded-lg ml-auto">
           Add Prompt
         </Link>
       </div>

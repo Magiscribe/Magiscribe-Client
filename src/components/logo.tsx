@@ -1,12 +1,8 @@
-import { motion } from "framer-motion";
+import { motion } from 'framer-motion';
 
 function WandIcon() {
   return (
-    <svg
-      className="w-12 mb-4 mr-2 inline"
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 289.17 287.44"
-    >
+    <svg className="w-12 mb-4 mr-2 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 289.17 287.44">
       <defs>
         <style>
           {`
@@ -98,14 +94,9 @@ function WandIcon() {
 
 export function Logo() {
   return (
-    <a
-      className={`font-display no-underline hover:no-underline font-bold text-2xl lg:text-4xl mt-2`}
-    >
+    <a className={`font-display no-underline hover:no-underline font-bold text-2xl lg:text-4xl mt-2`}>
       <WandIcon />
-      <motion.span
-        animate={{ opacity: [0, 1], marginLeft: [25, 0] }}
-        transition={{ duration: 1, delay: 0.5 }}
-      >
+      <motion.span animate={{ opacity: [0, 1], marginLeft: [25, 0] }} transition={{ duration: 1, delay: 0.5 }}>
         Magiscribe
       </motion.span>
     </a>

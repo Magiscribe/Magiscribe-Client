@@ -1,14 +1,12 @@
-import { motion } from "framer-motion";
-import ContentSection from "../components/content-section";
-import { SignupForm } from "../components/forms/alpha";
-import HomeHero from "../components/heroes/home-hero";
-import SandcastleShape from "../components/shapes/beach";
-import PencilShape from "../components/shapes/drawing";
-import {
-  GradientWaveBottom,
-  GradientWaveTop,
-} from "../components/shapes/gradient-wave";
-import { SectionTemplate } from "../components/templates/section";
+import { motion } from 'framer-motion';
+import ContentSection from '../components/content-section';
+import { SignupForm } from '../components/forms/alpha';
+import HomeHero from '../components/heroes/home-hero';
+import SandcastleShape from '../components/shapes/beach';
+import PencilShape from '../components/shapes/drawing';
+import { GradientWaveBottom, GradientWaveTop } from '../components/shapes/gradient-wave';
+import { SectionTemplate } from '../components/templates/section';
+import { useSetTitle } from '../hooks/TitleHook';
 
 function AboutSection() {
   return (
@@ -50,6 +48,8 @@ function AboutSection() {
 }
 
 function Home() {
+  useSetTitle()('');
+
   return (
     <>
       <HomeHero />
@@ -60,21 +60,18 @@ function Home() {
 
       <AboutSection />
 
-      <a id="signup" style={{ position: "relative", top: "-100px" }}></a>
+      <a id="signup" style={{ position: 'relative', top: '-100px' }}></a>
       <SignupForm />
 
       <GradientWaveBottom />
 
       <section className="container mx-auto text-center py-6 mb-12">
-        <h2 className="w-full my-2 text-5xl font-bold leading-tight text-center text-white">
-          Reach out to us!
-        </h2>
+        <h2 className="w-full my-2 text-5xl font-bold leading-tight text-center text-white">Reach out to us!</h2>
         <div className="w-full mb-4">
           <div className="h-1 mx-auto bg-white w-1/6 opacity-50 my-0 py-0 rounded-t"></div>
         </div>
         <h3 className="my-4 text-2xl leading-tight pb-4">
-          Looking to learn more about Magiscribe, have a question, or just want
-          to say hi?
+          Looking to learn more about Magiscribe, have a question, or just want to say hi?
           <br />
           Reach out to us!
         </h3>

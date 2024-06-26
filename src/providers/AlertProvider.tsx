@@ -1,23 +1,21 @@
-import { AnimatePresence, motion } from "framer-motion";
-import React, { createContext, useState } from "react";
-import { AlertComponent } from "../components/alerts/Alert";
-import { useAlertContext } from "../hooks/AlertHooks";
+import { AnimatePresence, motion } from 'framer-motion';
+import React, { createContext, useState } from 'react';
+import { AlertComponent } from '../components/alerts/Alert';
+import { useContext } from 'react';
 
 export type Alert = {
   id: string;
-  type: "success" | "error" | "info" | "warning";
+  type: 'success' | 'error' | 'info' | 'warning';
   message: string;
 };
 
 interface AlertContextProps {
   alerts: Alert[];
-  addAlert: (message: string, type: Alert["type"], timeout?: number) => void;
+  addAlert: (message: string, type: Alert['type'], timeout?: number) => void;
   removeAlert: (id: string) => void;
 }
 
-export const AlertContext = createContext<AlertContextProps | undefined>(
-  undefined,
-);
+export const AlertContext = createContext<AlertContextProps | undefined>(undefined);
 
 const AlertWrapper = ({ children }: { children: React.ReactNode }) => {
   const { alerts, removeAlert } = useAlertContext();
@@ -34,10 +32,7 @@ const AlertWrapper = ({ children }: { children: React.ReactNode }) => {
                 animate={{ opacity: 1, y: 0, rotate: 0 }}
                 exit={{ opacity: 0, height: 0 }}
               >
-                <AlertComponent
-                  alert={alert}
-                  unmountSelf={() => removeAlert(alert.id)}
-                />
+                <AlertComponent alert={alert} unmountSelf={() => removeAlert(alert.id)} />
               </motion.div>
             ))}
           </AnimatePresence>
@@ -51,7 +46,7 @@ const AlertWrapper = ({ children }: { children: React.ReactNode }) => {
 const AlertProvider = ({ children }: { children: React.ReactNode }) => {
   const [alerts, setAlerts] = useState<Alert[]>([]);
 
-  const addAlert = (message: string, type: Alert["type"], timeout = 5000) => {
+  const addAlert = (message: string, type: Alert['type'], timeout = 5000) => {
     const alertId = Math.random().toString(36).substring(2, 9);
     setAlerts((alerts) => [...alerts, { id: alertId, message, type }]);
 
@@ -72,5 +67,19 @@ const AlertProvider = ({ children }: { children: React.ReactNode }) => {
     </AlertContext.Provider>
   );
 };
+
+export const useAlertContext = () => {
+  const context = useContext(AlertContext);
+  if (!context) {
+    throw new Error('useAlertContext must be used within an AlertProvider');
+  }
+  return context;
+};
+
+export const useAlert = () => useAlertContext().alerts;
+
+export const useAddAlert = () => useAlertContext().addAlert;
+
+export const useRemoveAlert = () => useAlertContext().removeAlert;
 
 export default AlertProvider;

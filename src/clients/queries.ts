@@ -1,4 +1,14 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
+
+export const GENERATE_TRANSCRIPTION_CREDENTIALS = gql`
+  query Mutation {
+    generateTranscriptionStreamingCredentials {
+      accessKeyId
+      secretAccessKey
+      sessionToken
+    }
+  }
+`;
 
 export const GET_ALL_MODELS = gql`
   query Query {

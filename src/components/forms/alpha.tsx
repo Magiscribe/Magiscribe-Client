@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { SectionTemplate } from "../templates/section";
-import { motion } from "framer-motion";
+import { useState } from 'react';
+import { SectionTemplate } from '../templates/section';
+import { motion } from 'framer-motion';
 
 export function SignupForm() {
   const [formSubmitted, setFormSubmitted] = useState(false);
@@ -13,9 +13,9 @@ export function SignupForm() {
     setFormSubmitted(true);
 
     await fetch(
-      "https://forms.zohopublic.com/magiscribe/form/BetaSignup/formperma/YL1QuMc8RT8_SVhvX0UrPDz78OTj6gyaWqELdoC0SRo/htmlRecords/submit",
+      'https://forms.zohopublic.com/magiscribe/form/BetaSignup/formperma/YL1QuMc8RT8_SVhvX0UrPDz78OTj6gyaWqELdoC0SRo/htmlRecords/submit',
       {
-        method: "POST",
+        method: 'POST',
         body: formData,
       },
     );
@@ -41,8 +41,7 @@ export function SignupForm() {
       >
         <div className="h-1 mx-auto gradient w-64 opacity-50 my-0 py-0 rounded-t"></div>
         <p className="text-center text-gray-600 mt-4">
-          Want to be the first to try out Magiscribe? Let us know and we'll get
-          you on the list!
+          Want to be the first to try out Magiscribe? Let us know and we'll get you on the list!
         </p>
       </motion.div>
       <motion.div
@@ -58,9 +57,7 @@ export function SignupForm() {
           <input type="hidden" name="zf_redirect_url" value="" />
           <input type="hidden" name="zc_gad" value="" />
           <div className="mb-2">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              First Name
-            </label>
+            <label className="block text-gray-700 text-sm font-bold mb-2">First Name</label>
             <input
               className="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               type="text"
@@ -70,9 +67,7 @@ export function SignupForm() {
             />
           </div>
           <div className="mb-2">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              Last Name
-            </label>
+            <label className="block text-gray-700 text-sm font-bold mb-2">Last Name</label>
             <input
               className="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               type="text"
@@ -82,9 +77,7 @@ export function SignupForm() {
             />
           </div>
           <div className="mb-2">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              Email
-            </label>
+            <label className="block text-gray-700 text-sm font-bold mb-2">Email</label>
             <input
               className="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               type="text"
@@ -96,13 +89,11 @@ export function SignupForm() {
           <button
             disabled={formSubmitted}
             className={`${
-              formSubmitted
-                ? "bg-green-500"
-                : "bg-indigo-600 hover:bg-indigo-800"
+              formSubmitted ? 'bg-green-500' : 'bg-indigo-600 hover:bg-indigo-800'
             } w-full text-white font-bold mt-2 py-2 px-4 rounded-full focus:outline-none focus:shadow-outline transition duration-300 ease-in-out`}
             type="submit"
           >
-            {formSubmitted ? "Submitted!" : "Submit"}
+            {formSubmitted ? 'Submitted!' : 'Submit'}
           </button>
           {formSubmitted && (
             <motion.p
@@ -110,8 +101,7 @@ export function SignupForm() {
               animate={{ opacity: 1, y: 0 }}
               className="text-center text-sm text-gray-600 mt-2"
             >
-              Thank you for signing up for pre-alpha access! We'll be in touch
-              soon.
+              Thank you for signing up for pre-alpha access! We'll be in touch soon.
             </motion.p>
           )}
         </form>

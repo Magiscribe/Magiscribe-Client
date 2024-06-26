@@ -1,40 +1,29 @@
-import type { DefaultOptions } from "@apollo/client";
-import {
-  ApolloClient,
-  ApolloProvider,
-  from,
-  HttpLink,
-  InMemoryCache,
-  split,
-} from "@apollo/client";
-import { setContext } from "@apollo/client/link/context";
-import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
-import { useAuth } from "@clerk/clerk-react";
-import { createClient } from "graphql-ws";
+import type { DefaultOptions } from '@apollo/client';
+import { ApolloClient, ApolloProvider, from, HttpLink, InMemoryCache, split } from '@apollo/client';
+import { setContext } from '@apollo/client/link/context';
+import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
+import { useAuth } from '@clerk/clerk-react';
+import { createClient } from 'graphql-ws';
 
-import { getMainDefinition } from "@apollo/client/utilities";
-import React, { useMemo } from "react";
+import { getMainDefinition } from '@apollo/client/utilities';
+import React, { useMemo } from 'react';
 
 const defaultOptions: DefaultOptions = {
   watchQuery: {
-    fetchPolicy: "no-cache",
-    errorPolicy: "ignore",
+    fetchPolicy: 'no-cache',
+    errorPolicy: 'ignore',
   },
   query: {
-    fetchPolicy: "no-cache",
-    errorPolicy: "all",
+    fetchPolicy: 'no-cache',
+    errorPolicy: 'all',
   },
   mutate: {
-    fetchPolicy: "no-cache", // Since all requests are currently used to update the board state, we shouldn't cache any responses.
-    errorPolicy: "all",
+    fetchPolicy: 'no-cache', // Since all requests are currently used to update the board state, we shouldn't cache any responses.
+    errorPolicy: 'all',
   },
 };
 
-export const ApolloProviderWrapper = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
+export const ApolloProviderWrapper = ({ children }: { children: React.ReactNode }) => {
   const { getToken } = useAuth();
 
   const client = useMemo(() => {
@@ -73,10 +62,7 @@ export const ApolloProviderWrapper = ({
     const splitLink = split(
       ({ query }) => {
         const definition = getMainDefinition(query);
-        return (
-          definition.kind === "OperationDefinition" &&
-          definition.operation === "subscription"
-        );
+        return definition.kind === 'OperationDefinition' && definition.operation === 'subscription';
       },
       wsLink,
       from([httpAuthMiddleware, httpLink]),

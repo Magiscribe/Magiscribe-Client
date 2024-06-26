@@ -1,19 +1,18 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
+
+export const GENERATE_TRANSCRIPTION_CREDENTIALS = gql`
+  mutation Mutation {
+    generateTranscriptionStreamingCredentials {
+      accessKeyId
+      secretAccessKey
+      sessionToken
+    }
+  }
+`;
 
 export const ADD_VISUAL_PREDICTION = gql`
-  # Increments a back-end counter and gets its resulting value
-  mutation AddVisualPrediction(
-    $subscriptionId: String!
-    $agentId: String!
-    $prompt: String!
-    $context: String!
-  ) {
-    addVisualPrediction(
-      subscriptionId: $subscriptionId
-      agentId: $agentId
-      prompt: $prompt
-      context: $context
-    )
+  mutation AddVisualPrediction($subscriptionId: String!, $agentId: String!, $prompt: String!, $context: String!) {
+    addVisualPrediction(subscriptionId: $subscriptionId, agentId: $agentId, prompt: $prompt, context: $context)
   }
 `;
 
