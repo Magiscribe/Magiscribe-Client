@@ -1,11 +1,13 @@
-import { useQuery } from "@apollo/client";
-import { useMutation, useSubscription } from "@apollo/client";
-import { GET_ALL_AGENTS } from "../../clients/queries";
-import ListBox from "../../components/list/ListBox";
-import { useState } from "react";
-import { Agent } from "../../types/agents";
-import { GRAPHQL_SUBSCRIPTION } from "../../clients/subscriptions";
+import { useMutation, useQuery, useSubscription } from "@apollo/client";
+import { useEffect, useState } from "react";
 import { ADD_VISUAL_PREDICTION } from "../../clients/mutations";
+import { GET_ALL_AGENTS } from "../../clients/queries";
+import { GRAPHQL_SUBSCRIPTION } from "../../clients/subscriptions";
+import ListBox from "../../components/list/ListBox";
+import { useTranscribe } from "../../hooks/AudioHooks";
+import { Agent } from "../../types/agents";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMicrophone, faMicrophoneSlash } from "@fortawesome/free-solid-svg-icons";
 
 export default function PlaygroundDashboard() {
   const [loading, setLoading] = useState(false);
@@ -27,6 +29,9 @@ export default function PlaygroundDashboard() {
   const { data: agents } = useQuery(GET_ALL_AGENTS);
   const [addVisualPrediction] = useMutation(ADD_VISUAL_PREDICTION);
 
+  const { isTranscribing, transcript, startTranscribing, stopTranscribing } = useTranscribe();
+
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -40,6 +45,20 @@ export default function PlaygroundDashboard() {
       },
     });
   };
+
+  const handleTranscribe = () => {
+    if (isTranscribing) {
+      stopTranscribing();
+    } else {
+      startTranscribing();
+    }
+  }
+
+  useEffect(() => {
+    if (isTranscribing) {
+      setForm({ ...form, prompt: form.prompt + transcript});
+    }
+  }, [transcript]);
 
   const handleClear = () => {
     setResponses([]);
@@ -113,14 +132,21 @@ export default function PlaygroundDashboard() {
             />
           </div>
           <button
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg disabled:opacity-50"
+            className="bg-blue-500 text-white px-4 py-2 rounded-lg ml-2 hover:bg-blue-600 transition-colors disabled:opacity-50"
             disabled={loading}
           >
             Run
           </button>
           <button
             type="button"
-            className="bg-red-500 text-white px-4 py-2 rounded-lg ml-2"
+            className="bg-blue-500 text-white px-4 py-2 rounded-lg ml-2 hover:bg-blue-600 transition-colors"
+            onClick={handleTranscribe}
+          >
+            {isTranscribing ? "Stop" : "Transcribe"} <FontAwesomeIcon icon={isTranscribing ? faMicrophoneSlash : faMicrophone} />
+          </button>
+          <button
+            type="button"
+            className="bg-red-500 text-white px-4 py-2 rounded-lg ml-2 hover:bg-red-600 transition-colors"
             onClick={handleClear}
           >
             Clear
