@@ -11,8 +11,8 @@ export const GENERATE_TRANSCRIPTION_CREDENTIALS = gql`
 `;
 
 export const ADD_VISUAL_PREDICTION = gql`
-  mutation AddVisualPrediction($subscriptionId: String!, $agentId: String!, $prompt: String!, $context: String!) {
-    addVisualPrediction(subscriptionId: $subscriptionId, agentId: $agentId, prompt: $prompt, context: $context)
+  mutation addPrediction($subscriptionId: String!, $agentId: String!, $prompt: String!, $context: String!) {
+    addPrediction(subscriptionId: $subscriptionId, agentId: $agentId, prompt: $prompt, context: $context)
   }
 `;
 

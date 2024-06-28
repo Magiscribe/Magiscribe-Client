@@ -32,7 +32,7 @@ export default function PlaygroundDashboard() {
 
   // Queries and Mutations
   const { data: agents } = useQuery(GET_ALL_AGENTS);
-  const [addVisualPrediction] = useMutation(ADD_VISUAL_PREDICTION);
+  const [addPrediction] = useMutation(ADD_VISUAL_PREDICTION);
 
   // Transcribe
   const { isTranscribing, transcript, startTranscribing, stopTranscribing } = useTranscribe();
@@ -45,7 +45,7 @@ export default function PlaygroundDashboard() {
     e.preventDefault();
 
     setLoading(true);
-    addVisualPrediction({
+    addPrediction({
       variables: {
         subscriptionId: form.subscriptionId,
         agentId: form.agent,
