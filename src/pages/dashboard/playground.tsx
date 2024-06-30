@@ -1,15 +1,17 @@
 import { useMutation, useQuery, useSubscription } from '@apollo/client';
+import { faMicrophone, faMicrophoneSlash, faVolumeHigh, faVolumeMute } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import { ADD_VISUAL_PREDICTION } from '../../clients/mutations';
 import { GET_ALL_AGENTS } from '../../clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '../../clients/subscriptions';
+import { useElevenLabsAudio } from '../../components/audioplayer';
 import ListBox from '../../components/list/ListBox';
 import { useTranscribe } from '../../hooks/AudioHooks';
 import { Agent } from '../../types/agents';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMicrophone, faMicrophoneSlash } from '@fortawesome/free-solid-svg-icons';
 
 interface VisualPredictionAdded {
+  id: string;
   context: string;
   prompt: string;
   result: string;
@@ -35,7 +37,9 @@ export default function PlaygroundDashboard() {
   const [addPrediction] = useMutation(ADD_VISUAL_PREDICTION);
 
   // Transcribe
+  const [enableAudio, setEnableAudio] = useState(false);
   const { isTranscribing, transcript, startTranscribing, stopTranscribing } = useTranscribe();
+  const audio = useElevenLabsAudio('sk_498df66d81e23ea405d298d42789a4bac304e05bb27ba4ca',);
 
   /**
    * Handles the form submission event.
@@ -97,7 +101,20 @@ export default function PlaygroundDashboard() {
     variables: { subscriptionId: form.subscriptionId },
     shouldResubscribe: true,
     onData: ({ data }) => {
-      setResponses([...responses, data.data]);
+      // If something with the same ID exists, append the new data.
+      const original = responses.find((response) => response.visualPredictionAdded.id === data.data.visualPredictionAdded.id);
+      if (original) {
+        original.visualPredictionAdded.result+= data.data.visualPredictionAdded.result;
+        // replace the original with the updated one
+        setResponses([...responses]);
+      } else {
+        setResponses([...responses, data.data]);
+      }
+
+      if (enableAudio) {
+        audio.addChunk(data.data.visualPredictionAdded.result);
+      }
+      
       const type = data.data.visualPredictionAdded.type;
       if (type === 'ERROR' || type === 'SUCCESS') {
         setLoading(false);
@@ -106,6 +123,7 @@ export default function PlaygroundDashboard() {
   });
 
   return (
+    <>
     <div className="bg-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl text-slate-700">
       <h1 className="text-3xl font-bold">Playground</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-8">
@@ -159,11 +177,13 @@ export default function PlaygroundDashboard() {
           </button>
           <button
             type="button"
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg ml-2 hover:bg-blue-600 transition-colors"
+            className="bg-green-500 text-white px-4 py-2 rounded-lg ml-2 hover:bg-green-600 transition-colors"
             onClick={handleTranscribe}
           >
-            {isTranscribing ? 'Stop' : 'Transcribe'}{' '}
-            <FontAwesomeIcon icon={isTranscribing ? faMicrophoneSlash : faMicrophone} />
+            Transcription {isTranscribing ? 'On' : 'Off'}{' '}<FontAwesomeIcon icon={isTranscribing ? faMicrophone : faMicrophoneSlash} />
+          </button>
+          <button type="button" className="bg-green-500 text-white px-4 py-2 rounded-lg ml-2 hover:bg-green-600 transition-colors" onClick={() => setEnableAudio(!enableAudio)}>
+             Audio {enableAudio ? 'On' : 'Off'} <FontAwesomeIcon icon={enableAudio ? faVolumeHigh : faVolumeMute} />
           </button>
           <button
             type="button"
@@ -176,9 +196,9 @@ export default function PlaygroundDashboard() {
         <div className="mt-6 h-full max-h-96 w-full bg-gray-100 rounded-lg">
           <code className="h-full w-full block p-4 overflow-y-auto">
             {[...responses].reverse().map((response, index) => {
-              const fields: Array<keyof VisualPredictionAdded> = ['context', 'prompt', 'result', 'type'];
+              const fields: Array<keyof VisualPredictionAdded> = ['id', 'context', 'prompt', 'result', 'type'];
               return (
-                <div key={index} className="mb-4 border-2 border-gray-200 p-2 rounded-lg text-sm">
+                <div key={response.visualPredictionAdded.id} className="mb-4 border-2 border-gray-200 p-2 rounded-lg text-sm">
                   {fields.map((field) => {
                     const value = response.visualPredictionAdded[field];
                     return value ? (
@@ -195,5 +215,6 @@ export default function PlaygroundDashboard() {
         </div>
       </div>
     </div>
+    </>
   );
 }
