@@ -63,7 +63,7 @@ export default function PlaygroundDashboard() {
       variables: {
         subscriptionId: form.subscriptionId,
         agentId: form.agent,
-        prompt: form.prompt,
+        userMessage: form.prompt,
         context: 'context',
       },
     });
