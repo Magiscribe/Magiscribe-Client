@@ -8,6 +8,29 @@ import ListBoxMultiple from '../../../components/list/ListBoxMultiple';
 import { useAddAlert } from '../../../hooks/AlertHooks';
 import { Prompt } from '../../../types/agents';
 
+const OutputReturnMode = [
+  {
+    name: 'Synchonous Passthrough Aggregate',
+    id: 'SYNCHRONOUS_PASSTHROUGH_AGGREGATE',
+  },
+  {
+    name: 'Synchonous Passthrough Individual',
+    id: 'SYNCHRONOUS_PASSTHROUGH_INVIDUAL',
+  },
+  {
+    name: 'Synchonous Execution Aggregate',
+    id: 'SYNCHRONOUS_EXECUTION_AGGREGATE',
+  },
+  {
+    name: 'Synchonous Execution Individual',
+    id: 'SYNCHRONOUS_EXECUTION_INVIDUAL',
+  },
+  {
+    name: 'Streaming Individual',
+    id: 'STREAMING_INDIVIDUAL',
+  },
+];
+
 export default function CapabilityEdit() {
   const addAlert = useAddAlert();
   const [form, setForm] = useState({
@@ -17,6 +40,9 @@ export default function CapabilityEdit() {
     description: '',
     llmModel: '',
     prompts: [''],
+    outputMode: '',
+    subscriptionFilter: '',
+    outputFilter: '',
   });
   const [searchParams] = useSearchParams();
   const [addUpdateCapability] = useMutation(ADD_UPDATE_CAPABILITY);
@@ -39,6 +65,9 @@ export default function CapabilityEdit() {
         description: capability.getCapability.description,
         llmModel: capability.getCapability.llmModel,
         prompts: capability.getCapability.prompts.map((prompt: Prompt) => prompt.id),
+        outputMode: capability.getCapability.outputMode,
+        subscriptionFilter: capability.getCapability.subscriptionFilter,
+        outputFilter: capability.getCapability.outputFilter,
       });
     }
   }, [capability]);
@@ -63,6 +92,9 @@ export default function CapabilityEdit() {
             description: form.description,
             llmModel: form.llmModel,
             prompts: form.prompts,
+            outputMode: form.outputMode,
+            subscriptionFilter: form.subscriptionFilter?.trim() === '' ? null : form.subscriptionFilter,
+            outputFilter: form.outputFilter?.trim() === '' ? null : form.outputFilter,
           },
         },
       });
@@ -158,6 +190,50 @@ export default function CapabilityEdit() {
               values={(prompts?.getAllPrompts ?? []).map((capability: Prompt) => ({
                 name: capability.name ?? '',
                 id: capability.id,
+              }))}
+            />
+          </div>
+          <div className="mb-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-bold mb-2" htmlFor="name">
+                Subscription Filter
+              </label>
+              <input
+                className="border-2 border-gray-200 p-2 rounded-lg w-full"
+                id="subscriptionFilter"
+                type="text"
+                value={form.subscriptionFilter}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-bold mb-2" htmlFor="name">
+                Output Filter
+              </label>
+              <input
+                className="border-2 border-gray-200 p-2 rounded-lg w-full"
+                id="outputFilter"
+                type="text"
+                value={form.outputFilter}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-bold mb-2" htmlFor="name">
+              Output Mode
+            </label>
+            <ListBox
+              setSelected={(value) => {
+                setForm({
+                  ...form,
+                  outputMode: value.id,
+                });
+              }}
+              selected={OutputReturnMode.find((mode) => mode.id === form.outputMode) ?? { name: '', id: '' }}
+              values={OutputReturnMode.map((mode) => ({
+                name: mode.name,
+                id: mode.id,
               }))}
             />
           </div>

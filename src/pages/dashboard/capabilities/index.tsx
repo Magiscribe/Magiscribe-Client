@@ -23,7 +23,7 @@ function CapabilityCard({ capability, onUpdate }: { capability: Capability; onUp
   };
 
   return (
-    <div className="relative bg-gray-100 p-4 rounded-lg shadow-md">
+    <div className="relative bg-gray-100 p-4 rounded-lg shadow-md h-full w-full">
       <h2 className="text-xl font-bold">
         {capability.name} <span className="text-sm font-normal text-slate-700">({capability.alias})</span>
       </h2>

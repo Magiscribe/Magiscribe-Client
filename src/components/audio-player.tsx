@@ -4,12 +4,11 @@ import { useCallback, useEffect, useState, useRef } from 'react';
 export const useElevenLabsAudio = ({
   apiKey,
   voiceId,
-  modelId = 'eleven_multilingual_v2'
+  modelId = 'eleven_multilingual_v2',
 }: {
   apiKey: string;
   voiceId: string;
   modelId: string;
-
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [transcript, setTranscript] = useState('');
@@ -23,27 +22,29 @@ export const useElevenLabsAudio = ({
   }, [apiKey]);
 
   const generateAndPushAudio = useCallback((text: string) => {
-    const audioPromise = new Promise<HTMLAudioElement>(async (resolve, reject) => {
-      try {
-        const audioStream = await clientRef.current!.generate({
-          stream: true,
-          text,
-          model_id: modelId,
-          voice: voiceId,
-        });
+    const audioPromise = new Promise<HTMLAudioElement>((resolve, reject) => {
+      (async () => {
+        try {
+          const audioStream = await clientRef.current!.generate({
+            stream: true,
+            text,
+            model_id: modelId,
+            voice: voiceId,
+          });
 
-        const chunks: Buffer[] = [];
-        for await (const chunk of audioStream) {
-          chunks.push(chunk);
+          const chunks: Buffer[] = [];
+          for await (const chunk of audioStream) {
+            chunks.push(chunk);
+          }
+
+          const content = Buffer.concat(chunks);
+          const audio = new Audio(URL.createObjectURL(new Blob([content])));
+          resolve(audio);
+        } catch (error) {
+          console.error('Error generating audio:', error);
+          reject(error);
         }
-
-        const content = Buffer.concat(chunks);
-        const audio = new Audio(URL.createObjectURL(new Blob([content])));
-        resolve(audio);
-      } catch (error) {
-        console.error('Error generating audio:', error);
-        reject(error);
-      }
+      })();
     });
 
     audioPromiseQueueRef.current.push(audioPromise);

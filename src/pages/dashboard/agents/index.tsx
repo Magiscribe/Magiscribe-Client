@@ -23,7 +23,7 @@ function AgentCard({ agent, onUpdate }: { agent: Agent; onUpdate?: () => void })
   };
 
   return (
-    <div className="relative bg-gray-100 p-4 rounded-lg shadow-md">
+    <div className="relative bg-gray-100 p-4 rounded-lg shadow-md h-full w-full">
       <h2 className="text-xl font-bold">{agent.name}</h2>
       <p className="text-sm">{agent.description}</p>
       <div className="flex flex-wrap gap-2 mt-2">

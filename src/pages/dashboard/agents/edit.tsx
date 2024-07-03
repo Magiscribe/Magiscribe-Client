@@ -17,6 +17,9 @@ export default function AgentEdit() {
     reasoningLLMModel: '',
     reasoningPrompt: '',
     capabilities: [''],
+    memoryEnabled: false,
+    subscriptionFilter: '',
+    outputFilter: '',
   });
   const [searchParams] = useSearchParams();
   const [addUpdateAgent] = useMutation(ADD_UPDATE_AGENT);
@@ -39,6 +42,9 @@ export default function AgentEdit() {
         reasoningLLMModel: agent.getAgent.reasoningLLMModel,
         reasoningPrompt: agent.getAgent.reasoningPrompt,
         capabilities: agent.getAgent.capabilities.map((capability: Capability) => capability.id),
+        memoryEnabled: agent.getAgent.memoryEnabled,
+        subscriptionFilter: agent.getAgent.subscriptionFilter,
+        outputFilter: agent.getAgent.outputFilter,
       });
     }
   }, [agent]);
@@ -63,6 +69,9 @@ export default function AgentEdit() {
             reasoningLLMModel: form.reasoningLLMModel,
             reasoningPrompt: form.reasoningPrompt,
             capabilities: form.capabilities,
+            memoryEnabled: form.memoryEnabled,
+            subscriptionFilter: form.subscriptionFilter?.trim() === '' ? null : form.subscriptionFilter,
+            outputFilter: form.outputFilter?.trim() === '' ? null : form.outputFilter,
           },
         },
       });
@@ -162,6 +171,53 @@ export default function AgentEdit() {
               rows={30}
               value={form.reasoningPrompt}
               onChange={handleChange}
+            />
+          </div>
+          <div className="mb-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-bold mb-2" htmlFor="name">
+                Subscription Filter
+              </label>
+              <input
+                className="border-2 border-gray-200 p-2 rounded-lg w-full"
+                id="subscriptionFilter"
+                type="text"
+                value={form.subscriptionFilter}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-bold mb-2" htmlFor="name">
+                Output Filter
+              </label>
+              <input
+                className="border-2 border-gray-200 p-2 rounded-lg w-full"
+                id="outputFilter"
+                type="text"
+                value={form.outputFilter}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-bold mb-2" htmlFor="name">
+              Memory
+            </label>
+            <ListBox
+              setSelected={(value) => {
+                setForm({
+                  ...form,
+                  memoryEnabled: value.id === 'true',
+                });
+              }}
+              selected={{
+                name: form.memoryEnabled ? 'Enabled' : 'Disabled',
+                id: form.memoryEnabled ? 'true' : 'false',
+              }}
+              values={[
+                { name: 'Enabled', id: 'true' },
+                { name: 'Disabled', id: 'false' },
+              ]}
             />
           </div>
           <button className="bg-blue-500 text-white px-4 py-2 rounded-lg">Save</button>

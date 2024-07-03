@@ -25,8 +25,6 @@ export const GET_ALL_AGENTS = gql`
       id
       name
       description
-      reasoningLLMModel
-      reasoningPrompt
       capabilities {
         name
         id
@@ -47,6 +45,9 @@ export const GET_AGENT = gql`
         name
         id
       }
+      memoryEnabled
+      subscriptionFilter
+      outputFilter
     }
   }
 `;
@@ -55,7 +56,6 @@ export const GET_ALL_CAPABILITIES = gql`
   query Query {
     getAllCapabilities {
       id
-      llmModel
       prompts {
         name
         id
@@ -79,6 +79,9 @@ export const GET_CAPABILITY = gql`
       alias
       name
       description
+      outputMode
+      subscriptionFilter
+      outputFilter
     }
   }
 `;

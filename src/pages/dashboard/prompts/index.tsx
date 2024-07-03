@@ -23,7 +23,7 @@ function PromptCard({ prompt, onUpdate }: { prompt: Prompt; onUpdate?: () => voi
   };
 
   return (
-    <div className="relative bg-gray-100 p-4 rounded-lg shadow-md">
+    <div className="relative bg-gray-100 p-4 rounded-lg shadow-md h-full w-full">
       <h2 className="text-xl font-bold">{prompt.name}</h2>
       <div className="absolute top-4 right-4 flex gap-2">
         <Link

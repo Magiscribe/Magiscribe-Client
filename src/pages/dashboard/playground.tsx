@@ -26,16 +26,19 @@ interface Data {
 export default function PlaygroundDashboard() {
   // States
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useWithLocalStorage({
-    subscriptionId: Math.random().toString(36),
-    elevenlabs: {
-      apiKey: '',
-      voiceId: '',
-      modelId: '',
+  const [form, setForm] = useWithLocalStorage(
+    {
+      subscriptionId: Math.random().toString(36),
+      elevenlabs: {
+        apiKey: '',
+        voiceId: '',
+        modelId: '',
+      },
+      agent: '',
+      prompt: '',
     },
-    agent: '',
-    prompt: '',
-  }, 'playground-form');
+    'playground-form',
+  );
   const [responses, setResponses] = useState<Array<Data>>([]);
 
   // Queries and Mutations
@@ -103,34 +106,35 @@ export default function PlaygroundDashboard() {
 
   /**
    * Subscribes to the GraphQL subscription.
-   * @returns {void}
-   * @sideeffect Updates the responses when a new data is received.
-   * @sideeffect Updates the loading state when the type is "ERROR" or "SUCCESS".
+   * Updates responses and loading state based on received data.
    */
   useSubscription(GRAPHQL_SUBSCRIPTION, {
     variables: { subscriptionId: form.subscriptionId },
     shouldResubscribe: true,
     onData: ({ data }) => {
-      // If something with the same ID exists, append the new data.
-      const original = responses.find(
-        (response) =>
-          response.predictionAdded.id === data.data.predictionAdded.id &&
-          response.predictionAdded.type === 'DATA',
+      const newPrediction = data.data.predictionAdded;
+
+      // Find existing response with matching ID and type 'DATA'
+      const existingResponse = responses.find(
+        (r) => r.predictionAdded.id === newPrediction.id && r.predictionAdded.type === 'DATA',
       );
-      if (original) {
-        original.predictionAdded.result += data.data.predictionAdded.result;
-        // replace the original with the updated one
+
+      if (existingResponse && newPrediction.type === 'DATA') {
+        // Update existing response
+        existingResponse.predictionAdded.result += newPrediction.result;
         setResponses([...responses]);
       } else {
+        // Add new response
         setResponses([...responses, data.data]);
       }
 
+      // Add audio chunk if enabled
       if (enableAudio) {
-        audio.addChunk(data.data.predictionAdded.result);
+        audio.addChunk(newPrediction.result);
       }
 
-      const type = data.data.predictionAdded.type;
-      if (type === 'ERROR' || type === 'SUCCESS') {
+      // Update loading state for 'ERROR' or 'SUCCESS' types
+      if (['ERROR', 'SUCCESS'].includes(newPrediction.type)) {
         setLoading(false);
       }
     },
@@ -211,7 +215,6 @@ export default function PlaygroundDashboard() {
                   }
                 />
               </div>
-              
             </div>
             <div className="mb-4">
               <label className="block text-sm font-bold mb-2" htmlFor="agent">
