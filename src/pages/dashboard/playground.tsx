@@ -29,11 +29,7 @@ export default function PlaygroundDashboard() {
   const [form, setForm] = useWithLocalStorage(
     {
       subscriptionId: Math.random().toString(36),
-      elevenlabs: {
-        apiKey: '',
-        voiceId: '',
-        modelId: '',
-      },
+      voice: 'PHOEBE',
       agent: '',
       prompt: '',
     },
@@ -48,11 +44,7 @@ export default function PlaygroundDashboard() {
   // Transcribe
   const [enableAudio, setEnableAudio] = useState(false);
   const { isTranscribing, transcript, startTranscribing, stopTranscribing } = useTranscribe();
-  const audio = useElevenLabsAudio({
-    apiKey: form.elevenlabs.apiKey,
-    voiceId: form.elevenlabs.voiceId,
-    modelId: form.elevenlabs.modelId,
-  });
+  const audio = useElevenLabsAudio(form.voice);
 
   /**
    * Handles the form submission event.
@@ -129,7 +121,7 @@ export default function PlaygroundDashboard() {
       }
 
       // Add audio chunk if enabled
-      if (enableAudio) {
+      if (enableAudio && newPrediction.type === 'DATA') {
         audio.addChunk(newPrediction.result);
       }
 
@@ -157,64 +149,16 @@ export default function PlaygroundDashboard() {
                 onChange={(e) => setForm({ ...form, subscriptionId: e.target.value })}
               />
             </div>
-            <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-bold mb-2" htmlFor="apiKey">
-                  ElevenLabs API Key
-                </label>
-                <input
-                  className="border-2 border-gray-200 p-2 rounded-lg w-full"
-                  id="apiKey"
-                  value={form.elevenlabs.apiKey}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      elevenlabs: {
-                        ...form.elevenlabs,
-                        apiKey: e.target.value,
-                      },
-                    })
-                  }
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-bold mb-2" htmlFor="voiceId">
-                  Voice ID
-                </label>
-                <input
-                  className="border-2 border-gray-200 p-2 rounded-lg w-full"
-                  id="voiceId"
-                  value={form.elevenlabs.voiceId}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      elevenlabs: {
-                        ...form.elevenlabs,
-                        voiceId: e.target.value,
-                      },
-                    })
-                  }
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-bold mb-2" htmlFor="modelId">
-                  Model ID
-                </label>
-                <input
-                  className="border-2 border-gray-200 p-2 rounded-lg w-full"
-                  id="modelId"
-                  value={form.elevenlabs.modelId}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      elevenlabs: {
-                        ...form.elevenlabs,
-                        modelId: e.target.value,
-                      },
-                    })
-                  }
-                />
-              </div>
+            <div className="mb-4">
+              <label className="block text-sm font-bold mb-2" htmlFor="voice">
+                Voice
+              </label>
+              <input
+                className="border-2 border-gray-200 p-2 rounded-lg w-full"
+                id="voice"
+                value={form.voice}
+                onChange={(e) => setForm({ ...form, voice: e.target.value })}
+              />
             </div>
             <div className="mb-4">
               <label className="block text-sm font-bold mb-2" htmlFor="agent">

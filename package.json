@@ -26,7 +26,6 @@
     "@tailwindcss/typography": "^0.5.13",
     "@types/node": "^20.14.9",
     "clsx": "^2.1.1",
-    "elevenlabs": "^0.8.1",
     "globals": "^15.7.0",
     "graphql": "16.9.0",
     "graphql-ws": "5.16.0",

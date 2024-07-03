@@ -1,44 +1,24 @@
-import { ElevenLabsClient } from 'elevenlabs';
-import { useCallback, useEffect, useState, useRef } from 'react';
+import { useMutation } from '@apollo/client';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { GENERATE_AUDIO } from '../clients/mutations';
 
-export const useElevenLabsAudio = ({
-  apiKey,
-  voiceId,
-  modelId = 'eleven_multilingual_v2',
-}: {
-  apiKey: string;
-  voiceId: string;
-  modelId: string;
-}) => {
+export const useElevenLabsAudio = (voice: string) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [transcript, setTranscript] = useState('');
+  const [generateAudio] = useMutation(GENERATE_AUDIO);
   const audioPromiseQueueRef = useRef<Promise<HTMLAudioElement>[]>([]);
-  const clientRef = useRef<ElevenLabsClient | null>(null);
-
-  useEffect(() => {
-    clientRef.current = new ElevenLabsClient({
-      apiKey: apiKey,
-    });
-  }, [apiKey]);
 
   const generateAndPushAudio = useCallback((text: string) => {
     const audioPromise = new Promise<HTMLAudioElement>((resolve, reject) => {
       (async () => {
         try {
-          const audioStream = await clientRef.current!.generate({
-            stream: true,
-            text,
-            model_id: modelId,
-            voice: voiceId,
+          const audioUrl = await generateAudio({
+            variables: {
+              text,
+              voice,
+            },
           });
-
-          const chunks: Buffer[] = [];
-          for await (const chunk of audioStream) {
-            chunks.push(chunk);
-          }
-
-          const content = Buffer.concat(chunks);
-          const audio = new Audio(URL.createObjectURL(new Blob([content])));
+          const audio = new Audio(audioUrl.data.generateAudio);
           resolve(audio);
         } catch (error) {
           console.error('Error generating audio:', error);

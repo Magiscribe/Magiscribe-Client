@@ -10,6 +10,12 @@ export const GENERATE_TRANSCRIPTION_CREDENTIALS = gql`
   }
 `;
 
+export const GENERATE_AUDIO = gql`
+  mutation Mutation($voice: String!, $text: String!) {
+    generateAudio(voice: $voice, text: $text)
+  }
+`;
+
 export const ADD_VISUAL_PREDICTION = gql`
   mutation addPrediction($subscriptionId: String!, $agentId: String!, $userMessage: String!, $context: String!) {
     addPrediction(subscriptionId: $subscriptionId, agentId: $agentId, userMessage: $userMessage, context: $context)
