@@ -8,7 +8,7 @@ import { useSetTitle } from '../hooks/TitleHook';
 export default function DashboardTemplate() {
   const { session } = useSession();
 
-  useSetTitle()('Agent Builder');
+  useSetTitle()('Agent Lab');
 
   return (
     <Protect
