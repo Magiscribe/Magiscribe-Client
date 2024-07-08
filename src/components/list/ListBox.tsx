@@ -7,6 +7,7 @@ interface ListBoxProps {
   selected: { id: string; name: string } | undefined;
   setSelected: ({ id, name }: { id: string; name: string }) => void;
   values: { id: string; name: string }[];
+  placeholder?: string;
 }
 
 export default function ListBox({ selected, setSelected, values }: ListBoxProps) {

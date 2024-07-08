@@ -53,8 +53,13 @@ export const ADD_UPDATE_CAPABILITY = gql`
       alias
       description
       llmModel
+      outputMode
+      subscriptionFilter
+      outputFilter
       prompts {
         id
+        name
+        text
       }
     }
   }

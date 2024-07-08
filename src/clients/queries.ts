@@ -65,6 +65,7 @@ export const GET_CAPABILITY = gql`
       prompts {
         name
         id
+        text
       }
       alias
       name
