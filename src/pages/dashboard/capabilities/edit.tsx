@@ -1,11 +1,58 @@
 import { useMutation, useQuery } from '@apollo/client';
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ADD_UPDATE_CAPABILITY, ADD_UPDATE_PROMPT } from '../../../clients/mutations';
+import { ADD_UPDATE_CAPABILITY } from '../../../clients/mutations';
 import { GET_ALL_MODELS, GET_ALL_PROMPTS, GET_CAPABILITY } from '../../../clients/queries';
 import ListBox from '../../../components/list/ListBox';
 import { useAddAlert } from '../../../hooks/AlertHooks';
 import { Prompt } from '../../../types/agents';
+import ReorderableList from '../../../components/list/ReorderableList';
+import React from 'react';
+
+interface ListItem {
+  id: string;
+  name: string;
+
+}
+
+
+const PromptItem = (
+  item: ListItem,
+  isEditing: boolean,
+  onEdit: (field: string, value: any) => void
+) => {
+  const prompt = item as Prompt; // Type assertion, assuming Prompt extends ListItem
+
+  return (
+    <div className="flex-grow">
+      {isEditing ? (
+        // Edit mode UI
+        <div>
+          <input
+            type="text"
+            value={prompt.name}
+            onChange={(e) => onEdit('name', e.target.value)}
+            className="w-full mb-2 p-1 border rounded"
+          />
+          <textarea
+            value={prompt.text}
+            onChange={(e) => onEdit('text', e.target.value)}
+            className="w-full mb-2 p-1 border rounded"
+            rows={3}
+          />
+        </div>
+      ) : (
+        // View mode UI
+        <div>
+          <h3 className="text-lg font-semibold">{prompt.name}</h3>
+          <p className="text-sm text-gray-600">{prompt.text.substring(0, 100)}...</p>
+        </div>
+      )}
+    </div>
+  );
+};
+
+
 
 const OutputReturnMode = [
   {
@@ -45,9 +92,8 @@ export default function CapabilityEdit() {
   });
   const [searchParams] = useSearchParams();
   const [addUpdateCapability] = useMutation(ADD_UPDATE_CAPABILITY);
-  const [addUpdatePrompt] = useMutation(ADD_UPDATE_PROMPT);
   const { data: prompts } = useQuery(GET_ALL_PROMPTS);
-  const [availablePrompts, setAvailablePrompts] = useState<Prompt[]>([]);
+  // const [availablePrompts, setAvailablePrompts] = useState<Prompt[]>([]);
   const { data: models } = useQuery(GET_ALL_MODELS);
   const { data: capability } = useQuery(GET_CAPABILITY, {
     skip: !searchParams.has('id'),
@@ -56,7 +102,7 @@ export default function CapabilityEdit() {
     },
   });
   const navigate = useNavigate();
-  const [editingPromptId, setEditingPromptId] = useState<string | null>(null);
+
 
   useEffect(() => {
     if (capability) {
@@ -78,12 +124,12 @@ export default function CapabilityEdit() {
     }
   }, [capability]);
 
-  useEffect(() => {
-    if (prompts && form.prompts) {
-      const usedPromptIds = new Set(form.prompts.map(p => p.id));
-      setAvailablePrompts(prompts.getAllPrompts.filter((p: Prompt) => !usedPromptIds.has(p.id)));
-    }
-  }, [prompts, form.prompts]);
+  // useEffect(() => {
+  //   if (prompts && form.prompts) {
+  //     const usedPromptIds = new Set(form.prompts.map(p => p.id));
+  //     setAvailablePrompts(prompts.getAllPrompts.filter((p: Prompt) => !usedPromptIds.has(p.id)));
+  //   }
+  // }, [prompts, form.prompts]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({
@@ -92,83 +138,9 @@ export default function CapabilityEdit() {
     });
   };
 
-  const handleEditPrompt = (e: React.MouseEvent, promptId: string) => {
-    e.preventDefault(); // Prevent form submission
-    setEditingPromptId(promptId);
-  };
-
-  const handleDeletePrompt = (promptId: string) => {
-    const deletedPrompt = form.prompts.find(p => p.id === promptId);
-    setForm({
-      ...form,
-      prompts: form.prompts.filter((p) => p.id !== promptId),
-    });
-    if (deletedPrompt) {
-      setAvailablePrompts([...availablePrompts, deletedPrompt]);
-    }
-    addAlert('Prompt removed from capability', 'success');
-  };
-  
-  const handlePromptChange = (promptId: string, field: string, value: string) => {
-    const newPrompts = form.prompts.map(prompt => 
-      prompt.id === promptId ? { ...prompt, [field]: value } : prompt
-    );
-    setForm({ ...form, prompts: newPrompts });
-  };
-  
-  const handleSavePrompt = async (e: React.MouseEvent, promptId: string) => {
-    e.preventDefault(); // Prevent form submission
-    try {
-      const promptToSave = form.prompts.find(p => p.id === promptId);
-      if (!promptToSave) return;
-  
-      await addUpdatePrompt({
-        variables: {
-          prompt: {
-            id: promptToSave.id,
-            name: promptToSave.name,
-            text: promptToSave.text,
-          },
-        },
-      });
-  
-      setEditingPromptId(null);
-      addAlert('Prompt saved successfully', 'success');
-    } catch (error) {
-      console.error(error);
-      addAlert('Error saving prompt', 'error');
-    }
-  };
-  
-  const handleCancelEditPrompt = (e: React.MouseEvent) => {
-    e.preventDefault(); // Prevent form submission
-    setEditingPromptId(null);
-  };
-
-  const handleAddPrompt = ({ id }: { id: string }) => {
-    const selectedPrompt = availablePrompts.find(p => p.id === id);
-    if (selectedPrompt) {
-      setForm({
-        ...form,
-        prompts: [...form.prompts, selectedPrompt],
-      });
-      setAvailablePrompts(availablePrompts.filter(p => p.id !== id));
-    }
-  };
-
-  const handleMovePrompt = (index: number, direction: 'up' | 'down') => {
-    const newPrompts = [...form.prompts];
-    if (direction === 'up' && index > 0) {
-      [newPrompts[index - 1], newPrompts[index]] = [newPrompts[index], newPrompts[index - 1]];
-    } else if (direction === 'down' && index < newPrompts.length - 1) {
-      [newPrompts[index], newPrompts[index + 1]] = [newPrompts[index + 1], newPrompts[index]];
-    }
-    setForm({ ...form, prompts: newPrompts });
-  };
-
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-  
+
     try {
       const result = await addUpdateCapability({
         variables: {
@@ -185,12 +157,12 @@ export default function CapabilityEdit() {
           },
         },
       });
-  
+
       if (result.errors) {
         addAlert('Error saving capability', 'error');
         return;
       }
-  
+
       addAlert('Capability saved successfully', 'success');
       navigate('/dashboard/capabilities');
     } catch (error) {
@@ -306,97 +278,14 @@ export default function CapabilityEdit() {
               }))}
             />
           </div>
-          <div className="mb-4">
-  <label className="block text-sm font-bold mb-2" htmlFor="prompts">
-    Prompts (Select from dropdown to add a prompt)
-  </label>
-  <div className="mb-4">
-    <ListBox
-      setSelected={handleAddPrompt}
-      selected={undefined}
-      values={availablePrompts.map((prompt) => ({
-        name: prompt.name,
-        id: prompt.id,
-      }))}
-    />
-  </div>
-  <ul className="border-2 border-gray-200 rounded-lg p-2">
-    {form.prompts.map((prompt, index) => (
-      <li key={prompt.id} className="mb-2 p-2 bg-gray-100 rounded flex">
-        
-        <div className="flex-grow">
-          {editingPromptId === prompt.id ? (
-            <div>
-              <input
-                type="text"
-                value={prompt.name}
-                onChange={(e) => handlePromptChange(prompt.id, 'name', e.target.value)}
-                className="w-full mb-2 p-1 border rounded"
-              />
-              <textarea
-                value={prompt.text}
-                onChange={(e) => handlePromptChange(prompt.id, 'text', e.target.value)}
-                className="w-full mb-2 p-1 border rounded"
-                rows={3}
-              />
-              <div className="flex justify-left space-x-2">
-                <button
-                  onClick={(e) => handleSavePrompt(e, prompt.id)}
-                  className="bg-green-500 text-white px-2 py-1 rounded"
-                >
-                  Save Prompt
-                </button>
-                <button
-                  onClick={handleCancelEditPrompt}
-                  className="bg-gray-500 text-white px-2 py-1 rounded"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div>
-              <h3 className="text-lg font-semibold">{prompt.name}</h3>
-              <p className="text-sm text-gray-600">{prompt.text.substring(0, 100)}...</p>
-              <div className="flex justify-left space-x-2 mt-2">
-                <button
-                  onClick={(e) => handleEditPrompt(e, prompt.id)}
-                  className="bg-blue-500 text-white px-2 py-1 rounded"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDeletePrompt(prompt.id)}
-                  className="bg-red-500 text-white px-2 py-1 rounded"
-                >
-                  Remove
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-        <div className="flex flex-col justify-center mr-2">
-          <button
-            type="button"
-            onClick={() => handleMovePrompt(index, 'up')}
-            disabled={index === 0}
-            className="bg-gray-300 text-gray-700 px-2 py-1 rounded disabled:opacity-50 mb-1"
-          >
-            ▲
-          </button>
-          <button
-            type="button"
-            onClick={() => handleMovePrompt(index, 'down')}
-            disabled={index === form.prompts.length - 1}
-            className="bg-gray-300 text-gray-700 px-2 py-1 rounded disabled:opacity-50"
-          >
-            ▼
-          </button>
-        </div>
-      </li>
-    ))}
-  </ul>
-</div>
+          <ReorderableList
+          availableItems={prompts}
+          items={form.prompts} 
+          onItemsChange={() => setForm((form) => ({ ...form, prompts }))}
+          renderItem={PromptItem}
+          onItemSave={async () => {}}
+          />
+
           <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-lg">Save Capability</button>
         </form>
       </div>
