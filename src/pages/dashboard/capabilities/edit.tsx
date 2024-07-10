@@ -1,58 +1,13 @@
 import { useMutation, useQuery } from '@apollo/client';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ADD_UPDATE_CAPABILITY } from '../../../clients/mutations';
+import { ADD_UPDATE_CAPABILITY, ADD_UPDATE_PROMPT } from '../../../clients/mutations';
 import { GET_ALL_MODELS, GET_ALL_PROMPTS, GET_CAPABILITY } from '../../../clients/queries';
 import ListBox from '../../../components/list/ListBox';
+import ReorderableList from '../../../components/list/ReorderableList';
+import CustomModal from '../../../components/modal';
 import { useAddAlert } from '../../../hooks/AlertHooks';
 import { Prompt } from '../../../types/agents';
-import ReorderableList from '../../../components/list/ReorderableList';
-import React from 'react';
-
-interface ListItem {
-  id: string;
-  name: string;
-
-}
-
-
-const PromptItem = (
-  item: ListItem,
-  isEditing: boolean,
-  onEdit: (field: string, value: any) => void
-) => {
-  const prompt = item as Prompt; // Type assertion, assuming Prompt extends ListItem
-
-  return (
-    <div className="flex-grow">
-      {isEditing ? (
-        // Edit mode UI
-        <div>
-          <input
-            type="text"
-            value={prompt.name}
-            onChange={(e) => onEdit('name', e.target.value)}
-            className="w-full mb-2 p-1 border rounded"
-          />
-          <textarea
-            value={prompt.text}
-            onChange={(e) => onEdit('text', e.target.value)}
-            className="w-full mb-2 p-1 border rounded"
-            rows={3}
-          />
-        </div>
-      ) : (
-        // View mode UI
-        <div>
-          <h3 className="text-lg font-semibold">{prompt.name}</h3>
-          <p className="text-sm text-gray-600">{prompt.text.substring(0, 100)}...</p>
-        </div>
-      )}
-    </div>
-  );
-};
-
-
 
 const OutputReturnMode = [
   {
@@ -78,7 +33,7 @@ const OutputReturnMode = [
 ];
 
 export default function CapabilityEdit() {
-  const addAlert = useAddAlert();
+  // States
   const [form, setForm] = useState({
     id: null,
     name: '',
@@ -90,46 +45,37 @@ export default function CapabilityEdit() {
     subscriptionFilter: '',
     outputFilter: '',
   });
+  const [openPromptModal, setOpenPromptModal] = useState(false);
+
+  // Hooks
+  const addAlert = useAddAlert();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+
+  // Queries and Mutations
   const [addUpdateCapability] = useMutation(ADD_UPDATE_CAPABILITY);
+  const [addUpdatePrompt] = useMutation(ADD_UPDATE_PROMPT);
   const { data: prompts } = useQuery(GET_ALL_PROMPTS);
-  // const [availablePrompts, setAvailablePrompts] = useState<Prompt[]>([]);
   const { data: models } = useQuery(GET_ALL_MODELS);
-  const { data: capability } = useQuery(GET_CAPABILITY, {
+  useQuery(GET_CAPABILITY, {
     skip: !searchParams.has('id'),
     variables: {
       capabilityId: searchParams.get('id'),
     },
-  });
-  const navigate = useNavigate();
-
-
-  useEffect(() => {
-    if (capability) {
+    onCompleted: (data) => {
       setForm({
-        id: capability.getCapability.id,
-        name: capability.getCapability.name,
-        alias: capability.getCapability.alias,
-        description: capability.getCapability.description,
-        llmModel: capability.getCapability.llmModel,
-        prompts: capability.getCapability.prompts.map((prompt: Prompt) => ({
-          id: prompt.id,
-          name: prompt.name,
-          text: prompt.text,
-        })),
-        outputMode: capability.getCapability.outputMode,
-        subscriptionFilter: capability.getCapability.subscriptionFilter,
-        outputFilter: capability.getCapability.outputFilter,
+        id: data.getCapability.id,
+        name: data.getCapability.name,
+        alias: data.getCapability.alias,
+        description: data.getCapability.description,
+        llmModel: data.getCapability.llmModel,
+        prompts: data.getCapability.prompts,
+        outputMode: data.getCapability.outputMode,
+        subscriptionFilter: data.getCapability.subscriptionFilter,
+        outputFilter: data.getCapability.outputFilter,
       });
-    }
-  }, [capability]);
-
-  // useEffect(() => {
-  //   if (prompts && form.prompts) {
-  //     const usedPromptIds = new Set(form.prompts.map(p => p.id));
-  //     setAvailablePrompts(prompts.getAllPrompts.filter((p: Prompt) => !usedPromptIds.has(p.id)));
-  //   }
-  // }, [prompts, form.prompts]);
+    },
+  });
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({
@@ -138,7 +84,42 @@ export default function CapabilityEdit() {
     });
   };
 
-  const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleDeletePrompt = (promptId: string) => {
+    setForm({
+      ...form,
+      prompts: form.prompts.filter((p) => p.id !== promptId),
+    });
+  };
+
+  const handlePromptAdd = ({ id }: { id: string }) => {
+    const selectedItem = prompts?.getAllPrompts.find((prompt: Prompt) => prompt.id === id);
+    if (selectedItem) {
+      setForm({
+        ...form,
+        prompts: [...form.prompts, selectedItem],
+      });
+    };
+  };
+
+  const handlePromptChange = (promptId: string, field: string, value: string) => {
+    const newPrompts = form.prompts.map((prompt) => (prompt.id === promptId ? { ...prompt, [field]: value } : prompt));
+    setForm({ ...form, prompts: newPrompts });
+  };
+
+  const handlePromptSave = async (prompt: Prompt, callback: () => void) => {
+    await addUpdatePrompt({
+      variables: {
+        prompt: {
+          id: prompt.id,
+          name: prompt.name,
+          text: prompt.text,
+        },
+      },
+    });
+    callback();
+  };
+
+  const handleFormSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
@@ -150,7 +131,7 @@ export default function CapabilityEdit() {
             name: form.name,
             description: form.description,
             llmModel: form.llmModel,
-            prompts: form.prompts.map(prompt => prompt.id),
+            prompts: form.prompts.map((prompt) => prompt.id),
             outputMode: form.outputMode,
             subscriptionFilter: form.subscriptionFilter?.trim() === '' ? null : form.subscriptionFilter,
             outputFilter: form.outputFilter?.trim() === '' ? null : form.outputFilter,
@@ -175,7 +156,7 @@ export default function CapabilityEdit() {
     <>
       <div className="bg-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl text-slate-700">
         <h1 className="text-3xl font-bold">{form.id ? 'Edit' : 'Add'} Capability</h1>
-        <form className="mt-8" onSubmit={handleSave}>
+        <form className="mt-8" onSubmit={handleFormSave}>
           <div className="mb-4">
             <label className="block text-sm font-bold mb-2" htmlFor="name">
               Name
@@ -233,7 +214,7 @@ export default function CapabilityEdit() {
               }
             />
           </div>
-          
+
           <div className="mb-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-bold mb-2" htmlFor="name">
@@ -278,15 +259,117 @@ export default function CapabilityEdit() {
               }))}
             />
           </div>
-          <ReorderableList
-          availableItems={prompts}
-          items={form.prompts} 
-          onItemsChange={() => setForm((form) => ({ ...form, prompts }))}
-          renderItem={PromptItem}
-          onItemSave={async () => {}}
-          />
 
-          <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-lg">Save Capability</button>
+          <div className="mb-4">
+            <label className="block text-sm font-bold mb-2" htmlFor="prompts">
+              Prompts
+            </label>
+            <button
+              type="button"
+              onClick={() => setOpenPromptModal(true)}
+              className="bg-blue-500 text-white px-2 py-1 rounded-lg mb-2"
+            >
+              Add Prompt
+            </button>
+            <CustomModal
+              title={'Add Item'}
+              size='7xl'
+              open={openPromptModal}
+              onClose={() => setOpenPromptModal(false)}
+            >
+              <div className='grid grid-cols-1 lg:grid-cols-4 gap-4'>
+                {prompts?.getAllPrompts.filter((item: Prompt) => !form.prompts.find((i) => i.id === item.id)).map((item: Prompt) => (
+                  <div key={item.id} className='bg-gray-100 p-2 rounded-lg h-full w-full flex flex-col'>
+                    <h3 className='text-lg font-bold'>{item.name}</h3>
+                    <p className='flex-grow'>{item.text.substring(0, 50)}{item.text.length > 50 ? '...' : ''}</p>
+                    <button
+                      type='button'
+                      onClick={() => {
+                        handlePromptAdd({ id: item.id });
+                        setOpenPromptModal(false);
+                      }}
+                      className='bg-blue-500 text-white px-2 py-1 rounded-lg self-start mt-2'
+                    >
+                      Add
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </CustomModal>
+            <ReorderableList
+              items={form.prompts.map((prompt) => prompt)}
+              onItemsChange={(newItems) => {
+                setForm({
+                  ...form,
+                  prompts: newItems,
+                });
+              }}
+              renderItem={(item, isEditing, edit, cancelEdit) => (
+                <div key={item.id}>
+                  <h3 className="text-lg font-semibold">{item.name}</h3>
+                  <p className="text-sm text-gray-600">
+                    {item.text.substring(0, 100)}
+                    {item.text.length > 100 ? '...' : ''}
+                  </p>
+                  <div className="flex justify-left space-x-2 mt-2">
+                    {isEditing ? (
+                      <div className="flex-grow">
+                        <input
+                          type="text"
+                          value={item.name}
+                          onChange={(e) => handlePromptChange(item.id, 'name', e.target.value)}
+                          className="w-full mb-2 p-1 border rounded-lg"
+                        />
+                        <textarea
+                          value={item.text}
+                          onChange={(e) => handlePromptChange(item.id, 'text', e.target.value)}
+                          className="w-full mb-2 p-1 border rounded-lg"
+                          rows={3}
+                        />
+                        <div className="flex space-x-2">
+                          <button
+                            type="button"
+                            onClick={(e) => handlePromptSave(item, () => cancelEdit(e))}
+                            className="bg-green-500 text-white px-2 py-1 rounded-lg"
+                          >
+                            Save
+                          </button>
+                          <button
+                            type="button"
+                            onClick={cancelEdit}
+                            className="bg-gray-500 text-white px-2 py-1 rounded-lg"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex-grow space-x-2">
+                        <button
+                          type="button"
+                          onClick={() => edit(item)}
+                          className="bg-blue-500 text-white px-2 py-1 rounded-lg"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeletePrompt(item.id)}
+                          className="bg-red-500 text-white px-2 py-1 rounded-lg"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            />
+
+          </div>
+          <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-lg">
+            Save Capability
+          </button>
         </form>
       </div>
     </>
