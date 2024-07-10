@@ -1,36 +1,38 @@
 import { useMutation, useQuery } from '@apollo/client';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ADD_UPDATE_PROMPT } from '../../../clients/mutations';
 import { GET_PROMPT } from '../../../clients/queries';
 import { useAddAlert } from '../../../hooks/AlertHooks';
 
 export default function PromptEdit() {
-  const addAlert = useAddAlert();
+  // States
   const [form, setForm] = useState({
     id: '',
     name: '',
     text: '',
   });
+
+  // Hooks
+  const addAlert = useAddAlert();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+
+  // Queries and Mutations
   const [addUpdatePrompt] = useMutation(ADD_UPDATE_PROMPT);
-  const { data: prompt } = useQuery(GET_PROMPT, {
+  useQuery(GET_PROMPT, {
     skip: !searchParams.has('id'),
     variables: {
       promptId: searchParams.get('id'),
     },
-  });
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (prompt) {
+    onCompleted: (data) => {
       setForm({
-        id: prompt.getPrompt.id,
-        name: prompt.getPrompt.name,
-        text: prompt.getPrompt.text,
+        id: data.getPrompt.id,
+        name: data.getPrompt.name,
+        text: data.getPrompt.text,
       });
     }
-  }, [prompt]);
+  });
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({

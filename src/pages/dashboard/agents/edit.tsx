@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ADD_UPDATE_AGENT } from '../../../clients/mutations';
 import { GET_AGENT, GET_ALL_CAPABILITIES, GET_ALL_MODELS } from '../../../clients/queries';
@@ -9,7 +9,7 @@ import { useAddAlert } from '../../../hooks/AlertHooks';
 import { Capability } from '../../../types/agents';
 
 export default function AgentEdit() {
-  const addAlert = useAddAlert();
+  // States
   const [form, setForm] = useState({
     id: null,
     name: '',
@@ -21,33 +21,35 @@ export default function AgentEdit() {
     subscriptionFilter: '',
     outputFilter: '',
   });
+
+  // Hooks
+  const addAlert = useAddAlert();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+
+  // Queries and Mutations
   const [addUpdateAgent] = useMutation(ADD_UPDATE_AGENT);
   const { data: models } = useQuery(GET_ALL_MODELS);
   const { data: capabilities } = useQuery(GET_ALL_CAPABILITIES);
-  const { data: agent } = useQuery(GET_AGENT, {
+  useQuery(GET_AGENT, {
     skip: !searchParams.has('id'),
     variables: {
       agentId: searchParams.get('id'),
     },
-  });
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (agent) {
+    onCompleted: (data) => {
       setForm({
-        id: agent.getAgent.id,
-        name: agent.getAgent.name,
-        description: agent.getAgent.description,
-        reasoningLLMModel: agent.getAgent.reasoningLLMModel,
-        reasoningPrompt: agent.getAgent.reasoningPrompt,
-        capabilities: agent.getAgent.capabilities.map((capability: Capability) => capability.id),
-        memoryEnabled: agent.getAgent.memoryEnabled,
-        subscriptionFilter: agent.getAgent.subscriptionFilter,
-        outputFilter: agent.getAgent.outputFilter,
+        id: data.getAgent.id,
+        name: data.getAgent.name,
+        description: data.getAgent.description,
+        reasoningLLMModel: data.getAgent.reasoningLLMModel,
+        reasoningPrompt: data.getAgent.reasoningPrompt,
+        capabilities: data.getAgent.capabilities.map((capability: Capability) => capability.id),
+        memoryEnabled: data.getAgent.memoryEnabled,
+        subscriptionFilter: data.getAgent.subscriptionFilter,
+        outputFilter: data.getAgent.outputFilter,
       });
     }
-  }, [agent]);
+  });
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({
