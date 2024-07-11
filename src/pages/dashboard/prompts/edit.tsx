@@ -31,7 +31,7 @@ export default function PromptEdit() {
         name: data.getPrompt.name,
         text: data.getPrompt.text,
       });
-    }
+    },
   });
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

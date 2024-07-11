@@ -48,7 +48,7 @@ export default function AgentEdit() {
         subscriptionFilter: data.getAgent.subscriptionFilter,
         outputFilter: data.getAgent.outputFilter,
       });
-    }
+    },
   });
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

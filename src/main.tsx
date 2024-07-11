@@ -15,6 +15,7 @@ import CapabilityDashboard from './pages/dashboard/capabilities';
 import CapabilityEdit from './pages/dashboard/capabilities/edit';
 import PlaygroundDashboard from './pages/dashboard/playground';
 import { TitleProvider } from './hooks/TitleHook';
+import CanvasDashboard from './pages/dashboard/canvas';
 
 const router = createBrowserRouter([
   {
@@ -60,6 +61,10 @@ const router = createBrowserRouter([
           {
             path: '/dashboard/prompts/edit',
             element: <PromptEdit />,
+          },
+          {
+            path: '/dashboard/canvas',
+            element: <CanvasDashboard />,
           },
         ],
       },

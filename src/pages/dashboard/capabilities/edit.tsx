@@ -98,7 +98,7 @@ export default function CapabilityEdit() {
         ...form,
         prompts: [...form.prompts, selectedItem],
       });
-    };
+    }
   };
 
   const handlePromptChange = (promptId: string, field: string, value: string) => {
@@ -271,29 +271,29 @@ export default function CapabilityEdit() {
             >
               Add Prompt
             </button>
-            <CustomModal
-              title={'Add Item'}
-              size='7xl'
-              open={openPromptModal}
-              onClose={() => setOpenPromptModal(false)}
-            >
-              <div className='grid grid-cols-1 lg:grid-cols-4 gap-4'>
-                {prompts?.getAllPrompts.filter((item: Prompt) => !form.prompts.find((i) => i.id === item.id)).map((item: Prompt) => (
-                  <div key={item.id} className='bg-gray-100 p-2 rounded-lg h-full w-full flex flex-col'>
-                    <h3 className='text-lg font-bold'>{item.name}</h3>
-                    <p className='flex-grow'>{item.text.substring(0, 50)}{item.text.length > 50 ? '...' : ''}</p>
-                    <button
-                      type='button'
-                      onClick={() => {
-                        handlePromptAdd({ id: item.id });
-                        setOpenPromptModal(false);
-                      }}
-                      className='bg-blue-500 text-white px-2 py-1 rounded-lg self-start mt-2'
-                    >
-                      Add
-                    </button>
-                  </div>
-                ))}
+            <CustomModal title={'Add Item'} size="7xl" open={openPromptModal} onClose={() => setOpenPromptModal(false)}>
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+                {prompts?.getAllPrompts
+                  .filter((item: Prompt) => !form.prompts.find((i) => i.id === item.id))
+                  .map((item: Prompt) => (
+                    <div key={item.id} className="bg-gray-100 p-2 rounded-lg h-full w-full flex flex-col">
+                      <h3 className="text-lg font-bold">{item.name}</h3>
+                      <p className="flex-grow">
+                        {item.text.substring(0, 50)}
+                        {item.text.length > 50 ? '...' : ''}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          handlePromptAdd({ id: item.id });
+                          setOpenPromptModal(false);
+                        }}
+                        className="bg-blue-500 text-white px-2 py-1 rounded-lg self-start mt-2"
+                      >
+                        Add
+                      </button>
+                    </div>
+                  ))}
               </div>
             </CustomModal>
             <ReorderableList
@@ -365,7 +365,6 @@ export default function CapabilityEdit() {
                 </div>
               )}
             />
-
           </div>
           <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-lg">
             Save Capability
