@@ -7,6 +7,7 @@ interface CanvasProps {
   canvasSize?: number;
   drawing: LineProps[];
   setDrawing?: (drawing: LineProps[]) => void;
+  onDrawDone?: (drawing: LineProps[]) => void;
 }
 
 export interface LineProps {
@@ -18,7 +19,7 @@ export interface LineProps {
   canvasWidth: number;
 }
 
-export default function Canvas({ drawing, setDrawing }: CanvasProps) {
+export default function Canvas({ drawing, setDrawing, onDrawDone }: CanvasProps) {
   const stageRef = useRef<HTMLDivElement>(null);
   const [tool, setTool] = React.useState<string>('pen');
   const [color, setColor] = React.useState<string>('#f58c29');
@@ -130,6 +131,9 @@ export default function Canvas({ drawing, setDrawing }: CanvasProps) {
 
   const handleMouseUp = () => {
     isDrawing.current = false;
+    if (onDrawDone) {
+      onDrawDone(drawing);
+    }
   };
 
   return (
@@ -234,11 +238,6 @@ export default function Canvas({ drawing, setDrawing }: CanvasProps) {
           ))}
         </select>
       </div>
-
-      <hr />
-
-      {/* JSON of drawing */}
-      <code className="p-4 text-xs text-gray-500">{JSON.stringify(drawing, null, 2)}</code>
     </div>
   );
 }
