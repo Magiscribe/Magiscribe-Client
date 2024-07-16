@@ -13,7 +13,6 @@ export const GRAPHQL_SUBSCRIPTION = gql`
     predictionAdded(subscriptionId: $subscriptionId) {
       id
       subscriptionId
-      context
       result
       type
     }
