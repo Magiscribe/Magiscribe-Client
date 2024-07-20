@@ -1,13 +1,5 @@
 import { gql } from '@apollo/client';
 
-export const SEND_STREAM_EVENT = gql`
-  mutation Mutation($subscriptionId: String!, $data: JSONObject!) {
-    createStreamObject(subscriptionId: $subscriptionId, data: $data) {
-      data
-    }
-  }
-`;
-
 export const GENERATE_TRANSCRIPTION_CREDENTIALS = gql`
   mutation Mutation {
     generateTranscriptionStreamingCredentials {
