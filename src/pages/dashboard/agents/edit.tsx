@@ -55,11 +55,13 @@ export default function AgentEdit() {
         id: data.getAgent.id,
         name: data.getAgent.name,
         description: data.getAgent.description,
-        reasoning: data.getAgent.reasoning ? {
-          llmModel: data.getAgent.reasoning.llmModel,
-          prompt: data.getAgent.reasoning.prompt,
-          variablePassThrough: data.getAgent.reasoning.variablePassThrough,
-        } : null,
+        reasoning: data.getAgent.reasoning
+          ? {
+              llmModel: data.getAgent.reasoning.llmModel,
+              prompt: data.getAgent.reasoning.prompt,
+              variablePassThrough: data.getAgent.reasoning.variablePassThrough,
+            }
+          : null,
         capabilities: data.getAgent.capabilities.map((capability: Capability) => capability.id),
         memoryEnabled: data.getAgent.memoryEnabled,
         subscriptionFilter: data.getAgent.subscriptionFilter,
@@ -69,10 +71,21 @@ export default function AgentEdit() {
   });
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setForm({
-      ...form,
-      [event.target.id]: event.target.value,
-    });
+    const { id, value } = event.target;
+    setForm((prevForm) => ({
+      ...prevForm,
+      [id]: value,
+    }));
+  };
+
+  const handleReasoningChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const { id, value } = event.target;
+    setForm((prevForm) => ({
+      ...prevForm,
+      reasoning: prevForm.reasoning
+        ? { ...prevForm.reasoning, [id]: value }
+        : { llmModel: null, prompt: null, variablePassThrough: null, [id]: value },
+    }));
   };
 
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -162,11 +175,14 @@ export default function AgentEdit() {
               setSelected={(value) => {
                 setForm({
                   ...form,
-                  reasoning: value.id === 'true' ? {
-                    llmModel: '',
-                    prompt: '',
-                    variablePassThrough: false,
-                  } : null,
+                  reasoning:
+                    value.id === 'true'
+                      ? {
+                          llmModel: '',
+                          prompt: '',
+                          variablePassThrough: false,
+                        }
+                      : null,
                 });
               }}
               selected={{
@@ -179,71 +195,76 @@ export default function AgentEdit() {
               ]}
             />
           </div>
-          {form.reasoning && <div className="mb-4">
-            <label className="block text-sm font-bold mb-2" htmlFor="capabilities">
-              LLM Model
-            </label>
-            <ListBox
-              setSelected={(value) => {
-                setForm({
-                  ...form,
-                  reasoning: {
-                    ...form.reasoning!,
-                    llmModel: value.id,
+          {form.reasoning && (
+            <div className="mb-4">
+              <label className="block text-sm font-bold mb-2" htmlFor="capabilities">
+                LLM Model
+              </label>
+              <ListBox
+                setSelected={(value) => {
+                  setForm({
+                    ...form,
+                    reasoning: {
+                      ...form.reasoning!,
+                      llmModel: value.id,
+                    },
+                  });
+                }}
+                selected={
+                  models?.getAllModels.find((model: { id: string }) => model.id === form.reasoning!.llmModel) ?? {
+                    name: '',
+                    id: '',
                   }
-                });
-              }}
-              selected={
-                models?.getAllModels.find((model: { id: string }) => model.id === form.reasoning!.llmModel) ?? {
-                  name: '',
-                  id: '',
                 }
-              }
-              values={
-                models?.getAllModels.map((model: { name: string; id: string }) => ({
-                  name: model.name,
-                  id: model.id,
-                })) ?? []
-              }
-            />
-          </div>}
-          {form.reasoning && <div className="mb-4">
-            <label className="block text-sm font-bold mb-2" htmlFor="prompt">
-              Reasoning Prompt
-            </label>
-            <textarea
-              className="border-2 border-gray-200 p-2 rounded-lg w-full"
-              id="reasoningPrompt"
-              rows={30}
-              value={form.reasoning?.prompt ?? ''}
-              onChange={handleChange}
-            />
-          </div>
-}
-          {form.reasoning && <div className="mb-4">
-            <label className="block text-sm font-bold mb-2" htmlFor="name">
-              Variable Pass Through
-            </label>
-            <ListBox
-              setSelected={(value) => {
-                setForm({
-                  ...form,
-                  reasoning: {
-                    ...form.reasoning!,
-                    variablePassThrough: value.id === 'true',
-                  }
-                });
-              }}
-              selected={{
-                name: form.reasoning.variablePassThrough ? 'Enabled' : 'Disabled',
-                id: form.reasoning.variablePassThrough ? 'true' : 'false',
-              }}
-              values={[
-                { name: 'Enabled', id: 'true' },
-                { name: 'Disabled', id: 'false' },
-              ]}
-            />
-          </div>}
+                values={
+                  models?.getAllModels.map((model: { name: string; id: string }) => ({
+                    name: model.name,
+                    id: model.id,
+                  })) ?? []
+                }
+              />
+            </div>
+          )}
+          {form.reasoning && (
+            <div className="mb-4">
+              <label className="block text-sm font-bold mb-2" htmlFor="prompt">
+                Reasoning Prompt
+              </label>
+              <textarea
+                className="border-2 border-gray-200 p-2 rounded-lg w-full"
+                id="prompt"
+                rows={30}
+                value={form.reasoning.prompt ?? ''}
+                onChange={handleReasoningChange}
+              />
+            </div>
+          )}
+          {form.reasoning && (
+            <div className="mb-4">
+              <label className="block text-sm font-bold mb-2" htmlFor="name">
+                Variable Pass Through
+              </label>
+              <ListBox
+                setSelected={(value) => {
+                  setForm({
+                    ...form,
+                    reasoning: {
+                      ...form.reasoning!,
+                      variablePassThrough: value.id === 'true',
+                    },
+                  });
+                }}
+                selected={{
+                  name: form.reasoning.variablePassThrough ? 'Enabled' : 'Disabled',
+                  id: form.reasoning.variablePassThrough ? 'true' : 'false',
+                }}
+                values={[
+                  { name: 'Enabled', id: 'true' },
+                  { name: 'Disabled', id: 'false' },
+                ]}
+              />
+            </div>
+          )}
           <div className="mb-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-bold mb-2" htmlFor="name">
