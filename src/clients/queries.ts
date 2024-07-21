@@ -29,8 +29,11 @@ export const GET_AGENT = gql`
       id
       name
       description
-      reasoningLLMModel
-      reasoningPrompt
+      reasoning {
+        llmModel
+        prompt
+        variablePassThrough
+      }
       capabilities {
         name
         id

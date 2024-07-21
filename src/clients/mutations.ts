@@ -28,8 +28,11 @@ export const ADD_UPDATE_AGENT = gql`
       id
       name
       description
-      reasoningLLMModel
-      reasoningPrompt
+      reasoning {
+        llmModel
+        prompt
+        variablePassThrough
+      }
       capabilities {
         id
       }

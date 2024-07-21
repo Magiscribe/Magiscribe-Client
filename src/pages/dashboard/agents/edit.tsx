@@ -8,14 +8,28 @@ import ListBoxMultiple from '../../../components/list/ListBoxMultiple';
 import { useAddAlert } from '../../../hooks/AlertHooks';
 import { Capability } from '../../../types/agents';
 
+interface Form {
+  id: string | null;
+  name: string;
+  description: string;
+  reasoning: {
+    llmModel: string | null;
+    prompt: string | null;
+    variablePassThrough: boolean | null;
+  } | null;
+  capabilities: string[];
+  memoryEnabled: boolean;
+  subscriptionFilter: string | null;
+  outputFilter: string | null;
+}
+
 export default function AgentEdit() {
   // States
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<Form>({
     id: null,
     name: '',
     description: '',
-    reasoningLLMModel: '',
-    reasoningPrompt: '',
+    reasoning: null,
     capabilities: [''],
     memoryEnabled: false,
     subscriptionFilter: '',
@@ -41,8 +55,11 @@ export default function AgentEdit() {
         id: data.getAgent.id,
         name: data.getAgent.name,
         description: data.getAgent.description,
-        reasoningLLMModel: data.getAgent.reasoningLLMModel,
-        reasoningPrompt: data.getAgent.reasoningPrompt,
+        reasoning: data.getAgent.reasoning ? {
+          llmModel: data.getAgent.reasoning.llmModel,
+          prompt: data.getAgent.reasoning.prompt,
+          variablePassThrough: data.getAgent.reasoning.variablePassThrough,
+        } : null,
         capabilities: data.getAgent.capabilities.map((capability: Capability) => capability.id),
         memoryEnabled: data.getAgent.memoryEnabled,
         subscriptionFilter: data.getAgent.subscriptionFilter,
@@ -68,8 +85,7 @@ export default function AgentEdit() {
             id: form.id,
             name: form.name,
             description: form.description,
-            reasoningLLMModel: form.reasoningLLMModel,
-            reasoningPrompt: form.reasoningPrompt,
+            reasoning: form.reasoning,
             capabilities: form.capabilities,
             memoryEnabled: form.memoryEnabled,
             subscriptionFilter: form.subscriptionFilter?.trim() === '' ? null : form.subscriptionFilter,
@@ -139,6 +155,31 @@ export default function AgentEdit() {
             />
           </div>
           <div className="mb-4">
+            <label className="block text-sm font-bold mb-2" htmlFor="name">
+              Reasoning Enabled
+            </label>
+            <ListBox
+              setSelected={(value) => {
+                setForm({
+                  ...form,
+                  reasoning: value.id === 'true' ? {
+                    llmModel: '',
+                    prompt: '',
+                    variablePassThrough: false,
+                  } : null,
+                });
+              }}
+              selected={{
+                name: form.reasoning ? 'Enabled' : 'Disabled',
+                id: form.reasoning ? 'true' : 'false',
+              }}
+              values={[
+                { name: 'Enabled', id: 'true' },
+                { name: 'Disabled', id: 'false' },
+              ]}
+            />
+          </div>
+          {form.reasoning && <div className="mb-4">
             <label className="block text-sm font-bold mb-2" htmlFor="capabilities">
               LLM Model
             </label>
@@ -146,11 +187,14 @@ export default function AgentEdit() {
               setSelected={(value) => {
                 setForm({
                   ...form,
-                  reasoningLLMModel: value.id,
+                  reasoning: {
+                    ...form.reasoning!,
+                    llmModel: value.id,
+                  }
                 });
               }}
               selected={
-                models?.getAllModels.find((model: { id: string }) => model.id === form.reasoningLLMModel) ?? {
+                models?.getAllModels.find((model: { id: string }) => model.id === form.reasoning!.llmModel) ?? {
                   name: '',
                   id: '',
                 }
@@ -162,8 +206,8 @@ export default function AgentEdit() {
                 })) ?? []
               }
             />
-          </div>
-          <div className="mb-4">
+          </div>}
+          {form.reasoning && <div className="mb-4">
             <label className="block text-sm font-bold mb-2" htmlFor="prompt">
               Reasoning Prompt
             </label>
@@ -171,10 +215,35 @@ export default function AgentEdit() {
               className="border-2 border-gray-200 p-2 rounded-lg w-full"
               id="reasoningPrompt"
               rows={30}
-              value={form.reasoningPrompt}
+              value={form.reasoning?.prompt ?? ''}
               onChange={handleChange}
             />
           </div>
+}
+          {form.reasoning && <div className="mb-4">
+            <label className="block text-sm font-bold mb-2" htmlFor="name">
+              Variable Pass Through
+            </label>
+            <ListBox
+              setSelected={(value) => {
+                setForm({
+                  ...form,
+                  reasoning: {
+                    ...form.reasoning!,
+                    variablePassThrough: value.id === 'true',
+                  }
+                });
+              }}
+              selected={{
+                name: form.reasoning.variablePassThrough ? 'Enabled' : 'Disabled',
+                id: form.reasoning.variablePassThrough ? 'true' : 'false',
+              }}
+              values={[
+                { name: 'Enabled', id: 'true' },
+                { name: 'Disabled', id: 'false' },
+              ]}
+            />
+          </div>}
           <div className="mb-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-bold mb-2" htmlFor="name">
@@ -184,7 +253,7 @@ export default function AgentEdit() {
                 className="border-2 border-gray-200 p-2 rounded-lg w-full"
                 id="subscriptionFilter"
                 type="text"
-                value={form.subscriptionFilter}
+                value={form.subscriptionFilter ?? ''}
                 onChange={handleChange}
               />
             </div>
@@ -196,7 +265,7 @@ export default function AgentEdit() {
                 className="border-2 border-gray-200 p-2 rounded-lg w-full"
                 id="outputFilter"
                 type="text"
-                value={form.outputFilter}
+                value={form.outputFilter ?? ''}
                 onChange={handleChange}
               />
             </div>
