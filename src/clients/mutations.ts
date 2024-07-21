@@ -1,13 +1,5 @@
 import { gql } from '@apollo/client';
 
-export const SEND_STREAM_EVENT = gql`
-  mutation Mutation($subscriptionId: String!, $data: JSONObject!) {
-    createStreamObject(subscriptionId: $subscriptionId, data: $data) {
-      data
-    }
-  }
-`;
-
 export const GENERATE_TRANSCRIPTION_CREDENTIALS = gql`
   mutation Mutation {
     generateTranscriptionStreamingCredentials {
@@ -24,9 +16,9 @@ export const GENERATE_AUDIO = gql`
   }
 `;
 
-export const ADD_VISUAL_PREDICTION = gql`
-  mutation addPrediction($subscriptionId: String!, $agentId: String!, $userMessage: String!, $context: String!) {
-    addPrediction(subscriptionId: $subscriptionId, agentId: $agentId, userMessage: $userMessage, context: $context)
+export const ADD_PREDICTION = gql`
+  mutation addPrediction($subscriptionId: String!, $agentId: String!, $variables: JSONObject) {
+    addPrediction(subscriptionId: $subscriptionId, agentId: $agentId, variables: $variables)
   }
 `;
 
@@ -36,8 +28,11 @@ export const ADD_UPDATE_AGENT = gql`
       id
       name
       description
-      reasoningLLMModel
-      reasoningPrompt
+      reasoning {
+        llmModel
+        prompt
+        variablePassThrough
+      }
       capabilities {
         id
       }

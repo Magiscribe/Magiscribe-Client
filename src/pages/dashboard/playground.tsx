@@ -2,7 +2,6 @@ import { useMutation, useQuery, useSubscription } from '@apollo/client';
 import { faMicrophone, faMicrophoneSlash, faVolumeHigh, faVolumeMute } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
-import { ADD_VISUAL_PREDICTION } from '../../clients/mutations';
 import { GET_ALL_AGENTS } from '../../clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '../../clients/subscriptions';
 import { useElevenLabsAudio } from '../../components/audio-player';
@@ -10,6 +9,7 @@ import ListBox from '../../components/list/ListBox';
 import { useTranscribe } from '../../hooks/AudioHooks';
 import { Agent } from '../../types/agents';
 import { useWithLocalStorage } from '../../hooks/local-storage-hook';
+import { ADD_PREDICTION } from '../../clients/mutations';
 
 interface predictionAdded {
   id: string;
@@ -39,7 +39,7 @@ export default function PlaygroundDashboard() {
 
   // Queries and Mutations
   const { data: agents } = useQuery(GET_ALL_AGENTS);
-  const [addPrediction] = useMutation(ADD_VISUAL_PREDICTION);
+  const [addPrediction] = useMutation(ADD_PREDICTION);
 
   // Transcribe
   const [enableAudio, setEnableAudio] = useState(false);
@@ -58,8 +58,9 @@ export default function PlaygroundDashboard() {
       variables: {
         subscriptionId: form.subscriptionId,
         agentId: form.agent,
-        userMessage: form.prompt,
-        context: 'context',
+        variables: {
+          userMessage: form.prompt,
+        },
       },
     });
   };

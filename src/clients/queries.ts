@@ -1,13 +1,5 @@
 import { gql } from '@apollo/client';
 
-export const STREAM_EVENT_QUERY = gql`
-  query Query($subscriptionId: String!) {
-    streamObject(subscriptionId: $subscriptionId) {
-      data
-    }
-  }
-`;
-
 export const GET_ALL_MODELS = gql`
   query Query {
     getAllModels {
@@ -37,8 +29,11 @@ export const GET_AGENT = gql`
       id
       name
       description
-      reasoningLLMModel
-      reasoningPrompt
+      reasoning {
+        llmModel
+        prompt
+        variablePassThrough
+      }
       capabilities {
         name
         id
