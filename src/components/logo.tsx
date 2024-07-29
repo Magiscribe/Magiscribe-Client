@@ -94,11 +94,11 @@ function WandIcon() {
 
 export function Logo() {
   return (
-    <a className={`font-display no-underline hover:no-underline font-bold text-2xl lg:text-4xl mt-2`}>
+    <div className={`font-display no-underline hover:no-underline font-bold text-2xl lg:text-4xl mt-2`}>
       <WandIcon />
       <motion.span animate={{ opacity: [0, 1], marginLeft: [25, 0] }} transition={{ duration: 1, delay: 0.5 }}>
         Magiscribe
       </motion.span>
-    </a>
+    </div>
   );
 }

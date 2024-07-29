@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 export function NavBar() {
   const [atTop, setAtTop] = useState(true);
-  const title = useTitle();
+  const { title } = useTitle();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -33,16 +33,16 @@ export function NavBar() {
         <Link to="/" className="pl-4 flex items-center">
           <Logo />
           <AnimatePresence mode="wait">
-            {title.title && (
+            {title && (
               <motion.span
-                key={title.title}
+                key={title}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.5 }}
                 className="text-2xl lg:text-3xl font-display pl-2"
               >
-                | {title.title}
+                | {title}
               </motion.span>
             )}
           </AnimatePresence>
