@@ -19,7 +19,7 @@ import CapabilityEdit from './pages/dashboard/agent-lab/capabilities/edit';
 import PromptDashboard from './pages/dashboard/agent-lab/prompts';
 import PromptEdit from './pages/dashboard/agent-lab/prompts/edit';
 import StakeholderInput from './pages/dashboard/stakeholder/main';
-import InquiryPage from './pages/input';
+import InquiryPage from './pages/inquiry';
 import DashboardPage from './pages/dashboard';
 
 const router = createBrowserRouter([

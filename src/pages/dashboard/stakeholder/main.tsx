@@ -105,7 +105,7 @@ export default function StakeholderInput() {
   const Modal = () => {
     const alert = useAddAlert();
 
-    const link = `${window.location.origin}/link/${id}`;
+    const link = `${window.location.origin}/inquiry/${id}`;
 
     const handleCopyLink = () => {
       navigator.clipboard.writeText(link);
