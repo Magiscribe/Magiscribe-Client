@@ -1,17 +1,18 @@
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Logo } from '../logo';
 import { useTitle } from '../../hooks/TitleHook';
-import { AnimatePresence, motion } from 'framer-motion';
+import { Logo } from '../logo';
 
 export function NavBar() {
   const [atTop, setAtTop] = useState(true);
+
   const { title } = useTitle();
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 100) {
+      if (window.scrollY > 50) {
         setAtTop(false);
       } else {
         setAtTop(true);
@@ -69,14 +70,16 @@ export function NavBar() {
             </a>
           </SignedOut>
           <SignedIn>
-            <Link
-              to="/dashboard"
-              className={`mx-auto lg:mx-0 hover:underline font-bold rounded-full mt-4 lg:mt-0 py-3 px-5 shadow opacity-75 focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out ${
-                atTop ? 'bg-white text-slate-800' : 'bg-indigo-800 text-white'
-              }`}
-            >
-              Dashboard
-            </Link>
+            <div className="flex space-x-4">
+              <Link
+                to="/dashboard"
+                className={`mx-auto lg:mx-0 hover:underline font-bold rounded-full mt-4 lg:mt-0 py-2 px-4 shadow opacity-75 focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out ${
+                  atTop ? 'bg-white text-slate-800' : 'bg-indigo-800 text-white'
+                }`}
+              >
+                Dashboard
+              </Link>
+            </div>
           </SignedIn>
           <SignedIn>
             <UserButton

@@ -17,8 +17,13 @@ export const GENERATE_AUDIO = gql`
 `;
 
 export const ADD_PREDICTION = gql`
-  mutation addPrediction($subscriptionId: String!, $agentId: String!, $variables: JSONObject) {
-    addPrediction(subscriptionId: $subscriptionId, agentId: $agentId, variables: $variables)
+  mutation addPrediction(
+    $subscriptionId: String!
+    $agentId: String!
+    $variables: JSONObject
+    $attachments: [JSONObject!]
+  ) {
+    addPrediction(subscriptionId: $subscriptionId, agentId: $agentId, variables: $variables, attachments: $attachments)
   }
 `;
 
@@ -89,6 +94,41 @@ export const ADD_UPDATE_PROMPT = gql`
 export const DELETE_PROMPT = gql`
   mutation Mutation($promptId: String!) {
     deletePrompt(promptId: $promptId) {
+      id
+    }
+  }
+`;
+
+export const CREATE_DATA = gql`
+  mutation Mutation($data: JSONObject!) {
+    createUpdateDataObject(data: $data) {
+      id
+      data
+    }
+  }
+`;
+
+export const INSERT_DATA = gql`
+  mutation Mutation($id: String!, $value: JSONObject!, $field: String!) {
+    insertIntoDataObject(id: $id, value: $value, field: $field) {
+      data
+      id
+    }
+  }
+`;
+
+export const UPDATE_DATA = gql`
+  mutation Mutation($id: String!, $data: JSONObject!) {
+    createUpdateDataObject(id: $id, data: $data) {
+      id
+      data
+    }
+  }
+`;
+
+export const DELETE_DATA = gql`
+  mutation Mutation($id: String!) {
+    deleteDataObject(id: $id) {
       id
     }
   }
