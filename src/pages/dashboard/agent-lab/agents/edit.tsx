@@ -1,12 +1,12 @@
 import { useMutation, useQuery } from '@apollo/client';
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ADD_UPDATE_AGENT } from '../../../clients/mutations';
-import { GET_AGENT, GET_ALL_CAPABILITIES, GET_ALL_MODELS } from '../../../clients/queries';
-import ListBox from '../../../components/list/ListBox';
-import ListBoxMultiple from '../../../components/list/ListBoxMultiple';
-import { useAddAlert } from '../../../hooks/AlertHooks';
-import { Capability } from '../../../types/agents';
+import { ADD_UPDATE_AGENT } from '@/clients/mutations';
+import { GET_AGENT, GET_ALL_CAPABILITIES, GET_ALL_MODELS } from '@/clients/queries';
+import ListBox from '@/components/list/ListBox';
+import ListBoxMultiple from '@/components/list/ListBoxMultiple';
+import { useAddAlert } from '@/hooks/AlertHooks';
+import { Capability } from '@/types/agents';
 
 interface Form {
   id: string | null;
@@ -113,7 +113,7 @@ export default function AgentEdit() {
       }
 
       addAlert('Agent saved successfully', 'success');
-      navigate('/dashboard/agents');
+      navigate('../');
     } catch (error) {
       console.error(error);
     }

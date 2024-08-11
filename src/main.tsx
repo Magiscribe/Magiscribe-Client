@@ -2,20 +2,25 @@ import { ClerkProvider } from '@clerk/clerk-react';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import '@xyflow/react/dist/style.css';
 import './assets/styles/index.css';
-import AgentDashboard from './pages/dashboard/agents';
-import HomeHero from './pages/home';
-import DashboardTemplate from './templates/dashboard';
-import Main from './templates/main';
-import AgentEdit from './pages/dashboard/agents/edit';
-import AlertProvider from './providers/AlertProvider';
-import PromptDashboard from './pages/dashboard/prompts';
-import PromptEdit from './pages/dashboard/prompts/edit';
-import CapabilityDashboard from './pages/dashboard/capabilities';
-import CapabilityEdit from './pages/dashboard/capabilities/edit';
-import PlaygroundDashboard from './pages/dashboard/playground';
+import { ApolloProviderWrapper } from './clients/graphqlClient';
 import { TitleProvider } from './hooks/TitleHook';
-import CanvasDashboard from './pages/dashboard/canvas';
+import HomeHero from './pages/home';
+import AlertProvider from './providers/AlertProvider';
+import Main from './templates/main';
+import StakeholderTemplate from './templates/stakeholder';
+import AgentLabTemplate from './templates/agent-lab';
+import PlaygroundDashboard from './pages/dashboard/agent-lab/playground';
+import AgentDashboard from './pages/dashboard/agent-lab/agents';
+import AgentEdit from './pages/dashboard/agent-lab/agents/edit';
+import CapabilityDashboard from './pages/dashboard/agent-lab/capabilities';
+import CapabilityEdit from './pages/dashboard/agent-lab/capabilities/edit';
+import PromptDashboard from './pages/dashboard/agent-lab/prompts';
+import PromptEdit from './pages/dashboard/agent-lab/prompts/edit';
+import StakeholderInput from './pages/dashboard/stakeholder/main';
+import InquiryPage from './pages/input';
+import DashboardPage from './pages/dashboard';
 
 const router = createBrowserRouter([
   {
@@ -28,45 +33,72 @@ const router = createBrowserRouter([
       },
       {
         path: '/dashboard',
-        element: <DashboardTemplate />,
         children: [
           {
             path: '/dashboard',
-            element: <></>,
+            element: <DashboardPage />,
           },
           {
-            path: '/dashboard/playground',
-            element: <PlaygroundDashboard />,
+            path: '/dashboard/agent-lab',
+            element: <AgentLabTemplate />,
+            children: [
+              {
+                path: '/dashboard/agent-lab',
+                element: <></>,
+              },
+              {
+                path: '/dashboard/agent-lab/playground',
+                element: <PlaygroundDashboard />,
+              },
+              {
+                path: '/dashboard/agent-lab/agents',
+                element: <AgentDashboard />,
+              },
+              {
+                path: '/dashboard/agent-lab/agents/edit',
+                element: <AgentEdit />,
+              },
+              {
+                path: '/dashboard/agent-lab/capabilities',
+                element: <CapabilityDashboard />,
+              },
+              {
+                path: '/dashboard/agent-lab/capabilities/edit',
+                element: <CapabilityEdit />,
+              },
+              {
+                path: '/dashboard/agent-lab/prompts',
+                element: <PromptDashboard />,
+              },
+              {
+                path: '/dashboard/agent-lab/prompts/edit',
+                element: <PromptEdit />,
+              },
+            ],
           },
           {
-            path: '/dashboard/agents',
-            element: <AgentDashboard />,
-          },
-          {
-            path: '/dashboard/agents/edit',
-            element: <AgentEdit />,
-          },
-          {
-            path: '/dashboard/capabilities',
-            element: <CapabilityDashboard />,
-          },
-          {
-            path: '/dashboard/capabilities/edit',
-            element: <CapabilityEdit />,
-          },
-          {
-            path: '/dashboard/prompts',
-            element: <PromptDashboard />,
-          },
-          {
-            path: '/dashboard/prompts/edit',
-            element: <PromptEdit />,
-          },
-          {
-            path: '/dashboard/canvas',
-            element: <CanvasDashboard />,
+            path: '/dashboard/stakeholder',
+            element: <StakeholderTemplate />,
+            children: [
+              {
+                path: '/dashboard/stakeholder',
+                element: <StakeholderInput />,
+              },
+              {
+                path: '/dashboard/stakeholder/:id',
+                element: <StakeholderInput />,
+              },
+            ],
           },
         ],
+      },
+      {
+        path: 'inquiry/:id',
+        element: <InquiryPage />,
+      },
+      {
+        path: '*',
+        element: <div>404</div>,
       },
     ],
   },
@@ -75,11 +107,13 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ClerkProvider publishableKey={import.meta.env.VITE_APP_CLERK_PK as string}>
-      <TitleProvider>
-        <AlertProvider>
-          <RouterProvider router={router} />
-        </AlertProvider>
-      </TitleProvider>
+      <ApolloProviderWrapper>
+        <TitleProvider>
+          <AlertProvider>
+            <RouterProvider router={router} />
+          </AlertProvider>
+        </TitleProvider>
+      </ApolloProviderWrapper>
     </ClerkProvider>
   </React.StrictMode>,
 );

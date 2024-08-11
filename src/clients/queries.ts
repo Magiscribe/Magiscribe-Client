@@ -99,3 +99,20 @@ export const GET_PROMPT = gql`
     }
   }
 `;
+
+export const GET_DATA = gql`
+  query Query($id: String!) {
+    dataObject(id: $id) {
+      data
+    }
+  }
+`;
+
+export const GET_USER_FORMS = gql`
+  query DataObjectsCreated {
+    dataObjectsCreated {
+      id
+      data
+    }
+  }
+`;

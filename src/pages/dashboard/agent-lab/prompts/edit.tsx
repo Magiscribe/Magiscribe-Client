@@ -1,9 +1,9 @@
 import { useMutation, useQuery } from '@apollo/client';
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ADD_UPDATE_PROMPT } from '../../../clients/mutations';
-import { GET_PROMPT } from '../../../clients/queries';
-import { useAddAlert } from '../../../hooks/AlertHooks';
+import { ADD_UPDATE_PROMPT } from '@/clients/mutations';
+import { GET_PROMPT } from '@/clients/queries';
+import { useAddAlert } from '@/hooks/AlertHooks';
 
 export default function PromptEdit() {
   // States
@@ -61,7 +61,7 @@ export default function PromptEdit() {
       }
 
       addAlert('Prompt saved successfully', 'success');
-      navigate('/dashboard/prompts');
+      navigate('../');
     } catch (error) {
       console.error(error);
     }

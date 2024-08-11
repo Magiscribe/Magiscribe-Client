@@ -2,14 +2,14 @@ import { useMutation, useQuery, useSubscription } from '@apollo/client';
 import { faMicrophone, faMicrophoneSlash, faVolumeHigh, faVolumeMute } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
-import { GET_ALL_AGENTS } from '../../clients/queries';
-import { GRAPHQL_SUBSCRIPTION } from '../../clients/subscriptions';
-import { useElevenLabsAudio } from '../../components/audio-player';
-import ListBox from '../../components/list/ListBox';
-import { useTranscribe } from '../../hooks/AudioHooks';
-import { Agent } from '../../types/agents';
-import { useWithLocalStorage } from '../../hooks/local-storage-hook';
-import { ADD_PREDICTION } from '../../clients/mutations';
+import { GET_ALL_AGENTS } from '@/clients/queries';
+import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
+import { useElevenLabsAudio } from '@/components/audio-player';
+import ListBox from '@/components/list/ListBox';
+import { useTranscribe } from '@/hooks/AudioHooks';
+import { Agent } from '@/types/agents';
+import { useWithLocalStorage } from '@/hooks/local-storage-hook';
+import { ADD_PREDICTION } from '@/clients/mutations';
 
 interface predictionAdded {
   id: string;
@@ -36,6 +36,7 @@ export default function PlaygroundDashboard() {
     'playground-form',
   );
   const [responses, setResponses] = useState<Array<Data>>([]);
+  const [base64Images, setBase64Images] = useState<string[]>([]);
 
   // Queries and Mutations
   const { data: agents } = useQuery(GET_ALL_AGENTS);
@@ -61,6 +62,12 @@ export default function PlaygroundDashboard() {
         variables: {
           userMessage: form.prompt,
         },
+        attachments: base64Images.map((image) => ({
+          type: 'image_url',
+          image_url: {
+            url: image,
+          },
+        })),
       },
     });
   };
@@ -95,6 +102,23 @@ export default function PlaygroundDashboard() {
    */
   const handleClear = () => {
     setResponses([]);
+  };
+
+  /**
+   * Handles the image upload and conversion to base64.
+   * @param event {React.ChangeEvent<HTMLInputElement>} The change event.
+   */
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files) {
+      Array.from(files).forEach((file) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setBase64Images((prevImages) => [...prevImages, reader.result as string]);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
   };
 
   /**
@@ -190,6 +214,36 @@ export default function PlaygroundDashboard() {
                 value={form.prompt}
                 onChange={(e) => setForm({ ...form, prompt: e.target.value })}
               />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-bold mb-2" htmlFor="image-upload">
+                Upload Images
+              </label>
+              <input
+                type="file"
+                id="image-upload"
+                accept="image/*"
+                multiple
+                onChange={handleImageUpload}
+                className="border-2 border-gray-200 p-2 rounded-lg w-full"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-bold mb-2">Uploaded Images</label>
+              <div className="flex flex-wrap gap-2">
+                {base64Images.map((image, index) => (
+                  <div key={index} className="relative">
+                    <img src={image} alt={`Uploaded ${index + 1}`} className="w-24 h-24 object-cover rounded" />
+                    <button
+                      type="button"
+                      onClick={() => setBase64Images(base64Images.filter((_, i) => i !== index))}
+                      className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
             <button
               className="bg-blue-500 text-white px-4 py-2 rounded-lg ml-2 hover:bg-blue-600 transition-colors disabled:opacity-50"

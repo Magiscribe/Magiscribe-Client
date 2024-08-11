@@ -1,13 +1,13 @@
 import { useMutation, useQuery } from '@apollo/client';
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ADD_UPDATE_CAPABILITY, ADD_UPDATE_PROMPT } from '../../../clients/mutations';
-import { GET_ALL_MODELS, GET_ALL_PROMPTS, GET_CAPABILITY } from '../../../clients/queries';
-import ListBox from '../../../components/list/ListBox';
-import ReorderableList from '../../../components/list/ReorderableList';
-import CustomModal from '../../../components/modal';
-import { useAddAlert } from '../../../hooks/AlertHooks';
-import { Prompt } from '../../../types/agents';
+import { ADD_UPDATE_CAPABILITY, ADD_UPDATE_PROMPT } from '@/clients/mutations';
+import { GET_ALL_MODELS, GET_ALL_PROMPTS, GET_CAPABILITY } from '@/clients/queries';
+import ListBox from '@/components/list/ListBox';
+import ReorderableList from '@/components/list/ReorderableList';
+import CustomModal from '@/components/modal';
+import { useAddAlert } from '@/hooks/AlertHooks';
+import { Prompt } from '@/types/agents';
 
 const OutputReturnMode = [
   {
@@ -145,7 +145,7 @@ export default function CapabilityEdit() {
       }
 
       addAlert('Capability saved successfully', 'success');
-      navigate('/dashboard/capabilities');
+      navigate('../');
     } catch (error) {
       console.error(error);
       addAlert('Error saving capability', 'error');
