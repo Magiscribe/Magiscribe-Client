@@ -32,10 +32,23 @@ const OutputReturnMode = [
   },
 ];
 
+export type CapabilityEditForm = {
+    id?: string;
+    name: string;
+    alias: string;
+    description: string;
+    llmModel: string;
+    prompts: Prompt[];
+    outputMode: string;
+    subscriptionFilter: string;
+    outputFilter: string;
+    newPromptTitle: string;
+}
+
 export default function CapabilityEdit() {
   // States
-  const [form, setForm] = useState({
-    id: null,
+  const [form, setForm] = useState<CapabilityEditForm>({
+    id: undefined,
     name: '',
     alias: '',
     description: '',
@@ -44,6 +57,7 @@ export default function CapabilityEdit() {
     outputMode: '',
     subscriptionFilter: '',
     outputFilter: '',
+    newPromptTitle: '',
   });
   const [openPromptModal, setOpenPromptModal] = useState(false);
 
@@ -73,6 +87,7 @@ export default function CapabilityEdit() {
         outputMode: data.getCapability.outputMode,
         subscriptionFilter: data.getCapability.subscriptionFilter,
         outputFilter: data.getCapability.outputFilter,
+        newPromptTitle: '',
       });
     },
   });
@@ -90,6 +105,41 @@ export default function CapabilityEdit() {
       prompts: form.prompts.filter((p) => p.id !== promptId),
     });
   };
+
+  const handleNewPromptTitleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setForm({
+      ...form,
+      newPromptTitle: event.target.value,
+    });
+  };
+
+  const handleNewPromptAdd = async () => {
+    try {
+      const result = await addUpdatePrompt({
+        variables: {
+          prompt: {
+            id: "",
+            name: form.newPromptTitle,
+            text: "Placeholder prompt text",
+          },
+        },
+      });
+
+      if (result.errors) {
+        addAlert('Error creating prompt', 'error');
+        return;
+      }
+
+      addAlert('New prompt saved successfully', 'success');
+      setForm({
+        ...form,
+        prompts: [...form.prompts, result.data.addUpdatePrompt],
+      });
+      setOpenPromptModal(false);
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   const handlePromptAdd = ({ id }: { id: string }) => {
     const selectedItem = prompts?.getAllPrompts.find((prompt: Prompt) => prompt.id === id);
@@ -294,6 +344,25 @@ export default function CapabilityEdit() {
                       </button>
                     </div>
                   ))}
+                  <div key={"newPrompt"} className="bg-gray-100 p-2 rounded-lg h-full w-full flex flex-col">
+                    <h3 className="text-lg font-bold">{"New Prompt"}</h3>
+                    <textarea
+                      className="border-2 border-gray-200 p-2 rounded-lg w-full"
+                      id="text"
+                      rows={1}
+                      placeholder="Enter title of new prompt"
+                      onChange={handleNewPromptTitleChange}
+                    />
+                    <button
+                        type="button"
+                        onClick={() => {
+                          handleNewPromptAdd();
+                        }}
+                        className="bg-blue-500 text-white px-2 py-1 rounded-lg self-start mt-2"
+                      >
+                        Add
+                  </button>
+                  </div>                
               </div>
             </CustomModal>
             <ReorderableList
