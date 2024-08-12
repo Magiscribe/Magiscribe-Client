@@ -52,10 +52,15 @@ export const GET_ALL_CAPABILITIES = gql`
       prompts {
         name
         id
+        text
       }
       alias
       name
+      llmModel
       description
+      outputMode
+      subscriptionFilter
+      outputFilter
     }
   }
 `;

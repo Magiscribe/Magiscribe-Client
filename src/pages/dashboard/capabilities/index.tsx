@@ -1,11 +1,12 @@
 import { useMutation, useQuery } from '@apollo/client';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { DELETE_CAPABILITY } from '../../../clients/mutations';
+import { ADD_UPDATE_CAPABILITY, DELETE_CAPABILITY } from '../../../clients/mutations';
 import { GET_ALL_CAPABILITIES } from '../../../clients/queries';
 import { Capability, Prompt } from '../../../types/agents';
+import { useAddAlert } from '../../../hooks/AlertHooks';
 
-function CapabilityCard({ capability, onUpdate }: { capability: Capability; onUpdate?: () => void }) {
+function CapabilityCard({ capability, onUpdate, onCopy }: { capability: Capability; onCopy: (id: string) => void, onUpdate?: () => void}) {
   const [deleteCapability] = useMutation(DELETE_CAPABILITY);
 
   const handleDelete = async () => {
@@ -45,6 +46,9 @@ function CapabilityCard({ capability, onUpdate }: { capability: Capability; onUp
         >
           Edit
         </Link>
+        <button onClick={() => onCopy(capability.id)} className="text-sm bg-blue-500 text-white px-2 py-1 rounded-lg">
+          Copy
+        </button>
         <button onClick={handleDelete} className="text-red-700 text-sm">
           Delete
         </button>
@@ -54,7 +58,40 @@ function CapabilityCard({ capability, onUpdate }: { capability: Capability; onUp
 }
 
 export default function CapabilityDashboard() {
+  const addAlert = useAddAlert();
   const { data, refetch } = useQuery(GET_ALL_CAPABILITIES);
+  const [addUpdateCapability] = useMutation(ADD_UPDATE_CAPABILITY);
+  const handleCopy = async (id: string) => {
+    const selectedItem = data?.getAllCapabilities.find((capability: Capability) => capability.id === id) as Capability;
+
+    try {
+      const result = await addUpdateCapability({
+        variables: {
+          capability: {
+            id: null,
+            alias: selectedItem.alias + " Copy",
+            name: selectedItem.name + " Copy",
+            description: selectedItem.description,
+            llmModel: selectedItem.llmModel,
+            prompts: selectedItem.prompts.map(prompt => prompt.id),
+            outputMode: selectedItem.outputMode,
+            subscriptionFilter: selectedItem.subscriptionFilter,
+            outputFilter: selectedItem.outputFilter,
+          }
+        },
+      });
+
+      if (result.errors) {
+        addAlert('Error copying capability', 'error');
+        return;
+      }
+
+      addAlert('Capability copied successfully', 'success');
+      refetch();
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   return (
     <div className="bg-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl text-slate-700">
@@ -73,7 +110,7 @@ export default function CapabilityDashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2, delay: 0.05 * i }}
           >
-            <CapabilityCard key={capability.id} capability={capability} onUpdate={refetch} />
+            <CapabilityCard key={capability.id} capability={capability} onCopy={handleCopy} onUpdate={refetch} />
           </motion.div>
         ))}
       </div>
