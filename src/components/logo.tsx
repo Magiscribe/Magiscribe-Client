@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 
-function WandIcon() {
+export function WandIcon() {
   return (
     <svg className="w-12 mb-4 mr-2 inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 289.17 287.44">
       <defs>
