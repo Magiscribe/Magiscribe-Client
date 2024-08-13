@@ -58,6 +58,15 @@ export default function PlaygroundDashboard() {
   const { isTranscribing, transcript, startTranscribing, stopTranscribing } = useTranscribe();
   const audio = useElevenLabsAudio(form.voice);
 
+  useEffect(() => {
+    if (!form.customVariables || form.customVariables.length === 0) {
+      setForm((prevForm: Form) => ({
+        ...prevForm,
+        customVariables: [{ key: 'userMessage', value: 'Placeholder' }],
+      }));
+    }
+  }, []);
+
   const addCustomVariable = () => {
     setForm((prevForm: Form) => ({
       ...prevForm,
