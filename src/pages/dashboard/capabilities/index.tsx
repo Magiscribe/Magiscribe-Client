@@ -1,13 +1,25 @@
 import { useMutation, useQuery } from '@apollo/client';
 import { motion } from 'framer-motion';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ADD_UPDATE_CAPABILITY, DELETE_CAPABILITY } from '../../../clients/mutations';
 import { GET_ALL_CAPABILITIES } from '../../../clients/queries';
 import { Capability, Prompt } from '../../../types/agents';
 import { useAddAlert } from '../../../hooks/AlertHooks';
+import DeleteConfirmationModal from '../../../components/delete-modal'; // Adjust the import path as needed
 
-function CapabilityCard({ capability, onUpdate, onCopy }: { capability: Capability; onCopy: (id: string) => void, onUpdate?: () => void}) {
+function CapabilityCard({
+  capability,
+  onUpdate,
+  onCopy,
+}: {
+  capability: Capability;
+  onCopy: (id: string) => void;
+  onUpdate?: () => void;
+}) {
   const [deleteCapability] = useMutation(DELETE_CAPABILITY);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const addAlert = useAddAlert();
 
   const handleDelete = async () => {
     try {
@@ -16,11 +28,13 @@ function CapabilityCard({ capability, onUpdate, onCopy }: { capability: Capabili
           capabilityId: capability.id,
         },
       });
+      addAlert('Capability successfully deleted', 'success');
+      if (onUpdate) onUpdate();
     } catch (error) {
       console.error(error);
+      addAlert('Failed to delete capability', 'error');
     }
-
-    if (onUpdate) onUpdate();
+    setIsDeleteModalOpen(false);
   };
 
   return (
@@ -32,6 +46,7 @@ function CapabilityCard({ capability, onUpdate, onCopy }: { capability: Capabili
       <div className="flex flex-wrap gap-2 mt-2">
         {capability.prompts.map((prompt: Prompt) => (
           <Link
+            key={prompt.id}
             to={`/dashboard/prompts/edit?id=${prompt.id}`}
             className="text-xs font-bold bg-blue-200 text-blue-800 py-1 px-2 rounded-full"
           >
@@ -49,10 +64,16 @@ function CapabilityCard({ capability, onUpdate, onCopy }: { capability: Capabili
         <button onClick={() => onCopy(capability.id)} className="text-sm bg-blue-500 text-white px-2 py-1 rounded-lg">
           Copy
         </button>
-        <button onClick={handleDelete} className="text-red-700 text-sm">
+        <button onClick={() => setIsDeleteModalOpen(true)} className="text-red-700 text-sm">
           Delete
         </button>
       </div>
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDelete}
+        itemName="capability"
+      />
     </div>
   );
 }
@@ -61,6 +82,7 @@ export default function CapabilityDashboard() {
   const addAlert = useAddAlert();
   const { data, refetch } = useQuery(GET_ALL_CAPABILITIES);
   const [addUpdateCapability] = useMutation(ADD_UPDATE_CAPABILITY);
+
   const handleCopy = async (id: string) => {
     const selectedItem = data?.getAllCapabilities.find((capability: Capability) => capability.id === id) as Capability;
 
@@ -69,15 +91,15 @@ export default function CapabilityDashboard() {
         variables: {
           capability: {
             id: null,
-            alias: selectedItem.alias + " Copy",
-            name: selectedItem.name + " Copy",
+            alias: selectedItem.alias + ' Copy',
+            name: selectedItem.name + ' Copy',
             description: selectedItem.description,
             llmModel: selectedItem.llmModel,
-            prompts: selectedItem.prompts.map(prompt => prompt.id),
+            prompts: selectedItem.prompts.map((prompt) => prompt.id),
             outputMode: selectedItem.outputMode,
             subscriptionFilter: selectedItem.subscriptionFilter,
             outputFilter: selectedItem.outputFilter,
-          }
+          },
         },
       });
 
@@ -91,7 +113,7 @@ export default function CapabilityDashboard() {
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 
   return (
     <div className="bg-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl text-slate-700">

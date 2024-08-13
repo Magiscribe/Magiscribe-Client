@@ -33,17 +33,17 @@ const OutputReturnMode = [
 ];
 
 export type CapabilityEditForm = {
-    id?: string;
-    name: string;
-    alias: string;
-    description: string;
-    llmModel: string;
-    prompts: Prompt[];
-    outputMode: string;
-    subscriptionFilter: string;
-    outputFilter: string;
-    newPromptTitle: string;
-}
+  id?: string;
+  name: string;
+  alias: string;
+  description: string;
+  llmModel: string;
+  prompts: Prompt[];
+  outputMode: string;
+  subscriptionFilter: string;
+  outputFilter: string;
+  newPromptTitle: string;
+};
 
 export default function CapabilityEdit() {
   // States
@@ -118,9 +118,9 @@ export default function CapabilityEdit() {
       const result = await addUpdatePrompt({
         variables: {
           prompt: {
-            id: "",
+            id: '',
             name: form.newPromptTitle,
-            text: "Placeholder prompt text",
+            text: 'Placeholder prompt text',
           },
         },
       });
@@ -139,7 +139,7 @@ export default function CapabilityEdit() {
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 
   const handlePromptAdd = ({ id }: { id: string }) => {
     const selectedItem = prompts?.getAllPrompts.find((prompt: Prompt) => prompt.id === id);
@@ -166,6 +166,7 @@ export default function CapabilityEdit() {
         },
       },
     });
+    addAlert('Prompt saved successfully', 'success');
     callback();
   };
 
@@ -344,25 +345,25 @@ export default function CapabilityEdit() {
                       </button>
                     </div>
                   ))}
-                  <div key={"newPrompt"} className="bg-gray-100 p-2 rounded-lg h-full w-full flex flex-col">
-                    <h3 className="text-lg font-bold">{"New Prompt"}</h3>
-                    <textarea
-                      className="border-2 border-gray-200 p-2 rounded-lg w-full"
-                      id="text"
-                      rows={1}
-                      placeholder="Enter title of new prompt"
-                      onChange={handleNewPromptTitleChange}
-                    />
-                    <button
-                        type="button"
-                        onClick={() => {
-                          handleNewPromptAdd();
-                        }}
-                        className="bg-blue-500 text-white px-2 py-1 rounded-lg self-start mt-2"
-                      >
-                        Add
+                <div key={'newPrompt'} className="bg-gray-100 p-2 rounded-lg h-full w-full flex flex-col">
+                  <h3 className="text-lg font-bold">{'New Prompt'}</h3>
+                  <textarea
+                    className="border-2 border-gray-200 p-2 rounded-lg w-full"
+                    id="text"
+                    rows={1}
+                    placeholder="Enter title of new prompt"
+                    onChange={handleNewPromptTitleChange}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleNewPromptAdd();
+                    }}
+                    className="bg-blue-500 text-white px-2 py-1 rounded-lg self-start mt-2"
+                  >
+                    Add
                   </button>
-                  </div>                
+                </div>
               </div>
             </CustomModal>
             <ReorderableList

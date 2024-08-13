@@ -1,25 +1,32 @@
 import { useMutation, useQuery } from '@apollo/client';
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
 import { DELETE_AGENT } from '../../../clients/mutations';
 import { GET_ALL_AGENTS } from '../../../clients/queries';
 import { Agent, Capability } from '../../../types/agents';
 import { motion } from 'framer-motion';
+import DeleteConfirmationModal from '../../../components/delete-modal'; // Adjust the import path as needed
+import { useAddAlert } from '../../../hooks/AlertHooks';
 
 function AgentCard({ agent, onUpdate }: { agent: Agent; onUpdate?: () => void }) {
-  const [deleteCapability] = useMutation(DELETE_AGENT);
+  const [deleteAgent] = useMutation(DELETE_AGENT);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const addAlert = useAddAlert();
 
   const handleDelete = async () => {
     try {
-      await deleteCapability({
+      await deleteAgent({
         variables: {
           agentId: agent.id,
         },
       });
+      addAlert('Agent successfully deleted', 'success');
+      if (onUpdate) onUpdate();
     } catch (error) {
       console.error(error);
+      addAlert('Failed to delete agent', 'error');
     }
-
-    if (onUpdate) onUpdate();
+    setIsDeleteModalOpen(false);
   };
 
   return (
@@ -29,6 +36,7 @@ function AgentCard({ agent, onUpdate }: { agent: Agent; onUpdate?: () => void })
       <div className="flex flex-wrap gap-2 mt-2">
         {agent.capabilities.map((capability: Capability) => (
           <Link
+            key={capability.id}
             to={`/dashboard/capabilities/edit?id=${capability.id}`}
             className="text-xs font-bold bg-blue-200 text-blue-800 py-1 px-2 rounded-full"
           >
@@ -43,10 +51,16 @@ function AgentCard({ agent, onUpdate }: { agent: Agent; onUpdate?: () => void })
         >
           Edit
         </Link>
-        <button onClick={handleDelete} className="text-red-700 text-sm">
+        <button onClick={() => setIsDeleteModalOpen(true)} className="text-red-700 text-sm">
           Delete
         </button>
       </div>
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDelete}
+        itemName="agent"
+      />
     </div>
   );
 }

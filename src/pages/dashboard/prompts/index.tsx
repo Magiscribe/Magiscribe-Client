@@ -1,25 +1,33 @@
 import { useMutation, useQuery } from '@apollo/client';
 import { motion } from 'framer-motion';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { DELETE_PROMPT } from '../../../clients/mutations';
 import { GET_ALL_PROMPTS } from '../../../clients/queries';
 import { Prompt } from '../../../types/agents';
+import DeleteConfirmationModal from '../../../components/delete-modal'; // Adjust the import path as needed
+import { useAddAlert } from '../../../hooks/AlertHooks';
 
 function PromptCard({ prompt, onUpdate }: { prompt: Prompt; onUpdate?: () => void }) {
-  const [deleteCapability] = useMutation(DELETE_PROMPT);
+  const [deletePrompt] = useMutation(DELETE_PROMPT);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const addAlert = useAddAlert();
 
   const handleDelete = async () => {
     try {
-      await deleteCapability({
+      await deletePrompt({
         variables: {
           promptId: prompt.id,
         },
       });
+      addAlert('Prompt successfully deleted', 'success');
     } catch (error) {
       console.error(error);
+      addAlert('Error deleting prompt', 'error');
     }
 
     if (onUpdate) onUpdate();
+    setIsDeleteModalOpen(false);
   };
 
   return (
@@ -32,10 +40,16 @@ function PromptCard({ prompt, onUpdate }: { prompt: Prompt; onUpdate?: () => voi
         >
           Edit
         </Link>
-        <button onClick={handleDelete} className="text-red-700 text-sm">
+        <button onClick={() => setIsDeleteModalOpen(true)} className="text-red-700 text-sm">
           Delete
         </button>
       </div>
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDelete}
+        itemName="prompt"
+      />
     </div>
   );
 }
