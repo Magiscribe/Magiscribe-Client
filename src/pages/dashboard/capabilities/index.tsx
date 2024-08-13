@@ -85,14 +85,14 @@ export default function CapabilityDashboard() {
 
   const handleCopy = async (id: string) => {
     const selectedItem = data?.getAllCapabilities.find((capability: Capability) => capability.id === id) as Capability;
-
+    const timeStamp = Date.now();
     try {
       const result = await addUpdateCapability({
         variables: {
           capability: {
             id: null,
-            alias: selectedItem.alias + ' Copy',
-            name: selectedItem.name + ' Copy',
+            alias: selectedItem.alias + 'Copy_' + timeStamp,
+            name: selectedItem.name + ' Copy ' + timeStamp,
             description: selectedItem.description,
             llmModel: selectedItem.llmModel,
             prompts: selectedItem.prompts.map((prompt) => prompt.id),

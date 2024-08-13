@@ -2,13 +2,21 @@ import { useMutation, useQuery } from '@apollo/client';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { DELETE_PROMPT } from '../../../clients/mutations';
+import { DELETE_PROMPT, ADD_UPDATE_PROMPT } from '../../../clients/mutations';
 import { GET_ALL_PROMPTS } from '../../../clients/queries';
 import { Prompt } from '../../../types/agents';
-import DeleteConfirmationModal from '../../../components/delete-modal'; // Adjust the import path as needed
+import DeleteConfirmationModal from '../../../components/delete-modal';
 import { useAddAlert } from '../../../hooks/AlertHooks';
 
-function PromptCard({ prompt, onUpdate }: { prompt: Prompt; onUpdate?: () => void }) {
+function PromptCard({
+  prompt,
+  onUpdate,
+  onCopy,
+}: {
+  prompt: Prompt;
+  onUpdate?: () => void;
+  onCopy: (id: string) => void;
+}) {
   const [deletePrompt] = useMutation(DELETE_PROMPT);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const addAlert = useAddAlert();
@@ -21,12 +29,11 @@ function PromptCard({ prompt, onUpdate }: { prompt: Prompt; onUpdate?: () => voi
         },
       });
       addAlert('Prompt successfully deleted', 'success');
+      if (onUpdate) onUpdate();
     } catch (error) {
       console.error(error);
       addAlert('Error deleting prompt', 'error');
     }
-
-    if (onUpdate) onUpdate();
     setIsDeleteModalOpen(false);
   };
 
@@ -40,6 +47,9 @@ function PromptCard({ prompt, onUpdate }: { prompt: Prompt; onUpdate?: () => voi
         >
           Edit
         </Link>
+        <button onClick={() => onCopy(prompt.id)} className="text-sm bg-blue-500 text-white px-2 py-1 rounded-lg">
+          Copy
+        </button>
         <button onClick={() => setIsDeleteModalOpen(true)} className="text-red-700 text-sm">
           Delete
         </button>
@@ -56,6 +66,35 @@ function PromptCard({ prompt, onUpdate }: { prompt: Prompt; onUpdate?: () => voi
 
 export default function PromptDashboard() {
   const { data, refetch } = useQuery(GET_ALL_PROMPTS);
+  const [addUpdatePrompt] = useMutation(ADD_UPDATE_PROMPT);
+  const addAlert = useAddAlert();
+
+  const handleCopy = async (id: string) => {
+    const selectedItem = data?.getAllPrompts.find((prompt: Prompt) => prompt.id === id) as Prompt;
+    const timeStamp = Date.now();
+    try {
+      const result = await addUpdatePrompt({
+        variables: {
+          prompt: {
+            id: null,
+            name: selectedItem.name + '_Copy_' + timeStamp,
+            text: selectedItem.text,
+          },
+        },
+      });
+
+      if (result.errors) {
+        addAlert('Error copying prompt', 'error');
+        return;
+      }
+
+      addAlert('Prompt copied successfully', 'success');
+      refetch();
+    } catch (error) {
+      console.error(error);
+      addAlert('Error copying prompt', 'error');
+    }
+  };
 
   return (
     <div className="bg-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl text-slate-700">
@@ -74,7 +113,7 @@ export default function PromptDashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2, delay: 0.05 * i }}
           >
-            <PromptCard key={prompt.id} prompt={prompt} onUpdate={refetch} />
+            <PromptCard key={prompt.id} prompt={prompt} onUpdate={refetch} onCopy={handleCopy} />
           </motion.div>
         ))}
       </div>

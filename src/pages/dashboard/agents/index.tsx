@@ -1,14 +1,14 @@
 import { useMutation, useQuery } from '@apollo/client';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
-import { DELETE_AGENT } from '../../../clients/mutations';
+import { DELETE_AGENT, ADD_UPDATE_AGENT } from '../../../clients/mutations';
 import { GET_ALL_AGENTS } from '../../../clients/queries';
 import { Agent, Capability } from '../../../types/agents';
 import { motion } from 'framer-motion';
-import DeleteConfirmationModal from '../../../components/delete-modal'; // Adjust the import path as needed
+import DeleteConfirmationModal from '../../../components/delete-modal';
 import { useAddAlert } from '../../../hooks/AlertHooks';
 
-function AgentCard({ agent, onUpdate }: { agent: Agent; onUpdate?: () => void }) {
+function AgentCard({ agent, onUpdate, onCopy }: { agent: Agent; onUpdate?: () => void; onCopy: (id: string) => void }) {
   const [deleteAgent] = useMutation(DELETE_AGENT);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const addAlert = useAddAlert();
@@ -51,6 +51,9 @@ function AgentCard({ agent, onUpdate }: { agent: Agent; onUpdate?: () => void })
         >
           Edit
         </Link>
+        <button onClick={() => onCopy(agent.id)} className="text-sm bg-blue-500 text-white px-2 py-1 rounded-lg">
+          Copy
+        </button>
         <button onClick={() => setIsDeleteModalOpen(true)} className="text-red-700 text-sm">
           Delete
         </button>
@@ -67,6 +70,41 @@ function AgentCard({ agent, onUpdate }: { agent: Agent; onUpdate?: () => void })
 
 export default function AgentDashboard() {
   const { data, refetch } = useQuery(GET_ALL_AGENTS);
+  const [addUpdateAgent] = useMutation(ADD_UPDATE_AGENT);
+  const addAlert = useAddAlert();
+
+  const handleCopy = async (id: string) => {
+    const selectedItem = data?.getAllAgents.find((agent: Agent) => agent.id === id);
+    if (!selectedItem) {
+      addAlert('Agent not found', 'error');
+      return;
+    }
+
+    const timeStamp = Date.now();
+    try {
+      const result = await addUpdateAgent({
+        variables: {
+          agent: {
+            id: null, // Ensure a new agent is created
+            name: `${selectedItem.name} Copy ${timeStamp}`,
+            description: selectedItem.description,
+            capabilities: selectedItem.capabilities.map((capability: Capability) => capability.id),
+          },
+        },
+      });
+
+      if (result.errors) {
+        addAlert('Error copying agent', 'error');
+        return;
+      }
+
+      addAlert('Agent copied successfully', 'success');
+      refetch();
+    } catch (error) {
+      console.error(error);
+      addAlert('Error copying agent', 'error');
+    }
+  };
 
   return (
     <div className="bg-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl text-slate-700">
@@ -85,7 +123,7 @@ export default function AgentDashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2, delay: 0.05 * i }}
           >
-            <AgentCard key={agent.id} agent={agent} onUpdate={refetch} />
+            <AgentCard key={agent.id} agent={agent} onUpdate={refetch} onCopy={handleCopy} />
           </motion.div>
         ))}
       </div>
