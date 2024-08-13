@@ -30,31 +30,36 @@ function AgentCard({ agent, onUpdate, onCopy }: { agent: Agent; onUpdate?: () =>
   };
 
   return (
-    <div className="relative bg-gray-100 p-4 rounded-lg shadow-md h-full w-full">
-      <h2 className="text-xl font-bold">{agent.name}</h2>
-      <p className="text-sm">{agent.description}</p>
-      <div className="flex flex-wrap gap-2 mt-2">
-        {agent.capabilities.map((capability: Capability) => (
-          <Link
-            key={capability.id}
-            to={`/dashboard/capabilities/edit?id=${capability.id}`}
-            className="text-xs font-bold bg-blue-200 text-blue-800 py-1 px-2 rounded-full"
-          >
-            {capability.name}
-          </Link>
-        ))}
+    <div className="bg-gray-100 p-4 rounded-lg shadow-md h-full w-full flex flex-col">
+      <div className="flex-grow">
+        <h2 className="text-xl font-bold mb-2 break-words">{agent.name}</h2>
+        <p className="text-sm mb-4 break-words">{agent.description}</p>
+        <div className="flex flex-wrap gap-2 mb-4">
+          {agent.capabilities.map((capability: Capability) => (
+            <Link
+              key={capability.id}
+              to={`/dashboard/capabilities/edit?id=${capability.id}`}
+              className="text-xs font-bold bg-blue-200 text-blue-800 py-1 px-2 rounded-full break-all"
+            >
+              {capability.name}
+            </Link>
+          ))}
+        </div>
       </div>
-      <div className="absolute top-4 right-4 flex gap-2">
+      <div className="flex justify-end gap-2 mt-auto">
         <Link
           to={`/dashboard/agents/edit?id=${agent.id}`}
-          className="text-sm bg-blue-500 text-white px-2 py-1 rounded-lg"
+          className="text-sm bg-blue-500 text-white px-2 py-1 rounded-lg whitespace-nowrap"
         >
           Edit
         </Link>
-        <button onClick={() => onCopy(agent.id)} className="text-sm bg-blue-500 text-white px-2 py-1 rounded-lg">
+        <button
+          onClick={() => onCopy(agent.id)}
+          className="text-sm bg-blue-500 text-white px-2 py-1 rounded-lg whitespace-nowrap"
+        >
           Copy
         </button>
-        <button onClick={() => setIsDeleteModalOpen(true)} className="text-red-700 text-sm">
+        <button onClick={() => setIsDeleteModalOpen(true)} className="text-sm text-red-700 whitespace-nowrap">
           Delete
         </button>
       </div>

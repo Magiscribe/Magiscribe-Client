@@ -38,19 +38,24 @@ function PromptCard({
   };
 
   return (
-    <div className="relative bg-gray-100 p-4 rounded-lg shadow-md h-full w-full">
-      <h2 className="text-xl font-bold">{prompt.name}</h2>
-      <div className="absolute top-4 right-4 flex gap-2">
+    <div className="bg-gray-100 p-4 rounded-lg shadow-md h-full w-full flex flex-col">
+      <div className="flex-grow">
+        <h2 className="text-xl font-bold mb-4 break-words">{prompt.name}</h2>
+      </div>
+      <div className="flex justify-end gap-2 mt-2">
         <Link
           to={`/dashboard/prompts/edit?id=${prompt.id}`}
-          className="text-sm bg-blue-500 text-white px-2 py-1 rounded-lg"
+          className="text-sm bg-blue-500 text-white px-2 py-1 rounded-lg whitespace-nowrap"
         >
           Edit
         </Link>
-        <button onClick={() => onCopy(prompt.id)} className="text-sm bg-blue-500 text-white px-2 py-1 rounded-lg">
+        <button
+          onClick={() => onCopy(prompt.id)}
+          className="text-sm bg-blue-500 text-white px-2 py-1 rounded-lg whitespace-nowrap"
+        >
           Copy
         </button>
-        <button onClick={() => setIsDeleteModalOpen(true)} className="text-red-700 text-sm">
+        <button onClick={() => setIsDeleteModalOpen(true)} className="text-sm text-red-700 whitespace-nowrap">
           Delete
         </button>
       </div>
