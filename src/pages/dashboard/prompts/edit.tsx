@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client';
 import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { ADD_UPDATE_PROMPT } from '../../../clients/mutations';
 import { GET_PROMPT } from '../../../clients/queries';
 import { useAddAlert } from '../../../hooks/AlertHooks';
@@ -70,7 +70,15 @@ export default function PromptEdit() {
   return (
     <>
       <div className="bg-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl text-slate-700">
-        <h1 className="text-3xl font-bold">{form.id ? 'Edit' : 'Add'} Prompt</h1>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold">{form.id ? 'Edit' : 'Add'} Prompt</h1>
+          <Link
+            to="/dashboard/prompts"
+            className="bg-indigo-500 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors"
+          >
+            Back
+          </Link>
+        </div>
         <form className="mt-8" onSubmit={handleSave}>
           <div className="mb-4">
             <label className="block text-sm font-bold mb-2" htmlFor="name">
@@ -96,7 +104,7 @@ export default function PromptEdit() {
               onChange={handleChange}
             />
           </div>
-          <button className="bg-blue-500 text-white px-4 py-2 rounded-lg">Save</button>
+          <button className="bg-indigo-500 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg">Save</button>
         </form>
       </div>
     </>

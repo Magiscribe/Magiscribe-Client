@@ -199,7 +199,7 @@ export default function PlaygroundDashboard() {
             </button>
             <button
               type="button"
-              className="bg-green-500 text-white px-4 py-2 rounded-lg ml-2 hover:bg-green-600 transition-colors"
+              className="bg-green-500 text-white px-4 py-2 rounded-lg ml-2 hover:bg-green-700 transition-colors"
               onClick={handleTranscribe}
             >
               Transcription {isTranscribing ? 'On' : 'Off'}{' '}
@@ -207,7 +207,7 @@ export default function PlaygroundDashboard() {
             </button>
             <button
               type="button"
-              className="bg-green-500 text-white px-4 py-2 rounded-lg ml-2 hover:bg-green-600 transition-colors"
+              className="bg-green-500 text-white px-4 py-2 rounded-lg ml-2 hover:bg-green-700 transition-colors"
               onClick={() => setEnableAudio(!enableAudio)}
             >
               Audio {enableAudio ? 'On' : 'Off'} <FontAwesomeIcon icon={enableAudio ? faVolumeHigh : faVolumeMute} />

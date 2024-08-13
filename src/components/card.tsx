@@ -11,10 +11,12 @@ interface LinkCardProps {
 
 export default function LinkCard({ to, title, description, gradient, isActive = false }: LinkCardProps) {
   const gradients = {
-    red: 'from-red-600 to-pink-400',
-    green: 'from-green-600 to-green-400',
-    purple: 'from-purple-600 to-purple-400',
-    blue: 'from-blue-400 to-blue-600',
+    red: 'from-red-700 to-red-500',
+    green: 'from-green-700 to-green-500',
+    purple: 'from-purple-700 to-purple-500',
+    indigo: 'from-indigo-700 to indigo-500',
+    blue: 'from-blue-700 to-blue-500',
+    orange: 'from-orange-700 to-orange-500',
   };
 
   const bg = gradients[gradient as keyof typeof gradients] || gradients['purple'];

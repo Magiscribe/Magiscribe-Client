@@ -45,17 +45,20 @@ function PromptCard({
       <div className="flex justify-end gap-2 mt-2">
         <Link
           to={`/dashboard/prompts/edit?id=${prompt.id}`}
-          className="text-sm bg-blue-500 text-white px-2 py-1 rounded-lg whitespace-nowrap"
+          className="text-sm bg-indigo-500 hover:bg-indigo-700 text-white px-2 py-1 rounded-lg whitespace-nowrap"
         >
           Edit
         </Link>
         <button
           onClick={() => onCopy(prompt.id)}
-          className="text-sm bg-blue-500 text-white px-2 py-1 rounded-lg whitespace-nowrap"
+          className="text-sm bg-indigo-500 hover:bg-indigo-700 text-white px-2 py-1 rounded-lg whitespace-nowrap"
         >
           Copy
         </button>
-        <button onClick={() => setIsDeleteModalOpen(true)} className="text-sm text-red-700 whitespace-nowrap">
+        <button
+          onClick={() => setIsDeleteModalOpen(true)}
+          className="text-sm bg-red-500 hover:bg-red-700 text-white px-2 py-1 rounded-lg whitespace-nowrap"
+        >
           Delete
         </button>
       </div>
@@ -103,9 +106,12 @@ export default function PromptDashboard() {
 
   return (
     <div className="bg-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl text-slate-700">
-      <div className="flex items-center">
+      <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Prompts</h1>
-        <Link to="/dashboard/prompts/edit" className="bg-blue-500 text-sm text-white px-2 py-1 rounded-lg ml-auto">
+        <Link
+          to="/dashboard/prompts/edit"
+          className="bg-green-500 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
+        >
           Add Prompt
         </Link>
       </div>

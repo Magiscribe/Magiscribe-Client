@@ -38,21 +38,21 @@ export default function DashboardTemplate() {
               title="Agents"
               description="View and manage your agents."
               to="/dashboard/agents"
-              gradient="red"
+              gradient="orange"
               isActive={isActive('/agents')}
             />
             <LinkCard
               title="Capabilities"
               description="What can your agents do?"
               to="/dashboard/capabilities"
-              gradient="green"
+              gradient="blue"
               isActive={isActive('/capabilities')}
             />
             <LinkCard
               title="Prompts"
               description="Create and manage prompts."
               to="/dashboard/prompts"
-              gradient="blue"
+              gradient="green"
               isActive={isActive('/prompts')}
             />
             <LinkCard
