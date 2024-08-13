@@ -22,7 +22,7 @@ export default function LinkCard({ to, title, description, gradient, isActive = 
   return (
     <div className={`relative flex flex-col items-center justify-center bg-gradient-to-r ${bg} rounded-xl shadow-xl`}>
       {isActive && (
-        <div className="absolute top-2 right-2">
+        <div className="absolute top-6 right-2">
           <WandIcon />
         </div>
       )}
