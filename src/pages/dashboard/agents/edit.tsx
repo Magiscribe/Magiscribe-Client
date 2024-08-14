@@ -126,7 +126,7 @@ export default function AgentEdit() {
           <h1 className="text-3xl font-bold">{form.id ? 'Edit' : 'Add'} Agent</h1>
           <Link
             to="/dashboard/agents"
-            className="bg-indigo-500 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors"
+            className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
           >
             Back
           </Link>
@@ -327,7 +327,7 @@ export default function AgentEdit() {
             </div>
           </div>
 
-          <button className="bg-indigo-500 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg">Save</button>
+          <button className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">Save</button>
         </form>
       </div>
     </>

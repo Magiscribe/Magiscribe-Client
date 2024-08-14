@@ -78,7 +78,7 @@ export const CustomVariablesSection: React.FC<CustomVariablesSectionProps> = ({
         <p>No custom variables. Add one below.</p>
       )}
       <button
-        className="bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors mt-2"
+        className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors mt-2"
         onClick={onAddVariable}
         type="button"
       >

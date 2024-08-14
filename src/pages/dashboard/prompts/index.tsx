@@ -45,13 +45,13 @@ function PromptCard({
       <div className="flex justify-end gap-2 mt-2">
         <Link
           to={`/dashboard/prompts/edit?id=${prompt.id}`}
-          className="text-sm bg-indigo-500 hover:bg-indigo-700 text-white px-2 py-1 rounded-lg whitespace-nowrap"
+          className="text-sm bg-blue-500 hover:bg-blue-700 text-white px-2 py-1 rounded-lg whitespace-nowrap"
         >
           Edit
         </Link>
         <button
           onClick={() => onCopy(prompt.id)}
-          className="text-sm bg-indigo-500 hover:bg-indigo-700 text-white px-2 py-1 rounded-lg whitespace-nowrap"
+          className="text-sm bg-blue-500 hover:bg-blue-700 text-white px-2 py-1 rounded-lg whitespace-nowrap"
         >
           Copy
         </button>

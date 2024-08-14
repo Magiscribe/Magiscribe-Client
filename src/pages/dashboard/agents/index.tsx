@@ -39,7 +39,7 @@ function AgentCard({ agent, onUpdate, onCopy }: { agent: Agent; onUpdate?: () =>
             <Link
               key={capability.id}
               to={`/dashboard/capabilities/edit?id=${capability.id}`}
-              className="text-xs bg-blue-200 text-blue-700 hover:bg-blue-700 hover:text-white py-1 px-2 rounded-full break-all"
+              className="text-xs font-bold bg-blue-200 text-blue-700 hover:bg-blue-700 hover:text-blue-200 py-1 px-2 rounded-full break-all"
             >
               {capability.name}
             </Link>
@@ -49,13 +49,13 @@ function AgentCard({ agent, onUpdate, onCopy }: { agent: Agent; onUpdate?: () =>
       <div className="flex justify-end gap-2 mt-auto">
         <Link
           to={`/dashboard/agents/edit?id=${agent.id}`}
-          className="text-sm bg-indigo-500 hover:bg-indigo-700 text-white px-2 py-1 rounded-lg whitespace-nowrap"
+          className="text-sm bg-blue-500 hover:bg-blue-700 text-white px-2 py-1 rounded-lg whitespace-nowrap"
         >
           Edit
         </Link>
         <button
           onClick={() => onCopy(agent.id)}
-          className="text-sm bg-indigo-500 hover:bg-indigo-700 text-white px-2 py-1 rounded-lg whitespace-nowrap"
+          className="text-sm bg-blue-500 hover:bg-blue-700 text-white px-2 py-1 rounded-lg whitespace-nowrap"
         >
           Copy
         </button>
@@ -120,7 +120,7 @@ export default function AgentDashboard() {
         <h1 className="text-3xl font-bold">Agents</h1>
         <Link
           to="/dashboard/agents/edit"
-          className="bg-orange-500 hover:bg-orange-700 text-white px-4 py-2 rounded-lg transition-colors"
+          className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
         >
           Add Agent
         </Link>

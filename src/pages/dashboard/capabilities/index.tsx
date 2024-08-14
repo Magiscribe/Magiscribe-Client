@@ -49,7 +49,7 @@ function CapabilityCard({
             <Link
               key={prompt.id}
               to={`/dashboard/prompts/edit?id=${prompt.id}`}
-              className="text-xs bg-green-200 text-green-700 hover:bg-green-700 hover:text-white py-1 px-2 rounded-full break-all"
+              className="text-xs font-bold bg-green-200 text-green-800 hover:bg-green-700 hover:text-green-200 py-1 px-2 rounded-full break-all"
             >
               {prompt.name}
             </Link>
@@ -59,13 +59,13 @@ function CapabilityCard({
       <div className="flex justify-end gap-2 mt-auto">
         <Link
           to={`/dashboard/capabilities/edit?id=${capability.id}`}
-          className="text-sm bg-indigo-500 hover:bg-indigo-700 text-white px-2 py-1 rounded-lg whitespace-nowrap"
+          className="text-sm bg-blue-500 hover:bg-blue-700 text-white px-2 py-1 rounded-lg whitespace-nowrap"
         >
           Edit
         </Link>
         <button
           onClick={() => onCopy(capability.id)}
-          className="text-sm bg-indigo-500 hover:bg-indigo-700 text-white px-2 py-1 rounded-lg whitespace-nowrap"
+          className="text-sm bg-blue-500 hover:bg-blue-700 text-white px-2 py-1 rounded-lg whitespace-nowrap"
         >
           Copy
         </button>

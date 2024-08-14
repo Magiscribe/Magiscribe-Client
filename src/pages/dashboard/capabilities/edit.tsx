@@ -210,7 +210,7 @@ export default function CapabilityEdit() {
           <h1 className="text-3xl font-bold">{form.id ? 'Edit' : 'Add'} Capability</h1>
           <Link
             to="/dashboard/capabilities"
-            className="bg-indigo-500 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors"
+            className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
           >
             Back
           </Link>
@@ -434,7 +434,7 @@ export default function CapabilityEdit() {
                         <button
                           type="button"
                           onClick={() => edit(item)}
-                          className="bg-indigo-500 hover:bg-indigo-700 text-white px-2 py-1 rounded-lg"
+                          className="bg-blue-500 hover:bg-blue-700 text-white px-2 py-1 rounded-lg"
                         >
                           Edit
                         </button>
@@ -452,7 +452,7 @@ export default function CapabilityEdit() {
               )}
             />
           </div>
-          <button type="submit" className="bg-indigo-500 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg">
+          <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
             Save
           </button>
         </form>
