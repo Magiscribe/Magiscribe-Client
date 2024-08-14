@@ -10,6 +10,7 @@ import { useTranscribe } from '@/hooks/AudioHooks';
 import { Agent } from '@/types/agents';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
 import { ADD_PREDICTION } from '@/clients/mutations';
+import { CustomVariablesSection } from '@/components/custom-variables';
 
 interface predictionAdded {
   id: string;
@@ -23,18 +24,29 @@ interface Data {
   predictionAdded: predictionAdded;
 }
 
+interface Form {
+  subscriptionId: string;
+  voice: string;
+  agent: string;
+  customVariables: CustomVariable[];
+}
+
+interface CustomVariable {
+  key: string;
+  value: string;
+}
+
+const initialForm: Form = {
+  subscriptionId: Math.random().toString(36),
+  voice: 'PHOEBE',
+  agent: '',
+  customVariables: [{ key: 'userMessage', value: 'Placeholder' }],
+};
+
 export default function PlaygroundDashboard() {
   // States
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useWithLocalStorage(
-    {
-      subscriptionId: Math.random().toString(36),
-      voice: 'PHOEBE',
-      agent: '',
-      prompt: '',
-    },
-    'playground-form',
-  );
+  const [form, setForm] = useWithLocalStorage(initialForm, 'playground-form');
   const [responses, setResponses] = useState<Array<Data>>([]);
   const [base64Images, setBase64Images] = useState<string[]>([]);
 
@@ -47,29 +59,64 @@ export default function PlaygroundDashboard() {
   const { isTranscribing, transcript, startTranscribing, stopTranscribing } = useTranscribe();
   const audio = useElevenLabsAudio(form.voice);
 
-  /**
-   * Handles the form submission event.
-   * @param e {React.FormEvent<HTMLFormElement>} The form event.
-   */
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  useEffect(() => {
+    if (!form.customVariables || form.customVariables.length === 0) {
+      setForm((prevForm: Form) => ({
+        ...prevForm,
+      }));
+    }
+  }, []);
+
+  const addCustomVariable = () => {
+    setForm((prevForm: Form) => ({
+      ...prevForm,
+      customVariables: [...(prevForm.customVariables || []), { key: '', value: '' }],
+    }));
+  };
+
+  const removeCustomVariable = (index: number) => {
+    setForm((prevForm: Form) => ({
+      ...prevForm,
+      customVariables: (prevForm.customVariables || []).filter((_, i) => i !== index),
+    }));
+  };
+
+  const updateCustomVariable = (index: number, updatedVariable: { key: string; value: string }) => {
+    setForm((prevForm: Form) => ({
+      ...prevForm,
+      customVariables: (prevForm.customVariables || []).map((variable, i) =>
+        i === index ? updatedVariable : variable,
+      ),
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
 
-    setLoading(true);
-    addPrediction({
-      variables: {
-        subscriptionId: form.subscriptionId,
-        agentId: form.agent,
+    const customVariables = form.customVariables as CustomVariable[];
+    const variables = Object.fromEntries(customVariables.map(({ key, value }) => [key, value]));
+
+    try {
+      const result = await addPrediction({
         variables: {
-          userMessage: form.prompt,
+          subscriptionId: form.subscriptionId,
+          agentId: form.agent,
+          variables,
+          attachments: base64Images.map((image) => ({
+            type: 'image_url',
+            image_url: {
+              url: image,
+            },
+          })),
         },
-        attachments: base64Images.map((image) => ({
-          type: 'image_url',
-          image_url: {
-            url: image,
-          },
-        })),
-      },
-    });
+      });
+
+      console.log('Prediction added successfully:', result);
+      // Handle successful submission (e.g., show a success message)
+    } catch (error) {
+      console.error('Error submitting prediction:', error);
+      // Handle other types of errors
+    }
   };
 
   /**
@@ -204,15 +251,11 @@ export default function PlaygroundDashboard() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm font-bold mb-2" htmlFor="prompt">
-                Prompt
-              </label>
-              <textarea
-                className="border-2 border-gray-200 p-2 rounded-lg w-full"
-                id="prompt"
-                rows={8}
-                value={form.prompt}
-                onChange={(e) => setForm({ ...form, prompt: e.target.value })}
+              <CustomVariablesSection
+                variables={form.customVariables || []}
+                onAddVariable={addCustomVariable}
+                onRemoveVariable={removeCustomVariable}
+                onUpdateVariable={updateCustomVariable}
               />
             </div>
             <div className="mb-4">

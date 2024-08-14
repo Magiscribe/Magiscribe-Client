@@ -14,8 +14,12 @@ export interface Capability {
   id: string;
   name: string;
   alias: string;
+  llmModel: string;
   description: string;
   prompts: Prompt[];
+  outputMode: string;
+  subscriptionFilter: string;
+  outputFilter: string;
 }
 
 export interface Agent {

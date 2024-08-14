@@ -1,6 +1,3 @@
-import { useMutation, useQuery } from '@apollo/client';
-import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ADD_UPDATE_CAPABILITY, ADD_UPDATE_PROMPT } from '@/clients/mutations';
 import { GET_ALL_MODELS, GET_ALL_PROMPTS, GET_CAPABILITY } from '@/clients/queries';
 import ListBox from '@/components/list/ListBox';
@@ -8,6 +5,9 @@ import ReorderableList from '@/components/list/ReorderableList';
 import CustomModal from '@/components/modal';
 import { useAddAlert } from '@/hooks/AlertHooks';
 import { Prompt } from '@/types/agents';
+import { useMutation, useQuery } from '@apollo/client';
+import { useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const OutputReturnMode = [
   {
@@ -32,10 +32,23 @@ const OutputReturnMode = [
   },
 ];
 
+export type CapabilityEditForm = {
+  id?: string;
+  name: string;
+  alias: string;
+  description: string;
+  llmModel: string;
+  prompts: Prompt[];
+  outputMode: string;
+  subscriptionFilter: string;
+  outputFilter: string;
+  newPromptTitle: string;
+};
+
 export default function CapabilityEdit() {
   // States
-  const [form, setForm] = useState({
-    id: null,
+  const [form, setForm] = useState<CapabilityEditForm>({
+    id: undefined,
     name: '',
     alias: '',
     description: '',
@@ -44,6 +57,7 @@ export default function CapabilityEdit() {
     outputMode: '',
     subscriptionFilter: '',
     outputFilter: '',
+    newPromptTitle: '',
   });
   const [openPromptModal, setOpenPromptModal] = useState(false);
 
@@ -73,6 +87,7 @@ export default function CapabilityEdit() {
         outputMode: data.getCapability.outputMode,
         subscriptionFilter: data.getCapability.subscriptionFilter,
         outputFilter: data.getCapability.outputFilter,
+        newPromptTitle: '',
       });
     },
   });
@@ -89,6 +104,41 @@ export default function CapabilityEdit() {
       ...form,
       prompts: form.prompts.filter((p) => p.id !== promptId),
     });
+  };
+
+  const handleNewPromptTitleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setForm({
+      ...form,
+      newPromptTitle: event.target.value,
+    });
+  };
+
+  const handleNewPromptAdd = async () => {
+    try {
+      const result = await addUpdatePrompt({
+        variables: {
+          prompt: {
+            id: '',
+            name: form.newPromptTitle,
+            text: 'Placeholder prompt text',
+          },
+        },
+      });
+
+      if (result.errors) {
+        addAlert('Error creating prompt', 'error');
+        return;
+      }
+
+      addAlert('New prompt saved successfully', 'success');
+      setForm({
+        ...form,
+        prompts: [...form.prompts, result.data.addUpdatePrompt],
+      });
+      setOpenPromptModal(false);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handlePromptAdd = ({ id }: { id: string }) => {
@@ -116,6 +166,7 @@ export default function CapabilityEdit() {
         },
       },
     });
+    addAlert('Prompt saved successfully', 'success');
     callback();
   };
 
@@ -155,31 +206,81 @@ export default function CapabilityEdit() {
   return (
     <>
       <div className="bg-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl text-slate-700">
-        <h1 className="text-3xl font-bold">{form.id ? 'Edit' : 'Add'} Capability</h1>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold">{form.id ? 'Edit' : 'Add'} Capability</h1>
+        </div>
         <form className="mt-8" onSubmit={handleFormSave}>
-          <div className="mb-4">
-            <label className="block text-sm font-bold mb-2" htmlFor="name">
-              Name
-            </label>
-            <input
-              className="border-2 border-gray-200 p-2 rounded-lg w-full"
-              id="name"
-              type="text"
-              value={form.name}
-              onChange={handleChange}
-            />
+          <div className="mb-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="mb-4">
+              <label className="block text-sm font-bold mb-2" htmlFor="name">
+                Name
+              </label>
+              <input
+                className="border-2 border-gray-200 p-2 rounded-lg w-full"
+                id="name"
+                type="text"
+                value={form.name}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-bold mb-2" htmlFor="name">
+                Alias
+              </label>
+              <input
+                className="border-2 border-gray-200 p-2 rounded-lg w-full"
+                id="alias"
+                type="text"
+                value={form.alias}
+                onChange={handleChange}
+              />
+            </div>
           </div>
-          <div className="mb-4">
-            <label className="block text-sm font-bold mb-2" htmlFor="name">
-              Alias
-            </label>
-            <input
-              className="border-2 border-gray-200 p-2 rounded-lg w-full"
-              id="alias"
-              type="text"
-              value={form.alias}
-              onChange={handleChange}
-            />
+
+          <div className="mb-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="mb-4">
+              <label className="block text-sm font-bold mb-2" htmlFor="capabilities">
+                LLM Model
+              </label>
+              <ListBox
+                setSelected={(value) => {
+                  setForm({
+                    ...form,
+                    llmModel: value.id,
+                  });
+                }}
+                selected={
+                  models?.getAllModels.find((model: { id: string }) => model.id === form.llmModel) ?? {
+                    name: '',
+                    id: '',
+                  }
+                }
+                values={
+                  models?.getAllModels.map((model: { name: string; id: string }) => ({
+                    name: model.name,
+                    id: model.id,
+                  })) ?? []
+                }
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-bold mb-2" htmlFor="name">
+                Output Mode
+              </label>
+              <ListBox
+                setSelected={(value) => {
+                  setForm({
+                    ...form,
+                    outputMode: value.id,
+                  });
+                }}
+                selected={OutputReturnMode.find((mode) => mode.id === form.outputMode) ?? { name: '', id: '' }}
+                values={OutputReturnMode.map((mode) => ({
+                  name: mode.name,
+                  id: mode.id,
+                }))}
+              />
+            </div>
           </div>
           <div className="mb-4">
             <label className="block text-sm font-bold mb-2" htmlFor="description">
@@ -192,33 +293,11 @@ export default function CapabilityEdit() {
               onChange={handleChange}
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-sm font-bold mb-2" htmlFor="capabilities">
-              LLM Model
-            </label>
-            <ListBox
-              setSelected={(value) => {
-                setForm({
-                  ...form,
-                  llmModel: value.id,
-                });
-              }}
-              selected={
-                models?.getAllModels.find((model: { id: string }) => model.id === form.llmModel) ?? { name: '', id: '' }
-              }
-              values={
-                models?.getAllModels.map((model: { name: string; id: string }) => ({
-                  name: model.name,
-                  id: model.id,
-                })) ?? []
-              }
-            />
-          </div>
 
           <div className="mb-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-bold mb-2" htmlFor="name">
-                Subscription Filter
+                Subscription Filter (Optional)
               </label>
               <input
                 className="border-2 border-gray-200 p-2 rounded-lg w-full"
@@ -230,7 +309,7 @@ export default function CapabilityEdit() {
             </div>
             <div>
               <label className="block text-sm font-bold mb-2" htmlFor="name">
-                Output Filter
+                Output Filter (Optional)
               </label>
               <input
                 className="border-2 border-gray-200 p-2 rounded-lg w-full"
@@ -241,24 +320,6 @@ export default function CapabilityEdit() {
               />
             </div>
           </div>
-          <div className="mb-4">
-            <label className="block text-sm font-bold mb-2" htmlFor="name">
-              Output Mode
-            </label>
-            <ListBox
-              setSelected={(value) => {
-                setForm({
-                  ...form,
-                  outputMode: value.id,
-                });
-              }}
-              selected={OutputReturnMode.find((mode) => mode.id === form.outputMode) ?? { name: '', id: '' }}
-              values={OutputReturnMode.map((mode) => ({
-                name: mode.name,
-                id: mode.id,
-              }))}
-            />
-          </div>
 
           <div className="mb-4">
             <label className="block text-sm font-bold mb-2" htmlFor="prompts">
@@ -267,7 +328,7 @@ export default function CapabilityEdit() {
             <button
               type="button"
               onClick={() => setOpenPromptModal(true)}
-              className="bg-blue-500 text-white px-2 py-1 rounded-lg mb-2"
+              className="bg-green-500 hover:bg-green-700 text-white px-2 py-1 rounded-lg mb-2"
             >
               Add Prompt
             </button>
@@ -294,6 +355,25 @@ export default function CapabilityEdit() {
                       </button>
                     </div>
                   ))}
+                <div key={'newPrompt'} className="bg-gray-100 p-2 rounded-lg h-full w-full flex flex-col">
+                  <h3 className="text-lg font-bold">{'New Prompt'}</h3>
+                  <textarea
+                    className="border-2 border-gray-200 p-2 rounded-lg w-full"
+                    id="text"
+                    rows={1}
+                    placeholder="Enter title of new prompt"
+                    onChange={handleNewPromptTitleChange}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleNewPromptAdd();
+                    }}
+                    className="bg-blue-500 text-white px-2 py-1 rounded-lg self-start mt-2"
+                  >
+                    Add
+                  </button>
+                </div>
               </div>
             </CustomModal>
             <ReorderableList
@@ -348,7 +428,7 @@ export default function CapabilityEdit() {
                         <button
                           type="button"
                           onClick={() => edit(item)}
-                          className="bg-blue-500 text-white px-2 py-1 rounded-lg"
+                          className="bg-blue-500 hover:bg-blue-700 text-white px-2 py-1 rounded-lg"
                         >
                           Edit
                         </button>
@@ -366,8 +446,8 @@ export default function CapabilityEdit() {
               )}
             />
           </div>
-          <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-lg">
-            Save Capability
+          <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+            Save
           </button>
         </form>
       </div>
