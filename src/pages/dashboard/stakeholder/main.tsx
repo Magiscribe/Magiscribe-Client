@@ -138,7 +138,7 @@ export default function StakeholderInput() {
       {!id && (
         <>
           <IntroContent />
-          <h2 className="text-2xl font-semibold text-slate-100 mb-4">Your Forms</h2>
+          <h2 className="text-2xl font-semibold text-slate-100 mb-4">Your Inquiries</h2>
           <FormBubbles />
         </>
       )}

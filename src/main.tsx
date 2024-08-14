@@ -77,15 +77,15 @@ const router = createBrowserRouter([
             ],
           },
           {
-            path: '/dashboard/stakeholder',
+            path: '/dashboard/inquiry',
             element: <StakeholderTemplate />,
             children: [
               {
-                path: '/dashboard/stakeholder',
+                path: '/dashboard/inquiry',
                 element: <StakeholderInput />,
               },
               {
-                path: '/dashboard/stakeholder/:id',
+                path: '/dashboard/inquiry/:id',
                 element: <StakeholderInput />,
               },
             ],

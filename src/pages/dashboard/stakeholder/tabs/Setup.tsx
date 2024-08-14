@@ -1,7 +1,7 @@
 import { ADD_PREDICTION, DELETE_DATA, UPDATE_DATA } from '@/clients/mutations';
 import { GET_ALL_AGENTS, GET_DATA } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
-import TreeInput from '@/components/tree-input';
+import GraphInput from '@/components/graph/graph-input';
 import { useMutation, useQuery, useSubscription } from '@apollo/client';
 import { useAuth } from '@clerk/clerk-react';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
@@ -23,9 +23,9 @@ interface Form {
 const initialNodes: Node[] = [
   {
     id: '0',
-    type: 'text',
-    data: { text: 'Start', type: 'Start', handles: { source: false, target: true } },
+    type: 'start',
     position: { x: 0, y: -250 },
+    data: {},
   },
 ];
 
@@ -125,7 +125,7 @@ const DecisionGraph = ({
         </div>
       </div>
       <div className="col-span-3">
-        <TreeInput
+        <GraphInput
           nodes={nodes}
           setNodes={setNodes}
           edges={edges}
@@ -211,47 +211,31 @@ const Setup = ({ id }: { id: string }) => {
     const newNodes: Node[] = [];
     const newEdges: Edge[] = [];
     let lastAnswerId: string | null = null;
-    let lastFollowUpId: string | null = null;
 
     questions.forEach((question, index) => {
       const questionId = uuidv4();
-      const answerId = uuidv4();
-      const followUpId = uuidv4();
 
-      newNodes.push(
-        {
-          id: questionId,
-          type: 'text',
-          data: { text: question, type: 'Information', handles: { source: true, target: true } },
-          position: { x: index * 400, y: index * 600 },
-        },
-        {
-          id: answerId,
-          type: 'text',
-          data: { type: 'User Text', handles: { source: true, target: true } },
-          position: { x: index * 400, y: index * 600 + 200 },
-        },
-        {
-          id: followUpId,
-          type: 'text',
-          data: { type: 'Follow Up', handles: { source: true, target: true } },
-          position: { x: index * 400 - 200, y: index * 600 + 400 },
-        },
-      );
+      newNodes.push({
+        id: questionId,
+        type: 'conversation',
+        data: { text: question, dynamicGeneration: true },
+        position: { x: index * 350, y: index * 450 + 200 },
+      });
 
-      newEdges.push(
-        { id: uuidv4(), source: index === 0 ? '0' : lastAnswerId!, target: questionId },
-        { id: uuidv4(), source: questionId, target: answerId },
-        { id: uuidv4(), source: answerId, target: followUpId },
-      );
+      newEdges.push({ id: uuidv4(), source: index === 0 ? '0' : lastAnswerId!, target: questionId });
 
-      if (lastFollowUpId) {
-        newEdges.push({ id: uuidv4(), source: lastFollowUpId, target: questionId });
-      }
-
-      lastAnswerId = answerId;
-      lastFollowUpId = followUpId;
+      lastAnswerId = questionId;
     });
+
+    // Add end node and edge
+    const endId = uuidv4();
+    newNodes.push({
+      id: endId,
+      type: 'end',
+      data: {},
+      position: { x: questions.length * 350, y: questions.length * 450 + 200 },
+    });
+    newEdges.push({ id: uuidv4(), source: lastAnswerId!, target: endId });
 
     const updatedNodes = [...nodes, ...newNodes];
     const updatedEdges = [...edges, ...newEdges];
@@ -265,12 +249,12 @@ const Setup = ({ id }: { id: string }) => {
   };
   const handleDelete = () => {
     deleteObject({ variables: { id } });
-    navigate('/dashboard/stakeholder');
+    navigate('/dashboard/inquiry');
   };
 
   const handleSave = () => {
     updateObject({ variables: { id, data: { form, graph: { nodes, edges } } } });
-    navigate('/dashboard/stakeholder');
+    navigate('/dashboard/inquiry');
   };
 
   const clearGraph = () => {
