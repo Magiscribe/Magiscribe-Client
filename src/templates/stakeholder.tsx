@@ -4,7 +4,7 @@ import NotReadyHero from '../components/heroes/not-ready';
 import { useSetTitle } from '../hooks/TitleHook';
 
 export default function StakeholderTemplate() {
-  useSetTitle()('Stakeholder');
+  useSetTitle()('Inquiry Builder');
 
   return (
     <Protect
@@ -22,7 +22,7 @@ export default function StakeholderTemplate() {
       }
     >
       <div className="container max-w-12xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold">Stakeholder</h1>
+        <h1 className="text-3xl font-bold">Inquiry Builder</h1>
         <AnimatedOutlet />
       </div>
     </Protect>

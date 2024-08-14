@@ -23,7 +23,7 @@ export default function DashboardPage() {
         <LinkCard
           title="Inquiry Builder"
           description="Create complex conversational flows to capture user feedback."
-          to="/dashboard/stakeholder"
+          to="/dashboard/inquiry"
           gradient="purple"
         />
       </div>
