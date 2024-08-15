@@ -49,8 +49,8 @@ export function ExractPromptVariables(prompt: string): string[] {
 
   const regex = /{{(.*?)}}/g;
   const matches = [...prompt.matchAll(regex)];
-  
-  return matches.map(match => match[1]);
+
+  return matches.map((match) => match[1]);
 }
 
 export const CustomVariablesSection: React.FC<CustomVariablesSectionProps> = ({
@@ -61,32 +61,33 @@ export const CustomVariablesSection: React.FC<CustomVariablesSectionProps> = ({
 }) => {
   const { data: agent } = useQuery(GET_AGENT_WITH_PROMPTS, {
     variables: {
-      agentId
-    }
+      agentId,
+    },
   });
 
-
-  const customPromptVariables = useMemo(()=> {
-    if (!agent) return [];
-    var variables = (agent.getAgentWithPrompts as Agent).capabilities.map(capability => capability.prompts.map(prompt => ExractPromptVariables(prompt.text))).flat(Infinity)
-    variables.concat(ExractPromptVariables((agent.getAgentWithPrompts as Agent).reasoningPrompt))
+  const customPromptVariables = useMemo(() => {
+    if (!agent || !agent.getAgentWithPrompts) return [];
+    var variables = (agent.getAgentWithPrompts as Agent).capabilities
+      .map((capability) => capability.prompts.map((prompt) => ExractPromptVariables(prompt.text)))
+      .flat(Infinity);
+    variables.concat(ExractPromptVariables((agent.getAgentWithPrompts as Agent).reasoningPrompt));
     var flattenedVariables = [...new Set(variables)] as string[];
 
-    const customVariables: CustomVariable[] = flattenedVariables.map(variable => {
+    const customVariables: CustomVariable[] = flattenedVariables.map((variable) => {
       const customVariable: CustomVariable = {
         key: variable,
-        value: ""
-      }
+        value: '',
+      };
       return customVariable;
-    })
+    });
     return customVariables;
-  }, [agent])
+  }, [agent]);
 
   useEffect(() => {
     if (customPromptVariables?.length > 0) {
-      setCustomVariables(customPromptVariables)
+      setCustomVariables(customPromptVariables);
     }
-  }, [customPromptVariables])
+  }, [customPromptVariables]);
 
   return (
     <div className="mb-4">

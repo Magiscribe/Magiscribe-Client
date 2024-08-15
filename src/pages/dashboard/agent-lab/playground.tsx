@@ -2,7 +2,7 @@ import { useMutation, useQuery, useSubscription } from '@apollo/client';
 import { faMicrophone, faMicrophoneSlash, faVolumeHigh, faVolumeMute } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useCallback, useEffect, useState } from 'react';
-import { GET_ALL_AGENTS, GET_AGENT_WITH_PROMPTS } from '@/clients/queries';
+import { GET_ALL_AGENTS } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import { useElevenLabsAudio } from '@/components/audio-player';
 import ListBox from '@/components/list/ListBox';
@@ -48,7 +48,7 @@ export default function PlaygroundDashboard() {
   // Queries and Mutations
   const { data: agents } = useQuery(GET_ALL_AGENTS);
   const [addPrediction] = useMutation(ADD_PREDICTION);
-  
+
   // Transcribe
   const [enableAudio, setEnableAudio] = useState(false);
   const { isTranscribing, transcript, startTranscribing, stopTranscribing } = useTranscribe();
@@ -62,21 +62,26 @@ export default function PlaygroundDashboard() {
     }
   }, []);
 
-  const setCustomVariables = useCallback((agentVariables: CustomVariable[]) => {
-    if (!agentVariables.length) return;
-    const customVariables = agentVariables.map(variable => {
-      const value = (form as Form).customVariables.filter(formVariable => formVariable.key === variable.key).shift()
-      const variableWithFormValue: CustomVariable = {
-        key: variable.key,
-        value: value?.value ?? ""
-      }
-      return variableWithFormValue
-    })
-    setForm((prevForm: Form) => ({
-      ...prevForm,
-      customVariables,
-    }));
-  }, [form]);
+  const setCustomVariables = useCallback(
+    (agentVariables: CustomVariable[]) => {
+      if (!agentVariables.length) return;
+      const customVariables = agentVariables.map((variable) => {
+        const value = (form as Form).customVariables
+          .filter((formVariable) => formVariable.key === variable.key)
+          .shift();
+        const variableWithFormValue: CustomVariable = {
+          key: variable.key,
+          value: value?.value ?? '',
+        };
+        return variableWithFormValue;
+      });
+      setForm((prevForm: Form) => ({
+        ...prevForm,
+        customVariables,
+      }));
+    },
+    [form],
+  );
 
   const updateCustomVariable = (index: number, updatedVariable: { key: string; value: string }) => {
     setForm((prevForm: Form) => ({
