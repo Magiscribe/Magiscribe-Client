@@ -38,7 +38,7 @@ function AgentCard({ agent, onUpdate, onCopy }: { agent: Agent; onUpdate?: () =>
           {agent.capabilities.map((capability: Capability) => (
             <Link
               key={capability.id}
-              to={`edit?id=${capability.id}`}
+              to={`../capabilities/edit?id=${capability.id}`}
               className="text-xs font-bold bg-green-200 text-green-700 hover:bg-green-700 hover:text-green-200 py-1 px-2 rounded-full break-all"
             >
               {capability.name}

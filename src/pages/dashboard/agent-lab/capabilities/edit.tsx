@@ -196,7 +196,7 @@ export default function CapabilityEdit() {
       }
 
       addAlert('Capability saved successfully', 'success');
-      navigate('../');
+      navigate('../capabilities');
     } catch (error) {
       console.error(error);
       addAlert('Error saving capability', 'error');
@@ -328,7 +328,7 @@ export default function CapabilityEdit() {
             <button
               type="button"
               onClick={() => setOpenPromptModal(true)}
-              className="bg-green-500 hover:bg-green-700 text-white px-2 py-1 rounded-lg mb-2"
+              className="bg-blue-500 hover:bg-blue-700 text-white px-2 py-1 rounded-lg mb-2"
             >
               Add Prompt
             </button>
