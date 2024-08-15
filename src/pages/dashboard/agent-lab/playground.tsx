@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useSubscription } from '@apollo/client';
 import { faMicrophone, faMicrophoneSlash, faVolumeHigh, faVolumeMute } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useEffect, useState } from 'react';
-import { GET_ALL_AGENTS } from '@/clients/queries';
+import { useCallback, useEffect, useState } from 'react';
+import { GET_ALL_AGENTS, GET_AGENT_WITH_PROMPTS } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import { useElevenLabsAudio } from '@/components/audio-player';
 import ListBox from '@/components/list/ListBox';
@@ -10,7 +10,7 @@ import { useTranscribe } from '@/hooks/AudioHooks';
 import { Agent } from '@/types/agents';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
 import { ADD_PREDICTION } from '@/clients/mutations';
-import { CustomVariablesSection } from '@/components/custom-variables';
+import { CustomVariable, CustomVariablesSection } from '@/components/custom-variables';
 
 interface predictionAdded {
   id: string;
@@ -31,11 +31,6 @@ interface Form {
   customVariables: CustomVariable[];
 }
 
-interface CustomVariable {
-  key: string;
-  value: string;
-}
-
 const initialForm: Form = {
   subscriptionId: Math.random().toString(36),
   voice: 'PHOEBE',
@@ -53,7 +48,7 @@ export default function PlaygroundDashboard() {
   // Queries and Mutations
   const { data: agents } = useQuery(GET_ALL_AGENTS);
   const [addPrediction] = useMutation(ADD_PREDICTION);
-
+  
   // Transcribe
   const [enableAudio, setEnableAudio] = useState(false);
   const { isTranscribing, transcript, startTranscribing, stopTranscribing } = useTranscribe();
@@ -61,25 +56,27 @@ export default function PlaygroundDashboard() {
 
   useEffect(() => {
     if (!form.customVariables || form.customVariables.length === 0) {
-      setForm((prevForm: Form) => ({
-        ...prevForm,
+      setForm(() => ({
+        ...initialForm,
       }));
     }
   }, []);
 
-  const addCustomVariable = () => {
+  const setCustomVariables = useCallback((agentVariables: CustomVariable[]) => {
+    if (!agentVariables.length) return;
+    const customVariables = agentVariables.map(variable => {
+      const value = (form as Form).customVariables.filter(formVariable => formVariable.key === variable.key).shift()
+      const variableWithFormValue: CustomVariable = {
+        key: variable.key,
+        value: value?.value ?? ""
+      }
+      return variableWithFormValue
+    })
     setForm((prevForm: Form) => ({
       ...prevForm,
-      customVariables: [...(prevForm.customVariables || []), { key: '', value: '' }],
+      customVariables,
     }));
-  };
-
-  const removeCustomVariable = (index: number) => {
-    setForm((prevForm: Form) => ({
-      ...prevForm,
-      customVariables: (prevForm.customVariables || []).filter((_, i) => i !== index),
-    }));
-  };
+  }, [form]);
 
   const updateCustomVariable = (index: number, updatedVariable: { key: string; value: string }) => {
     setForm((prevForm: Form) => ({
@@ -252,10 +249,10 @@ export default function PlaygroundDashboard() {
             </div>
             <div className="mb-4">
               <CustomVariablesSection
+                agentId={form.agent}
                 variables={form.customVariables || []}
-                onAddVariable={addCustomVariable}
-                onRemoveVariable={removeCustomVariable}
                 onUpdateVariable={updateCustomVariable}
+                setCustomVariables={setCustomVariables}
               />
             </div>
             <div className="mb-4">

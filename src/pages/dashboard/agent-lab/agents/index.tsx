@@ -39,7 +39,7 @@ function AgentCard({ agent, onUpdate, onCopy }: { agent: Agent; onUpdate?: () =>
             <Link
               key={capability.id}
               to={`edit?id=${capability.id}`}
-              className="text-xs font-bold bg-blue-200 text-blue-700 hover:bg-blue-700 hover:text-blue-200 py-1 px-2 rounded-full break-all"
+              className="text-xs font-bold bg-green-200 text-green-700 hover:bg-green-700 hover:text-green-200 py-1 px-2 rounded-full break-all"
             >
               {capability.name}
             </Link>
