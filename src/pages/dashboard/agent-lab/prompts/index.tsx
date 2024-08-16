@@ -44,7 +44,8 @@ function PromptCard({
       </div>
       <div className="flex-grow">
         <p className="text-sm mb-4 break-words">
-          {prompt.text.substring(0, 100).trim()}{prompt.text.length > 100 ? '...' : ''}
+          {prompt.text.substring(0, 100).trim()}
+          {prompt.text.length > 100 ? '...' : ''}
         </p>
       </div>
       <div className="flex justify-end gap-2 mt-2">

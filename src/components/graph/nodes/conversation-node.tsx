@@ -14,7 +14,7 @@ interface NodeData {
   instruction?: string;
   type: 'rating-single' | 'rating-multi' | 'open-ended' | 'information';
   ratings?: string[];
-  dynamicGeneration?: Boolean;
+  dynamicGeneration?: boolean;
 }
 
 const typeOptions = [

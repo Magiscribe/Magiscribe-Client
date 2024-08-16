@@ -67,11 +67,11 @@ export const CustomVariablesSection: React.FC<CustomVariablesSectionProps> = ({
 
   const customPromptVariables = useMemo(() => {
     if (!agent || !agent.getAgentWithPrompts) return [];
-    var variables = (agent.getAgentWithPrompts as Agent).capabilities
+    const variables = (agent.getAgentWithPrompts as Agent).capabilities
       .map((capability) => capability.prompts.map((prompt) => ExractPromptVariables(prompt.text)))
       .flat(Infinity);
     variables.concat(ExractPromptVariables((agent.getAgentWithPrompts as Agent).reasoningPrompt));
-    var flattenedVariables = [...new Set(variables)] as string[];
+    const flattenedVariables = [...new Set(variables)] as string[];
 
     const customVariables: CustomVariable[] = flattenedVariables.map((variable) => {
       const customVariable: CustomVariable = {

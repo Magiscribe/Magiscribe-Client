@@ -9,7 +9,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Edge, Node, OnEdgesChange, OnNodesChange, useEdgesState, useNodesState } from '@xyflow/react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid';
 
 interface Form {
   userId: string;
@@ -181,7 +180,7 @@ const Setup = ({ id }: { id: string }) => {
       if (prediction && prediction.type === 'SUCCESS') {
         setLoading(false);
         console.log(JSON.parse(JSON.parse(prediction.result)));
-        const questionGraph = JSON.parse(JSON.parse(prediction.result)) as { question: string }[];
+        // const questionGraph = JSON.parse(JSON.parse(prediction.result)) as { question: string }[];
         // addQuestions(newQuestions.map((question) => question.question));
       }
     },
@@ -208,42 +207,42 @@ const Setup = ({ id }: { id: string }) => {
     });
   };
 
-  const processGraph = (questions: string[]) => {
-    const newNodes: Node[] = [];
-    const newEdges: Edge[] = [];
-    let lastAnswerId: string | null = null;
+  // const processGraph = (questions: string[]) => {
+  //   const newNodes: Node[] = [];
+  //   const newEdges: Edge[] = [];
+  //   let lastAnswerId: string | null = null;
 
-    questions.forEach((question, index) => {
-      const questionId = uuidv4();
+  //   questions.forEach((question, index) => {
+  //     const questionId = uuidv4();
 
-      newNodes.push({
-        id: questionId,
-        type: 'conversation',
-        data: { text: question, dynamicGeneration: true },
-        position: { x: index * 350, y: index * 450 + 200 },
-      });
+  //     newNodes.push({
+  //       id: questionId,
+  //       type: 'conversation',
+  //       data: { text: question, dynamicGeneration: true },
+  //       position: { x: index * 350, y: index * 450 + 200 },
+  //     });
 
-      newEdges.push({ id: uuidv4(), source: index === 0 ? '0' : lastAnswerId!, target: questionId });
+  //     newEdges.push({ id: uuidv4(), source: index === 0 ? '0' : lastAnswerId!, target: questionId });
 
-      lastAnswerId = questionId;
-    });
+  //     lastAnswerId = questionId;
+  //   });
 
-    // Add end node and edge
-    const endId = uuidv4();
-    newNodes.push({
-      id: endId,
-      type: 'end',
-      data: {},
-      position: { x: questions.length * 350, y: questions.length * 450 + 200 },
-    });
-    newEdges.push({ id: uuidv4(), source: lastAnswerId!, target: endId });
+  //   // Add end node and edge
+  //   const endId = uuidv4();
+  //   newNodes.push({
+  //     id: endId,
+  //     type: 'end',
+  //     data: {},
+  //     position: { x: questions.length * 350, y: questions.length * 450 + 200 },
+  //   });
+  //   newEdges.push({ id: uuidv4(), source: lastAnswerId!, target: endId });
 
-    const updatedNodes = [...nodes, ...newNodes];
-    const updatedEdges = [...edges, ...newEdges];
+  //   const updatedNodes = [...nodes, ...newNodes];
+  //   const updatedEdges = [...edges, ...newEdges];
 
-    setNodes(updatedNodes);
-    setEdges(updatedEdges);
-  };
+  //   setNodes(updatedNodes);
+  //   setEdges(updatedEdges);
+  // };
 
   const handleSetForm = (newForm: Form) => {
     setForm(newForm);
