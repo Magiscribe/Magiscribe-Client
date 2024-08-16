@@ -48,8 +48,8 @@ function CapabilityCard({
           {capability.prompts.map((prompt: Prompt) => (
             <Link
               key={prompt.id}
-              to={`edit?id=${prompt.id}`}
-              className="text-xs font-bold bg-blue-200 text-blue-700 hover:bg-blue-700 hover:text-blue-200 py-1 px-2 rounded-full break-all"
+              to={`../prompts/edit?id=${prompt.id}`}
+              className="text-xs font-bold bg-purple-200 text-purple-700 hover:bg-purple-700 hover:text-purple-200 py-1 px-2 rounded-full break-all"
             >
               {prompt.name}
             </Link>

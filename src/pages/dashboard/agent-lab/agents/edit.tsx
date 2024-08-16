@@ -113,7 +113,7 @@ export default function AgentEdit() {
       }
 
       addAlert('Agent saved successfully', 'success');
-      navigate('../');
+      navigate('../agents');
     } catch (error) {
       console.error(error);
     }

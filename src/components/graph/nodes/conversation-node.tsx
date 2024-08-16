@@ -1,31 +1,35 @@
-import { faUserFriends, faInfoCircle, faQuestionCircle, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Handle, Position, useReactFlow } from '@xyflow/react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Handle, Position, useReactFlow } from '@xyflow/react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUserFriends, faInfoCircle, faQuestionCircle, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import CustomHandle from './limit-handle';
-
-interface NodeData {
-  text: string;
-  type: string;
-  dynamicGeneration: boolean;
-}
 
 interface ConversationNodeProps {
   id: string;
   data: NodeData;
 }
 
+interface NodeData {
+  text?: string;
+  instruction?: string;
+  type: 'rating-single' | 'rating-multi' | 'open-ended' | 'information';
+  ratings?: string[];
+  dynamicGeneration?: boolean;
+}
+
 const typeOptions = [
-  { value: 'Information', icon: faInfoCircle, color: 'text-blue-500' },
-  { value: 'Question', icon: faQuestionCircle, color: 'text-yellow-500' },
-  { value: 'Confirmation', icon: faCheckCircle, color: 'text-green-500' },
+  { value: 'information', icon: faInfoCircle, color: 'text-blue-500' },
+  { value: 'open-ended', icon: faQuestionCircle, color: 'text-yellow-500' },
+  { value: 'rating', icon: faCheckCircle, color: 'text-green-500' },
 ];
 
 export default function ConversationNode({ id, data }: ConversationNodeProps) {
   const [nodeData, setNodeData] = useState<NodeData>({
     text: data.text || '',
-    type: data.type || 'Information',
-    dynamicGeneration: data.dynamicGeneration || false,
+    instruction: data.instruction || '',
+    type: data.type || 'information',
+    ratings: data.ratings || [],
+    dynamicGeneration: data.instruction ? true : false,
   });
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -45,7 +49,14 @@ export default function ConversationNode({ id, data }: ConversationNodeProps) {
   const handleInputChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
       const { name, value, type } = event.target;
-      updateNodeData({ [name]: type === 'checkbox' ? (event.target as HTMLInputElement).checked : value });
+      if (type === 'checkbox') {
+        const checked = (event.target as HTMLInputElement).checked;
+        updateNodeData({
+          instruction: checked ? 'New instruction' : undefined,
+        });
+      } else {
+        updateNodeData({ [name]: value });
+      }
     },
     [updateNodeData],
   );
@@ -89,7 +100,7 @@ export default function ConversationNode({ id, data }: ConversationNodeProps) {
           <div className="flex items-center">
             <input
               type={type}
-              checked={type === 'checkbox' ? (nodeData[name] as boolean) : undefined}
+              checked={!!nodeData.instruction}
               {...commonProps}
               className="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 focus:ring-2"
             />

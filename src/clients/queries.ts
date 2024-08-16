@@ -9,6 +9,33 @@ export const GET_ALL_MODELS = gql`
   }
 `;
 
+export const GET_AGENT_WITH_PROMPTS = gql`
+  query Query($agentId: String!) {
+    getAgentWithPrompts(agentId: $agentId) {
+      id
+      name
+      description
+      reasoning {
+        llmModel
+        prompt
+        variablePassThrough
+      }
+      capabilities {
+        name
+        id
+        prompts {
+          name
+          id
+          text
+        }
+      }
+      memoryEnabled
+      subscriptionFilter
+      outputFilter
+    }
+  }
+`;
+
 export const GET_ALL_AGENTS = gql`
   query Query {
     getAllAgents {

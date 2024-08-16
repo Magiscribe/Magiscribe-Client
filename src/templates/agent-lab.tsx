@@ -51,7 +51,7 @@ export default function AgentLabTemplate() {
             title="Agents"
             description="View and manage your agents."
             to="/dashboard/agent-lab/agents"
-            gradient="red"
+            gradient="orange"
             isActive={isActive('agents')}
           />
           <LinkCard
@@ -65,14 +65,14 @@ export default function AgentLabTemplate() {
             title="Prompts"
             description="Create and manage prompts."
             to="/dashboard/agent-lab/prompts"
-            gradient="blue"
+            gradient="purple"
             isActive={isActive('prompts')}
           />
           <LinkCard
             title="Playground"
             description="See things go brrrr."
             to="/dashboard/agent-lab/playground"
-            gradient="purple"
+            gradient="blue"
             isActive={isActive('playground')}
           />
         </div>

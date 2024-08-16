@@ -61,7 +61,7 @@ export default function PromptEdit() {
       }
 
       addAlert('Prompt saved successfully', 'success');
-      navigate('../');
+      navigate('../prompts');
     } catch (error) {
       console.error(error);
     }

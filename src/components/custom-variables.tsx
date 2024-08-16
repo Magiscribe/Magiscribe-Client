@@ -1,4 +1,7 @@
-import React from 'react';
+import { GET_AGENT_WITH_PROMPTS } from '@/clients/queries';
+import { useQuery } from '@apollo/client';
+import React, { useEffect, useMemo } from 'react';
+import { Agent } from '@/types/agents';
 
 interface Variable {
   key: string;
@@ -8,16 +11,15 @@ interface Variable {
 interface CustomVariableInputProps {
   variable: Variable;
   onUpdate: (updatedVariable: Variable) => void;
-  onRemove: () => void;
 }
 
-export const CustomVariableInput: React.FC<CustomVariableInputProps> = ({ variable, onUpdate, onRemove }) => {
+export const CustomVariableInput: React.FC<CustomVariableInputProps> = ({ variable, onUpdate }) => {
   return (
     <div className="flex items-center space-x-2 mb-2 gap-2 my-2">
       <input
         className="border-2 border-gray-200 p-2 rounded-lg flex-grow"
         value={variable.key}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate({ ...variable, key: e.target.value })}
+        disabled={true}
         placeholder="Key"
       />
       <input
@@ -26,30 +28,67 @@ export const CustomVariableInput: React.FC<CustomVariableInputProps> = ({ variab
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate({ ...variable, value: e.target.value })}
         placeholder="Value"
       />
-      <button
-        className="bg-red-500 text-white px-2 py-1 rounded-lg hover:bg-red-700 transition-colors"
-        onClick={onRemove}
-        type="button"
-      >
-        Remove
-      </button>
     </div>
   );
 };
 
+export interface CustomVariable {
+  key: string;
+  value: string;
+}
+
 interface CustomVariablesSectionProps {
   variables: Variable[];
-  onAddVariable: () => void;
-  onRemoveVariable: (index: number) => void;
+  agentId: string;
   onUpdateVariable: (index: number, updatedVariable: Variable) => void;
+  setCustomVariables: (customVariables: CustomVariable[]) => void;
+}
+
+export function ExractPromptVariables(prompt: string): string[] {
+  if (!prompt) return [];
+
+  const regex = /{{(.*?)}}/g;
+  const matches = [...prompt.matchAll(regex)];
+
+  return matches.map((match) => match[1]);
 }
 
 export const CustomVariablesSection: React.FC<CustomVariablesSectionProps> = ({
   variables,
-  onAddVariable,
-  onRemoveVariable,
+  agentId,
   onUpdateVariable,
+  setCustomVariables,
 }) => {
+  const { data: agent } = useQuery(GET_AGENT_WITH_PROMPTS, {
+    variables: {
+      agentId,
+    },
+  });
+
+  const customPromptVariables = useMemo(() => {
+    if (!agent || !agent.getAgentWithPrompts) return [];
+    const variables = (agent.getAgentWithPrompts as Agent).capabilities
+      .map((capability) => capability.prompts.map((prompt) => ExractPromptVariables(prompt.text)))
+      .flat(Infinity);
+    variables.concat(ExractPromptVariables((agent.getAgentWithPrompts as Agent).reasoningPrompt));
+    const flattenedVariables = [...new Set(variables)] as string[];
+
+    const customVariables: CustomVariable[] = flattenedVariables.map((variable) => {
+      const customVariable: CustomVariable = {
+        key: variable,
+        value: '',
+      };
+      return customVariable;
+    });
+    return customVariables;
+  }, [agent]);
+
+  useEffect(() => {
+    if (customPromptVariables?.length > 0) {
+      setCustomVariables(customPromptVariables);
+    }
+  }, [customPromptVariables]);
+
   return (
     <div className="mb-4">
       <label className="block text-sm font-bold mb-2">Custom Variables</label>
@@ -59,19 +98,11 @@ export const CustomVariablesSection: React.FC<CustomVariablesSectionProps> = ({
             key={index}
             variable={variable}
             onUpdate={(updatedVariable) => onUpdateVariable(index, updatedVariable)}
-            onRemove={() => onRemoveVariable(index)}
           />
         ))
       ) : (
         <p>No custom variables. Add one below.</p>
       )}
-      <button
-        className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors mt-2"
-        onClick={onAddVariable}
-        type="button"
-      >
-        Add Variable
-      </button>
     </div>
   );
 };

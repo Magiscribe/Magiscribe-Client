@@ -42,6 +42,12 @@ function PromptCard({
       <div className="flex-grow">
         <h2 className="text-xl font-bold mb-4 break-words">{prompt.name}</h2>
       </div>
+      <div className="flex-grow">
+        <p className="text-sm mb-4 break-words">
+          {prompt.text.substring(0, 100).trim()}
+          {prompt.text.length > 100 ? '...' : ''}
+        </p>
+      </div>
       <div className="flex justify-end gap-2 mt-2">
         <Link
           to={`edit?id=${prompt.id}`}
