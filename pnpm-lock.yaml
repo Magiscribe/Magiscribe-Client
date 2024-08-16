@@ -14,6 +14,9 @@ importers:
       '@aws-sdk/client-transcribe-streaming':
         specifier: ^3.624.0
         version: 3.624.0
+      '@dagrejs/dagre':
+        specifier: ^1.1.4
+        version: 1.1.4
       '@fortawesome/fontawesome-svg-core':
         specifier: ^6.6.0
         version: 6.6.0
@@ -334,6 +337,13 @@ packages:
   '@clerk/types@4.13.0':
     resolution: {integrity: sha512-W/iZ5ig35UgJHmZqqgO1tosHuGtdKR8e+f8FJWphpdIW6KNCK+Oxc5lOO/hJU1c9aih0x5QdlLrKsqF3S8JKdA==}
     engines: {node: '>=18.17.0'}
+
+  '@dagrejs/dagre@1.1.4':
+    resolution: {integrity: sha512-QUTc54Cg/wvmlEUxB+uvoPVKFazM1H18kVHBQNmK2NbrDR5ihOCR6CXLnDSZzMcSQKJtabPUWridBOlJM3WkDg==}
+
+  '@dagrejs/graphlib@2.2.4':
+    resolution: {integrity: sha512-mepCf/e9+SKYy1d02/UkvSy6+6MoyXhVxP8lLDfA7BPE1X1d4dR0sZznmbM8/XVJ1GPM+Svnx7Xj6ZweByWUkw==}
+    engines: {node: '>17.0.0'}
 
   '@esbuild/aix-ppc64@0.21.5':
     resolution: {integrity: sha512-1SDgH6ZSPTlggy1yI6+Dbkiz8xzpHJEVAlF/AM1tHPLsf5STom9rwtjE4hKAF20FfXXNTFqEYXyJNWh1GiZedQ==}
@@ -3413,6 +3423,12 @@ snapshots:
   '@clerk/types@4.13.0':
     dependencies:
       csstype: 3.1.1
+
+  '@dagrejs/dagre@1.1.4':
+    dependencies:
+      '@dagrejs/graphlib': 2.2.4
+
+  '@dagrejs/graphlib@2.2.4': {}
 
   '@esbuild/aix-ppc64@0.21.5':
     optional: true

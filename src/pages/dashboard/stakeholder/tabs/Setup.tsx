@@ -9,6 +9,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Edge, Node, OnEdgesChange, OnNodesChange, useEdgesState, useNodesState } from '@xyflow/react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { v4 as uuid } from 'uuid';
+import Dagre from '@dagrejs/dagre';
 
 interface Form {
   userId: string;
@@ -179,9 +181,7 @@ const Setup = ({ id }: { id: string }) => {
       const prediction = subscriptionData.data?.predictionAdded;
       if (prediction && prediction.type === 'SUCCESS') {
         setLoading(false);
-        console.log(JSON.parse(JSON.parse(prediction.result)));
-        // const questionGraph = JSON.parse(JSON.parse(prediction.result)) as { question: string }[];
-        // addQuestions(newQuestions.map((question) => question.question));
+        processGraph(JSON.parse(JSON.parse(prediction.result)));
       }
     },
     onError: (error) => {
@@ -207,42 +207,39 @@ const Setup = ({ id }: { id: string }) => {
     });
   };
 
-  // const processGraph = (questions: string[]) => {
-  //   const newNodes: Node[] = [];
-  //   const newEdges: Edge[] = [];
-  //   let lastAnswerId: string | null = null;
+  const processGraph = (input: any) => {
+    const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
+    g.setGraph({ rankdir: 'TB' });
 
-  //   questions.forEach((question, index) => {
-  //     const questionId = uuidv4();
+    const newNodes: Node[] = [];
+    const newEdges: Edge[] = [];
 
-  //     newNodes.push({
-  //       id: questionId,
-  //       type: 'conversation',
-  //       data: { text: question, dynamicGeneration: true },
-  //       position: { x: index * 350, y: index * 450 + 200 },
-  //     });
+    input.nodes.map((edge) => {
+      return newNodes.push({
+        id: edge.id,
+        type: edge.type,
+        position: { x: 0, y: 0 },
+        data: edge.data as any,
+      });
+    })
 
-  //     newEdges.push({ id: uuidv4(), source: index === 0 ? '0' : lastAnswerId!, target: questionId });
+    input.edges.map((edge) => {
+      return newEdges.push({
+        id: uuid(),
+        source: edge.source.toString(),
+        target: edge.target.toString(),
+      });
+    });
 
-  //     lastAnswerId = questionId;
-  //   });
+    newNodes.forEach((node) => { g.setNode(node.id, { width: 400, height: 400 }); });
+    newEdges.forEach((edge) => { g.setEdge(edge.source, edge.target); });
 
-  //   // Add end node and edge
-  //   const endId = uuidv4();
-  //   newNodes.push({
-  //     id: endId,
-  //     type: 'end',
-  //     data: {},
-  //     position: { x: questions.length * 350, y: questions.length * 450 + 200 },
-  //   });
-  //   newEdges.push({ id: uuidv4(), source: lastAnswerId!, target: endId });
+    Dagre.layout(g);
 
-  //   const updatedNodes = [...nodes, ...newNodes];
-  //   const updatedEdges = [...edges, ...newEdges];
 
-  //   setNodes(updatedNodes);
-  //   setEdges(updatedEdges);
-  // };
+    setNodes(newNodes.map((node) => { return { ...node, position: { x: g.node(node.id).x, y: g.node(node.id).y } } }));
+    setEdges(newEdges);
+  };
 
   const handleSetForm = (newForm: Form) => {
     setForm(newForm);

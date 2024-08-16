@@ -56,7 +56,7 @@ function Flow({ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange }
     start: StartNode,
     end: EndNode,
     conversation: ConversationNode,
-    condition: ConditionNode,
+    conditional: ConditionNode,
   };
 
   const onConnect: OnConnect = useCallback(
