@@ -180,8 +180,9 @@ const Setup = ({ id }: { id: string }) => {
       const prediction = subscriptionData.data?.predictionAdded;
       if (prediction && prediction.type === 'SUCCESS') {
         setLoading(false);
-        const newQuestions = JSON.parse(JSON.parse(prediction.result)) as { question: string }[];
-        addQuestions(newQuestions.map((question) => question.question));
+        console.log(JSON.parse(JSON.parse(prediction.result)));
+        const questionGraph = JSON.parse(JSON.parse(prediction.result)) as { question: string }[];
+        // addQuestions(newQuestions.map((question) => question.question));
       }
     },
     onError: (error) => {
@@ -192,7 +193,7 @@ const Setup = ({ id }: { id: string }) => {
 
   const generateGraph = () => {
     const drawingAgent = agents?.getAllAgents.find(
-      (agent: { name: string }) => agent.name === 'Stakeholder | Question Agent',
+      (agent: { name: string }) => agent.name === 'Stakeholder | Graph Generator',
     );
     setLoading(true);
     addPrediction({
@@ -207,7 +208,7 @@ const Setup = ({ id }: { id: string }) => {
     });
   };
 
-  const addQuestions = (questions: string[]) => {
+  const processGraph = (questions: string[]) => {
     const newNodes: Node[] = [];
     const newEdges: Edge[] = [];
     let lastAnswerId: string | null = null;
