@@ -207,6 +207,7 @@ const Setup = ({ id }: { id: string }) => {
     });
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const processGraph = (input: any) => {
     const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
     g.setGraph({ rankdir: 'TB' });
@@ -219,9 +220,10 @@ const Setup = ({ id }: { id: string }) => {
         id: edge.id,
         type: edge.type,
         position: { x: 0, y: 0 },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         data: edge.data as any,
       });
-    })
+    });
 
     input.edges.map((edge) => {
       return newEdges.push({
@@ -231,13 +233,20 @@ const Setup = ({ id }: { id: string }) => {
       });
     });
 
-    newNodes.forEach((node) => { g.setNode(node.id, { width: 400, height: 400 }); });
-    newEdges.forEach((edge) => { g.setEdge(edge.source, edge.target); });
+    newNodes.forEach((node) => {
+      g.setNode(node.id, { width: 400, height: 400 });
+    });
+    newEdges.forEach((edge) => {
+      g.setEdge(edge.source, edge.target);
+    });
 
     Dagre.layout(g);
 
-
-    setNodes(newNodes.map((node) => { return { ...node, position: { x: g.node(node.id).x, y: g.node(node.id).y } } }));
+    setNodes(
+      newNodes.map((node) => {
+        return { ...node, position: { x: g.node(node.id).x, y: g.node(node.id).y } };
+      }),
+    );
     setEdges(newEdges);
   };
 

@@ -9,8 +9,7 @@ export default function DashboardPage() {
   const isAdmin = session?.user.organizationMemberships[0]?.role === 'org:admin';
 
   return (
-    <div className="container max-w-12xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold">Dashboard</h1>
+    <>
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-4 my-8">
         {isAdmin && (
           <LinkCard
@@ -27,6 +26,6 @@ export default function DashboardPage() {
           gradient="purple"
         />
       </div>
-    </div>
+    </>
   );
 }
