@@ -27,5 +27,10 @@ export interface Agent {
   name: string;
   description: string;
   reasoningPrompt: string;
+  reasoning: {
+    llmModel: string;
+    prompt: string;
+    variablePassThrough: Boolean;
+  };
   capabilities: Capability[];
 }

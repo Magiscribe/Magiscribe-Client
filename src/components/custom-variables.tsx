@@ -49,6 +49,7 @@ export function ExractPromptVariables(prompt: string): string[] {
 
   const regex = /{{(.*?)}}/g;
   const matches = [...prompt.matchAll(regex)];
+  console.log('Matches', matches);
 
   return matches.map((match) => match[1]);
 }
@@ -67,10 +68,22 @@ export const CustomVariablesSection: React.FC<CustomVariablesSectionProps> = ({
 
   const customPromptVariables = useMemo(() => {
     if (!agent || !agent.getAgentWithPrompts) return [];
-    const variables = (agent.getAgentWithPrompts as Agent).capabilities
+    console.log('Agent', agent);
+    let variables = (agent.getAgentWithPrompts as Agent).capabilities
       .map((capability) => capability.prompts.map((prompt) => ExractPromptVariables(prompt.text)))
       .flat(Infinity);
-    variables.concat(ExractPromptVariables((agent.getAgentWithPrompts as Agent).reasoningPrompt));
+
+    console.log('Variables before', variables);
+    // Extract variables from reasoning prompt
+    const reasoningVariables = ExractPromptVariables(agent.getAgentWithPrompts.reasoning.prompt);
+    console.log('Reasoning variables', reasoningVariables);
+
+    // Combine both sets of variables
+    variables = [...variables, ...reasoningVariables];
+
+    console.log('Variables after', variables);
+
+    // Remove duplicates
     const flattenedVariables = [...new Set(variables)] as string[];
 
     const customVariables: CustomVariable[] = flattenedVariables.map((variable) => {
