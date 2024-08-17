@@ -7,6 +7,7 @@ import { GET_DATA } from '../../../../clients/queries';
 
 const AnalysisTab: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  console.log(id);
 
   const { loading: dataLoading, error: dataError } = useQuery(GET_DATA, {
     variables: { id: id },

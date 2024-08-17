@@ -46,7 +46,7 @@ interface CustomVariablesSectionProps {
 
 export function ExractPromptVariables(prompt: string): string[] {
   if (!prompt) return [];
-
+  console.log(prompt);
   const regex = /{{(.*?)}}/g;
   const matches = [...prompt.matchAll(regex)];
   console.log('Matches', matches);
@@ -75,11 +75,14 @@ export const CustomVariablesSection: React.FC<CustomVariablesSectionProps> = ({
 
     console.log('Variables before', variables);
     // Extract variables from reasoning prompt
-    const reasoningVariables = ExractPromptVariables(agent.getAgentWithPrompts.reasoning.prompt);
-    console.log('Reasoning variables', reasoningVariables);
+    if (agent.getAgentWithPrompts.reasoning) {
+      console.log('HOW?');
+      const reasoningVariables = ExractPromptVariables(agent.getAgentWithPrompts.reasoning.prompt);
+      console.log('Reasoning variables', reasoningVariables);
+      variables = [...variables, ...reasoningVariables];
+    }
 
     // Combine both sets of variables
-    variables = [...variables, ...reasoningVariables];
 
     console.log('Variables after', variables);
 

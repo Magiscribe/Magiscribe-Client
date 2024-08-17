@@ -3,7 +3,6 @@ import { GET_ALL_AGENTS, GET_DATA } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import GraphInput from '@/components/graph/graph-input';
 import { useMutation, useQuery, useSubscription } from '@apollo/client';
-import { useAuth } from '@clerk/clerk-react';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Edge, Node, OnEdgesChange, OnNodesChange, useEdgesState, useNodesState } from '@xyflow/react';
@@ -13,7 +12,6 @@ import { v4 as uuid } from 'uuid';
 import Dagre from '@dagrejs/dagre';
 
 interface Form {
-  userId: string;
   title: string;
   createdAt: number;
   organizationName: string;
@@ -140,13 +138,11 @@ const DecisionGraph = ({
 };
 
 const Setup = ({ id }: { id: string }) => {
-  const { userId } = useAuth();
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState<Form>({
-    userId: userId!,
     title: '',
     createdAt: Date.now(),
     organizationName: '',
@@ -169,8 +165,7 @@ const Setup = ({ id }: { id: string }) => {
       setForm(dataObject.data.form);
       if (dataObject.data.graph) {
         const loadedGraph = dataObject.data.graph;
-        setNodes(loadedGraph.nodes);
-        setEdges(loadedGraph.edges);
+        processGraph(loadedGraph);
       }
     },
   });
