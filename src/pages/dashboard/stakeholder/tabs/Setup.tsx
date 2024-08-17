@@ -214,16 +214,16 @@ const Setup = ({ id }: { id: string }) => {
     const newNodes: Node[] = [];
     const newEdges: Edge[] = [];
 
-    input.nodes.map((edge) => {
+    input.nodes.map((edge: Edge) => {
       return newNodes.push({
         id: edge.id,
         type: edge.type,
         position: { x: 0, y: 0 },
         data: edge.data as any,
       });
-    })
+    });
 
-    input.edges.map((edge) => {
+    input.edges.map((edge: Edge) => {
       return newEdges.push({
         id: uuid(),
         source: edge.source.toString(),
@@ -231,13 +231,20 @@ const Setup = ({ id }: { id: string }) => {
       });
     });
 
-    newNodes.forEach((node) => { g.setNode(node.id, { width: 400, height: 400 }); });
-    newEdges.forEach((edge) => { g.setEdge(edge.source, edge.target); });
+    newNodes.forEach((node) => {
+      g.setNode(node.id, { width: 400, height: 400 });
+    });
+    newEdges.forEach((edge) => {
+      g.setEdge(edge.source, edge.target);
+    });
 
     Dagre.layout(g);
 
-
-    setNodes(newNodes.map((node) => { return { ...node, position: { x: g.node(node.id).x, y: g.node(node.id).y } } }));
+    setNodes(
+      newNodes.map((node) => {
+        return { ...node, position: { x: g.node(node.id).x, y: g.node(node.id).y } };
+      }),
+    );
     setEdges(newEdges);
   };
 
