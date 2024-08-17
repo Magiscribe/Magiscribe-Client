@@ -207,6 +207,7 @@ const Setup = ({ id }: { id: string }) => {
     });
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const processGraph = (input: any) => {
     const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
     g.setGraph({ rankdir: 'TB' });
@@ -219,6 +220,7 @@ const Setup = ({ id }: { id: string }) => {
         id: edge.id,
         type: edge.type,
         position: { x: 0, y: 0 },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         data: edge.data as any,
       });
     });
