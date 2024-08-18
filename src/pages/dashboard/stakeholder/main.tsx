@@ -1,29 +1,28 @@
-import { CREATE_DATA } from '@/clients/mutations';
-import CustomModal from '@/components/modal';
-import { useAddAlert } from '@/providers/AlertProvider';
+import { useState } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { useAuth } from '@clerk/clerk-react';
-import { faArrowLeft, faLink } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
-import clsx from 'clsx';
-import { motion } from 'framer-motion';
-import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { GET_USER_FORMS } from '../../../clients/queries';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft, faLink } from '@fortawesome/free-solid-svg-icons';
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
+import { motion } from 'framer-motion';
+import clsx from 'clsx';
+
+import { CREATE_DATA } from '@/clients/mutations';
+import { GET_USER_FORMS } from '@/clients/queries';
+import CustomModal from '@/components/modal';
+import { useAddAlert } from '@/providers/AlertProvider';
+
 import AnalysisTab from './tabs/Analysis';
 import SetupForm from './tabs/Setup';
+import PreviewTab from './tabs/Preview';
 
 export default function StakeholderInput() {
-  // Hooks
   const { userId } = useAuth();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-
-  // Modal
   const [shareModalOpen, setShareModalOpen] = useState(false);
 
-  // Fetch user forms
   const { data: userFormsData } = useQuery(GET_USER_FORMS);
   const [createObject] = useMutation(CREATE_DATA);
 
@@ -55,8 +54,7 @@ export default function StakeholderInput() {
 
   const FormBubbles = () => (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-      {// eslint-disable-next-line @typescript-eslint/no-explicit-any
-      userFormsData?.dataObjectsCreated.map((userForm: any) => {
+      {userFormsData?.dataObjectsCreated.map((userForm: any) => {
         const formData = userForm.data;
         return (
           <motion.div
@@ -66,7 +64,7 @@ export default function StakeholderInput() {
             onClick={() => selectForm(userForm.id)}
           >
             <h3 className="text-lg font-semibold mb-2">
-              {formData.form.title == '' ? 'Untitled Form' : formData.form.title}
+              {formData.form.title === '' ? 'Untitled Form' : formData.form.title}
             </h3>
             <p className="text-sm text-gray-500">Created: {new Date(formData.form.createdAt).toLocaleDateString()}</p>
           </motion.div>
@@ -74,7 +72,7 @@ export default function StakeholderInput() {
       })}
       <motion.div
         className="bg-blue-500 p-4 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow flex items-center justify-center"
-        whileHover={{ scale: 1.05 }} // Darker blue on hover
+        whileHover={{ scale: 1.05 }}
         onClick={createForm}
       >
         <span className="text-4xl font-bold text-white">+</span>
@@ -84,7 +82,7 @@ export default function StakeholderInput() {
 
   const IntroContent = () => (
     <div className="mb-8 text-slate-100">
-      <h2 className="text-2xl font-semibold  mb-4">Are you responsible for a large group of stakeholders?</h2>
+      <h2 className="text-2xl font-semibold mb-4">Are you responsible for a large group of stakeholders?</h2>
       <ul className="list-disc pl-6 mb-4">
         <li>User base of your product/service</li>
         <li>Workforce/Shareholders of your company</li>
@@ -104,7 +102,6 @@ export default function StakeholderInput() {
 
   const Modal = () => {
     const alert = useAddAlert();
-
     const link = `${window.location.origin}/inquiry/${id}`;
 
     const handleCopyLink = () => {
@@ -116,7 +113,6 @@ export default function StakeholderInput() {
     return (
       <CustomModal open={shareModalOpen} onClose={() => setShareModalOpen(false)} title="Share" size="4xl">
         <p className="text-slate-600 mb-6">Share the link with anyone you want to get input from</p>
-
         <div className="flex items-stretch">
           <p className="flex-grow bg-white p-2 rounded-l-md border border-r-0 border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500">
             {link}
@@ -142,7 +138,7 @@ export default function StakeholderInput() {
           <FormBubbles />
         </>
       )}
-      {id ? (
+      {id && (
         <>
           <div className="w-full flex items-center justify-between mb-4">
             <button
@@ -162,7 +158,7 @@ export default function StakeholderInput() {
           </div>
           <TabGroup>
             <TabList className="flex space-x-1 rounded-xl border-2 border-white mb-4">
-              {['Setup', 'Analyze'].map((category) => (
+              {['Setup', 'Preview', 'Analysis'].map((category) => (
                 <Tab
                   key={category}
                   className={({ selected }) =>
@@ -195,13 +191,22 @@ export default function StakeholderInput() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 100 }}
                 >
+                  <PreviewTab />
+                </motion.div>
+              </TabPanel>
+              <TabPanel>
+                <motion.div
+                  initial={{ opacity: 0, x: -100 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 100 }}
+                >
                   <AnalysisTab />
                 </motion.div>
               </TabPanel>
             </TabPanels>
           </TabGroup>
         </>
-      ) : null}
+      )}
       <Modal />
     </>
   );
