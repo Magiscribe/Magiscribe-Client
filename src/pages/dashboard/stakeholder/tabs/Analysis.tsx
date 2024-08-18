@@ -20,6 +20,9 @@ const AnalysisTab: React.FC = () => {
     variables: { id: id },
     skip: !id,
     errorPolicy: 'all',
+    onCompleted: ({ dataObject }) => {
+      console.log(dataObject);
+    },
   });
 
   if (dataLoading) return <p>Loading...</p>;
