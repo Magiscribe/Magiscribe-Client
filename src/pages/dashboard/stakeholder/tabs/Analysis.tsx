@@ -1,26 +1,36 @@
-import { useQuery } from '@apollo/client';
-import { Tab, TabGroup, TabList } from '@headlessui/react';
-import clsx from 'clsx';
 import React from 'react';
+import { useQuery } from '@apollo/client';
+import { Tab } from '@headlessui/react';
+import clsx from 'clsx';
 import { useParams } from 'react-router-dom';
 import { GET_DATA } from '../../../../clients/queries';
+import PerResponseTab from './PerResponseTab';
+import PerQuestionTab from './PerQuestionTab';
 
 const AnalysisTab: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   console.log(id);
 
-  const { loading: dataLoading, error: dataError } = useQuery(GET_DATA, {
+  const {
+    loading: dataLoading,
+    error: dataError,
+    data,
+  } = useQuery(GET_DATA, {
     variables: { id: id },
+    skip: !id,
+    errorPolicy: 'all',
   });
 
   if (dataLoading) return <p>Loading...</p>;
   if (dataError) return <p>Error: {dataError.message}</p>;
 
+  const tabCategories = ['Per Response', 'Per Question', 'Via Chat'];
+
   return (
     <div className="mt-8">
-      <TabGroup>
-        <TabList className="flex space-x-1 rounded-xl bg-slate-200 p-1">
-          {['Per Response', 'Per Question', 'Via Chat'].map((category) => (
+      <Tab.Group>
+        <Tab.List className="flex space-x-1 rounded-xl bg-slate-200 p-1">
+          {tabCategories.map((category) => (
             <Tab
               key={category}
               className={({ selected }) =>
@@ -36,9 +46,19 @@ const AnalysisTab: React.FC = () => {
               {category}
             </Tab>
           ))}
-        </TabList>
-        <br />
-      </TabGroup>
+        </Tab.List>
+        <Tab.Panels className="mt-4">
+          <Tab.Panel>
+            {data && data.dataObject ? <PerResponseTab data={data.dataObject} /> : <p>No data available</p>}
+          </Tab.Panel>
+          <Tab.Panel>
+            {data && data.dataObject ? <PerQuestionTab data={data.dataObject} /> : <p>No data available</p>}
+          </Tab.Panel>
+          <Tab.Panel>
+            <p>Via Chat content goes here</p>
+          </Tab.Panel>
+        </Tab.Panels>
+      </Tab.Group>
     </div>
   );
 };

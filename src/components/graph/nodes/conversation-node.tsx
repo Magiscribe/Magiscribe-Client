@@ -4,12 +4,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserFriends, faInfoCircle, faQuestionCircle, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import CustomHandle from './limit-handle';
 
-interface ConversationNodeProps {
+export interface ConversationNodeProps {
   id: string;
   data: NodeData;
 }
 
-interface NodeData {
+export interface NodeData {
   text?: string;
   instruction?: string;
   type: 'rating-single' | 'rating-multi' | 'open-ended' | 'information';
