@@ -122,7 +122,7 @@ const PreviewTab: React.FC = () => {
           type="text"
           value={inputMessage}
           onChange={(e) => setInputMessage(e.target.value)}
-          placeholder="Enter your response..."
+          placeholder="Describe the persona of a simulated individual responding to your inquiry..."
           className="flex-grow p-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
           disabled={loading}
         />
