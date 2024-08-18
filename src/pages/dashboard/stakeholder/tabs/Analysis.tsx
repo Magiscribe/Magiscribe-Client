@@ -6,6 +6,7 @@ import { useParams } from 'react-router-dom';
 import { GET_DATA } from '../../../../clients/queries';
 import PerResponseTab from './PerResponseTab';
 import PerQuestionTab from './PerQuestionTab';
+import ViaChatTab from './ViaChatTab';
 
 const AnalysisTab: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -55,7 +56,7 @@ const AnalysisTab: React.FC = () => {
             {data && data.dataObject ? <PerQuestionTab data={data.dataObject} /> : <p>No data available</p>}
           </Tab.Panel>
           <Tab.Panel>
-            <p>Via Chat content goes here</p>
+            {data && data.dataObject ? <ViaChatTab data={data.dataObject} /> : <p>No data available</p>}
           </Tab.Panel>
         </Tab.Panels>
       </Tab.Group>

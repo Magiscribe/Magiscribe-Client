@@ -187,7 +187,7 @@ const Setup = ({ id }: { id: string }) => {
 
   const generateGraph = () => {
     const drawingAgent = agents?.getAllAgents.find(
-      (agent: { name: string }) => agent.name === 'Stakeholder | Graph Generator',
+      (agent: { name: string }) => agent.name === 'Stakeholder | Graph Generator Level 0',
     );
     setLoading(true);
     addPrediction({
