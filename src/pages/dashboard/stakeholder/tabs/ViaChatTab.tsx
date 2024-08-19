@@ -3,7 +3,7 @@ import { useQuery, useMutation, useSubscription } from '@apollo/client';
 import { GET_ALL_AGENTS } from '../../../../clients/queries';
 import { ADD_PREDICTION } from '../../../../clients/mutations';
 import { GRAPHQL_SUBSCRIPTION } from '../../../../clients/subscriptions';
-import Chart, { ChartProps } from '../../../../components/Chart';
+import Chart, { ChartProps } from '../../../../components/chart';
 import MarkdownCustom from '../../../../components/markdown-custom';
 import { TabProps } from '../../../../types/conversation';
 
