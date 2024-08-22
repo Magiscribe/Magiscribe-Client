@@ -63,7 +63,7 @@ function Flow({ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange }
     start: StartNode,
     end: EndNode,
     conversation: ConversationNode,
-    conditional: ConditionNode,
+    condition: ConditionNode,
     information: InformationNode,
   };
 
@@ -94,7 +94,7 @@ function Flow({ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange }
     [screenToFlowPosition],
   );
 
-  const addNode = (type: 'conversation' | 'conditional' | 'end') => {
+  const addNode = (type: string) => {
     const newNodeId = `${Date.now()}`;
     setNodes((prev) => [
       ...prev,
@@ -150,10 +150,11 @@ function Flow({ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange }
       <div className="absolute bottom-0 left-0 p-4">
         <CustomModal open={addNodeModalOpen} onClose={() => setAddNodeModalOpen(false)} title="Add Node">
           <div className="grid grid-cols-1 gap-4">
-            {['conversation', 'conditional', 'end'].map((type) => (
+            {Object.keys(nodeTypes).filter((type) => type !== 'start').sort()
+            .map((type) => (
               <button
                 key={type}
-                onClick={() => addNode(type as 'conversation' | 'conditional')}
+                onClick={() => addNode(type)}
                 className="w-full px-4 py-2 bg-blue-600 text-white rounded-xl"
               >
                 {type.charAt(0).toUpperCase() + type.slice(1)} Node

@@ -42,16 +42,19 @@ const PerResponseTab: React.FC<TabProps> = ({ data }) => {
   const displayedUsers = users.slice(currentPage * usersPerPage, (currentPage + 1) * usersPerPage);
 
   return (
-    <div className="p-4">
-      <div className="mb-4">
-        <h2 className="text-xl font-bold mb-2">Select User</h2>
+    <div className="bg-white px-4 py-8 rounded-2xl shadow-xl text-slate-700">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold">Per-Question</h2>
+      </div>
+      <div className="my-4">
+        <h2 className="font-bold mb-2">Select User</h2>
         <div className="grid grid-cols-4 sm:grid-col-3 lg:grid-cols-6 gap-2">
           {displayedUsers.map(({ userId }) => (
             <button
               key={userId}
               onClick={() => setSelectedUser((prev) => (prev === userId ? null : (userId as string)))}
               className={`p-2 text-sm rounded-md ${
-                selectedUser === userId ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'
+                selectedUser === userId ? 'bg-blue-500 text-white' : 'bg-slate-200 text-black'
               }`}
             >
               {userId || 'Unknown'}
@@ -74,8 +77,8 @@ const PerResponseTab: React.FC<TabProps> = ({ data }) => {
         )}
       </div>
       <div>
-        <h2 className="text-xl font-bold mb-2">
-          User Response{selectedUser && <span className="font-thin"> | {selectedUser}</span>}
+        <h2 className="font-bold mb-2">
+          User Response{selectedUser && <> | {selectedUser}</>}
         </h2>
         {selectedUser &&
           users
@@ -84,7 +87,7 @@ const PerResponseTab: React.FC<TabProps> = ({ data }) => {
               const graphNode = nodesMap[node.id];
               if (graphNode?.type === 'conversation') {
                 return (
-                  <div key={node.id} className="mb-4 p-4 bg-slate-100 rounded-2xl">
+                  <div key={node.id} className="mb-4 p-4 bg-slate-200 rounded-2xl">
                     {renderNodeContent(node, graphNode)}
                   </div>
                 );

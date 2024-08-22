@@ -10,9 +10,9 @@ import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import GraphInput from '@/components/graph/graph-input';
 import DeleteConfirmationModal from '@/components/modals/delete-modal';
 import ModalGraphHelp from '@/components/modals/graph-help-modal';
-import { useGraph } from '@/hooks/Graph';
 import { useAddAlert } from '@/providers/AlertProvider';
 import { createGraph, formatAndSetGraph } from '@/utils/graphUtils';
+import useGraph from '@/hooks/graph';
 
 export interface SetupFormData {
   title: string;

@@ -40,16 +40,19 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
     });
 
   return (
-    <div className="p-4">
-      <div className="mb-4">
-        <h2 className="text-xl font-bold mb-2">Select Question</h2>
+    <div className="bg-white px-4 py-8 rounded-2xl shadow-xl text-slate-700">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold">Per-Question</h2>
+      </div>
+      <div className="my-4">
+        <h2 className="font-bold mb-2">Select Question</h2>
         <div className="grid grid-cols-4 sm:grid-col-3 lg:grid-cols-6 gap-2">
           {conversationNodes.map((node, index) => (
             <button
               key={node.id}
               onClick={() => setCurrentQuestionIndex(index)}
               className={`p-2 text-sm rounded-md ${
-                currentQuestionIndex === index ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'
+                currentQuestionIndex === index ? 'bg-blue-500 text-white' : 'bg-slate-200 text-black'
               }`}
             >
               {node.data.instruction || node.data.text || `Question ${index + 1}`}
@@ -58,8 +61,8 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
         </div>
       </div>
       <div>
-        <h2 className="text-xl font-bold mb-2">Node {currentNode.id}</h2>
-        <div className="mb-6 p-4 bg-gray-100 rounded">
+        <h2 className="font-bold mb-2">Node {currentNode.id}</h2>
+        <div className="mb-6 p-4 bg-slate-200 rounded">
           {nodeData.text ? (
             <>
               <p className="font-semibold mb-2 text-black">{nodeData.text}</p>

@@ -14,7 +14,6 @@ enum NodeType {
 type ConversationNodeProps = NodeProps & {
   data: {
     text?: string;
-    instruction?: string;
     type: NodeType;
     ratings?: string[];
     dynamicGeneration?: boolean;

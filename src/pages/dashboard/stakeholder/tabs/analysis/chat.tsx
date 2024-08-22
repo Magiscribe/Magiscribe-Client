@@ -5,6 +5,10 @@ import Chart, { ChartProps } from '@/components/chart';
 import MarkdownCustom from '@/components/markdown-custom';
 import { TabProps } from '@/types/conversation';
 import { useMutation, useQuery, useSubscription } from '@apollo/client';
+import { faInfoCircle, faPaperPlane, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { motion } from 'framer-motion';
+import clsx from 'clsx';
 import React, { useEffect, useRef, useState } from 'react';
 
 interface Message {
@@ -13,13 +17,17 @@ interface Message {
   sender: 'user' | 'bot';
 }
 
-const ViaChatTab: React.FC<TabProps> = ({ data }) => {
+export default function ViaChatTab({ data }: TabProps) {
+  // State
   const [inputMessage, setInputMessage] = useState('');
   const [loading, setLoading] = useState<boolean>(false);
   const [subscriptionId] = useState<string>(`advanced_analysis_${Date.now()}`);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<Message[]>([]);
 
+  // Ref
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Queries and Mutations
   const { data: agents, loading: agentsLoading } = useQuery(GET_ALL_AGENTS);
   const [addPrediction] = useMutation(ADD_PREDICTION);
 
@@ -38,8 +46,7 @@ const ViaChatTab: React.FC<TabProps> = ({ data }) => {
 
       if (prediction && prediction.type === 'SUCCESS') {
         setLoading(false);
-        const results = JSON.parse(prediction.result);
-        handleAnalysisResults(results);
+        parseAndDisplayAnalysisResults(JSON.parse(prediction.result));
       }
     },
     onError: (error) => {
@@ -48,7 +55,7 @@ const ViaChatTab: React.FC<TabProps> = ({ data }) => {
     },
   });
 
-  const handleAnalysisResults = (results: string[]) => {
+  const parseAndDisplayAnalysisResults = (results: string[]) => {
     results.forEach((result) => {
       try {
         const parsed = JSON.parse(result);
@@ -61,15 +68,13 @@ const ViaChatTab: React.FC<TabProps> = ({ data }) => {
               value: item.value,
             })),
           };
-          const newChartMessage: Message = { type: 'chart', content: chartProps, sender: 'bot' };
-          setMessages((prevMessages) => [...prevMessages, newChartMessage]);
+          setMessages((prevMessages) => [...prevMessages, { type: 'chart', content: chartProps, sender: 'bot' }]);
         } else {
           throw new Error('Not a valid chart data');
         }
       } catch (error) {
         console.error('Error parsing result:', error);
-        const newBotMessage: Message = { type: 'text', content: result, sender: 'bot' };
-        setMessages((prevMessages) => [...prevMessages, newBotMessage]);
+        setMessages((prevMessages) => [...prevMessages, { type: 'text', content: result, sender: 'bot' }]);
       }
     });
   };
@@ -78,8 +83,7 @@ const ViaChatTab: React.FC<TabProps> = ({ data }) => {
     e.preventDefault();
     if (inputMessage.trim() === '') return;
 
-    const newUserMessage: Message = { type: 'text', content: inputMessage, sender: 'user' };
-    setMessages((prevMessages) => [...prevMessages, newUserMessage]);
+    setMessages((prevMessages) => [...prevMessages, { type: 'text', content: inputMessage, sender: 'user' }]);
 
     let agentId;
     if (!agentsLoading && agents?.getAllAgents) {
@@ -117,23 +121,36 @@ const ViaChatTab: React.FC<TabProps> = ({ data }) => {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-200px)]">
-      <div className="flex-grow overflow-auto mb-4 p-4 bg-white rounded-lg shadow">
+    <div className="bg-white px-4 py-8 rounded-2xl shadow-xl text-slate-700">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold">Chat</h2>
+      </div>
+      <div className="flex-grow mb-4 rounded-lg">
         {messages.map((message, index) => (
-          <div key={index} className={`mb-4 flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-            {message.type === 'text' ? (
-              <div
-                className={`max-w-[80%] ${
-                  message.sender === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
-                } p-2 rounded-lg`}
-              >
-                <MarkdownCustom>{message.content as string}</MarkdownCustom>
-              </div>
-            ) : (
-              <div className="w-full">
-                <Chart {...(message.content as ChartProps)} />
-              </div>
+          <div 
+            key={index} 
+            className={clsx(
+              'pt-4 flex',
+              message.sender === 'user' ? 'justify-end' : 'justify-start'
             )}
+          >
+            <motion.div
+              initial={{ opacity: 0, x: message.sender === 'user' ? -100 : 100 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5 }}
+              className={clsx(
+                'shadow-3xl max-w-[80%] p-2 rounded-lg',
+                message.sender === 'user' 
+                  ? 'bg-blue-500 text-white' 
+                  : 'bg-slate-300 text-gray-800'
+              )}
+            >
+              {message.type === 'text' ? (
+                <MarkdownCustom>{message.content as string}</MarkdownCustom>
+              ) : (
+                <Chart {...(message.content as ChartProps)} />
+              )}
+            </motion.div>
           </div>
         ))}
         <div ref={messagesEndRef} />
@@ -144,19 +161,25 @@ const ViaChatTab: React.FC<TabProps> = ({ data }) => {
           value={inputMessage}
           onChange={(e) => setInputMessage(e.target.value)}
           placeholder="Ask a question about your data..."
-          className="flex-grow p-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+          className={clsx(
+            "flex-grow p-2 border border-gray-300 rounded-l-lg text-black",
+            "focus:outline-none focus:ring-2 focus:ring-blue-500"
+          )}
           disabled={loading}
         />
         <button
           type="submit"
-          className="px-4 py-2 bg-blue-500 text-white rounded-r-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-400"
+          className={clsx(
+            "px-4 py-2 bg-blue-500 text-white rounded-r-lg",
+            "hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500",
+            "disabled:bg-gray-400"
+          )}
           disabled={loading}
         >
-          {loading ? 'Sending...' : 'Send'}
+          Send
+          <FontAwesomeIcon icon={loading ? faSpinner : faPaperPlane} spin={loading} className="ml-2" />
         </button>
       </form>
     </div>
   );
 };
-
-export default ViaChatTab;

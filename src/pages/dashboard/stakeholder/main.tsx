@@ -13,8 +13,8 @@ import { GET_USER_FORMS } from '@/clients/queries';
 import CustomModal from '@/components/modal';
 import { useAddAlert } from '@/providers/AlertProvider';
 
-import AnalysisTab from './tabs/Analysis';
-import SetupForm from './tabs/Setup';
+import AnalysisTab from './tabs/analysis';
+import SetupForm from './tabs/setup';
 
 export default function StakeholderInput() {
   const { userId } = useAuth();

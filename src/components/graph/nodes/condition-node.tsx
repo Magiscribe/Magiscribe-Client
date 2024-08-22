@@ -7,12 +7,12 @@ import { useNodeData } from '../utils';
 
 type ConditionNodeProps = NodeProps & {
   data: {
-    instruction: string;
+    text: string;
   };
 };
 
 export default function ConditionNode({ id, data }: ConditionNodeProps) {
-  const textareaRef = useAutoResizeTextareaRef(data.instruction);
+  const textareaRef = useAutoResizeTextareaRef(data.text);
   const { handleInputChange } = useNodeData<ConversationNodeData>(id);
 
   return (
@@ -27,7 +27,7 @@ export default function ConditionNode({ id, data }: ConditionNodeProps) {
         <textarea
           ref={textareaRef}
           name="instruction"
-          value={data.instruction}
+          value={data.text}
           onChange={handleInputChange}
           rows={1}
           placeholder="Enter your text here..."

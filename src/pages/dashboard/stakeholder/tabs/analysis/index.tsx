@@ -4,9 +4,9 @@ import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import clsx from 'clsx';
 import { useParams } from 'react-router-dom';
 import { GET_DATA } from '@/clients/queries';
-import PerResponseTab from './PerResponseTab';
-import PerQuestionTab from './PerQuestionTab';
-import ViaChatTab from './ViaChatTab';
+import PerResponseTab from './per-response';
+import PerQuestionTab from './per-question';
+import ViaChatTab from './chat';
 import { motion } from 'framer-motion';
 
 const AnalysisTab: React.FC = () => {
