@@ -1,8 +1,11 @@
 import {
   addEdge,
+  Background,
+  Controls,
   DefaultEdgeOptions,
   Edge,
   FitViewOptions,
+  MiniMap,
   Node,
   NodeTypes,
   OnConnect,
@@ -18,10 +21,14 @@ import {
 import React, { useCallback, useRef, useState } from 'react';
 import ConditionNode from './nodes/condition-node';
 import ConversationNode from './nodes/conversation-node';
-import { EndNode, StartNode } from './nodes/start-node';
+import { EndNode, StartNode } from './nodes/start-end-node';
 import CustomModal from '../modal';
+import InformationNode from './nodes/information-node';
 
-const fitViewOptions: FitViewOptions = { padding: 0.2 };
+const fitViewOptions: FitViewOptions = {
+  nodes: [{ id: 'start' }],
+  padding: 0.2,
+};
 const defaultEdgeOptions: DefaultEdgeOptions = {
   style: {
     strokeWidth: 4,
@@ -57,6 +64,7 @@ function Flow({ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange }
     end: EndNode,
     conversation: ConversationNode,
     condition: ConditionNode,
+    information: InformationNode,
   };
 
   const onConnect: OnConnect = useCallback(
@@ -124,8 +132,21 @@ function Flow({ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange }
         fitViewOptions={fitViewOptions}
         defaultEdgeOptions={defaultEdgeOptions}
         proOptions={proOptions}
-        nodeOrigin={[0.5, 0]}
-      />
+      >
+        <MiniMap
+          zoomable
+          pannable
+          style={{
+            border: '1px solid #ddd',
+            borderRadius: 8,
+            boxShadow: '0 0 10px rgba(0,0,0,0.2)',
+            background: 'rgba(255,255,255,0)',
+          }}
+        />
+        <Background />
+        <Controls />
+      </ReactFlow>
+
       <div className="absolute bottom-0 left-0 p-4">
         <CustomModal open={addNodeModalOpen} onClose={() => setAddNodeModalOpen(false)} title="Add Node">
           <div className="grid grid-cols-1 gap-4">
