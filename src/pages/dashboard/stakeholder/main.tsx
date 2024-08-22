@@ -6,7 +6,7 @@ import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { CREATE_DATA } from '@/clients/mutations';
 import { GET_USER_FORMS } from '@/clients/queries';
@@ -45,10 +45,6 @@ export default function StakeholderInput() {
 
   const selectForm = (formId: string) => {
     navigate(`${formId}`);
-  };
-
-  const handleBack = () => {
-    navigate('../');
   };
 
   const FormBubbles = () => (
@@ -140,13 +136,13 @@ export default function StakeholderInput() {
       {id && (
         <>
           <div className="w-full flex items-center justify-between mb-4">
-            <button
-              onClick={handleBack}
+            <Link
+              to = "../"
               className="flex items-center text-slate-100 hover:text-slate-200 transition-colors"
             >
               <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
-              Back to Forms
-            </button>
+              Back
+            </Link>
             <button
               onClick={() => setShareModalOpen(true)}
               className="flex items-center text-slate-100 hover:text-slate-200 transition-colors"

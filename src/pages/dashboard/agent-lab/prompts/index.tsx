@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { DELETE_PROMPT, ADD_UPDATE_PROMPT } from '@/clients/mutations';
 import { GET_ALL_PROMPTS } from '@/clients/queries';
 import { Prompt } from '@/types/agents';
-import DeleteConfirmationModal from '@/components/delete-modal';
+import DeleteConfirmationModal from '@/components/modals/delete-modal';
 import { useAddAlert } from '@/hooks/AlertHooks';
 
 function PromptCard({
@@ -72,7 +72,7 @@ function PromptCard({
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={handleDelete}
-        itemName="prompt"
+        text="Are you sure you want to delete this prompt?"
       />
     </div>
   );

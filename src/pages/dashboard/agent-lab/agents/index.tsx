@@ -5,7 +5,7 @@ import { DELETE_AGENT, ADD_UPDATE_AGENT } from '@/clients/mutations';
 import { GET_ALL_AGENTS } from '@/clients/queries';
 import { Agent, Capability } from '@/types/agents';
 import { motion } from 'framer-motion';
-import DeleteConfirmationModal from '@/components/delete-modal';
+import DeleteConfirmationModal from '@/components/modals/delete-modal';
 import { useAddAlert } from '@/hooks/AlertHooks';
 
 function AgentCard({ agent, onUpdate, onCopy }: { agent: Agent; onUpdate?: () => void; onCopy: (id: string) => void }) {
@@ -70,7 +70,7 @@ function AgentCard({ agent, onUpdate, onCopy }: { agent: Agent; onUpdate?: () =>
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={handleDelete}
-        itemName="agent"
+        text='Are you sure you want to delete this agent?'
       />
     </div>
   );

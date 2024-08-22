@@ -1,43 +1,51 @@
+import { useMutation, useQuery, useSubscription } from '@apollo/client';
+import { faBroom, faPlus, faQuestionCircle, faSpinner, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React, { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import { ADD_PREDICTION, DELETE_DATA, UPDATE_DATA } from '@/clients/mutations';
 import { GET_ALL_AGENTS, GET_DATA } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import GraphInput from '@/components/graph/graph-input';
-import { useMutation, useQuery, useSubscription } from '@apollo/client';
-import { faSpinner } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Edge, Node, OnEdgesChange, OnNodesChange, useEdgesState, useNodesState } from '@xyflow/react';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { v4 as uuid } from 'uuid';
-import Dagre from '@dagrejs/dagre';
+import DeleteConfirmationModal from '@/components/modals/delete-modal';
+import ModalGraphHelp from '@/components/modals/graph-help-modal';
+import { useGraph } from '@/hooks/Graph';
+import { useAddAlert } from '@/providers/AlertProvider';
+import { createGraph, formatAndSetGraph } from '@/utils/graphUtils';
 
-interface Form {
+export interface SetupFormData {
   title: string;
-  createdAt: number;
   organizationName: string;
   organizationRole: string;
   inputGoals: string;
 }
 
-const initialNodes: Node[] = [
-  {
-    id: '0',
-    type: 'start',
-    position: { x: 0, y: -250 },
-    data: {},
-  },
-];
+interface SetupFormProps {
+  form: SetupFormData;
+  updateForm: (newForm: SetupFormData) => void;
+}
 
-const initialEdges: Edge[] = [];
+/**
+ * SetupForm component for inputting setup details.
+ * @param {Object} props - Component props
+ * @param {SetupFormData} props.form - The current form data
+ * @param {Function} props.updateForm - Function to update the form data
+ */
+export const SetupForm: React.FC<SetupFormProps> = ({ form, updateForm }) => {
+  const handleInputChange = (field: keyof SetupFormData) => (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    updateForm({ ...form, [field]: e.target.value });
+  };
 
-const SetupForm = ({ form, handleSetForm }: { form: Form; handleSetForm: (newForm: Form) => void }) => {
   return (
     <div className="bg-white px-4 py-8 rounded-2xl shadow-xl text-slate-700">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Setup</h2>
       </div>
       <form className="space-y-4">
-        {['title', 'organizationName', 'organizationRole'].map((field) => (
+        {(['title', 'organizationName', 'organizationRole'] as const).map((field) => (
           <div key={field}>
             <label className="block text-sm font-bold mb-2" htmlFor={field}>
               {field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' $1')}
@@ -45,8 +53,8 @@ const SetupForm = ({ form, handleSetForm }: { form: Form; handleSetForm: (newFor
             <input
               type="text"
               id={field}
-              value={form[field as keyof Form]}
-              onChange={(e) => handleSetForm({ ...form, [field]: e.target.value })}
+              value={form[field]}
+              onChange={handleInputChange(field)}
               className="border-2 border-gray-200 p-2 rounded-lg w-full"
             />
           </div>
@@ -58,7 +66,7 @@ const SetupForm = ({ form, handleSetForm }: { form: Form; handleSetForm: (newFor
           <textarea
             id="inputGoals"
             value={form.inputGoals}
-            onChange={(e) => handleSetForm({ ...form, inputGoals: e.target.value })}
+            onChange={handleInputChange('inputGoals')}
             rows={3}
             className="border-2 border-gray-200 p-2 rounded-lg w-full"
           />
@@ -68,99 +76,39 @@ const SetupForm = ({ form, handleSetForm }: { form: Form; handleSetForm: (newFor
   );
 };
 
-const DecisionGraph = ({
-  loading,
-  generateGraph,
-  nodes,
-  setNodes,
-  edges,
-  setEdges,
-  onNodesChange,
-  onEdgesChange,
-  clearGraph,
-}: {
-  loading: boolean;
-  generateGraph: () => void;
-  nodes: Node[];
-  setNodes: React.Dispatch<React.SetStateAction<Node[]>>;
-  onNodesChange: OnNodesChange;
-  edges: Edge[];
-  setEdges: React.Dispatch<React.SetStateAction<Edge[]>>;
-  onEdgesChange: OnEdgesChange;
-  clearGraph: () => void;
-}) => {
-  return (
-    <div className="mt-8 h-[80vh] grid grid-cols-6 gap-4 border-white border-2 rounded-2xl">
-      <div className="col-span-1 bg-white p-4 rounded-lg space-y-4 text-slate-700">
-        <h2 className="text-2xl font-bold">Decision Graph</h2>
-        <p className="text-sm">What is a decision graph?</p>
-        <p className="text-sm">
-          A decision graph is a visual representation of what questions you want to ask a user and how you want to
-          handle the conversation flow based on their answers.
-        </p>
-        <p className="text-sm">
-          This provides you the opportunity to create a structured conversation flow that can be used to gather
-          information from your users, while still adhering to the conversational principles of a natural conversation.
-        </p>
-        <div className="flex flex-col space-y-4">
-          <button
-            disabled={loading}
-            onClick={generateGraph}
-            className="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold py-1 px-3 rounded-3xl"
-          >
-            Generate Graph {loading && <FontAwesomeIcon icon={faSpinner} spin />}
-          </button>
-          <button
-            onClick={clearGraph}
-            className="bg-red-500 hover:bg-red-700 text-white text-sm font-bold py-1 px-3 rounded-3xl"
-          >
-            Clear Graph
-          </button>
-        </div>
-      </div>
-      <div className="col-span-5">
-        <GraphInput
-          nodes={nodes}
-          setNodes={setNodes}
-          edges={edges}
-          setEdges={setEdges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-        />
-      </div>
-    </div>
-  );
-};
-
-const Setup = ({ id }: { id: string }) => {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  const [loading, setLoading] = useState(false);
-
-  const [form, setForm] = useState<Form>({
+/**
+ * Setup component for creating and managing decision graphs.
+ * @param {Object} props - Component props
+ * @param {string} props.id - The ID of the current setup
+ */
+const Setup: React.FC<{ id: string }> = ({ id }) => {
+  const [form, setForm] = useState<SetupFormData>({
     title: '',
-    createdAt: Date.now(),
     organizationName: '',
     organizationRole: '',
     inputGoals: '',
   });
+  const [loading, setLoading] = useState(false);
+  const [clearGraphModal, setClearGraphModal] = useState(false);
+  const [helpModal, setHelpModal] = useState(false);
+
+  const alert = useAddAlert();
+  const navigate = useNavigate();
+
+  const { nodes, edges, setNodes, setEdges, onNodesChange, onEdgesChange } = useGraph();
 
   const { data: agents } = useQuery(GET_ALL_AGENTS);
   const [addPrediction] = useMutation(ADD_PREDICTION);
   const [updateObject] = useMutation(UPDATE_DATA);
   const [deleteObject] = useMutation(DELETE_DATA);
 
-  const navigate = useNavigate();
-
   useQuery(GET_DATA, {
     variables: { id },
     skip: !id,
-    errorPolicy: 'all',
     onCompleted: ({ dataObject }) => {
       setForm(dataObject.data.form);
       if (dataObject.data.graph) {
-        const loadedGraph = dataObject.data.graph;
-        processGraph(loadedGraph);
+        handleGraphCreation(dataObject.data.graph);
       }
     },
   });
@@ -169,18 +117,19 @@ const Setup = ({ id }: { id: string }) => {
     variables: { subscriptionId: 'predictionAdded' },
     onSubscriptionData: ({ subscriptionData }) => {
       const prediction = subscriptionData.data?.predictionAdded;
-      if (prediction && prediction.type === 'SUCCESS') {
+      if (prediction?.type === 'SUCCESS') {
+        alert('Graph generated successfully!', 'success');
         setLoading(false);
-        processGraph(JSON.parse(JSON.parse(prediction.result)));
+        handleGraphCreation(JSON.parse(JSON.parse(prediction.result)), true);
       }
     },
-    onError: (error) => {
-      console.error(error);
+    onError: () => {
+      alert('Something went wrong!', 'error');
       setLoading(false);
     },
   });
 
-  const generateGraph = () => {
+  const handleGenerateGraph = useCallback(() => {
     const drawingAgent = agents?.getAllAgents.find(
       (agent: { name: string }) => agent.name === 'Stakeholder | Graph Generator',
     );
@@ -195,93 +144,109 @@ const Setup = ({ id }: { id: string }) => {
         },
       },
     });
-  };
+    alert('Started generating graph... This may take a few seconds.', 'info');
+  }, [agents, form, addPrediction, alert]);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const processGraph = (input: any) => {
-    const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
-    g.setGraph({ rankdir: 'TB' });
+  const handleGraphCreation = useCallback((input: any, autoPosition: boolean = false) => {
+    const graph = createGraph(input);
+    formatAndSetGraph(graph, autoPosition, setNodes, setEdges);
+  }, [setNodes, setEdges]);
 
-    const newNodes: Node[] = [];
-    const newEdges: Edge[] = [];
-
-    input.nodes.map((edge: Edge) => {
-      return newNodes.push({
-        id: edge.id,
-        type: edge.type,
-        position: { x: 0, y: 0 },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        data: edge.data as any,
-      });
-    });
-
-    input.edges.map((edge: Edge) => {
-      return newEdges.push({
-        id: uuid(),
-        source: edge.source.toString(),
-        target: edge.target.toString(),
-      });
-    });
-
-    newNodes.forEach((node) => {
-      g.setNode(node.id, { width: 400, height: 400 });
-    });
-    newEdges.forEach((edge) => {
-      g.setEdge(edge.source, edge.target);
-    });
-
-    Dagre.layout(g);
-
-    setNodes(
-      newNodes.map((node) => {
-        return { ...node, position: { x: g.node(node.id).x, y: g.node(node.id).y } };
-      }),
-    );
-    setEdges(newEdges);
-  };
-
-  const handleSetForm = (newForm: Form) => {
+  const updateForm = useCallback((newForm: SetupFormData) => {
     setForm(newForm);
-  };
-  const handleDelete = () => {
+  }, []);
+
+  const handleDelete = useCallback(() => {
     deleteObject({ variables: { id } });
+    alert('Inquiry deleted successfully!', 'success');
     navigate('/dashboard/inquiry');
-  };
+  }, [deleteObject, id, alert, navigate]);
 
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
     updateObject({ variables: { id, data: { form, graph: { nodes, edges } } } });
+    alert('Inquiry saved successfully!', 'success');
     navigate('/dashboard/inquiry');
-  };
+  }, [updateObject, id, form, nodes, edges, alert, navigate]);
 
-  const clearGraph = () => {
-    setNodes(initialNodes);
-    setEdges(initialEdges);
-  };
+  const handleFormat = useCallback(() => {
+    formatAndSetGraph({ nodes, edges }, true, setNodes, setEdges);
+    alert('Graph formatted successfully!', 'success');
+  }, [nodes, edges, setNodes, setEdges, alert]);
+
+  const clearGraph = useCallback(() => {
+    handleGraphCreation({ nodes: [{ id: '0', type: 'start', position: { x: 0, y: 0 }, data: {} }], edges: [] }, true);
+    alert('Graph cleared successfully!', 'success');
+  }, [handleGraphCreation, alert]);
 
   return (
     <div className="container max-w-12xl mx-auto">
-      <SetupForm form={form} handleSetForm={handleSetForm} />
-      <DecisionGraph
-        loading={loading}
-        generateGraph={generateGraph}
-        nodes={nodes}
-        setNodes={setNodes}
-        edges={edges}
-        setEdges={setEdges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        clearGraph={clearGraph}
+      <SetupForm form={form} updateForm={updateForm} />
+      <ModalGraphHelp open={helpModal} onClose={() => setHelpModal(false)} />
+      <DeleteConfirmationModal 
+        isOpen={clearGraphModal}
+        onClose={() => setClearGraphModal(false)}
+        onConfirm={() => { clearGraph(); setClearGraphModal(false); }}
+        text="Are you sure you want to clear the graph?"
+        confirmText='Clear Graph'
       />
-      <div className="flex justify-end bg-white p-4 rounded-2xl mt-8">
+      <div className="mt-8 h-[80vh] flex flex-col border-white border-2 rounded-2xl">
+        <div className="bg-white p-4 rounded-lg space-y-4 text-slate-700">
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-bold">Decision Graph</h2>
+            <div className="flex space-x-4">
+              <button
+                disabled={loading}
+                onClick={handleGenerateGraph}
+                className="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded-full flex items-center"
+              >
+                <FontAwesomeIcon icon={faPlus} className="mr-2" />
+                Generate Graph {loading && <FontAwesomeIcon icon={faSpinner} spin className="ml-2" />}
+              </button>
+              <button 
+                className="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded-full flex items-center"
+                onClick={handleFormat}
+              >
+                <FontAwesomeIcon icon={faBroom} className="mr-2" />
+                Format Graph
+              </button>
+              <button
+                onClick={() => setClearGraphModal(true)}
+                className="bg-red-500 hover:bg-red-700 text-white text-sm font-bold py-2 px-4 rounded-full flex items-center"
+              >
+                <FontAwesomeIcon icon={faTrash} className="mr-2" />
+                Clear Graph
+              </button>
+              <button
+                onClick={() => setHelpModal(true)}
+                className="bg-gray-500 hover:bg-gray-700 text-white text-sm font-bold py-2 px-4 rounded-full flex items-center"
+              >
+                <FontAwesomeIcon icon={faQuestionCircle} className="mr-2" />
+                Help
+              </button>
+            </div>
+          </div>
+        </div>
+        <div className="flex-grow">
+          <GraphInput
+            nodes={nodes}
+            setNodes={setNodes}
+            edges={edges}
+            setEdges={setEdges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+          />
+        </div>
+      </div>
+      <div className="flex justify-end bg-white p-4 rounded-2xl mt-8 space-x-4">
         <button
           onClick={handleSave}
-          className="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold py-1 px-3 rounded-3xl"
+          className="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded-full flex items-center"
         >
           Save
         </button>
         <button
           onClick={handleDelete}
-          className="bg-red-500 hover:bg-red-700 text-white text-sm font-bold py-1 px-3 rounded-3xl ml-4"
+          className="bg-red-500 hover:bg-red-700 text-white text-sm font-bold py-2 px-4 rounded-full flex items-center"
         >
           Delete
         </button>

@@ -1,32 +1,34 @@
 import React from 'react';
-import CustomModal from './modal'; // Adjust the import path as needed
+import CustomModal from '../modal'; // Adjust the import path as needed
 
 interface DeleteConfirmationModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
-  itemName?: string;
+  text: string;
+  confirmText?: string;
+  cancelText?: string;
 }
 
-const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
+export default function DeleteConfirmationModal({
   isOpen,
   onClose,
   onConfirm,
-  itemName = 'item',
-}) => {
+  text = 'item',
+  confirmText = 'Delete',
+  cancelText = 'Cancel',
+}: DeleteConfirmationModalProps) {
   return (
     <CustomModal title="Confirm Deletion" open={isOpen} onClose={onClose} size="md">
-      <p>Are you sure you want to delete this {itemName}?</p>
+      <p>{text}</p>
       <div className="mt-4 flex justify-center space-x-40">
         <button onClick={onClose} className="bg-gray-500 hover:bg-gray-700 text-white px-4 py-2 rounded-lg">
-          Cancel
+            {cancelText}
         </button>
         <button onClick={onConfirm} className="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded-lg">
-          Delete
+          {confirmText}
         </button>
       </div>
     </CustomModal>
   );
 };
-
-export default DeleteConfirmationModal;
