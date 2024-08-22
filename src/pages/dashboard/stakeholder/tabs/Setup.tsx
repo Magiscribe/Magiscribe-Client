@@ -3,15 +3,15 @@ import { GET_ALL_AGENTS, GET_DATA } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import GraphInput from '@/components/graph/graph-input';
 import { useMutation, useQuery, useSubscription } from '@apollo/client';
-import { useAuth } from '@clerk/clerk-react';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Edge, Node, OnEdgesChange, OnNodesChange, useEdgesState, useNodesState } from '@xyflow/react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { v4 as uuid } from 'uuid';
+import Dagre from '@dagrejs/dagre';
 
 interface Form {
-  userId: string;
   title: string;
   createdAt: number;
   organizationName: string;
@@ -90,7 +90,7 @@ const DecisionGraph = ({
   clearGraph: () => void;
 }) => {
   return (
-    <div className="mt-8 h-[70vh] grid grid-cols-4 gap-4 border-white border-2 rounded-2xl">
+    <div className="mt-8 h-[80vh] grid grid-cols-6 gap-4 border-white border-2 rounded-2xl">
       <div className="col-span-1 bg-white p-4 rounded-lg space-y-4 text-slate-700">
         <h2 className="text-2xl font-bold">Decision Graph</h2>
         <p className="text-sm">What is a decision graph?</p>
@@ -101,11 +101,6 @@ const DecisionGraph = ({
         <p className="text-sm">
           This provides you the opportunity to create a structured conversation flow that can be used to gather
           information from your users, while still adhering to the conversational principles of a natural conversation.
-        </p>
-        <hr />
-        <p className="text-sm">
-          Not sure where to start? Click the button below to generate some questions based on the information you
-          provided above.
         </p>
         <div className="flex flex-col space-y-4">
           <button
@@ -123,7 +118,7 @@ const DecisionGraph = ({
           </button>
         </div>
       </div>
-      <div className="col-span-3">
+      <div className="col-span-5">
         <GraphInput
           nodes={nodes}
           setNodes={setNodes}
@@ -138,13 +133,11 @@ const DecisionGraph = ({
 };
 
 const Setup = ({ id }: { id: string }) => {
-  const { userId } = useAuth();
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState<Form>({
-    userId: userId!,
     title: '',
     createdAt: Date.now(),
     organizationName: '',
@@ -167,8 +160,7 @@ const Setup = ({ id }: { id: string }) => {
       setForm(dataObject.data.form);
       if (dataObject.data.graph) {
         const loadedGraph = dataObject.data.graph;
-        setNodes(loadedGraph.nodes);
-        setEdges(loadedGraph.edges);
+        processGraph(loadedGraph);
       }
     },
   });
@@ -179,9 +171,7 @@ const Setup = ({ id }: { id: string }) => {
       const prediction = subscriptionData.data?.predictionAdded;
       if (prediction && prediction.type === 'SUCCESS') {
         setLoading(false);
-        console.log(JSON.parse(JSON.parse(prediction.result)));
-        // const questionGraph = JSON.parse(JSON.parse(prediction.result)) as { question: string }[];
-        // addQuestions(newQuestions.map((question) => question.question));
+        processGraph(JSON.parse(JSON.parse(prediction.result)));
       }
     },
     onError: (error) => {
@@ -207,42 +197,48 @@ const Setup = ({ id }: { id: string }) => {
     });
   };
 
-  // const processGraph = (questions: string[]) => {
-  //   const newNodes: Node[] = [];
-  //   const newEdges: Edge[] = [];
-  //   let lastAnswerId: string | null = null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const processGraph = (input: any) => {
+    const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
+    g.setGraph({ rankdir: 'TB' });
 
-  //   questions.forEach((question, index) => {
-  //     const questionId = uuidv4();
+    const newNodes: Node[] = [];
+    const newEdges: Edge[] = [];
 
-  //     newNodes.push({
-  //       id: questionId,
-  //       type: 'conversation',
-  //       data: { text: question, dynamicGeneration: true },
-  //       position: { x: index * 350, y: index * 450 + 200 },
-  //     });
+    input.nodes.map((edge: Edge) => {
+      return newNodes.push({
+        id: edge.id,
+        type: edge.type,
+        position: { x: 0, y: 0 },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        data: edge.data as any,
+      });
+    });
 
-  //     newEdges.push({ id: uuidv4(), source: index === 0 ? '0' : lastAnswerId!, target: questionId });
+    input.edges.map((edge: Edge) => {
+      return newEdges.push({
+        id: uuid(),
+        source: edge.source.toString(),
+        target: edge.target.toString(),
+      });
+    });
 
-  //     lastAnswerId = questionId;
-  //   });
+    newNodes.forEach((node) => {
+      g.setNode(node.id, { width: 400, height: 400 });
+    });
+    newEdges.forEach((edge) => {
+      g.setEdge(edge.source, edge.target);
+    });
 
-  //   // Add end node and edge
-  //   const endId = uuidv4();
-  //   newNodes.push({
-  //     id: endId,
-  //     type: 'end',
-  //     data: {},
-  //     position: { x: questions.length * 350, y: questions.length * 450 + 200 },
-  //   });
-  //   newEdges.push({ id: uuidv4(), source: lastAnswerId!, target: endId });
+    Dagre.layout(g);
 
-  //   const updatedNodes = [...nodes, ...newNodes];
-  //   const updatedEdges = [...edges, ...newEdges];
-
-  //   setNodes(updatedNodes);
-  //   setEdges(updatedEdges);
-  // };
+    setNodes(
+      newNodes.map((node) => {
+        return { ...node, position: { x: g.node(node.id).x, y: g.node(node.id).y } };
+      }),
+    );
+    setEdges(newEdges);
+  };
 
   const handleSetForm = (newForm: Form) => {
     setForm(newForm);

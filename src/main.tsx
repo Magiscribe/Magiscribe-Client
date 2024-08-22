@@ -9,7 +9,6 @@ import { TitleProvider } from './hooks/TitleHook';
 import HomeHero from './pages/home';
 import AlertProvider from './providers/AlertProvider';
 import Main from './templates/main';
-import StakeholderTemplate from './templates/stakeholder';
 import AgentLabTemplate from './templates/agent-lab';
 import PlaygroundDashboard from './pages/dashboard/agent-lab/playground';
 import AgentDashboard from './pages/dashboard/agent-lab/agents';
@@ -21,6 +20,7 @@ import PromptEdit from './pages/dashboard/agent-lab/prompts/edit';
 import StakeholderInput from './pages/dashboard/stakeholder/main';
 import InquiryPage from './pages/inquiry';
 import DashboardPage from './pages/dashboard';
+import DashboardTemplate from './templates/dashboard';
 
 const router = createBrowserRouter([
   {
@@ -33,6 +33,7 @@ const router = createBrowserRouter([
       },
       {
         path: '/dashboard',
+        element: <DashboardTemplate />,
         children: [
           {
             path: '/dashboard',
@@ -78,7 +79,6 @@ const router = createBrowserRouter([
           },
           {
             path: '/dashboard/inquiry',
-            element: <StakeholderTemplate />,
             children: [
               {
                 path: '/dashboard/inquiry',
