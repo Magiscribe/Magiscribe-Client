@@ -1,5 +1,5 @@
 import { CREATE_DATA } from '@/clients/mutations';
-import { GET_USER_FORMS } from '@/clients/queries';
+import { GET_USER_INQUIRIES } from '@/clients/queries';
 import CustomModal from '@/components/modal';
 import { useAddAlert } from '@/providers/AlertProvider';
 import { useMutation, useQuery } from '@apollo/client';
@@ -22,7 +22,7 @@ export default function Inquiry() {
   const navigate = useNavigate();
 
   // Queries and Mutations
-  const { data: userFormsData } = useQuery(GET_USER_FORMS);
+  const { data: userFormsData } = useQuery(GET_USER_INQUIRIES);
   const [createObject] = useMutation(CREATE_DATA);
 
   const createForm = async () => {

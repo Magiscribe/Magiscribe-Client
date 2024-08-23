@@ -140,7 +140,7 @@ export const GET_DATA = gql`
   }
 `;
 
-export const GET_USER_FORMS = gql`
+export const GET_USER_INQUIRIES = gql`
   query DataObjectsCreated {
     dataObjectsCreated {
       id
