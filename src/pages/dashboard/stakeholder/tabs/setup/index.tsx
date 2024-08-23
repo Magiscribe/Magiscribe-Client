@@ -1,18 +1,18 @@
-import { useMutation, useQuery, useSubscription } from '@apollo/client';
-import { faBroom, faPlus, faQuestionCircle, faSpinner, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useCallback, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-
 import { ADD_PREDICTION, DELETE_DATA, UPDATE_DATA } from '@/clients/mutations';
 import { GET_ALL_AGENTS, GET_DATA } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import GraphInput from '@/components/graph/graph-input';
 import DeleteConfirmationModal from '@/components/modals/delete-modal';
 import ModalGraphHelp from '@/components/modals/graph-help-modal';
+import useGraph from '@/hooks/graph';
 import { useAddAlert } from '@/providers/AlertProvider';
 import { createGraph, formatAndSetGraph } from '@/utils/graphUtils';
-import useGraph from '@/hooks/graph';
+import { useMutation, useQuery, useSubscription } from '@apollo/client';
+import { faBroom, faPlus, faQuestionCircle, faSpinner, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Edge, Node } from '@xyflow/react';
+import React, { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export interface SetupFormData {
   title: string;
@@ -33,11 +33,10 @@ interface SetupFormProps {
  * @param {Function} props.updateForm - Function to update the form data
  */
 export const SetupForm: React.FC<SetupFormProps> = ({ form, updateForm }) => {
-  const handleInputChange = (field: keyof SetupFormData) => (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    updateForm({ ...form, [field]: e.target.value });
-  };
+  const handleInputChange =
+    (field: keyof SetupFormData) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      updateForm({ ...form, [field]: e.target.value });
+    };
 
   return (
     <div className="bg-white px-4 py-8 rounded-2xl shadow-xl text-slate-700">
@@ -147,10 +146,13 @@ const Setup: React.FC<{ id: string }> = ({ id }) => {
     alert('Started generating graph... This may take a few seconds.', 'info');
   }, [agents, form, addPrediction, alert]);
 
-  const handleGraphCreation = useCallback((input: any, autoPosition: boolean = false) => {
-    const graph = createGraph(input);
-    formatAndSetGraph(graph, autoPosition, setNodes, setEdges);
-  }, [setNodes, setEdges]);
+  const handleGraphCreation = useCallback(
+    (input: { nodes: Node[]; edges: Edge[] }, autoPosition: boolean = false) => {
+      const graph = createGraph(input);
+      formatAndSetGraph(graph, autoPosition, setNodes, setEdges);
+    },
+    [setNodes, setEdges],
+  );
 
   const updateForm = useCallback((newForm: SetupFormData) => {
     setForm(newForm);
@@ -182,12 +184,15 @@ const Setup: React.FC<{ id: string }> = ({ id }) => {
     <div className="container max-w-12xl mx-auto">
       <SetupForm form={form} updateForm={updateForm} />
       <ModalGraphHelp open={helpModal} onClose={() => setHelpModal(false)} />
-      <DeleteConfirmationModal 
+      <DeleteConfirmationModal
         isOpen={clearGraphModal}
         onClose={() => setClearGraphModal(false)}
-        onConfirm={() => { clearGraph(); setClearGraphModal(false); }}
+        onConfirm={() => {
+          clearGraph();
+          setClearGraphModal(false);
+        }}
         text="Are you sure you want to clear the graph?"
-        confirmText='Clear Graph'
+        confirmText="Clear Graph"
       />
       <div className="mt-8 h-[80vh] flex flex-col border-white border-2 rounded-2xl">
         <div className="bg-white p-4 rounded-lg space-y-4 text-slate-700">
@@ -202,7 +207,7 @@ const Setup: React.FC<{ id: string }> = ({ id }) => {
                 <FontAwesomeIcon icon={faPlus} className="mr-2" />
                 Generate Graph {loading && <FontAwesomeIcon icon={faSpinner} spin className="ml-2" />}
               </button>
-              <button 
+              <button
                 className="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded-full flex items-center"
                 onClick={handleFormat}
               >

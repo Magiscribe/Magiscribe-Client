@@ -5,10 +5,10 @@ import Chart, { ChartProps } from '@/components/chart';
 import MarkdownCustom from '@/components/markdown-custom';
 import { TabProps } from '@/types/conversation';
 import { useMutation, useQuery, useSubscription } from '@apollo/client';
-import { faInfoCircle, faPaperPlane, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { faPaperPlane, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { motion } from 'framer-motion';
 import clsx from 'clsx';
+import { motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
 
 interface Message {
@@ -127,22 +127,14 @@ export default function ViaChatTab({ data }: TabProps) {
       </div>
       <div className="flex-grow mb-4 rounded-lg">
         {messages.map((message, index) => (
-          <div 
-            key={index} 
-            className={clsx(
-              'pt-4 flex',
-              message.sender === 'user' ? 'justify-end' : 'justify-start'
-            )}
-          >
+          <div key={index} className={clsx('pt-4 flex', message.sender === 'user' ? 'justify-end' : 'justify-start')}>
             <motion.div
               initial={{ opacity: 0, x: message.sender === 'user' ? -100 : 100 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
               className={clsx(
                 'shadow-3xl max-w-[80%] p-2 rounded-lg',
-                message.sender === 'user' 
-                  ? 'bg-blue-500 text-white' 
-                  : 'bg-slate-300 text-gray-800'
+                message.sender === 'user' ? 'bg-blue-500 text-white' : 'bg-slate-300 text-gray-800',
               )}
             >
               {message.type === 'text' ? (
@@ -162,17 +154,17 @@ export default function ViaChatTab({ data }: TabProps) {
           onChange={(e) => setInputMessage(e.target.value)}
           placeholder="Ask a question about your data..."
           className={clsx(
-            "flex-grow p-2 border border-gray-300 rounded-l-lg text-black",
-            "focus:outline-none focus:ring-2 focus:ring-blue-500"
+            'flex-grow p-2 border border-gray-300 rounded-l-lg text-black',
+            'focus:outline-none focus:ring-2 focus:ring-blue-500',
           )}
           disabled={loading}
         />
         <button
           type="submit"
           className={clsx(
-            "px-4 py-2 bg-blue-500 text-white rounded-r-lg",
-            "hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500",
-            "disabled:bg-gray-400"
+            'px-4 py-2 bg-blue-500 text-white rounded-r-lg',
+            'hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500',
+            'disabled:bg-gray-400',
           )}
           disabled={loading}
         >
@@ -182,4 +174,4 @@ export default function ViaChatTab({ data }: TabProps) {
       </form>
     </div>
   );
-};
+}

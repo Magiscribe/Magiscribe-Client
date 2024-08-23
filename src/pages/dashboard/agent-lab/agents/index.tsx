@@ -70,7 +70,7 @@ function AgentCard({ agent, onUpdate, onCopy }: { agent: Agent; onUpdate?: () =>
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={handleDelete}
-        text='Are you sure you want to delete this agent?'
+        text="Are you sure you want to delete this agent?"
       />
     </div>
   );

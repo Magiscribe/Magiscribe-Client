@@ -77,9 +77,7 @@ const PerResponseTab: React.FC<TabProps> = ({ data }) => {
         )}
       </div>
       <div>
-        <h2 className="font-bold mb-2">
-          User Response{selectedUser && <> | {selectedUser}</>}
-        </h2>
+        <h2 className="font-bold mb-2">User Response{selectedUser && <> | {selectedUser}</>}</h2>
         {selectedUser &&
           users
             .find((u) => u.userId === selectedUser)

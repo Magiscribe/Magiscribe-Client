@@ -80,7 +80,7 @@ function CapabilityCard({
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={handleDelete}
-        text='Are you sure you want to delete this capability?'
+        text="Are you sure you want to delete this capability?"
       />
     </div>
   );

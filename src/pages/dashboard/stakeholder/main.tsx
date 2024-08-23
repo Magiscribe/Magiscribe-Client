@@ -1,5 +1,8 @@
+import { CREATE_DATA } from '@/clients/mutations';
+import { GET_USER_FORMS } from '@/clients/queries';
+import CustomModal from '@/components/modal';
+import { useAddAlert } from '@/providers/AlertProvider';
 import { useMutation, useQuery } from '@apollo/client';
-import { useAuth } from '@clerk/clerk-react';
 import { faArrowLeft, faLink } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
@@ -7,21 +10,18 @@ import clsx from 'clsx';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-
-import { CREATE_DATA } from '@/clients/mutations';
-import { GET_USER_FORMS } from '@/clients/queries';
-import CustomModal from '@/components/modal';
-import { useAddAlert } from '@/providers/AlertProvider';
-
 import AnalysisTab from './tabs/analysis';
 import SetupForm from './tabs/setup';
 
-export default function StakeholderInput() {
-  const { userId } = useAuth();
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
+export default function Inquiry() {
+  // Modals
   const [shareModalOpen, setShareModalOpen] = useState(false);
 
+  // Hooks
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+
+  // Queries and Mutations
   const { data: userFormsData } = useQuery(GET_USER_FORMS);
   const [createObject] = useMutation(CREATE_DATA);
 
@@ -30,9 +30,7 @@ export default function StakeholderInput() {
       variables: {
         data: {
           form: {
-            userId,
             title: '',
-            createdAt: Date.now(),
             organizationName: '',
             organizationRole: '',
             inputGoals: '',
@@ -49,22 +47,29 @@ export default function StakeholderInput() {
 
   const FormBubbles = () => (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-      {userFormsData?.dataObjectsCreated.map((userForm) => {
-        const formData = userForm.data;
-        return (
-          <motion.div
-            key={userForm.id}
-            className="bg-white p-4 text-black rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow"
-            whileHover={{ scale: 1.05 }}
-            onClick={() => selectForm(userForm.id)}
-          >
-            <h3 className="text-lg font-semibold mb-2">
-              {formData.form.title === '' ? 'Untitled Form' : formData.form.title}
-            </h3>
-            <p className="text-sm text-gray-500">Created: {new Date(formData.form.createdAt).toLocaleDateString()}</p>
-          </motion.div>
-        );
-      })}
+      {userFormsData?.dataObjectsCreated.map(
+        (userForm: {
+          data: {
+            form: { title: string; createdAt: number };
+          };
+          id: string;
+        }) => {
+          const formData = userForm.data;
+          return (
+            <motion.div
+              key={userForm.id}
+              className="bg-white p-4 text-black rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow"
+              whileHover={{ scale: 1.05 }}
+              onClick={() => selectForm(userForm.id)}
+            >
+              <h3 className="text-lg font-semibold mb-2">
+                {formData.form.title === '' ? 'Untitled Form' : formData.form.title}
+              </h3>
+              <p className="text-sm text-gray-500">Created: {new Date(formData.form.createdAt).toLocaleDateString()}</p>
+            </motion.div>
+          );
+        },
+      )}
       <motion.div
         className="bg-blue-500 p-4 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow flex items-center justify-center"
         whileHover={{ scale: 1.05 }}
@@ -136,10 +141,7 @@ export default function StakeholderInput() {
       {id && (
         <>
           <div className="w-full flex items-center justify-between mb-4">
-            <Link
-              to = "../"
-              className="flex items-center text-slate-100 hover:text-slate-200 transition-colors"
-            >
+            <Link to="../" className="flex items-center text-slate-100 hover:text-slate-200 transition-colors">
               <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
               Back
             </Link>

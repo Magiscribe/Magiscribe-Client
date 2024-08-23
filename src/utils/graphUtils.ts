@@ -7,12 +7,12 @@ import { v4 as uuid } from 'uuid';
  * @param {any} input - Input data for graph creation
  * @returns {Object} Graph structure with nodes and edges
  */
-export const createGraph = (input: any): { nodes: Node[]; edges: Edge[] } => {
+export const createGraph = (input: { nodes: Node[]; edges: Edge[] }): { nodes: Node[]; edges: Edge[] } => {
   const newNodes: Node[] = input.nodes.map((node: Node) => ({
     id: node.id,
     type: node.type,
     position: { x: node.position?.x, y: node.position?.y },
-    data: node.data as any,
+    data: node.data,
   }));
 
   const newEdges: Edge[] = input.edges.map((edge: Edge) => ({
@@ -35,7 +35,7 @@ export const formatAndSetGraph = (
   graph: { nodes: Node[]; edges: Edge[] },
   autoPosition: boolean = false,
   setNodes: (nodes: Node[]) => void,
-  setEdges: (edges: Edge[]) => void
+  setEdges: (edges: Edge[]) => void,
 ) => {
   let formattedNodes = graph.nodes;
 

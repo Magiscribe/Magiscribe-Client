@@ -17,7 +17,7 @@ import CapabilityDashboard from './pages/dashboard/agent-lab/capabilities';
 import CapabilityEdit from './pages/dashboard/agent-lab/capabilities/edit';
 import PromptDashboard from './pages/dashboard/agent-lab/prompts';
 import PromptEdit from './pages/dashboard/agent-lab/prompts/edit';
-import StakeholderInput from './pages/dashboard/stakeholder/main';
+import Inquiry from './pages/dashboard/stakeholder/main';
 import InquiryPage from './pages/inquiry';
 import DashboardPage from './pages/dashboard';
 import DashboardTemplate from './templates/dashboard';
@@ -82,11 +82,11 @@ const router = createBrowserRouter([
             children: [
               {
                 path: '/dashboard/inquiry',
-                element: <StakeholderInput />,
+                element: <Inquiry />,
               },
               {
                 path: '/dashboard/inquiry/:id',
-                element: <StakeholderInput />,
+                element: <Inquiry />,
               },
             ],
           },
