@@ -71,6 +71,9 @@ export function GraphProvider({ children, id }: GraphProviderProps) {
 
       if (prediction?.type === 'SUCCESS') {
         setLoading(false);
+        console.log('Raw result', prediction.result);
+        console.log('Single parse', JSON.parse(prediction.result));
+        console.log('Double parse', JSON.parse(JSON.parse(prediction.result)));
         const result = JSON.parse(JSON.parse(prediction.result));
         if (onSubscriptionData.current) {
           onSubscriptionData.current(result);
@@ -103,10 +106,17 @@ export function GraphProvider({ children, id }: GraphProviderProps) {
     const nextNode = graph.current.nodes.find((node) => node.id === edge.target);
     if (!nextNode) return;
 
-    nodeHistory.current.push({
-      id: currentNode.current.id,
-      data,
-    });
+    if (currentNode.current.type != 'condition') {
+      nodeHistory.current.push({
+        id: currentNode.current.id,
+        data,
+      });
+    } else {
+      nodeHistory.current.push({
+        id: currentNode.current.id,
+        data: undefined,
+      });
+    }
 
     // Move the the next node.
     currentNode.current = nextNode;
