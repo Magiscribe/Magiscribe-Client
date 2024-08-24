@@ -62,12 +62,20 @@ export function formatAndSetGraph(
   setEdges(graph.edges);
 }
 
+export type StrippedNode = Omit<Node, 'position'>;
+export type StrippedEdge = Omit<Edge, 'id'>;
+
+export interface StrippedGraph {
+  nodes: StrippedNode[];
+  edges: StrippedEdge[];
+}
+
 /**
  * Strips nodes of non-essential data.
  * @param node {Node} A node object
- * @returns {Omit<Node, 'position'>} A node object without a position
+ * @returns {StrippedNode} A node object without a position
  */
-export function stripNode(node: Node): Omit<Node, 'position'> {
+export function stripNode(node: Node): StrippedNode {
   return {
     id: node.id,
     type: node.type,
@@ -78,9 +86,9 @@ export function stripNode(node: Node): Omit<Node, 'position'> {
 /**
  * Strips edge ids of non-essential data.
  * @param edge {Edge} An edge object
- * @returns { source: string; target: string } An edge object without an id
+ * @returns {StrippedEdge} An edge object without an id
  */
-export function stripEdgeId(edge: Edge): Omit<Edge, 'id'> {
+export function stripEdgeId(edge: Edge): StrippedEdge {
   return {
     source: edge.source,
     target: edge.target,
@@ -90,12 +98,9 @@ export function stripEdgeId(edge: Edge): Omit<Edge, 'id'> {
 /**
  * Strips graph of non-essential data.
  * @param graph { nodes: Node[]; edges: Edge[] } A graph structure with nodes and edges
- * @returns { nodes: Omit<Node, 'position'>[]; edges: Omit<Edge, 'id'>[] } A graph structure with nodes and edges
+ * @returns {StrippedGraph} A graph structure without node positions and edge ids
  */
-export function stripGraph(graph: { nodes: Node[]; edges: Edge[] }): {
-  nodes: Omit<Node, 'position'>[];
-  edges: Omit<Edge, 'id'>[];
-} {
+export function stripGraph(graph: { nodes: Node[]; edges: Edge[] }): StrippedGraph {
   return {
     nodes: graph.nodes.map(stripNode),
     edges: graph.edges.map(stripEdgeId),

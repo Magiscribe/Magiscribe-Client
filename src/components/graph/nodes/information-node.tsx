@@ -18,11 +18,10 @@ export default function InformationNode({ id, data }: InformationNodeProps) {
 
   return (
     <div className="px-6 py-4 shadow-lg rounded-xl bg-white border-2 border-gray-200 w-96">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center">
-          <FontAwesomeIcon icon={faExclamationCircle} className="mr-2 text-blue-600" />
-          <h3 className="text-lg font-bold text-gray-800">Information</h3>
-        </div>
+      <div className="flex items-center">
+        <FontAwesomeIcon icon={faExclamationCircle} className="mr-2 text-blue-600" />
+        <h3 className="text-lg font-bold text-gray-800">Information</h3>
+        <p className="ml-2 text-sm text-gray-500">#{id}</p>
       </div>
       <div className="space-y-4">
         <div className="flex flex-col gap-2">

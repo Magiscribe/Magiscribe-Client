@@ -8,14 +8,13 @@ interface StartEndNodeProps {
   type: 'start' | 'end';
 }
 
-function StartEndNode({ type }: StartEndNodeProps) {
+function StartEndNode({ id, type }: StartEndNodeProps) {
   return (
     <div className="px-4 py-2 shadow-md rounded-3xl bg-white border-2 border-stone-400 w-96 shadow-xl">
-      <div className="flex flex-col gap-2">
-        <p className="text-lg font-bold">
-          <FontAwesomeIcon icon={type === 'start' ? faPlay : faStop} className="mr-2 text-blue-600" />
-          {type === 'start' ? 'Start' : 'End'}
-        </p>
+      <div className="flex items-center">
+        <FontAwesomeIcon icon={type === 'start' ? faPlay : faStop} className="mr-2 text-blue-600" />
+        <h3 className="text-lg font-bold text-gray-800"> {type === 'start' ? 'Start' : 'End'}</h3>
+        <p className="ml-2 text-sm text-gray-500">#{id}</p>
       </div>
 
       {type === 'end' && <Handle type="target" position={Position.Top} className="w-4 h-4 !bg-teal-500" />}
