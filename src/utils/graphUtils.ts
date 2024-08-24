@@ -7,7 +7,7 @@ import { v4 as uuid } from 'uuid';
  * @param {any} input - Input data for graph creation
  * @returns {Object} Graph structure with nodes and edges
  */
-export const createGraph = (input: { nodes: Node[]; edges: Edge[] }): { nodes: Node[]; edges: Edge[] } => {
+export function createGraph(input: { nodes: Node[]; edges: Edge[] }): { nodes: Node[]; edges: Edge[] } {
   const newNodes: Node[] = input.nodes.map((node: Node) => ({
     id: node.id,
     type: node.type,
@@ -22,7 +22,7 @@ export const createGraph = (input: { nodes: Node[]; edges: Edge[] }): { nodes: N
   }));
 
   return { nodes: newNodes, edges: newEdges };
-};
+}
 
 /**
  * Formats and sets the graph, optionally auto-positioning nodes.
@@ -31,12 +31,12 @@ export const createGraph = (input: { nodes: Node[]; edges: Edge[] }): { nodes: N
  * @param {Function} setNodes - Function to set nodes
  * @param {Function} setEdges - Function to set edges
  */
-export const formatAndSetGraph = (
+export function formatAndSetGraph(
   graph: { nodes: Node[]; edges: Edge[] },
   autoPosition: boolean = false,
   setNodes: (nodes: Node[]) => void,
   setEdges: (edges: Edge[]) => void,
-) => {
+) {
   let formattedNodes = graph.nodes;
 
   if (autoPosition) {
@@ -60,4 +60,44 @@ export const formatAndSetGraph = (
 
   setNodes(formattedNodes);
   setEdges(graph.edges);
-};
+}
+
+/**
+ * Strips nodes of non-essential data.
+ * @param node {Node} A node object
+ * @returns {Omit<Node, 'position'>} A node object without a position
+ */
+export function stripNode(node: Node): Omit<Node, 'position'> {
+  return {
+    id: node.id,
+    type: node.type,
+    data: node.data,
+  };
+}
+
+/**
+ * Strips edge ids of non-essential data.
+ * @param edge {Edge} An edge object
+ * @returns { source: string; target: string } An edge object without an id
+ */
+export function stripEdgeId(edge: Edge): Omit<Edge, 'id'> {
+  return {
+    source: edge.source,
+    target: edge.target,
+  };
+}
+
+/**
+ * Strips graph of non-essential data.
+ * @param graph { nodes: Node[]; edges: Edge[] } A graph structure with nodes and edges
+ * @returns { nodes: Omit<Node, 'position'>[]; edges: Omit<Edge, 'id'>[] } A graph structure with nodes and edges
+ */
+export function stripGraph(graph: { nodes: Node[]; edges: Edge[] }): {
+  nodes: Omit<Node, 'position'>[];
+  edges: Omit<Edge, 'id'>[];
+} {
+  return {
+    nodes: graph.nodes.map(stripNode),
+    edges: graph.edges.map(stripEdgeId),
+  };
+}

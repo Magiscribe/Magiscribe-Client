@@ -50,7 +50,7 @@ export default function Inquiry() {
       {userFormsData?.dataObjectsCreated.map(
         (userForm: {
           data: {
-            form: { title: string, organizationName: string, organizationRole: string };
+            form: { title: string; organizationName: string; organizationRole: string };
           };
           id: string;
         }) => {
@@ -66,7 +66,8 @@ export default function Inquiry() {
                 {formData.form.title === '' ? 'Untitled Form' : formData.form.title}
               </h3>
               <p className="text-sm text-gray-500 mb-2">
-                {formData.form.organizationName === '' ? 'No Organization' : formData.form.organizationName} | {formData.form.organizationRole === '' ? 'No Role' : formData.form.organizationRole}
+                {formData.form.organizationName === '' ? 'No Organization' : formData.form.organizationName} |{' '}
+                {formData.form.organizationRole === '' ? 'No Role' : formData.form.organizationRole}
               </p>
             </motion.div>
           );

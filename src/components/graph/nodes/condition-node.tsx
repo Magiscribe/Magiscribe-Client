@@ -1,6 +1,6 @@
 import useAutoResizeTextareaRef from '@/hooks/AutoResizerTextarea';
 import { ConversationNodeData } from '@/types/conversation';
-import { faInfoCircle, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
+import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Handle, NodeProps, Position } from '@xyflow/react';
 import { useNodeData } from '../utils';
@@ -17,11 +17,11 @@ export default function ConditionNode({ id, data }: ConditionNodeProps) {
 
   return (
     <div className="px-4 py-2 shadow-md rounded-3xl bg-white border-2 border-stone-400 w-96 shadow-xl">
-        <div className="flex items-center">
-          <FontAwesomeIcon icon={faInfoCircle} className="mr-2 text-blue-600" />
-          <h3 className="text-lg font-bold text-gray-800">Condition</h3>
-          <p className="ml-2 text-sm text-gray-500">#{id}</p>
-        </div>
+      <div className="flex items-center">
+        <FontAwesomeIcon icon={faQuestionCircle} className="mr-2 text-blue-600" />
+        <h3 className="text-lg font-bold text-gray-800">Condition</h3>
+        <p className="ml-2 text-sm text-gray-500">#{id}</p>
+      </div>
       <div className="flex flex-col gap-2">
         <textarea
           ref={textareaRef}

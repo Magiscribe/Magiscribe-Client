@@ -2,6 +2,7 @@ import { ADD_PREDICTION } from '@/clients/mutations';
 import { GET_DATA } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import { getAgentIdByName } from '@/utils/agents';
+import { stripGraph } from '@/utils/graphUtils';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
 import { Edge, Node } from '@xyflow/react';
 import React, { createContext, useContext, useRef, useState } from 'react';
@@ -36,7 +37,7 @@ export function GraphProvider({ children, id }: GraphProviderProps) {
   const graph = useRef<{ nodes: Node[]; edges: Edge[] }>({ nodes: [], edges: [] });
   const currentNode = useRef<Node | null | undefined>(null);
   const visitedNodes = useRef<{ id: string; data: any }[]>([]);
-  
+
   // Loading State
   const [loading, setLoading] = useState<boolean>(false);
   const onSubscriptionData = useRef<(data: any) => void>(() => {});
@@ -109,8 +110,11 @@ export function GraphProvider({ children, id }: GraphProviderProps) {
     if (nextNode.data.dynamicGeneration) {
       console.log(nextNode.type);
       const agentId = await getAgentIdByName(
-        nextNode.type === 'conversation' ? 'Stakeholder | Dynamic Question Generation' : 'Stakeholder | Dynamic Information Generation'
-        , client);
+        nextNode.type === 'conversation'
+          ? 'Stakeholder | Dynamic Question Generation'
+          : 'Stakeholder | Dynamic Information Generation',
+        client,
+      );
 
       await addPrediction({
         variables: {
@@ -118,7 +122,7 @@ export function GraphProvider({ children, id }: GraphProviderProps) {
           agentId,
           variables: {
             userMessage: `We are at at node ${currentNode.current.id}`,
-            conversationGraph: JSON.stringify(graph.current),
+            conversationGraph: JSON.stringify(stripGraph(graph.current)),
             nodeVisitData: JSON.stringify(visitedNodes.current),
           },
         },
@@ -127,14 +131,12 @@ export function GraphProvider({ children, id }: GraphProviderProps) {
       onSubscriptionData.current = (result) => {
         currentNode.current!.data = {
           text: result.text,
-        }
+        };
         if (onNodeVisit.current) {
           onNodeVisit.current(currentNode.current!);
         }
       };
-    } else
-
-    if (nextNode.type === 'condition') {
+    } else if (nextNode.type === 'condition') {
       const agentId = await getAgentIdByName('Stakeholder | Condition Node', client);
 
       await addPrediction({
@@ -143,7 +145,7 @@ export function GraphProvider({ children, id }: GraphProviderProps) {
           agentId,
           variables: {
             userMessage: `We are at at node ${currentNode.current.id}`,
-            conversationGraph: JSON.stringify(graph.current),
+            conversationGraph: JSON.stringify(stripGraph(graph.current)),
             nodeVisitData: JSON.stringify(visitedNodes.current),
           },
         },
@@ -155,9 +157,7 @@ export function GraphProvider({ children, id }: GraphProviderProps) {
           data: result,
         });
       };
-    } else 
-
-    if (onNodeVisit.current) {
+    } else if (onNodeVisit.current) {
       onNodeVisit.current(currentNode.current);
     }
   };
