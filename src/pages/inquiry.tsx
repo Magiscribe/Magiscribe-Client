@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { ChartProps } from '@/components/chart';
+import MarkdownCustom from '@/components/markdown-custom';
+import { GraphProvider, useGraph } from '@/providers/inquiry-provider';
+import { StrippedNode } from '@/utils/graphUtils';
 import { faPaperPlane, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
-import MarkdownCustom from '@/components/markdown-custom';
-import { ChartProps } from '@/components/chart';
-import { Node } from '@xyflow/react';
-import { GraphProvider, useGraph } from '@/providers/inquiry-provider';
+import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
 
 interface Message {
   type: 'text' | 'chart';
@@ -27,7 +27,10 @@ function InquiryContent() {
       setMessages((prevMessages) => [...prevMessages, { type: 'text', content: inputMessage, sender: 'user' }]);
 
       handleNextNode({
-        data: { text: inputMessage },
+        data: {
+          text: currentNode.current.data.text,
+          response: inputMessage,
+        },
       });
       setInputMessage('');
     } else {
@@ -35,7 +38,7 @@ function InquiryContent() {
     }
   };
 
-  const onNodeVisit = (node: Node) => {
+  const onNodeVisit = (node: StrippedNode) => {
     if (node.type === 'information' || node.type === 'conversation') {
       setMessages((prevMessages) => [
         ...prevMessages,

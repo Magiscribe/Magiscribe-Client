@@ -103,6 +103,11 @@ export function GraphProvider({ children, id }: GraphProviderProps) {
     const nextNode = graph.current.nodes.find((node) => node.id === edge.target);
     if (!nextNode) return;
 
+    nodeHistory.current.push({
+      id: currentNode.current.id,
+      data,
+    });
+
     // Move the the next node.
     currentNode.current = nextNode;
 
@@ -132,13 +137,6 @@ export function GraphProvider({ children, id }: GraphProviderProps) {
           currentNode.current.data = {
             text: result.text,
           };
-
-          nodeHistory.current.push({
-            id: currentNode.current.id,
-            data: {
-              text: result.text,
-            },
-          });
         }
         if (onNodeVisit.current) {
           onNodeVisit.current(currentNode.current!);
@@ -172,11 +170,6 @@ export function GraphProvider({ children, id }: GraphProviderProps) {
         });
       };
 
-      nodeHistory.current.push({
-        id: currentNode.current.id,
-        data: data,
-      });
-
       return;
     }
 
@@ -184,11 +177,6 @@ export function GraphProvider({ children, id }: GraphProviderProps) {
     // the consumer with the current node.
     if (onNodeVisit.current) {
       onNodeVisit.current(currentNode.current);
-
-      nodeHistory.current.push({
-        id: currentNode.current.id,
-        data: data,
-      });
 
       return;
     }
