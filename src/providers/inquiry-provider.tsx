@@ -135,6 +135,7 @@ export function GraphProvider({ children, id }: GraphProviderProps) {
       onSubscriptionData.current = (result) => {
         if (currentNode.current) {
           currentNode.current.data = {
+            ...currentNode.current.data, // Preserve existing data
             text: result.text,
           };
         }
