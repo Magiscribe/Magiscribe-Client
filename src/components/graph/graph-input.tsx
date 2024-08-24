@@ -82,7 +82,7 @@ function Flow({ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange }
   const onConnectEnd: OnConnectEnd = useCallback(
     (event) => {
       if (!connectingNodeId.current) return;
-      
+
       setAddNodeParams({
         position: screenToFlowPosition({
           x: (event as MouseEvent).clientX,

@@ -1,6 +1,6 @@
 import { faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Handle, Position } from '@xyflow/react';
+import NodeContainer from '../elements/node-container';
 import CustomHandle from '../handles/limit-handle';
 
 interface StartEndNodeProps {
@@ -10,18 +10,12 @@ interface StartEndNodeProps {
 
 function StartEndNode({ id, type }: StartEndNodeProps) {
   return (
-    <div className="px-4 py-2 shadow-md rounded-3xl bg-white border-2 border-stone-400 w-96 shadow-xl">
-      <div className="flex items-center">
-        <FontAwesomeIcon icon={type === 'start' ? faPlay : faStop} className="mr-2 text-blue-600" />
-        <h3 className="text-lg font-bold text-gray-800"> {type === 'start' ? 'Start' : 'End'}</h3>
-        <p className="ml-2 text-sm text-gray-500">#{id}</p>
-      </div>
-
+    <NodeContainer title={type === 'start' ? 'Start' : 'End'} faIcon={type === 'start' ? faPlay : faStop} id={id}>
       {type === 'end' && <Handle type="target" position={Position.Top} className="w-4 h-4 !bg-teal-500" />}
       {type === 'start' && (
         <CustomHandle connectionCount={1} type="source" position={Position.Bottom} className="w-4 h-4 !bg-teal-500" />
       )}
-    </div>
+    </NodeContainer>
   );
 }
 

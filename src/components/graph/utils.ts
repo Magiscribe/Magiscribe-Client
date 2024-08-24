@@ -1,18 +1,14 @@
-// useNodeData.ts
-
-import { useCallback } from 'react';
 import { useReactFlow } from '@xyflow/react';
+import { useCallback } from 'react';
 
 export function useNodeData<T>(id: string) {
-  const { setNodes } = useReactFlow();
+  const { updateNodeData } = useReactFlow();
 
-  const updateNodeData = useCallback(
+  const update = useCallback(
     (updates: Partial<T>) => {
-      setNodes((prevNodes) =>
-        prevNodes.map((node) => (node.id === id ? { ...node, data: { ...node.data, ...updates } } : node)),
-      );
+      updateNodeData(id, updates);
     },
-    [id, setNodes],
+    [id],
   );
 
   const handleInputChange = useCallback(
@@ -20,13 +16,13 @@ export function useNodeData<T>(id: string) {
       const { name, value, type } = event.target;
       if (type === 'checkbox') {
         const checked = (event.target as HTMLInputElement).checked;
-        updateNodeData({ [name]: checked } as Partial<T>);
+        update({ [name]: checked } as Partial<T>);
       } else {
-        updateNodeData({ [name]: value } as Partial<T>);
+        update({ [name]: value } as Partial<T>);
       }
     },
     [updateNodeData],
   );
 
-  return { updateNodeData, handleInputChange };
+  return { handleInputChange };
 }
