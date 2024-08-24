@@ -95,7 +95,7 @@ function Flow({ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange }
   );
 
   const addNode = (type: string) => {
-    const newNodeId = `${Date.now()}`;
+    const newNodeId = Math.random().toString(36).substr(2, 4);  // Random 4 character string
     setNodes((prev) => [
       ...prev,
       {

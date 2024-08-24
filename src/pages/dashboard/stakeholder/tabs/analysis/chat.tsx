@@ -1,10 +1,10 @@
 import { ADD_PREDICTION } from '@/clients/mutations';
-import { GET_ALL_AGENTS } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import Chart, { ChartProps } from '@/components/chart';
 import MarkdownCustom from '@/components/markdown-custom';
 import { TabProps } from '@/types/conversation';
-import { useMutation, useQuery, useSubscription } from '@apollo/client';
+import { getAgentIdByName } from '@/utils/agents';
+import { useApolloClient, useMutation, useSubscription } from '@apollo/client';
 import { faPaperPlane, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import clsx from 'clsx';
@@ -28,7 +28,7 @@ export default function ViaChatTab({ data }: TabProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Queries and Mutations
-  const { data: agents, loading: agentsLoading } = useQuery(GET_ALL_AGENTS);
+  const client = useApolloClient();
   const [addPrediction] = useMutation(ADD_PREDICTION);
 
   const scrollToBottom = () => {
@@ -85,15 +85,7 @@ export default function ViaChatTab({ data }: TabProps) {
 
     setMessages((prevMessages) => [...prevMessages, { type: 'text', content: inputMessage, sender: 'user' }]);
 
-    let agentId;
-    if (!agentsLoading && agents?.getAllAgents) {
-      const chatAnalysisAgent = agents.getAllAgents.find(
-        (agent: { id: string; name: string }) => agent.name === 'Stakeholder | Chat Analysis',
-      );
-      if (chatAnalysisAgent) {
-        agentId = chatAnalysisAgent.id;
-      }
-    }
+    const agentId = await getAgentIdByName('Stakeholder | Chat Analysis', client);
 
     if (agentId) {
       setLoading(true);

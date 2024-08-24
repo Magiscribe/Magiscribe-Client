@@ -30,6 +30,7 @@ export default function ConversationNode({ id, data }: ConversationNodeProps) {
         <div className="flex items-center">
           <FontAwesomeIcon icon={faUserFriends} className="mr-2 text-blue-600" />
           <h3 className="text-lg font-bold text-gray-800">Conversation</h3>
+          <p className="ml-2 text-sm text-gray-500">#{id}</p>
         </div>
       </div>
       <div className="space-y-4">

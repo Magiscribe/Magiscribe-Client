@@ -50,7 +50,7 @@ export default function Inquiry() {
       {userFormsData?.dataObjectsCreated.map(
         (userForm: {
           data: {
-            form: { title: string; createdAt: number };
+            form: { title: string, organizationName: string, organizationRole: string };
           };
           id: string;
         }) => {
@@ -65,7 +65,9 @@ export default function Inquiry() {
               <h3 className="text-lg font-semibold mb-2">
                 {formData.form.title === '' ? 'Untitled Form' : formData.form.title}
               </h3>
-              <p className="text-sm text-gray-500">Created: {new Date(formData.form.createdAt).toLocaleDateString()}</p>
+              <p className="text-sm text-gray-500 mb-2">
+                {formData.form.organizationName === '' ? 'No Organization' : formData.form.organizationName} | {formData.form.organizationRole === '' ? 'No Role' : formData.form.organizationRole}
+              </p>
             </motion.div>
           );
         },
