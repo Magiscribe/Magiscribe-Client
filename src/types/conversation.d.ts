@@ -71,6 +71,44 @@ export interface TabProps {
       form: Form;
       graph: Graph;
       nodeVisitData: IndividualConversationData[];
+      summary: Summary;
     };
   };
+}
+
+export interface Tag {
+  [key: string]: string[];
+}
+
+export interface PerResponseSummary {
+  tags: Tag[];
+}
+
+export interface QuestionSummary {
+  nodeId: string;
+  responseCount: number;
+  textSummary?: string;
+  ratingSummary?: RatingSummary;
+  scalarSummary?: ScalarSummary;
+}
+
+export interface PerQuestionSummary {
+  questions: QuestionSummary[];
+}
+
+export interface Summary {
+  perResponse: PerResponseSummary;
+  perQuestion: PerQuestionSummary;
+}
+
+export interface RatingSummary {
+  counts: Record<string, number>;
+}
+
+export interface ScalarSummary {
+  min: number;
+  max: number;
+  mean: number;
+  median: number;
+  standardDeviation: number;
 }

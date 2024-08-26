@@ -57,26 +57,39 @@ export default function ViaChatTab({ data }: TabProps) {
     },
   });
 
+  const base64Decode = (text: string): string => {
+    const binaryString = atob(text);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    return new TextDecoder().decode(bytes);
+  };
+
   const parseAndDisplayAnalysisResults = (results: string[]) => {
-    results.forEach((result) => {
+    console.log(results);
+    console.log(results[0]);
+    const parsedResult = JSON.parse(results[0]);
+    parsedResult.forEach((result: any) => {
       try {
-        const parsed = JSON.parse(result);
-        if (parsed.chartType && Array.isArray(parsed.data)) {
+        if (result.chartType && Array.isArray(result.data)) {
           const chartProps: ChartProps = {
-            title: parsed.title || '',
-            chartType: parsed.chartType,
-            data: parsed.data.map((item: { name: string; value: number }) => ({
+            title: result.title || '',
+            chartType: result.chartType,
+            data: result.data.map((item: { name: string; value: number }) => ({
               name: item.name,
               value: item.value,
             })),
           };
           setMessages((prevMessages) => [...prevMessages, { type: 'chart', content: chartProps, sender: 'bot' }]);
+        } else if (result.markdownTextBase64) {
+          const decodedMarkdown = base64Decode(result.markdownTextBase64);
+          setMessages((prevMessages) => [...prevMessages, { type: 'text', content: decodedMarkdown, sender: 'bot' }]);
         } else {
-          throw new Error('Not a valid chart data');
+          setMessages((prevMessages) => [...prevMessages, { type: 'text', content: result.text, sender: 'bot' }]);
         }
       } catch (error) {
         console.error('Error parsing result:', error);
-        setMessages((prevMessages) => [...prevMessages, { type: 'text', content: result, sender: 'bot' }]);
       }
     });
   };

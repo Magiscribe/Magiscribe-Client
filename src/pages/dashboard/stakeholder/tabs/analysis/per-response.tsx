@@ -44,7 +44,7 @@ const PerResponseTab: React.FC<TabProps> = ({ data }) => {
   return (
     <div className="bg-white px-4 py-8 rounded-2xl shadow-xl text-slate-700">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Per-Question</h2>
+        <h2 className="text-2xl font-bold">Per Response</h2>
       </div>
       <div className="my-4">
         <h2 className="font-bold mb-2">Select User</h2>
@@ -77,7 +77,11 @@ const PerResponseTab: React.FC<TabProps> = ({ data }) => {
         )}
       </div>
       <div>
-        <h2 className="font-bold mb-2">User Response{selectedUser && <> | {selectedUser}</>}</h2>
+        {selectedUser && (
+          <h2 className="font-bold mb-2">
+            User Response <> | {selectedUser}</>
+          </h2>
+        )}
         {selectedUser &&
           users
             .find((u) => u.userId === selectedUser)
