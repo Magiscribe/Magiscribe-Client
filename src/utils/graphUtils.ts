@@ -70,6 +70,12 @@ export interface StrippedGraph {
   edges: StrippedEdge[];
 }
 
+export interface OptimizedGraph {
+  nodes: Map<string, StrippedNode>;
+  edges: Map<string, {source: string; target: string}>;
+  outgoingEdges: Map<string, Set<string>>;
+}
+
 /**
  * Strips nodes of non-essential data.
  * @param node {Node} A node object
@@ -105,4 +111,37 @@ export function stripGraph(graph: { nodes: Node[]; edges: Edge[] }): StrippedGra
     nodes: graph.nodes.map(stripNode),
     edges: graph.edges.map(stripEdgeId),
   };
+}
+
+/**
+ * Converts a StrippedGraph to an OptimizedGraph with Map-based structure.
+ * @param graph {StrippedGraph} A stripped graph structure
+ * @returns {OptimizedGraph} An optimized graph structure using Maps
+ */
+export function convertToOptimizedGraph(graph: StrippedGraph): OptimizedGraph {
+  const nodes = new Map(graph.nodes.map(node => [node.id, node]));
+  const edges = new Map(graph.edges.map((edge, index) => [
+    `edge-${index}`,
+    { source: edge.source, target: edge.target }
+  ]));
+  const outgoingEdges = new Map<string, Set<string>>();
+
+  for (const [edgeId, edge] of edges) {
+    if (!outgoingEdges.has(edge.source)) {
+      outgoingEdges.set(edge.source, new Set());
+    }
+    outgoingEdges.get(edge.source)!.add(edgeId);
+  }
+
+  return { nodes, edges, outgoingEdges };
+}
+
+/**
+ * Strips graph of non-essential data and converts it to an optimized structure.
+ * @param graph { nodes: Node[]; edges: Edge[] } A graph structure with nodes and edges
+ * @returns {OptimizedGraph} An optimized graph structure using Maps
+ */
+export function stripAndOptimizeGraph(graph: { nodes: Node[]; edges: Edge[] }): OptimizedGraph {
+  const strippedGraph = stripGraph(graph);
+  return convertToOptimizedGraph(strippedGraph);
 }

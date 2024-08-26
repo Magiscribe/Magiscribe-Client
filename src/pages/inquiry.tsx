@@ -1,6 +1,6 @@
 import { ChartProps } from '@/components/chart';
 import MarkdownCustom from '@/components/markdown-custom';
-import { GraphProvider, useGraph } from '@/providers/inquiry-provider';
+import { InquiryProvider, useInquiry } from '@/providers/inquiry-provider';
 import { StrippedNode } from '@/utils/graphUtils';
 import { faPaperPlane, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -18,7 +18,7 @@ interface Message {
 function InquiryContent() {
   const [inputMessage, setInputMessage] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
-  const { currentNode, handleNextNode, loading, setOnNodeVisit } = useGraph();
+  const { currentNode, handleNextNode, loading, setOnNodeVisit } = useInquiry();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,9 +109,13 @@ function InquiryContent() {
 export default function Inquiry() {
   const { id } = useParams<{ id: string }>();
 
+  if (!id) {
+    return <></>
+  }
+
   return (
-    <GraphProvider id={id!}>
+    <InquiryProvider id={id}>
       <InquiryContent />
-    </GraphProvider>
+    </InquiryProvider>
   );
 }
