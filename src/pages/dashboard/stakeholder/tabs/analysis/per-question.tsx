@@ -7,6 +7,8 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const { graph, nodeVisitData: responses } = data.data;
 
+  if (!responses) return <div className="p-4">No data available</div>;
+
   const conversationNodes = useMemo(
     () =>
       graph.nodes.filter(

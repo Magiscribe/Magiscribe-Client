@@ -24,6 +24,8 @@ export default function ViaChatTab({ data }: TabProps) {
   const [subscriptionId] = useState<string>(`advanced_analysis_${Date.now()}`);
   const [messages, setMessages] = useState<Message[]>([]);
 
+  if (!data.data.nodeVisitData) return <div className="p-4">No data available</div>;
+
   // Ref
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
