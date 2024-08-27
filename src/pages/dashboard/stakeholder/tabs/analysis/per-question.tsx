@@ -78,7 +78,7 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
                 currentQuestionIndex === index ? 'bg-blue-500 text-white' : 'bg-slate-200 text-black'
               }`}
             >
-              {node.data.instruction || node.data.text || `Question ${index + 1}`}
+              {node.data.text || `Question ${index + 1}`}
             </button>
           ))}
         </div>
@@ -93,23 +93,13 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
             </div>
           )}
           <div className="mb-6 p-4 bg-gray-100 rounded">
-            {nodeData.text ? (
-              <>
-                <p className="font-semibold mb-2 text-black">{nodeData.text}</p>
-                {currentSummary && currentSummary.ratingSummary && (
-                  <div className="mb-4">{renderBarChart(currentSummary.ratingSummary)}</div>
-                )}
-                {renderAnswers(currentNode.id)}
-              </>
-            ) : nodeData.instruction ? (
-              <>
-                <p className="font-semibold mb-2 text-black">{nodeData.instruction}</p>
-                {currentSummary && currentSummary.ratingSummary && (
-                  <div className="mb-4">{renderBarChart(currentSummary.ratingSummary)}</div>
-                )}
-                {renderAnswers(currentNode.id)}
-              </>
-            ) : null}
+            <>
+              <p className="font-semibold mb-2 text-black">{nodeData.text}</p>
+              {currentSummary && currentSummary.ratingSummary && (
+                <div className="mb-4">{renderBarChart(currentSummary.ratingSummary)}</div>
+              )}
+              {renderAnswers(currentNode.id)}
+            </>
           </div>
         </div>
         <div className="flex justify-end mt-4 space-x-2">

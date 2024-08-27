@@ -1,13 +1,15 @@
-import { ChartProps } from '@/components/chart';
-import MarkdownCustom from '@/components/markdown-custom';
-import { InquiryProvider, useInquiry } from '@/providers/inquiry-provider';
-import { StrippedNode } from '@/utils/graphUtils';
-import { faPaperPlane, faSpinner } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import clsx from 'clsx';
-import { motion } from 'framer-motion';
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
+import clsx from 'clsx';
+import { motion } from 'framer-motion';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPaperPlane, faSpinner } from '@fortawesome/free-solid-svg-icons';
+
+import { ChartProps } from '@/components/chart';
+import MarkdownCustom from '@/components/markdown-custom';
+import RatingInput from '@/components/graph/rating-input';
+import { InquiryProvider, useInquiry } from '@/providers/inquiry-provider';
+import { StrippedNode, NodeData } from '@/utils/graphUtils';
 
 interface Message {
   type: 'text' | 'chart';
@@ -18,19 +20,35 @@ interface Message {
 function InquiryContent() {
   const [inputMessage, setInputMessage] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
+  const [currentNodeType, setCurrentNodeType] = useState<string | null>(null);
+  const [currentRatings, setCurrentRatings] = useState<string[]>([]);
+  const [selectedRatings, setSelectedRatings] = useState<string[]>([]);
+  const [isEndNode, setIsEndNode] = useState(false);
   const { handleNextNode, loading, setOnUpdate } = useInquiry();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    setMessages((prevMessages) => [...prevMessages, { type: 'text', content: inputMessage, sender: 'user' }]);
+    let responseData: { response: string; ratings?: string[] } = { response: inputMessage };
 
-    handleNextNode({
-      data: {
-        response: inputMessage,
-      },
-    });
-    setInputMessage('');
+    if (selectedRatings.length > 0) {
+      responseData.ratings = selectedRatings;
+    }
+
+    if (inputMessage.trim() !== '' || selectedRatings.length > 0) {
+      const userMessage =
+        selectedRatings.length > 0
+          ? `${selectedRatings.join(', ')}${inputMessage ? ' - ' + inputMessage : ''}`
+          : inputMessage;
+
+      setMessages((prevMessages) => [...prevMessages, { type: 'text', content: userMessage, sender: 'user' }]);
+
+      handleNextNode({ data: responseData });
+      setInputMessage('');
+      setSelectedRatings([]);
+      setCurrentNodeType(null);
+      setCurrentRatings([]);
+    }
   };
 
   const onNodeVisit = (node: StrippedNode) => {
@@ -39,10 +57,28 @@ function InquiryContent() {
         ...prevMessages,
         { type: 'text', content: node.data.text as string, sender: 'bot' },
       ]);
+
+      if (node.type === 'conversation') {
+        const conversationData = node.data as NodeData & { type?: string; ratings?: string[] };
+        if (conversationData.type === 'rating-single' || conversationData.type === 'rating-multi') {
+          setCurrentNodeType(conversationData.type);
+          setCurrentRatings(conversationData.ratings || []);
+        } else {
+          setCurrentNodeType(null);
+          setCurrentRatings([]);
+        }
+      } else {
+        setCurrentNodeType(null);
+        setCurrentRatings([]);
+      }
     }
 
-    if (node.type === 'information') {
-      handleNextNode();
+    if (node.type === 'end') {
+      setIsEndNode(true);
+    } else if (node.type === 'information') {
+      setTimeout(() => {
+        handleNextNode();
+      }, 1000);
     }
   };
 
@@ -71,31 +107,42 @@ function InquiryContent() {
             </div>
           ))}
         </div>
-        <form onSubmit={handleSubmit} className="flex">
-          <input
-            type="text"
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
-            placeholder="Answer..."
-            className={clsx(
-              'flex-grow p-2 border border-gray-300 rounded-l-lg text-black',
-              'focus:outline-none focus:ring-2 focus:ring-blue-500',
+        {!isEndNode && (
+          <>
+            {currentNodeType && currentNodeType.startsWith('rating') && (
+              <RatingInput
+                ratings={currentRatings}
+                isMulti={currentNodeType === 'rating-multi'}
+                onRatingChange={setSelectedRatings}
+              />
             )}
-            disabled={loading}
-          />
-          <button
-            type="submit"
-            className={clsx(
-              'px-4 py-2 bg-blue-500 text-white rounded-r-lg',
-              'hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500',
-              'disabled:bg-gray-400',
-            )}
-            disabled={loading}
-          >
-            Send
-            <FontAwesomeIcon icon={loading ? faSpinner : faPaperPlane} spin={loading} className="ml-2" />
-          </button>
-        </form>
+            <form onSubmit={handleSubmit} className="flex">
+              <input
+                type="text"
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                placeholder="Additional Thoughts (optional)"
+                className={clsx(
+                  'flex-grow p-2 border border-gray-300 rounded-l-lg text-black',
+                  'focus:outline-none focus:ring-2 focus:ring-blue-500',
+                )}
+                disabled={loading}
+              />
+              <button
+                type="submit"
+                className={clsx(
+                  'px-4 py-2 bg-blue-500 text-white rounded-r-lg',
+                  'hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500',
+                  'disabled:bg-gray-400',
+                )}
+                disabled={loading || (selectedRatings.length === 0 && inputMessage.trim() === '')}
+              >
+                Send
+                <FontAwesomeIcon icon={loading ? faSpinner : faPaperPlane} spin={loading} className="ml-2" />
+              </button>
+            </form>
+          </>
+        )}
       </div>
     </div>
   );

@@ -23,25 +23,23 @@ export interface Graph {
 
 export interface GraphNode {
   id: string;
-  type: NodeType;
+  type: 'start' | 'end' | 'conversation' | 'information' | 'condition';
   data?: ConversationNodeData | ConditionNodeData | InformationNodeData;
 }
 
 export interface ConversationNodeData {
-  text?: string;
-  instruction?: string;
+  text: string;
   type: 'rating-single' | 'rating-multi' | 'open-ended' | 'scalar-single' | 'scalar-multi';
   ratings?: string[];
   scalars?: string[];
 }
 
 export interface ConditionNodeData {
-  instruction: string;
+  text: string;
 }
 
 export interface InformationNodeData {
-  type: 'start' | 'end' | 'general';
-  text?: string;
+  text: string;
 }
 
 export interface GraphEdge {
@@ -58,7 +56,6 @@ export interface NodeVisitData {
   id: string;
   data?: {
     question?: string;
-    explanation?: string;
     text?: string;
     ratings?: string[];
     scalars?: number[];

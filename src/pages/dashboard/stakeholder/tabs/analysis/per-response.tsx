@@ -18,10 +18,10 @@ const PerResponseTab: React.FC<TabProps> = ({ data }) => {
 
   const renderNodeContent = (node: NodeVisitData, graphNode: GraphNode) => {
     if (graphNode?.data && 'type' in graphNode.data) {
-      const { text: graphText, instruction } = graphNode.data as ConversationNodeData;
+      const { text: graphText } = graphNode.data as ConversationNodeData;
       const { data: nodeData } = node;
 
-      if (graphText || instruction) {
+      if (graphText) {
         return (
           <>
             <p className="font-semibold text-black">
