@@ -45,7 +45,7 @@ export function formatAndSetGraph(
     g.setGraph({ rankdir: 'TB' });
 
     formattedNodes.forEach((node) => {
-      g.setNode(node.id, { width: 400, height: 400 });
+      g.setNode(node.id, { width: node.measured?.width, height: node.measured?.height });
     });
     graph.edges.forEach((edge) => {
       g.setEdge(edge.source, edge.target);
@@ -53,10 +53,16 @@ export function formatAndSetGraph(
 
     Dagre.layout(g);
 
-    formattedNodes = formattedNodes.map((node) => ({
-      ...node,
-      position: { x: g.node(node.id).x, y: g.node(node.id).y },
-    }));
+    formattedNodes = formattedNodes.map((node) => {
+      const dagNode = g.node(node.id);
+      return {
+        ...node,
+        position: {
+          x: dagNode.x - dagNode.width / 2,
+          y: dagNode.y - dagNode.height / 2,
+        },
+      };
+    });
   }
 
   setNodes(formattedNodes);
