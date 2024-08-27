@@ -1,6 +1,7 @@
 import Dagre from '@dagrejs/dagre';
 import { Edge, Node } from '@xyflow/react';
 import { v4 as uuid } from 'uuid';
+import { OptimizedGraph, OptimizedNode, StrippedEdge, StrippedGraph, StrippedNode } from './graph';
 
 /**
  * Creates a graph structure from input data.
@@ -62,20 +63,6 @@ export function formatAndSetGraph(
   setEdges(graph.edges);
 }
 
-export type StrippedNode = Omit<Node, 'position'>;
-export type StrippedEdge = Omit<Edge, 'id'>;
-
-export interface StrippedGraph {
-  nodes: StrippedNode[];
-  edges: StrippedEdge[];
-}
-
-export interface OptimizedGraph {
-  nodes: Map<string, StrippedNode>;
-  edges: Map<string, {source: string; target: string}>;
-  outgoingEdges: Map<string, Set<string>>;
-}
-
 /**
  * Strips nodes of non-essential data.
  * @param node {Node} A node object
@@ -119,21 +106,29 @@ export function stripGraph(graph: { nodes: Node[]; edges: Edge[] }): StrippedGra
  * @returns {OptimizedGraph} An optimized graph structure using Maps
  */
 export function convertToOptimizedGraph(graph: StrippedGraph): OptimizedGraph {
-  const nodes = new Map(graph.nodes.map(node => [node.id, node]));
-  const edges = new Map(graph.edges.map((edge, index) => [
-    `edge-${index}`,
-    { source: edge.source, target: edge.target }
-  ]));
-  const outgoingEdges = new Map<string, Set<string>>();
+  const nodes: { [key: string]: OptimizedNode } = {};
+  const edges: { [key: string]: { source: string; target: string } } = {};
+  const outgoingEdges: { [key: string]: string[] } = {};
 
-  for (const [edgeId, edge] of edges) {
-    if (!outgoingEdges.has(edge.source)) {
-      outgoingEdges.set(edge.source, new Set());
+  graph.nodes.forEach((node) => {
+    nodes[node.id] = { ...node, outgoingEdges: [] };
+  });
+
+  graph.edges.forEach((edge, index) => {
+    const edgeId = `edge-${index}`;
+    edges[edgeId] = edge;
+
+    if (!outgoingEdges[edge.source]) {
+      outgoingEdges[edge.source] = [];
     }
-    outgoingEdges.get(edge.source)!.add(edgeId);
-  }
+    outgoingEdges[edge.source].push(edgeId);
+  });
 
-  return { nodes, edges, outgoingEdges };
+  Object.keys(nodes).forEach((id) => {
+    nodes[id].outgoingEdges = outgoingEdges[id] || [];
+  });
+
+  return { nodes, edges };
 }
 
 /**

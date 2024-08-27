@@ -7,7 +7,7 @@ import './assets/styles/index.css';
 import { ApolloProviderWrapper } from './clients/graphqlClient';
 import { TitleProvider } from './hooks/TitleHook';
 import HomeHero from './pages/home';
-import AlertProvider from './providers/AlertProvider';
+import AlertProvider from './providers/alert-provider';
 import Main from './templates/main';
 import AgentLabTemplate from './templates/agent-lab';
 import PlaygroundDashboard from './pages/dashboard/agent-lab/playground';

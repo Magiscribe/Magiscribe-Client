@@ -1,7 +1,7 @@
 import { CREATE_DATA } from '@/clients/mutations';
 import { GET_USER_INQUIRIES } from '@/clients/queries';
 import CustomModal from '@/components/modal';
-import { useAddAlert } from '@/providers/AlertProvider';
+import { useAddAlert } from '@/providers/alert-provider';
 import { useMutation, useQuery } from '@apollo/client';
 import { faArrowLeft, faLink } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

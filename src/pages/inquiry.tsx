@@ -18,24 +18,19 @@ interface Message {
 function InquiryContent() {
   const [inputMessage, setInputMessage] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
-  const { currentNode, handleNextNode, loading, setOnNodeVisit } = useInquiry();
+  const { handleNextNode, loading, setOnUpdate } = useInquiry();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (currentNode.current?.type === 'conversation') {
-      setMessages((prevMessages) => [...prevMessages, { type: 'text', content: inputMessage, sender: 'user' }]);
+    setMessages((prevMessages) => [...prevMessages, { type: 'text', content: inputMessage, sender: 'user' }]);
 
-      handleNextNode({
-        data: {
-          text: currentNode.current.data.text,
-          response: inputMessage,
-        },
-      });
-      setInputMessage('');
-    } else {
-      console.warn('Not implemented');
-    }
+    handleNextNode({
+      data: {
+        response: inputMessage,
+      },
+    });
+    setInputMessage('');
   };
 
   const onNodeVisit = (node: StrippedNode) => {
@@ -51,7 +46,7 @@ function InquiryContent() {
     }
   };
 
-  setOnNodeVisit(onNodeVisit);
+  setOnUpdate(onNodeVisit);
 
   return (
     <div className="flex items-center justify-center max-w-4xl mx-auto p-4">
@@ -110,7 +105,7 @@ export default function Inquiry() {
   const { id } = useParams<{ id: string }>();
 
   if (!id) {
-    return <></>
+    return <></>;
   }
 
   return (

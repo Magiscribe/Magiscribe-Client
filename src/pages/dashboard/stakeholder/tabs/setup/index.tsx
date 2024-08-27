@@ -4,7 +4,7 @@ import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import GraphInput from '@/components/graph/graph-input';
 import DeleteConfirmationModal from '@/components/modals/delete-modal';
 import ModalGraphHelp from '@/components/modals/graph-help-modal';
-import useGraph from '@/hooks/graph';
+import useReactFlowGraph from '@/hooks/graph';
 import { useAddAlert } from '@/providers/AlertProvider';
 import { getAgentIdByName } from '@/utils/agents';
 import { createGraph, formatAndSetGraph } from '@/utils/graphUtils';
@@ -95,7 +95,7 @@ const Setup: React.FC<{ id: string }> = ({ id }) => {
   const alert = useAddAlert();
   const navigate = useNavigate();
 
-  const { nodes, edges, setNodes, setEdges, onNodesChange, onEdgesChange } = useGraph();
+  const { nodes, edges, setNodes, setEdges, onNodesChange, onEdgesChange } = useReactFlowGraph();
 
   const client = useApolloClient();
   const [addPrediction] = useMutation(ADD_PREDICTION);

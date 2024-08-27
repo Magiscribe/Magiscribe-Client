@@ -2,15 +2,10 @@ import { ADD_PREDICTION } from '@/clients/mutations';
 import { GET_DATA } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import { getAgentIdByName } from '@/utils/agents';
-import { stripAndOptimizeGraph, stripGraph, StrippedNode } from '@/utils/graphUtils';
+import { GraphManager } from '@/utils/graphs/graph-manager';
+import { NodeData, OptimizedNode } from '@/utils/graphs/graph';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
 import React, { createContext, useContext, useRef, useState } from 'react';
-
-// Updated StrippedGraph interface
-interface StrippedGraph {
-  nodes: Map<string, StrippedNode & { outgoingEdges: string[] }>;
-  edges: Map<string, {source: string; target: string}>;
-}
 
 interface InquiryProviderProps {
   children: React.ReactNode;
@@ -19,61 +14,45 @@ interface InquiryProviderProps {
 
 interface HandleNextNodeProps {
   nextNodeId?: string;
-  data?: StrippedNode['data'];
+  data?: NodeData;
 }
 
 interface InquiryContextType {
-  currentNode: React.MutableRefObject<(StrippedNode & { outgoingEdges: string[] }) | null | undefined>;
-  nodeHistory: React.MutableRefObject<{ id: string; data: StrippedNode['data'] | undefined }[]>;
-
   handleNextNode: (props?: HandleNextNodeProps) => Promise<void>;
-  setOnNodeVisit: (callback: (node: StrippedNode & { outgoingEdges: string[] }) => void) => void;
-
+  onNodeUpdate: (callback: (node: OptimizedNode) => void) => void;
   loading: boolean;
 }
 
 const InquiryContext = createContext<InquiryContextType | undefined>(undefined);
 
-export function InquiryProvider({ children, id }: InquiryProviderProps) {
+function InquiryProvider({ children, id }: InquiryProviderProps) {
+  // Refs
+  const graph = useRef<GraphManager | null>(null);
+
+  // States
   const [subscriptionId] = useState<string>(`inquiry_${Date.now()}`);
-
-  // Updated Graph State
-  const graph = useRef<StrippedGraph>({
-    nodes: new Map(),
-    edges: new Map()
-  });
-  const currentNode = useRef<(StrippedNode & { outgoingEdges: string[] }) | null | undefined>(null);
-  const nodeHistory = useRef<{ id: string; data: StrippedNode['data'] | undefined }[]>([]);
-
-  console.log('State', {
-    graph: graph.current,
-    currentNode: currentNode.current,
-    nodeHistory: nodeHistory.current
-  })
-
   const [loading, setLoading] = useState<boolean>(false);
-  const onSubscriptionData = useRef<(data: StrippedNode['data']) => void>(() => {});
-  const onNodeVisit = useRef<(node: StrippedNode & { outgoingEdges: string[] }) => void>(() => {});
 
+  // Event handlers
+  const onSubscriptionData = useRef<(data: NodeData) => void>(() => {});
+  const onNodeUpdate = useRef<(node: OptimizedNode) => void>(() => {});
+
+  // Mutations and Apollo client
   const [addPrediction] = useMutation(ADD_PREDICTION);
   const client = useApolloClient();
 
+  /**
+   * Fetches the data object on mount when an ID is provided.
+   * Will automatically start the inquiry process.
+   */
   useQuery(GET_DATA, {
     variables: { id },
     skip: !id,
     errorPolicy: 'all',
     onCompleted: ({ dataObject }) => {
       if (dataObject.data.graph) {
-        const strippedGraph = stripAndOptimizeGraph(dataObject.data.graph);
-        graph.current.nodes = new Map(
-          Array.from(strippedGraph.nodes.entries()).map(([id, node]) => [
-            id,
-            { ...node, outgoingEdges: Array.from(strippedGraph.outgoingEdges.get(id) || []) }
-          ])
-        );
-        graph.current.edges = strippedGraph.edges;
-        currentNode.current = Array.from(graph.current.nodes.values()).find((node) => node.type === 'start');
-        handleNextNode();
+        graph.current = new GraphManager(dataObject.data.graph);
+        graph.current.onNodeVisit(handleOnNodeVisit);
       }
     },
     onError: () => {
@@ -81,6 +60,10 @@ export function InquiryProvider({ children, id }: InquiryProviderProps) {
     },
   });
 
+  /**
+   * Subscribes to the predictionAdded subscription.
+   * When a result from a prediction is received, it will trigger the onSubscriptionData callback.
+   */
   useSubscription(GRAPHQL_SUBSCRIPTION, {
     variables: { subscriptionId },
     onSubscriptionData: ({ subscriptionData }) => {
@@ -88,6 +71,8 @@ export function InquiryProvider({ children, id }: InquiryProviderProps) {
 
       if (prediction?.type === 'SUCCESS') {
         setLoading(false);
+
+        // TODO: Avoid double parsing. Will require changes to the backend.
         const result = JSON.parse(JSON.parse(prediction.result));
         if (onSubscriptionData.current) {
           onSubscriptionData.current(result);
@@ -99,109 +84,119 @@ export function InquiryProvider({ children, id }: InquiryProviderProps) {
     },
   });
 
+  /**
+   * Handles moving to the next node.
+   * @param {HandleNextNodeProps} props - The next node ID and data to pass to the next node.
+   * @returns {Promise<void>} A promise that resolves when the next node is visited
+   */
   async function handleNextNode({ nextNodeId, data }: HandleNextNodeProps = {}): Promise<void> {
-    if (!currentNode.current) {
-      return;
-    }
+    if (!graph.current) return;
 
-    const outgoingEdges = currentNode.current.outgoingEdges;
-    if (!outgoingEdges.length) return;
+    await graph.current.updateCurrentNodeData(data ?? {});
+    await graph.current.goToNextNode(nextNodeId);
+  }
 
-    let nextEdgeId: string | undefined;
-    if (nextNodeId) {
-      nextEdgeId = outgoingEdges.find(edgeId => {
-        const edge = graph.current.edges.get(edgeId);
-        return edge && edge.target === nextNodeId;
-      });
-    } else {
-      nextEdgeId = outgoingEdges[0];
-    }
-
-    if (!nextEdgeId) return;
-
-    const edge = graph.current.edges.get(nextEdgeId);
-    if (!edge) return;
-
-    const nextNode = graph.current.nodes.get(edge.target);
-    if (!nextNode) return;
-
-    nodeHistory.current.push({
-      id: currentNode.current.id,
-      data: currentNode.current.type !== 'condition' ? data : undefined,
-    });
-
-    currentNode.current = nextNode;
-
-    if (nextNode.data.dynamicGeneration) {
-      const agentId = await getAgentIdByName(
-        `Stakeholder | Dynamic ${nextNode.type === 'conversation' ? 'Question' : 'Information'} Generation`,
-        client,
-      );
-
-      await addPrediction({
-        variables: {
-          subscriptionId,
-          agentId,
-          variables: {
-            userMessage: `We are at at node ${currentNode.current.id}`,
-            conversationGraph: JSON.stringify(Object.fromEntries(graph.current.nodes)),
-            nodeVisitData: JSON.stringify(nodeHistory.current),
-          },
-        },
-      });
-
-      onSubscriptionData.current = (result) => {
-        if (currentNode.current) {
-          currentNode.current.data = {
-            ...currentNode.current.data,
-            text: result.text,
-          };
-        }
-        if (onNodeVisit.current) {
-          onNodeVisit.current(currentNode.current!);
-        }
-      };
-
-      return;
-    }
-
-    if (nextNode.type === 'condition') {
-      const agentId = await getAgentIdByName('Stakeholder | Condition Node', client);
-
-      await addPrediction({
-        variables: {
-          subscriptionId,
-          agentId,
-          variables: {
-            userMessage: `We are at at node ${currentNode.current.id}`,
-            conversationGraph: JSON.stringify(Object.fromEntries(graph.current.nodes)),
-            nodeVisitData: JSON.stringify(nodeHistory.current),
-          },
-        },
-      });
-
-      onSubscriptionData.current = (result) => {
-        handleNextNode({
-          nextNodeId: result.nextNodeId as string,
-          data: result,
-        });
-      };
-
-      return;
-    }
-
-    if (onNodeVisit.current) {
-      onNodeVisit.current(currentNode.current);
-      return;
+  /**
+   * Handles when a new node is visited.
+   * @param node {OptimizedNode} The node that was visited
+   * @returns {Promise<void>} A promise that resolves when the node is visited
+   */
+  async function handleOnNodeVisit(node: OptimizedNode): Promise<void> {
+    if (node.data.dynamicGeneration) {
+      await handleDynamicGeneration();
+    } else if (node.type === 'condition') {
+      await handleConditionNode();
+    } else if (onNodeUpdate.current) {
+      onNodeUpdate.current(node);
     }
   }
 
-  function setOnNodeVisit(callback: (node: StrippedNode & { outgoingEdges: string[] }) => void) {
-    onNodeVisit.current = callback;
+  /**
+   * Handles visiting a node with dynamic generation.
+   * Here, we will send a prediction to the backend to generate dynamic content that is then placed
+   * on the node. A callback is triggered at the end to notify subscribers of the new node data.
+   * @returns {Promise<void>} A promise that resolves when the dynamic generation is complete
+   */
+  async function handleDynamicGeneration(): Promise<void> {
+    // Base Case 1: The graph manager is initialized.
+    if (!graph.current) return;
+
+    // Base Case 2: The current node is defined (may be the case if the graph is empty).
+    const currentNode = graph.current.getCurrentNode();
+    if (!currentNode) return;
+
+    const agentId = await getAgentIdByName(
+      `Stakeholder | Dynamic ${currentNode.type === 'conversation' ? 'Question' : 'Information'} Generation`,
+      client,
+    );
+
+    await addPrediction({
+      variables: {
+        subscriptionId,
+        agentId,
+        variables: {
+          userMessage: `We are at at node ${currentNode.id}`,
+          conversationGraph: JSON.stringify(graph.current.getGraph()),
+          nodeVisitData: JSON.stringify(graph.current.getNodeHistory()),
+        },
+      },
+    });
+
+    onSubscriptionData.current = (result) => {
+      if (currentNode) {
+        currentNode.data = {
+          ...currentNode.data,
+          text: result.text,
+        };
+      }
+      if (onNodeUpdate.current) {
+        onNodeUpdate.current(currentNode);
+      }
+    };
+  }
+
+  async function handleConditionNode() {
+    // Base Case 1: The graph manager is initialized.
+    if (!graph.current) return;
+
+    const agentId = await getAgentIdByName('Stakeholder | Condition Node', client);
+
+    await addPrediction({
+      variables: {
+        subscriptionId,
+        agentId,
+        variables: {
+          userMessage: `We are at at node ${graph.current.getCurrentNode()?.id}`,
+          conversationGraph: JSON.stringify(graph.current.getGraph()),
+          nodeVisitData: JSON.stringify(graph.current.getNodeHistory()),
+        },
+      },
+    });
+
+    onSubscriptionData.current = (result) => {
+      handleNextNode({
+        nextNodeId: result.nextNodeId as string,
+        data: result,
+      });
+    };
+  }
+
+  /**
+   * Sets a callback for when a node is updated.
+   * @param callback {Function} A callback function that receives the updated node.
+   */
+  function setOnNodeUpdate(callback: (node: OptimizedNode) => void) {
+    onNodeUpdate.current = callback;
   }
 
   return (
-    <InquiryContext.Provider value={{ setOnNodeVisit, currentNode, nodeHistory: nodeHistory, handleNextNode, loading }}>
+    <InquiryContext.Provider
+      value={{
+        onNodeUpdate: setOnNodeUpdate,
+        handleNextNode,
+        loading,
+      }}
+    >
       {children}
     </InquiryContext.Provider>
   );
@@ -214,3 +209,5 @@ export function useInquiry() {
   }
   return context;
 }
+
+export { InquiryProvider };

@@ -1,4 +1,4 @@
-import { Alert } from '../../providers/AlertProvider';
+import { Alert } from '../../providers/alert-provider';
 
 interface AlertProps {
   alert: Alert;
