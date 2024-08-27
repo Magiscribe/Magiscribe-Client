@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
@@ -9,7 +9,7 @@ import { ChartProps } from '@/components/chart';
 import MarkdownCustom from '@/components/markdown-custom';
 import RatingInput from '@/components/graph/rating-input';
 import { InquiryProvider, useInquiry } from '@/providers/inquiry-provider';
-import { StrippedNode, NodeData } from '@/utils/graphUtils';
+import { StrippedNode, NodeData } from '@/utils/graphs/graph';
 
 interface Message {
   type: 'text' | 'chart';
@@ -20,16 +20,23 @@ interface Message {
 function InquiryContent() {
   const [inputMessage, setInputMessage] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
+
   const [currentNodeType, setCurrentNodeType] = useState<string | null>(null);
   const [currentRatings, setCurrentRatings] = useState<string[]>([]);
   const [selectedRatings, setSelectedRatings] = useState<string[]>([]);
-  const [isEndNode, setIsEndNode] = useState(false);
-  const { handleNextNode, loading, setOnUpdate } = useInquiry();
+
+  const { handleNextNode, loading, initialized, onNodeUpdate } = useInquiry();
+
+  useEffect(() => {
+    if (initialized) {
+      handleNextNode();
+    }
+  }, [initialized]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    let responseData: { response: string; ratings?: string[] } = { response: inputMessage };
+    const responseData: { response: string; ratings?: string[] } = { response: inputMessage };
 
     if (selectedRatings.length > 0) {
       responseData.ratings = selectedRatings;
@@ -73,16 +80,14 @@ function InquiryContent() {
       }
     }
 
-    if (node.type === 'end') {
-      setIsEndNode(true);
-    } else if (node.type === 'information') {
+    if (node.type === 'information') {
       setTimeout(() => {
         handleNextNode();
       }, 1000);
     }
   };
 
-  setOnUpdate(onNodeVisit);
+  onNodeUpdate(onNodeVisit);
 
   return (
     <div className="flex items-center justify-center max-w-4xl mx-auto p-4">
@@ -107,7 +112,7 @@ function InquiryContent() {
             </div>
           ))}
         </div>
-        {!isEndNode && (
+        {currentNodeType != 'end' && (
           <>
             {currentNodeType && currentNodeType.startsWith('rating') && (
               <RatingInput

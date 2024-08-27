@@ -20,6 +20,8 @@ interface HandleNextNodeProps {
 interface InquiryContextType {
   handleNextNode: (props?: HandleNextNodeProps) => Promise<void>;
   onNodeUpdate: (callback: (node: OptimizedNode) => void) => void;
+
+  initialized: boolean;
   loading: boolean;
 }
 
@@ -32,6 +34,7 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
   // States
   const [subscriptionId] = useState<string>(`inquiry_${Date.now()}`);
   const [loading, setLoading] = useState<boolean>(false);
+  const [initialized, setInitialized] = useState<boolean>(false);
 
   // Event handlers
   const onSubscriptionData = useRef<(data: NodeData) => void>(() => {});
@@ -53,6 +56,7 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
       if (dataObject.data.graph) {
         graph.current = new GraphManager(dataObject.data.graph);
         graph.current.onNodeVisit(handleOnNodeVisit);
+        setInitialized(true);
       }
     },
     onError: () => {
@@ -195,6 +199,7 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
         onNodeUpdate: setOnNodeUpdate,
         handleNextNode,
         loading,
+        initialized,
       }}
     >
       {children}

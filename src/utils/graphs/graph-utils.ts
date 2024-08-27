@@ -44,8 +44,11 @@ export function formatAndSetGraph(
     const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
     g.setGraph({ rankdir: 'TB' });
 
+    // TODO: Fix this so that it correctly sets the width and height of the nodes on the first render.
+    //       Currently, it sets the width and height to 400 on the first render because it does not have
+    //       the measured width and height of the nodes.
     formattedNodes.forEach((node) => {
-      g.setNode(node.id, { width: node.measured?.width, height: node.measured?.height });
+      g.setNode(node.id, { width: node.measured?.width ?? 400, height: node.measured?.height ?? 400 });
     });
     graph.edges.forEach((edge) => {
       g.setEdge(edge.source, edge.target);

@@ -70,28 +70,36 @@ export default function ViaChatTab({ data }: TabProps) {
     console.log(results);
     console.log(results[0]);
     const parsedResult = JSON.parse(results[0]);
-    parsedResult.forEach((result: any) => {
-      try {
-        if (result.chartType && Array.isArray(result.data)) {
-          const chartProps: ChartProps = {
-            title: result.title || '',
-            chartType: result.chartType,
-            data: result.data.map((item: { name: string; value: number }) => ({
-              name: item.name,
-              value: item.value,
-            })),
-          };
-          setMessages((prevMessages) => [...prevMessages, { type: 'chart', content: chartProps, sender: 'bot' }]);
-        } else if (result.markdownTextBase64) {
-          const decodedMarkdown = base64Decode(result.markdownTextBase64);
-          setMessages((prevMessages) => [...prevMessages, { type: 'text', content: decodedMarkdown, sender: 'bot' }]);
-        } else {
-          setMessages((prevMessages) => [...prevMessages, { type: 'text', content: result.text, sender: 'bot' }]);
+    parsedResult.forEach(
+      (result: {
+        title: string;
+        text: string;
+        markdownTextBase64: string;
+        chartType: string;
+        data: { name: string; value: number }[];
+      }) => {
+        try {
+          if (result.chartType && Array.isArray(result.data)) {
+            const chartProps: ChartProps = {
+              title: result.title || '',
+              chartType: result.chartType,
+              data: result.data.map((item: { name: string; value: number }) => ({
+                name: item.name,
+                value: item.value,
+              })),
+            };
+            setMessages((prevMessages) => [...prevMessages, { type: 'chart', content: chartProps, sender: 'bot' }]);
+          } else if (result.markdownTextBase64) {
+            const decodedMarkdown = base64Decode(result.markdownTextBase64);
+            setMessages((prevMessages) => [...prevMessages, { type: 'text', content: decodedMarkdown, sender: 'bot' }]);
+          } else {
+            setMessages((prevMessages) => [...prevMessages, { type: 'text', content: result.text, sender: 'bot' }]);
+          }
+        } catch (error) {
+          console.error('Error parsing result:', error);
         }
-      } catch (error) {
-        console.error('Error parsing result:', error);
-      }
-    });
+      },
+    );
   };
 
   const handleSendMessage = async (e: React.FormEvent) => {
