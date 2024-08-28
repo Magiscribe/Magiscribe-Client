@@ -1,4 +1,4 @@
-import { CREATE_INQUIRY, UPDATE_INQUIRY } from '@/clients/mutations';
+import { CREATE_INQUIRY } from '@/clients/mutations';
 import { GET_USER_INQUIRIES } from '@/clients/queries';
 import CustomModal from '@/components/modal';
 import { useAddAlert } from '@/providers/alert-provider';

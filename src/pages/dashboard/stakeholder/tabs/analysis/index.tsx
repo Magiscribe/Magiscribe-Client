@@ -1,31 +1,47 @@
-import React from 'react';
+import { GET_INQUIRIES_RESPONSES, GET_INQUIRY } from '@/clients/queries';
 import { useQuery } from '@apollo/client';
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import clsx from 'clsx';
-import { useParams } from 'react-router-dom';
-import { GET_DATA } from '@/clients/queries';
-import PerResponseTab from './per-response';
-import PerQuestionTab from './per-question';
-import ViaChatTab from './chat';
 import { motion } from 'framer-motion';
+import React from 'react';
+import { useParams } from 'react-router-dom';
+import ViaChatTab from './chat';
+import PerResponseTab from './per-response';
 
 const AnalysisTab: React.FC = () => {
   const { id } = useParams<{ id: string }>();
 
   const {
-    loading: dataLoading,
-    error: dataError,
-    data,
-  } = useQuery(GET_DATA, {
+    loading: graphLoading,
+    data: inquiryData,
+    error: graphError,
+  } = useQuery(GET_INQUIRY, {
     variables: { id: id },
     skip: !id,
     errorPolicy: 'all',
   });
 
-  if (dataLoading) return <p>Loading...</p>;
-  if (dataError) return <p>Error: {dataError.message}</p>;
+  const {
+    loading: dataLoading,
+    data: inquiryResponseData,
+    error: dataError,
+  } = useQuery(GET_INQUIRIES_RESPONSES, {
+    variables: { id: id },
+    skip: !id,
+    errorPolicy: 'all',
+  });
 
-  const tabCategories = ['Per Response', 'Per Question', 'Via Chat'];
+  if (dataLoading || graphLoading) return <p>Loading...</p>;
+  if (dataError || graphError) return <p>Error</p>;
+
+  const data = {
+    form: inquiryData?.getInquiry?.data?.form,
+    graph: inquiryData?.getInquiry?.data?.graph,
+    nodeVisitData: inquiryResponseData?.getInquiryResponses,
+    summary: 'Lorem ipsum',
+  };
+
+  const tabCategories = ['Per Response', /** 'Per Question',*/ 'Via Chat'];
 
   return (
     <div className="mt-8">
@@ -51,17 +67,17 @@ const AnalysisTab: React.FC = () => {
         <TabPanels className="mt-2">
           <TabPanel>
             <motion.div initial={{ opacity: 0, x: -100 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 100 }}>
-              {data && data.dataObject ? <PerResponseTab data={data.dataObject} /> : <p>No data available</p>}
+              <PerResponseTab data={data} />
             </motion.div>
           </TabPanel>
-          <TabPanel>
+          {/* <TabPanel>
             <motion.div initial={{ opacity: 0, x: -100 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 100 }}>
-              {data && data.dataObject ? <PerQuestionTab data={data.dataObject} /> : <p>No data available</p>}
+              <PerQuestionTab data={analysisData} />
             </motion.div>
-          </TabPanel>
+          </TabPanel> */}
           <TabPanel>
             <motion.div initial={{ opacity: 0, x: -100 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 100 }}>
-              {data && data.dataObject ? <ViaChatTab data={data.dataObject} /> : <p>No data available</p>}
+              <ViaChatTab data={data} />
             </motion.div>
           </TabPanel>
         </TabPanels>

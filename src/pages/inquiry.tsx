@@ -17,9 +17,27 @@ interface Message {
   sender: 'user' | 'bot';
 }
 
+function StartScreen({ onStart }: { onStart: () => void }) {
+  return (
+    <div className="flex items-center justify-center pt-24">
+      <div className="text-center">
+        <h1 className="text-4xl font-bold mb-4">Welcome to the Inquiry</h1>
+        <p className="text-xl mb-8">Click the button below to start your conversation.</p>
+        <button
+          onClick={onStart}
+          className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          Start Inquiry
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function InquiryContent() {
   const [inputMessage, setInputMessage] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
+  const [showStartScreen, setShowStartScreen] = useState(true);
 
   const [currentNodeType, setCurrentNodeType] = useState<string | null>(null);
   const [currentRatings, setCurrentRatings] = useState<string[]>([]);
@@ -28,10 +46,14 @@ function InquiryContent() {
   const { handleNextNode, loading, initialized, onNodeUpdate } = useInquiry();
 
   useEffect(() => {
-    if (initialized) {
+    if (initialized && !showStartScreen) {
       handleNextNode();
     }
-  }, [initialized]);
+  }, [initialized, showStartScreen]);
+
+  const handleStart = () => {
+    setShowStartScreen(false);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,8 +111,12 @@ function InquiryContent() {
 
   onNodeUpdate(onNodeVisit);
 
+  if (showStartScreen) {
+    return <StartScreen onStart={handleStart} />;
+  }
+
   return (
-    <div className="flex items-center justify-center max-w-4xl mx-auto p-4">
+    <div className="flex items-center justify-center pt-24">
       <div className="container max-w-3xl">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-bold">Chat</h2>

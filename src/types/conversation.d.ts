@@ -28,7 +28,7 @@ export interface GraphNode {
 }
 
 export interface ConversationNodeData {
-  text: string;
+  response: string;
   type: 'rating-single' | 'rating-multi' | 'open-ended' | 'scalar-single' | 'scalar-multi';
   ratings?: string[];
   scalars?: string[];
@@ -56,7 +56,7 @@ export interface NodeVisitData {
   id: string;
   data?: {
     question?: string;
-    text?: string;
+    response?: string;
     ratings?: string[];
     scalars?: number[];
   };

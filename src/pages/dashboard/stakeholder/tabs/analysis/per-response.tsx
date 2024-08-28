@@ -6,7 +6,7 @@ import { ConversationNodeData, GraphNode, NodeVisitData, TabProps } from '@/type
 const PerResponseTab: React.FC<TabProps> = ({ data }) => {
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
-  const { nodeVisitData: users = [], graph } = data.data;
+  const { nodeVisitData: users = [], graph } = data;
   const usersPerPage = 42;
 
   if (!users.length) return <div className="p-4">No data available</div>;
@@ -18,7 +18,7 @@ const PerResponseTab: React.FC<TabProps> = ({ data }) => {
 
   const renderNodeContent = (node: NodeVisitData, graphNode: GraphNode) => {
     if (graphNode?.data && 'type' in graphNode.data) {
-      const { text: graphText } = graphNode.data as ConversationNodeData;
+      const { response: graphText } = graphNode.data as ConversationNodeData;
       const { data: nodeData } = node;
 
       if (graphText) {
@@ -29,7 +29,7 @@ const PerResponseTab: React.FC<TabProps> = ({ data }) => {
             </p>
             <hr className="my-2" />
             <p className="text-black">
-              {nodeData?.text || nodeData?.ratings?.join(', ') || nodeData?.scalars?.join(', ')}
+              {nodeData?.response || nodeData?.ratings?.join(', ') || nodeData?.scalars?.join(', ')}
             </p>
           </>
         );
@@ -48,7 +48,7 @@ const PerResponseTab: React.FC<TabProps> = ({ data }) => {
       </div>
       <div className="my-4">
         <h2 className="font-bold mb-2">Select User</h2>
-        <div className="grid grid-cols-4 sm:grid-col-3 lg:grid-cols-6 gap-2">
+        <div className="grid grid-cols-4 sm:grid-col-3 lg:grid-cols-4 gap-2">
           {displayedUsers.map(({ userId }) => (
             <button
               key={userId}
