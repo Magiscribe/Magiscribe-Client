@@ -64,12 +64,9 @@ export interface NodeVisitData {
 
 export interface TabProps {
   data: {
-    data: {
-      form: Form;
-      graph: Graph;
-      nodeVisitData: IndividualConversationData[];
-      summary: Summary;
-    };
+    form: Form;
+    graph: Graph;
+    nodeVisitData: IndividualConversationData[];
   };
 }
 

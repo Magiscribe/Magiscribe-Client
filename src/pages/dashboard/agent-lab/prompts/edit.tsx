@@ -19,7 +19,7 @@ export default function PromptEdit() {
   const [searchParams] = useSearchParams();
 
   // Queries and Mutations
-  const [addUpdatePrompt] = useMutation(ADD_UPDATE_PROMPT);
+  const [upsertPrompt] = useMutation(ADD_UPDATE_PROMPT);
   useQuery(GET_PROMPT, {
     skip: !searchParams.has('id'),
     variables: {
@@ -45,7 +45,7 @@ export default function PromptEdit() {
     e.preventDefault();
 
     try {
-      const result = await addUpdatePrompt({
+      const result = await upsertPrompt({
         variables: {
           prompt: {
             id: form.id,

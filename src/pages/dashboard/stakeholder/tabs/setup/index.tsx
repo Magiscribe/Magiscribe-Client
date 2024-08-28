@@ -1,5 +1,5 @@
-import { ADD_PREDICTION, DELETE_DATA, UPDATE_DATA } from '@/clients/mutations';
-import { GET_DATA } from '@/clients/queries';
+import { ADD_PREDICTION, DELETE_INQUIRY, UPDATE_INQUIRY } from '@/clients/mutations';
+import { GET_INQUIRY } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import GraphInput from '@/components/graph/graph-input';
 import DeleteConfirmationModal from '@/components/modals/delete-modal';
@@ -99,16 +99,16 @@ const Setup: React.FC<{ id: string }> = ({ id }) => {
 
   const client = useApolloClient();
   const [addPrediction] = useMutation(ADD_PREDICTION);
-  const [updateObject] = useMutation(UPDATE_DATA);
-  const [deleteObject] = useMutation(DELETE_DATA);
+  const [updateObject] = useMutation(UPDATE_INQUIRY);
+  const [deleteObject] = useMutation(DELETE_INQUIRY);
 
-  useQuery(GET_DATA, {
+  useQuery(GET_INQUIRY, {
     variables: { id },
     skip: !id,
-    onCompleted: ({ dataObject }) => {
-      setForm(dataObject.data.form);
-      if (dataObject.data.graph) {
-        handleGraphCreation(dataObject.data.graph);
+    onCompleted: ({ getInquiry }) => {
+      setForm(getInquiry.data.form);
+      if (getInquiry.data.graph) {
+        handleGraphCreation(getInquiry.data.graph);
       }
     },
   });

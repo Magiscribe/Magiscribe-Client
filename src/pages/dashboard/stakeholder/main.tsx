@@ -1,4 +1,4 @@
-import { CREATE_DATA } from '@/clients/mutations';
+import { CREATE_INQUIRY, UPDATE_INQUIRY } from '@/clients/mutations';
 import { GET_USER_INQUIRIES } from '@/clients/queries';
 import CustomModal from '@/components/modal';
 import { useAddAlert } from '@/providers/alert-provider';
@@ -23,7 +23,7 @@ export default function Inquiry() {
 
   // Queries and Mutations
   const { data: userFormsData } = useQuery(GET_USER_INQUIRIES);
-  const [createObject] = useMutation(CREATE_DATA);
+  const [createObject] = useMutation(CREATE_INQUIRY);
 
   const createForm = async () => {
     const result = await createObject({
@@ -38,7 +38,7 @@ export default function Inquiry() {
         },
       },
     });
-    navigate(`${result.data.createUpdateDataObject.id}`);
+    navigate(`${result.data.upsertInquiry.id}`);
   };
 
   const selectForm = (formId: string) => {
@@ -47,7 +47,7 @@ export default function Inquiry() {
 
   const FormBubbles = () => (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-      {userFormsData?.dataObjectsCreated.map(
+      {userFormsData?.getInquiries.map(
         (userForm: {
           data: {
             form: { title: string; organizationName: string; organizationRole: string };

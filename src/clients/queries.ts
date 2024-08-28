@@ -10,7 +10,7 @@ export const GET_ALL_MODELS = gql`
 `;
 
 export const GET_AGENT_WITH_PROMPTS = gql`
-  query Query($agentId: String!) {
+  query Query($agentId: ID!) {
     getAgentWithPrompts(agentId: $agentId) {
       id
       name
@@ -51,7 +51,7 @@ export const GET_ALL_AGENTS = gql`
 `;
 
 export const GET_AGENT = gql`
-  query Query($agentId: String!) {
+  query Query($agentId: ID!) {
     getAgent(agentId: $agentId) {
       id
       name
@@ -93,7 +93,7 @@ export const GET_ALL_CAPABILITIES = gql`
 `;
 
 export const GET_CAPABILITY = gql`
-  query Query($capabilityId: String!) {
+  query Query($capabilityId: ID!) {
     getCapability(capabilityId: $capabilityId) {
       id
       llmModel
@@ -123,7 +123,7 @@ export const GET_ALL_PROMPTS = gql`
 `;
 
 export const GET_PROMPT = gql`
-  query Query($promptId: String!) {
+  query Query($promptId: ID!) {
     getPrompt(promptId: $promptId) {
       id
       name
@@ -132,9 +132,9 @@ export const GET_PROMPT = gql`
   }
 `;
 
-export const GET_DATA = gql`
-  query Query($id: String!) {
-    dataObject(id: $id) {
+export const GET_INQUIRY = gql`
+  query Query($id: ID!) {
+    getInquiry(id: $id) {
       data
     }
   }
@@ -142,8 +142,18 @@ export const GET_DATA = gql`
 
 export const GET_USER_INQUIRIES = gql`
   query DataObjectsCreated {
-    dataObjectsCreated {
+    getInquiries {
       id
+      data
+    }
+  }
+`;
+
+export const GET_INQUIRIES_RESPONSES = gql`
+  query Query($id: ID!) {
+    getInquiryResponses(id: $id) {
+      id
+      userId
       data
     }
   }
