@@ -1,13 +1,14 @@
 import { ADD_PREDICTION, DELETE_DATA, UPDATE_DATA } from '@/clients/mutations';
-import { GET_ALL_AGENTS, GET_DATA } from '@/clients/queries';
+import { GET_DATA } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import GraphInput from '@/components/graph/graph-input';
 import DeleteConfirmationModal from '@/components/modals/delete-modal';
 import ModalGraphHelp from '@/components/modals/graph-help-modal';
-import useGraph from '@/hooks/graph';
-import { useAddAlert } from '@/providers/AlertProvider';
-import { createGraph, formatAndSetGraph } from '@/utils/graphUtils';
-import { useMutation, useQuery, useSubscription } from '@apollo/client';
+import useReactFlowGraph from '@/hooks/graph';
+import { useAddAlert } from '@/providers/alert-provider';
+import { getAgentIdByName } from '@/utils/agents';
+import { createGraph, formatAndSetGraph } from '@/utils/graphs/graph-utils';
+import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
 import { faBroom, faPlus, faQuestionCircle, faSpinner, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Edge, Node } from '@xyflow/react';
@@ -94,9 +95,9 @@ const Setup: React.FC<{ id: string }> = ({ id }) => {
   const alert = useAddAlert();
   const navigate = useNavigate();
 
-  const { nodes, edges, setNodes, setEdges, onNodesChange, onEdgesChange } = useGraph();
+  const { nodes, edges, setNodes, setEdges, onNodesChange, onEdgesChange } = useReactFlowGraph();
 
-  const { data: agents } = useQuery(GET_ALL_AGENTS);
+  const client = useApolloClient();
   const [addPrediction] = useMutation(ADD_PREDICTION);
   const [updateObject] = useMutation(UPDATE_DATA);
   const [deleteObject] = useMutation(DELETE_DATA);
@@ -128,15 +129,14 @@ const Setup: React.FC<{ id: string }> = ({ id }) => {
     },
   });
 
-  const handleGenerateGraph = useCallback(() => {
-    const drawingAgent = agents?.getAllAgents.find(
-      (agent: { name: string }) => agent.name === 'Stakeholder | Graph Generator',
-    );
+  const handleGenerateGraph = useCallback(async () => {
+    const agentId = await getAgentIdByName('Stakeholder | Graph Generator', client);
+
     setLoading(true);
     addPrediction({
       variables: {
         subscriptionId: 'predictionAdded',
-        agentId: drawingAgent?.id,
+        agentId,
         variables: {
           ...form,
           userMessage: `${form.title}: As a ${form.organizationRole} for ${form.organizationName} I am looking create questions to get input from ${form.inputGoals}.`,
@@ -144,7 +144,7 @@ const Setup: React.FC<{ id: string }> = ({ id }) => {
       },
     });
     alert('Started generating graph... This may take a few seconds.', 'info');
-  }, [agents, form, addPrediction, alert]);
+  }, [form, addPrediction, alert]);
 
   const handleGraphCreation = useCallback(
     (input: { nodes: Node[]; edges: Edge[] }, autoPosition: boolean = false) => {

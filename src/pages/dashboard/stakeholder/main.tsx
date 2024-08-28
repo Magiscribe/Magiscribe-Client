@@ -1,7 +1,7 @@
 import { CREATE_DATA } from '@/clients/mutations';
-import { GET_USER_FORMS } from '@/clients/queries';
+import { GET_USER_INQUIRIES } from '@/clients/queries';
 import CustomModal from '@/components/modal';
-import { useAddAlert } from '@/providers/AlertProvider';
+import { useAddAlert } from '@/providers/alert-provider';
 import { useMutation, useQuery } from '@apollo/client';
 import { faArrowLeft, faLink } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -22,7 +22,7 @@ export default function Inquiry() {
   const navigate = useNavigate();
 
   // Queries and Mutations
-  const { data: userFormsData } = useQuery(GET_USER_FORMS);
+  const { data: userFormsData } = useQuery(GET_USER_INQUIRIES);
   const [createObject] = useMutation(CREATE_DATA);
 
   const createForm = async () => {
@@ -50,7 +50,7 @@ export default function Inquiry() {
       {userFormsData?.dataObjectsCreated.map(
         (userForm: {
           data: {
-            form: { title: string; createdAt: number };
+            form: { title: string; organizationName: string; organizationRole: string };
           };
           id: string;
         }) => {
@@ -65,7 +65,10 @@ export default function Inquiry() {
               <h3 className="text-lg font-semibold mb-2">
                 {formData.form.title === '' ? 'Untitled Form' : formData.form.title}
               </h3>
-              <p className="text-sm text-gray-500">Created: {new Date(formData.form.createdAt).toLocaleDateString()}</p>
+              <p className="text-sm text-gray-500 mb-2">
+                {formData.form.organizationName === '' ? 'No Organization' : formData.form.organizationName} |{' '}
+                {formData.form.organizationRole === '' ? 'No Role' : formData.form.organizationRole}
+              </p>
             </motion.div>
           );
         },

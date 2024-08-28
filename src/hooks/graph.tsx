@@ -16,7 +16,7 @@ const initialEdges: Edge[] = [];
  * Custom hook for managing graph state.
  * @returns {Object} Graph state and update functions
  */
-export default function useGraph() {
+export default function useReactFlowGraph() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
