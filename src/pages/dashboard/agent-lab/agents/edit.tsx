@@ -42,7 +42,7 @@ export default function AgentEdit() {
   const [searchParams] = useSearchParams();
 
   // Queries and Mutations
-  const [addUpdateAgent] = useMutation(ADD_UPDATE_AGENT);
+  const [upsertAgent] = useMutation(ADD_UPDATE_AGENT);
   const { data: models } = useQuery(GET_ALL_MODELS);
   const { data: capabilities } = useQuery(GET_ALL_CAPABILITIES);
   useQuery(GET_AGENT, {
@@ -92,7 +92,7 @@ export default function AgentEdit() {
     e.preventDefault();
 
     try {
-      const result = await addUpdateAgent({
+      const result = await upsertAgent({
         variables: {
           agent: {
             id: form.id,

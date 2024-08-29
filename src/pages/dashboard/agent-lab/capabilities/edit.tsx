@@ -67,8 +67,8 @@ export default function CapabilityEdit() {
   const [searchParams] = useSearchParams();
 
   // Queries and Mutations
-  const [addUpdateCapability] = useMutation(ADD_UPDATE_CAPABILITY);
-  const [addUpdatePrompt] = useMutation(ADD_UPDATE_PROMPT);
+  const [upsertCapability] = useMutation(ADD_UPDATE_CAPABILITY);
+  const [upsertPrompt] = useMutation(ADD_UPDATE_PROMPT);
   const { data: prompts } = useQuery(GET_ALL_PROMPTS);
   const { data: models } = useQuery(GET_ALL_MODELS);
   useQuery(GET_CAPABILITY, {
@@ -115,7 +115,7 @@ export default function CapabilityEdit() {
 
   const handleNewPromptAdd = async () => {
     try {
-      const result = await addUpdatePrompt({
+      const result = await upsertPrompt({
         variables: {
           prompt: {
             id: '',
@@ -133,7 +133,7 @@ export default function CapabilityEdit() {
       addAlert('New prompt saved successfully', 'success');
       setForm({
         ...form,
-        prompts: [...form.prompts, result.data.addUpdatePrompt],
+        prompts: [...form.prompts, result.data.upsertPrompt],
       });
       setOpenPromptModal(false);
     } catch (error) {
@@ -157,7 +157,7 @@ export default function CapabilityEdit() {
   };
 
   const handlePromptSave = async (prompt: Prompt, callback: () => void) => {
-    await addUpdatePrompt({
+    await upsertPrompt({
       variables: {
         prompt: {
           id: prompt.id,
@@ -174,7 +174,7 @@ export default function CapabilityEdit() {
     e.preventDefault();
 
     try {
-      const result = await addUpdateCapability({
+      const result = await upsertCapability({
         variables: {
           capability: {
             id: form.id,
