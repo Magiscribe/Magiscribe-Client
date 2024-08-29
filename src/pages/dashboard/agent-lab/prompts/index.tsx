@@ -80,14 +80,14 @@ function PromptCard({
 
 export default function PromptDashboard() {
   const { data, refetch } = useQuery(GET_ALL_PROMPTS);
-  const [addUpdatePrompt] = useMutation(ADD_UPDATE_PROMPT);
+  const [upsertPrompt] = useMutation(ADD_UPDATE_PROMPT);
   const addAlert = useAddAlert();
 
   const handleCopy = async (id: string) => {
     const selectedItem = data?.getAllPrompts.find((prompt: Prompt) => prompt.id === id) as Prompt;
     const timeStamp = Date.now();
     try {
-      const result = await addUpdatePrompt({
+      const result = await upsertPrompt({
         variables: {
           prompt: {
             id: null,

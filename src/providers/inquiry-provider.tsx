@@ -1,5 +1,5 @@
-import { ADD_PREDICTION } from '@/clients/mutations';
-import { GET_DATA } from '@/clients/queries';
+import { ADD_PREDICTION, CREATE_INQUIRY_REPONSE, UPDATE_INQUIRY_RESPONSE } from '@/clients/mutations';
+import { GET_INQUIRY } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import { getAgentIdByName } from '@/utils/agents';
 import { GraphManager } from '@/utils/graphs/graph-manager';
@@ -32,6 +32,7 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
   const graph = useRef<GraphManager | null>(null);
 
   // States
+  const inquiryResponseId = useRef<string | undefined>(undefined);
   const [subscriptionId] = useState<string>(`inquiry_${Date.now()}`);
   const [loading, setLoading] = useState<boolean>(false);
   const [initialized, setInitialized] = useState<boolean>(false);
@@ -42,19 +43,21 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
 
   // Mutations and Apollo client
   const [addPrediction] = useMutation(ADD_PREDICTION);
+  const [createResponse] = useMutation(CREATE_INQUIRY_REPONSE);
+  const [updateResponse] = useMutation(UPDATE_INQUIRY_RESPONSE);
   const client = useApolloClient();
 
   /**
    * Fetches the data object on mount when an ID is provided.
    * Will automatically start the inquiry process.
    */
-  useQuery(GET_DATA, {
+  useQuery(GET_INQUIRY, {
     variables: { id },
     skip: !id,
     errorPolicy: 'all',
-    onCompleted: ({ dataObject }) => {
-      if (dataObject.data.graph) {
-        graph.current = new GraphManager(dataObject.data.graph);
+    onCompleted: ({ getInquiry }) => {
+      if (getInquiry.data.graph) {
+        graph.current = new GraphManager(getInquiry.data.graph);
         graph.current.onNodeVisit(handleOnNodeVisit);
         setInitialized(true);
       }
@@ -96,7 +99,31 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
   async function handleNextNode({ nextNodeId, data }: HandleNextNodeProps = {}): Promise<void> {
     if (!graph.current) return;
 
-    await graph.current.updateCurrentNodeData(data ?? {});
+    if (!inquiryResponseId.current) {
+      const result = await createResponse({
+        variables: {
+          inquiryId: id,
+          data: graph.current.getNodeHistory(),
+        },
+      });
+      inquiryResponseId.current = result.data.upsertInquiryResponse.id;
+    } else {
+      await updateResponse({
+        variables: {
+          id: inquiryResponseId.current,
+          inquiryId: id,
+          data: graph.current.getNodeHistory(),
+        },
+      });
+    }
+
+    // Carries over data if the node has dynamic generation so we know what the node generated.
+    const carryOverdata = graph.current.getCurrentNode()?.data?.dynamicGeneration ? graph.current.getCurrentNode()?.data : {};
+
+    await graph.current.updateCurrentNodeData({
+      ...data,
+      ...carryOverdata,
+    });
     await graph.current.goToNextNode(nextNodeId);
   }
 

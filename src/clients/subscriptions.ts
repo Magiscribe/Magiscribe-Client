@@ -1,7 +1,7 @@
 import { gql } from '@apollo/client';
 
 export const GRAPHQL_SUBSCRIPTION = gql`
-  subscription predictionAdded($subscriptionId: String!) {
+  subscription predictionAdded($subscriptionId: ID!) {
     predictionAdded(subscriptionId: $subscriptionId) {
       id
       subscriptionId

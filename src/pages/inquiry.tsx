@@ -17,21 +17,42 @@ interface Message {
   sender: 'user' | 'bot';
 }
 
+function StartScreen({ onStart }: { onStart: () => void }) {
+  return (
+    <div className="flex items-center justify-center pt-24">
+      <div className="text-center">
+        <h1 className="text-4xl font-bold mb-4">Welcome to the Inquiry</h1>
+        <p className="text-xl mb-8">Click the button below to start your conversation.</p>
+        <button
+          onClick={onStart}
+          className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          Start Inquiry
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function InquiryContent() {
   const [inputMessage, setInputMessage] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
+  const [showStartScreen, setShowStartScreen] = useState(true);
 
-  const [currentNodeType, setCurrentNodeType] = useState<string | null>(null);
-  const [currentRatings, setCurrentRatings] = useState<string[]>([]);
+  const [currentNode, setCurrentNode] = useState<StrippedNode | null>(null);
   const [selectedRatings, setSelectedRatings] = useState<string[]>([]);
 
   const { handleNextNode, loading, initialized, onNodeUpdate } = useInquiry();
 
   useEffect(() => {
-    if (initialized) {
+    if (initialized && !showStartScreen) {
       handleNextNode();
     }
-  }, [initialized]);
+  }, [initialized, showStartScreen]);
+
+  const handleStart = () => {
+    setShowStartScreen(false);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,8 +74,6 @@ function InquiryContent() {
       handleNextNode({ data: responseData });
       setInputMessage('');
       setSelectedRatings([]);
-      setCurrentNodeType(null);
-      setCurrentRatings([]);
     }
   };
 
@@ -65,19 +84,7 @@ function InquiryContent() {
         { type: 'text', content: node.data.text as string, sender: 'bot' },
       ]);
 
-      if (node.type === 'conversation') {
-        const conversationData = node.data as NodeData & { type?: string; ratings?: string[] };
-        if (conversationData.type === 'rating-single' || conversationData.type === 'rating-multi') {
-          setCurrentNodeType(conversationData.type);
-          setCurrentRatings(conversationData.ratings || []);
-        } else {
-          setCurrentNodeType(null);
-          setCurrentRatings([]);
-        }
-      } else {
-        setCurrentNodeType(null);
-        setCurrentRatings([]);
-      }
+      setCurrentNode(node);
     }
 
     if (node.type === 'information') {
@@ -89,8 +96,12 @@ function InquiryContent() {
 
   onNodeUpdate(onNodeVisit);
 
+  if (showStartScreen) {
+    return <StartScreen onStart={handleStart} />;
+  }
+
   return (
-    <div className="flex items-center justify-center max-w-4xl mx-auto p-4">
+    <div className="flex items-center justify-center pt-24">
       <div className="container max-w-3xl">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-bold">Chat</h2>
@@ -112,12 +123,12 @@ function InquiryContent() {
             </div>
           ))}
         </div>
-        {currentNodeType != 'end' && (
+        {currentNode && currentNode.type != 'end' && (
           <>
-            {currentNodeType && currentNodeType.startsWith('rating') && (
+            {currentNode.data && currentNode.data.type && (currentNode.data.type as string).startsWith('rating') && (
               <RatingInput
-                ratings={currentRatings}
-                isMulti={currentNodeType === 'rating-multi'}
+                ratings={currentNode.data.ratings as any}
+                isMulti={currentNode.data.type === 'rating-multi'}
                 onRatingChange={setSelectedRatings}
               />
             )}
@@ -126,7 +137,7 @@ function InquiryContent() {
                 type="text"
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
-                placeholder="Additional Thoughts (optional)"
+                placeholder="Type your message here..."
                 className={clsx(
                   'flex-grow p-2 border border-gray-300 rounded-l-lg text-black',
                   'focus:outline-none focus:ring-2 focus:ring-blue-500',

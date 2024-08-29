@@ -78,7 +78,7 @@ function AgentCard({ agent, onUpdate, onCopy }: { agent: Agent; onUpdate?: () =>
 
 export default function AgentDashboard() {
   const { data, refetch } = useQuery(GET_ALL_AGENTS);
-  const [addUpdateAgent] = useMutation(ADD_UPDATE_AGENT);
+  const [upsertAgent] = useMutation(ADD_UPDATE_AGENT);
   const addAlert = useAddAlert();
 
   const handleCopy = async (id: string) => {
@@ -90,7 +90,7 @@ export default function AgentDashboard() {
 
     const timeStamp = Date.now();
     try {
-      const result = await addUpdateAgent({
+      const result = await upsertAgent({
         variables: {
           agent: {
             id: null, // Ensure a new agent is created

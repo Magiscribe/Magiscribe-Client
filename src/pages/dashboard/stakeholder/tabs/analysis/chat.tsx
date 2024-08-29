@@ -24,7 +24,7 @@ export default function ViaChatTab({ data }: TabProps) {
   const [subscriptionId] = useState<string>(`advanced_analysis_${Date.now()}`);
   const [messages, setMessages] = useState<Message[]>([]);
 
-  if (!data.data.nodeVisitData) return <div className="p-4">No data available</div>;
+  if (!data.nodeVisitData) return <div className="p-4">No data available</div>;
 
   // Ref
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -121,8 +121,8 @@ export default function ViaChatTab({ data }: TabProps) {
             agentId,
             variables: {
               userMessage: inputMessage,
-              conversationData: JSON.stringify(data.data),
-              numResponses: data.data.nodeVisitData.length,
+              conversationData: JSON.stringify(data),
+              numResponses: data.nodeVisitData.length,
             },
           },
         });

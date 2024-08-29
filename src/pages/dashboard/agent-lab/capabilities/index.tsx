@@ -89,13 +89,13 @@ function CapabilityCard({
 export default function CapabilityDashboard() {
   const addAlert = useAddAlert();
   const { data, refetch } = useQuery(GET_ALL_CAPABILITIES);
-  const [addUpdateCapability] = useMutation(ADD_UPDATE_CAPABILITY);
+  const [upsertCapability] = useMutation(ADD_UPDATE_CAPABILITY);
 
   const handleCopy = async (id: string) => {
     const selectedItem = data?.getAllCapabilities.find((capability: Capability) => capability.id === id) as Capability;
     const timeStamp = Date.now();
     try {
-      const result = await addUpdateCapability({
+      const result = await upsertCapability({
         variables: {
           capability: {
             id: null,

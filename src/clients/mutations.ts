@@ -17,19 +17,14 @@ export const GENERATE_AUDIO = gql`
 `;
 
 export const ADD_PREDICTION = gql`
-  mutation addPrediction(
-    $subscriptionId: String!
-    $agentId: String!
-    $variables: JSONObject
-    $attachments: [JSONObject!]
-  ) {
+  mutation addPrediction($subscriptionId: ID!, $agentId: ID!, $variables: JSONObject, $attachments: [JSONObject!]) {
     addPrediction(subscriptionId: $subscriptionId, agentId: $agentId, variables: $variables, attachments: $attachments)
   }
 `;
 
 export const ADD_UPDATE_AGENT = gql`
   mutation Mutation($agent: AgentInput!) {
-    addUpdateAgent(agent: $agent) {
+    upsertAgent(agent: $agent) {
       id
       name
       description
@@ -46,7 +41,7 @@ export const ADD_UPDATE_AGENT = gql`
 `;
 
 export const DELETE_AGENT = gql`
-  mutation Mutation($agentId: String!) {
+  mutation Mutation($agentId: ID!) {
     deleteAgent(agentId: $agentId) {
       id
     }
@@ -55,7 +50,7 @@ export const DELETE_AGENT = gql`
 
 export const ADD_UPDATE_CAPABILITY = gql`
   mutation Mutation($capability: CapabilityInput!) {
-    addUpdateCapability(capability: $capability) {
+    upsertCapability(capability: $capability) {
       id
       name
       alias
@@ -74,7 +69,7 @@ export const ADD_UPDATE_CAPABILITY = gql`
 `;
 
 export const DELETE_CAPABILITY = gql`
-  mutation Mutation($capabilityId: String!) {
+  mutation Mutation($capabilityId: ID!) {
     deleteCapability(capabilityId: $capabilityId) {
       id
     }
@@ -83,7 +78,7 @@ export const DELETE_CAPABILITY = gql`
 
 export const ADD_UPDATE_PROMPT = gql`
   mutation Mutation($prompt: PromptInput!) {
-    addUpdatePrompt(prompt: $prompt) {
+    upsertPrompt(prompt: $prompt) {
       id
       name
       text
@@ -92,44 +87,52 @@ export const ADD_UPDATE_PROMPT = gql`
 `;
 
 export const DELETE_PROMPT = gql`
-  mutation Mutation($promptId: String!) {
+  mutation Mutation($promptId: ID!) {
     deletePrompt(promptId: $promptId) {
       id
     }
   }
 `;
 
-export const CREATE_DATA = gql`
+export const CREATE_INQUIRY = gql`
   mutation Mutation($data: JSONObject!) {
-    createUpdateDataObject(data: $data) {
+    upsertInquiry(data: $data) {
+      data
+    }
+  }
+`;
+
+export const UPDATE_INQUIRY = gql`
+  mutation Mutation($id: ID!, $data: JSONObject!) {
+    upsertInquiry(id: $id, data: $data) {
       id
       data
     }
   }
 `;
 
-export const INSERT_DATA = gql`
-  mutation Mutation($id: String!, $value: JSONObject!, $field: String!) {
-    insertIntoDataObject(id: $id, value: $value, field: $field) {
-      data
+export const DELETE_INQUIRY = gql`
+  mutation Mutation($id: ID!) {
+    deleteInquiry(id: $id) {
       id
     }
   }
 `;
 
-export const UPDATE_DATA = gql`
-  mutation Mutation($id: String!, $data: JSONObject!) {
-    createUpdateDataObject(id: $id, data: $data) {
+export const CREATE_INQUIRY_REPONSE = gql`
+  mutation Mutation($inquiryId: ID, $data: [JSONObject!]!) {
+    upsertInquiryResponse(inquiryId: $inquiryId, data: $data) {
       id
       data
     }
   }
 `;
 
-export const DELETE_DATA = gql`
-  mutation Mutation($id: String!) {
-    deleteDataObject(id: $id) {
+export const UPDATE_INQUIRY_RESPONSE = gql`
+  mutation Mutation($id: ID, $inquiryId: ID, $data: [JSONObject!]!) {
+    upsertInquiryResponse(id: $id, inquiryId: $inquiryId, data: $data) {
       id
+      data
     }
   }
 `;

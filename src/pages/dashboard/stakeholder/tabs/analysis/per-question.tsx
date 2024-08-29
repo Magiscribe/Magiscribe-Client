@@ -6,7 +6,7 @@ import Chart, { ChartProps, ChartData } from '@/components/chart';
 
 const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const { graph, nodeVisitData: responses, summary } = data.data;
+  const { graph, nodeVisitData: responses } = data;
 
   if (!responses) return <div className="p-4">No response data available</div>;
 
@@ -26,10 +26,12 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
   const currentNode = conversationNodes[currentQuestionIndex];
   const nodeData = currentNode.data;
 
+
   const currentSummary = summary?.perQuestion?.questions?.find((q) => q.nodeId === currentNode.id);
 
   const renderBarChart = (ratingSummary: { counts: { [key: string]: number } } | undefined) => {
     if (!ratingSummary) return null;
+
 
     const chartData: ChartData[] = Object.entries(ratingSummary.counts).map(([name, value]) => ({ name, value }));
     const chartProps: ChartProps = {
@@ -89,18 +91,14 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
       <div>
         <h2 className="font-bold mb-2">Responses</h2>
         <div className="mb-6 p-4">
-          {currentSummary?.textSummary && (
-            <div className="mb-4 p-4 bg-blue-100 rounded">
-              <h3 className="font-semibold mb-2 text-black">AI Summary</h3>
-              <p className="text-black">{currentSummary.textSummary}</p>
-            </div>
-          )}
           <div className="mb-6 p-4 bg-gray-100 rounded">
             <>
               <p className="font-semibold mb-2 text-black">{nodeData.text}</p>
+
               {currentSummary?.ratingSummary && (
                 <div className="mb-4">{renderBarChart(currentSummary.ratingSummary)}</div>
               )}
+
               {renderAnswers(currentNode.id)}
             </>
           </div>
