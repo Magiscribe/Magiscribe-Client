@@ -8,7 +8,7 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const { graph, nodeVisitData: responses, summary } = data.data;
 
-  if (!responses) return <div className="p-4">No data available</div>;
+  if (!responses) return <div className="p-4">No response data available</div>;
 
   const conversationNodes = useMemo(
     () =>
@@ -22,12 +22,15 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
   if (!conversationNodes.length) {
     return <div className="p-4">No conversation nodes found.</div>;
   }
+
   const currentNode = conversationNodes[currentQuestionIndex];
   const nodeData = currentNode.data;
 
-  const currentSummary = summary.perQuestion.questions.find((q) => q.nodeId === currentNode.id);
+  const currentSummary = summary?.perQuestion?.questions?.find((q) => q.nodeId === currentNode.id);
 
-  const renderBarChart = (ratingSummary: { counts: { [key: string]: number } }) => {
+  const renderBarChart = (ratingSummary: { counts: { [key: string]: number } } | undefined) => {
+    if (!ratingSummary) return null;
+
     const chartData: ChartData[] = Object.entries(ratingSummary.counts).map(([name, value]) => ({ name, value }));
     const chartProps: ChartProps = {
       title: 'Rating Distribution',
@@ -95,7 +98,7 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
           <div className="mb-6 p-4 bg-gray-100 rounded">
             <>
               <p className="font-semibold mb-2 text-black">{nodeData.text}</p>
-              {currentSummary && currentSummary.ratingSummary && (
+              {currentSummary?.ratingSummary && (
                 <div className="mb-4">{renderBarChart(currentSummary.ratingSummary)}</div>
               )}
               {renderAnswers(currentNode.id)}
