@@ -7,6 +7,7 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import ViaChatTab from './chat';
 import PerResponseTab from './per-response';
+import PerQuestionTab from './per-question';
 
 const AnalysisTab: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -41,7 +42,7 @@ const AnalysisTab: React.FC = () => {
     summary: 'Lorem ipsum',
   };
 
-  const tabCategories = ['Per Response', /** 'Per Question',*/ 'Via Chat'];
+  const tabCategories = ['Per Response', 'Per Question', 'Via Chat'];
 
   return (
     <div className="mt-8">
@@ -70,11 +71,11 @@ const AnalysisTab: React.FC = () => {
               <PerResponseTab data={data} />
             </motion.div>
           </TabPanel>
-          {/* <TabPanel>
+          <TabPanel>
             <motion.div initial={{ opacity: 0, x: -100 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 100 }}>
-              <PerQuestionTab data={analysisData} />
+              <PerQuestionTab data={data} />
             </motion.div>
-          </TabPanel> */}
+          </TabPanel>
           <TabPanel>
             <motion.div initial={{ opacity: 0, x: -100 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 100 }}>
               <ViaChatTab data={data} />

@@ -39,8 +39,7 @@ function InquiryContent() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [showStartScreen, setShowStartScreen] = useState(true);
 
-  const [currentNodeType, setCurrentNodeType] = useState<string | null>(null);
-  const [currentRatings, setCurrentRatings] = useState<string[]>([]);
+  const [currentNode, setCurrentNode] = useState<StrippedNode | null>(null);
   const [selectedRatings, setSelectedRatings] = useState<string[]>([]);
 
   const { handleNextNode, loading, initialized, onNodeUpdate } = useInquiry();
@@ -75,8 +74,6 @@ function InquiryContent() {
       handleNextNode({ data: responseData });
       setInputMessage('');
       setSelectedRatings([]);
-      setCurrentNodeType(null);
-      setCurrentRatings([]);
     }
   };
 
@@ -87,19 +84,7 @@ function InquiryContent() {
         { type: 'text', content: node.data.text as string, sender: 'bot' },
       ]);
 
-      if (node.type === 'conversation') {
-        const conversationData = node.data as NodeData & { type?: string; ratings?: string[] };
-        if (conversationData.type === 'rating-single' || conversationData.type === 'rating-multi') {
-          setCurrentNodeType(conversationData.type);
-          setCurrentRatings(conversationData.ratings || []);
-        } else {
-          setCurrentNodeType(null);
-          setCurrentRatings([]);
-        }
-      } else {
-        setCurrentNodeType(null);
-        setCurrentRatings([]);
-      }
+      setCurrentNode(node);
     }
 
     if (node.type === 'information') {
@@ -138,12 +123,12 @@ function InquiryContent() {
             </div>
           ))}
         </div>
-        {currentNodeType != 'end' && (
+        {currentNode && currentNode.type != 'end' && (
           <>
-            {currentNodeType && currentNodeType.startsWith('rating') && (
+            {currentNode.data && currentNode.data.type && (currentNode.data.type as string).startsWith('rating') && (
               <RatingInput
-                ratings={currentRatings}
-                isMulti={currentNodeType === 'rating-multi'}
+                ratings={currentNode.data.ratings as any}
+                isMulti={currentNode.data.type === 'rating-multi'}
                 onRatingChange={setSelectedRatings}
               />
             )}
@@ -152,7 +137,7 @@ function InquiryContent() {
                 type="text"
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
-                placeholder="Additional Thoughts (optional)"
+                placeholder="Type your message here..."
                 className={clsx(
                   'flex-grow p-2 border border-gray-300 rounded-l-lg text-black',
                   'focus:outline-none focus:ring-2 focus:ring-blue-500',

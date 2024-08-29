@@ -99,20 +99,15 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
   async function handleNextNode({ nextNodeId, data }: HandleNextNodeProps = {}): Promise<void> {
     if (!graph.current) return;
 
-    console.log(id);
-
     if (!inquiryResponseId.current) {
-      console.log('creating response');
       const result = await createResponse({
         variables: {
           inquiryId: id,
           data: graph.current.getNodeHistory(),
         },
       });
-      console.log(result.data.upsertInquiryResponse.id);
       inquiryResponseId.current = result.data.upsertInquiryResponse.id;
     } else {
-      console.log('updating response');
       await updateResponse({
         variables: {
           id: inquiryResponseId.current,
@@ -122,7 +117,13 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
       });
     }
 
-    await graph.current.updateCurrentNodeData(data ?? {});
+    // Carries over data if the node has dynamic generation so we know what the node generated.
+    const carryOverdata = graph.current.getCurrentNode()?.data?.dynamicGeneration ? graph.current.getCurrentNode()?.data : {};
+
+    await graph.current.updateCurrentNodeData({
+      ...data,
+      ...carryOverdata,
+    });
     await graph.current.goToNextNode(nextNodeId);
   }
 

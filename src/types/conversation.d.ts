@@ -28,6 +28,7 @@ export interface GraphNode {
 }
 
 export interface ConversationNodeData {
+  text: string;
   response: string;
   type: 'rating-single' | 'rating-multi' | 'open-ended' | 'scalar-single' | 'scalar-multi';
   ratings?: string[];

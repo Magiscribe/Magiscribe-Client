@@ -9,7 +9,7 @@ export default function Main() {
       <div className="h-full w-full leading-normal tracking-normal text-white h-full absolute top-0">
         <NavBar />
 
-        <div className="pt-24 h-full">
+        <div className="pt-24">
           <Outlet />
         </div>
 

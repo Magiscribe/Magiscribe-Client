@@ -6,10 +6,10 @@ import { ConversationNodeData, GraphNode, NodeVisitData, TabProps } from '@/type
 const PerResponseTab: React.FC<TabProps> = ({ data }) => {
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
-  const { nodeVisitData: users = [], graph } = data;
+  const { nodeVisitData = [], graph } = data;
   const usersPerPage = 42;
 
-  if (!users.length) return <div className="p-4">No data available</div>;
+  if (!nodeVisitData.length) return <div className="p-4">No data available</div>;
 
   const nodesMap = useMemo(
     () => Object.fromEntries((graph?.nodes || []).map((node) => [node.id, node])),
@@ -18,7 +18,7 @@ const PerResponseTab: React.FC<TabProps> = ({ data }) => {
 
   const renderNodeContent = (node: NodeVisitData, graphNode: GraphNode) => {
     if (graphNode?.data && 'type' in graphNode.data) {
-      const { response: graphText } = graphNode.data as ConversationNodeData;
+      const { text: graphText } = graphNode.data as ConversationNodeData;
       const { data: nodeData } = node;
 
       if (graphText) {
@@ -29,7 +29,13 @@ const PerResponseTab: React.FC<TabProps> = ({ data }) => {
             </p>
             <hr className="my-2" />
             <p className="text-black">
-              {nodeData?.response || nodeData?.ratings?.join(', ') || nodeData?.scalars?.join(', ')}
+              {nodeData?.response && <span>{nodeData.response}</span>}
+              {nodeData?.ratings?.length && nodeData?.ratings?.length > 0 && (
+                <span>{nodeData.response ? ' - ' : ''}{nodeData.ratings.join(', ')}</span>
+              )}
+              {nodeData?.scalars?.length && nodeData?.scalars?.length > 0 && (
+                <span>{(nodeData.response || nodeData.ratings?.length && nodeData.ratings?.length > 0) ? ' - ' : ''}{nodeData.scalars.join(', ')}</span>
+              )}
             </p>
           </>
         );
@@ -38,8 +44,8 @@ const PerResponseTab: React.FC<TabProps> = ({ data }) => {
     return null;
   };
 
-  const totalPages = Math.ceil(users.length / usersPerPage);
-  const displayedUsers = users.slice(currentPage * usersPerPage, (currentPage + 1) * usersPerPage);
+  const totalPages = Math.ceil(nodeVisitData.length / usersPerPage);
+  const displayedUsers = nodeVisitData.slice(currentPage * usersPerPage, (currentPage + 1) * usersPerPage);
 
   return (
     <div className="bg-white px-4 py-8 rounded-2xl shadow-xl text-slate-700">
@@ -49,19 +55,18 @@ const PerResponseTab: React.FC<TabProps> = ({ data }) => {
       <div className="my-4">
         <h2 className="font-bold mb-2">Select User</h2>
         <div className="grid grid-cols-4 sm:grid-col-3 lg:grid-cols-4 gap-2">
-          {displayedUsers.map(({ userId }) => (
+          {displayedUsers.map(({ id, userId }) => (
             <button
-              key={userId}
-              onClick={() => setSelectedUser((prev) => (prev === userId ? null : (userId as string)))}
-              className={`p-2 text-sm rounded-md ${
-                selectedUser === userId ? 'bg-blue-500 text-white' : 'bg-slate-200 text-black'
-              }`}
+              key={`${id}-${userId}`}
+              onClick={() => setSelectedUser((prev) => (prev === id ? null : (id as string)))}
+              className={`p-2 text-sm rounded-md ${selectedUser === id ? 'bg-blue-500 text-white' : 'bg-slate-200 text-black'
+                }`}
             >
               {userId || 'Unknown'}
             </button>
           ))}
         </div>
-        {users.length > usersPerPage && (
+        {nodeVisitData.length > usersPerPage && (
           <div className="flex justify-end mt-4 space-x-2">
             {[faChevronLeft, faChevronRight].map((icon, index) => (
               <button
@@ -83,8 +88,8 @@ const PerResponseTab: React.FC<TabProps> = ({ data }) => {
           </h2>
         )}
         {selectedUser &&
-          users
-            .find((u) => u.userId === selectedUser)
+          nodeVisitData
+            .find((u) => u.id === selectedUser)
             ?.data?.map((node) => {
               const graphNode = nodesMap[node.id];
               if (graphNode?.type === 'conversation') {
