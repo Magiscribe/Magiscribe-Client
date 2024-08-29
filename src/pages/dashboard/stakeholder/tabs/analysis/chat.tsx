@@ -57,49 +57,51 @@ export default function ViaChatTab({ data }: TabProps) {
     },
   });
 
-  const base64Decode = (text: string): string => {
-    const binaryString = atob(text);
-    const bytes = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
-    }
-    return new TextDecoder().decode(bytes);
-  };
+  const parseAndDisplayAnalysisResults = (result: string[]) => {
+    console.log('Received result:', result);
 
-  const parseAndDisplayAnalysisResults = (results: string[]) => {
-    console.log(results);
-    console.log(results[0]);
-    const parsedResult = JSON.parse(results[0]);
-    parsedResult.forEach(
-      (result: {
-        title: string;
-        text: string;
-        markdownTextBase64: string;
-        chartType: string;
-        data: { name: string; value: number }[];
-      }) => {
-        try {
-          if (result.chartType && Array.isArray(result.data)) {
-            const chartProps: ChartProps = {
-              title: result.title || '',
-              chartType: result.chartType,
-              data: result.data.map((item: { name: string; value: number }) => ({
-                name: item.name,
-                value: item.value,
-              })),
-            };
-            setMessages((prevMessages) => [...prevMessages, { type: 'chart', content: chartProps, sender: 'bot' }]);
-          } else if (result.markdownTextBase64) {
-            const decodedMarkdown = base64Decode(result.markdownTextBase64);
-            setMessages((prevMessages) => [...prevMessages, { type: 'text', content: decodedMarkdown, sender: 'bot' }]);
-          } else {
-            setMessages((prevMessages) => [...prevMessages, { type: 'text', content: result.text, sender: 'bot' }]);
-          }
-        } catch (error) {
-          console.error('Error parsing result:', error);
+    try {
+      if (result.length === 0) {
+        console.error('Result array is empty');
+        return;
+      }
+
+      const content = result[0];
+
+      // Extract JSON content
+      const jsonMatch = content.match(/```json\n([\s\S]*?)\n```/);
+      const jsonContent = jsonMatch ? jsonMatch[1] : null;
+
+      // Extract Markdown content
+      const markdownMatch = content.match(/```markdown\n([\s\S]*?)\n```/);
+      const markdownContent = markdownMatch ? markdownMatch[1] : null;
+
+      if (jsonContent) {
+        const parsedResult = JSON.parse(jsonContent);
+
+        // Handle chart data
+        if (parsedResult.chartType && Array.isArray(parsedResult.data)) {
+          const chartProps: ChartProps = {
+            title: parsedResult.title || '',
+            chartType: parsedResult.chartType,
+            data: parsedResult.data.map((item: { name: string; value: number }) => ({
+              name: item.name,
+              value: item.value,
+            })),
+          };
+          console.log('Created chart props:', chartProps);
+          setMessages((prevMessages) => [...prevMessages, { type: 'chart', content: chartProps, sender: 'bot' }]);
         }
-      },
-    );
+      }
+
+      // Handle Markdown content
+      if (markdownContent) {
+        console.log('Adding Markdown content to messages');
+        setMessages((prevMessages) => [...prevMessages, { type: 'text', content: markdownContent, sender: 'bot' }]);
+      }
+    } catch (error) {
+      console.error('Error in parseAndDisplayAnalysisResults:', error);
+    }
   };
 
   const handleSendMessage = async (e: React.FormEvent) => {
