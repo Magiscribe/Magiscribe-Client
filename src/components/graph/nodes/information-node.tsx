@@ -37,7 +37,6 @@ export default function InformationNode({ id, data }: InformationNodeProps) {
           <textarea
             ref={textareaRef}
             name="text"
-            value={data.text}
             onChange={handleInputChange}
             rows={1}
             placeholder="Enter your text here..."
