@@ -1,14 +1,18 @@
 import React, { useMemo, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
-import { GraphNode, ConversationNodeData, TabProps } from '@/types/conversation';
-import Chart, { ChartProps, ChartData } from '@/components/chart';
+import {
+  GraphNode,
+  ConversationNodeData,
+  TabProps,
+  IndividualConversationData,
+  NodeVisitData,
+} from '@/types/conversation';
+// import Chart, { ChartProps, ChartData } from '@/components/chart';
 
 const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const { graph, nodeVisitData: responses } = data;
-
-  if (!responses) return <div className="p-4">No response data available</div>;
 
   const conversationNodes = useMemo(
     () =>
@@ -19,56 +23,74 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
     [graph.nodes],
   );
 
-  if (!conversationNodes.length) {
-    return <div className="p-4">No conversation nodes found.</div>;
+  const groupedResponses = useMemo(() => {
+    const grouped: { [nodeId: string]: { [userId: string]: NodeVisitData[] } } = {};
+    responses.forEach((response: IndividualConversationData) => {
+      response.data.forEach((nodeVisit: NodeVisitData) => {
+        if (!grouped[nodeVisit.id]) {
+          grouped[nodeVisit.id] = {};
+        }
+        if (!grouped[nodeVisit.id][response.userId || 'anonymous']) {
+          grouped[nodeVisit.id][response.userId || 'anonymous'] = [];
+        }
+        grouped[nodeVisit.id][response.userId || 'anonymous'].push(nodeVisit);
+      });
+    });
+    return grouped;
+  }, [responses]);
+
+  if (!responses || !conversationNodes.length) {
+    return <div className="p-4">No data available</div>;
   }
 
-  const currentNode = useMemo(() => {
-    return conversationNodes[currentQuestionIndex];
-  }, [conversationNodes, currentQuestionIndex]) 
+  const currentNode = conversationNodes[currentQuestionIndex];
+  const nodeData = currentNode.data;
 
+  // const renderBarChart = (ratingSummary: { counts: { [key: string]: number } } | undefined) => {
+  //   if (!ratingSummary) return null;
 
-  //const currentSummary = summary?.perQuestion?.questions?.find((q) => q.nodeId === currentNode.id);
-  const currentSummary = null;
-  const renderBarChart = (ratingSummary: { counts: { [key: string]: number } } | undefined) => {
-    if (!ratingSummary) return null;
+  //   const chartData: ChartData[] = Object.entries(ratingSummary.counts).map(([name, value]) => ({ name, value }));
+  //   const chartProps: ChartProps = {
+  //     title: 'Rating Distribution',
+  //     chartType: 'BarChart',
+  //     data: chartData,
+  //   };
+  //   return <Chart {...chartProps} />;
+  // };
 
+  const renderAnswers = (nodeId: string) => {
+    const nodeResponses = groupedResponses[nodeId] || {};
+    return Object.entries(nodeResponses).map(([userId, userResponses]) => (
+      <div key={`${userId}-${nodeId}`} className="ml-4 mb-4">
+        <p className="text-black font-semibold">{userId}:</p>
+        {userResponses.map((response, index) => {
+          const isDynamicGeneration = response.data?.text !== undefined;
+          const answerContent =
+            response.data?.response ||
+            response.data?.ratings?.join(', ') ||
+            response.data?.scalars?.join(', ') ||
+            'No response';
 
-    const chartData: ChartData[] = Object.entries(ratingSummary.counts).map(([name, value]) => ({ name, value }));
-    const chartProps: ChartProps = {
-      title: 'Rating Distribution',
-      chartType: 'BarChart',
-      data: chartData,
-    };
-    return <Chart {...chartProps} />;
-  };
-
-  const renderAnswers = (nodeId: string) =>
-    responses.map((response) => {
-      const answer = response.data.find((node) => node.id === nodeId);
-      if (answer?.data) {
-        var answerContent = answer.data.response;
-        answerContent += answer.data.ratings? "  Rating: " + answer.data.ratings?.join(', ') : "";
-        answerContent += answer.data.scalars? "  Rating: " + answer.data.scalars?.join(', ') : "";
-        return (
-          <div key={`${response.userId}-${nodeId}`} className="ml-4 mb-2">
-            <p className="text-black">
-              <span className="font-semibold">{response.userId}:</span>{' '}
-              {answer.data.question ? (
+          return (
+            <div key={`${userId}-${nodeId}-${index}`} className="ml-4 mt-2">
+              {isDynamicGeneration ? (
                 <>
-                  <span className="font-semibold">{answer.data.question}</span>
-                  <br />
-                  {answerContent}
+                  <p className="text-black font-medium">
+                    #{index + 1}: {response.data?.text}
+                  </p>
+                  <p className="text-black ml-4">{answerContent}</p>
                 </>
               ) : (
-                answerContent
+                <p className="text-black">
+                  <span className="font-medium">#{index + 1}:</span> {answerContent}
+                </p>
               )}
-            </p>
-          </div>
-        );
-      }
-      return null;
-    });
+            </div>
+          );
+        })}
+      </div>
+    ));
+  };
 
   return (
     <div className="bg-white px-4 py-8 rounded-2xl shadow-xl text-slate-700">
@@ -93,16 +115,12 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
       </div>
       <div>
         <h2 className="font-bold mb-2">Responses</h2>
-        
         <div className="mb-6 p-4">
           <div className="mb-6 p-4 bg-gray-100 rounded">
-            <>
-              <p className="font-semibold mb-2 text-black">{currentNode.data.text}</p>
-              {renderAnswers(currentNode.id)}
-            </>
+            <p className="font-semibold mb-2 text-black">{nodeData.text}</p>
+            {renderAnswers(currentNode.id)}
           </div>
         </div>
-      
         <div className="flex justify-end mt-4 space-x-2">
           {[faChevronLeft, faChevronRight].map((icon, index) => (
             <button
