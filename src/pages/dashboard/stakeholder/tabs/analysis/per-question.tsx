@@ -23,12 +23,13 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
     return <div className="p-4">No conversation nodes found.</div>;
   }
 
-  const currentNode = conversationNodes[currentQuestionIndex];
-  const nodeData = currentNode.data;
+  const currentNode = useMemo(() => {
+    return conversationNodes[currentQuestionIndex];
+  }, [conversationNodes, currentQuestionIndex]) 
 
 
-  const currentSummary = summary?.perQuestion?.questions?.find((q) => q.nodeId === currentNode.id);
-
+  //const currentSummary = summary?.perQuestion?.questions?.find((q) => q.nodeId === currentNode.id);
+  const currentSummary = null;
   const renderBarChart = (ratingSummary: { counts: { [key: string]: number } } | undefined) => {
     if (!ratingSummary) return null;
 
@@ -46,7 +47,9 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
     responses.map((response) => {
       const answer = response.data.find((node) => node.id === nodeId);
       if (answer?.data) {
-        const answerContent = answer.data.text || answer.data.ratings?.join(', ') || answer.data.scalars?.join(', ');
+        var answerContent = answer.data.response;
+        answerContent += answer.data.ratings? "  Rating: " + answer.data.ratings?.join(', ') : "";
+        answerContent += answer.data.scalars? "  Rating: " + answer.data.scalars?.join(', ') : "";
         return (
           <div key={`${response.userId}-${nodeId}`} className="ml-4 mb-2">
             <p className="text-black">
@@ -90,19 +93,16 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
       </div>
       <div>
         <h2 className="font-bold mb-2">Responses</h2>
+        
         <div className="mb-6 p-4">
           <div className="mb-6 p-4 bg-gray-100 rounded">
             <>
-              <p className="font-semibold mb-2 text-black">{nodeData.text}</p>
-
-              {currentSummary?.ratingSummary && (
-                <div className="mb-4">{renderBarChart(currentSummary.ratingSummary)}</div>
-              )}
-
+              <p className="font-semibold mb-2 text-black">{currentNode.data.text}</p>
               {renderAnswers(currentNode.id)}
             </>
           </div>
         </div>
+      
         <div className="flex justify-end mt-4 space-x-2">
           {[faChevronLeft, faChevronRight].map((icon, index) => (
             <button
