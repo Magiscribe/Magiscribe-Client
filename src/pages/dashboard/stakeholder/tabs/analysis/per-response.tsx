@@ -31,10 +31,16 @@ const PerResponseTab: React.FC<TabProps> = ({ data }) => {
             <p className="text-black">
               {nodeData?.response && <span>{nodeData.response}</span>}
               {nodeData?.ratings?.length && nodeData?.ratings?.length > 0 && (
-                <span>{nodeData.response ? ' - ' : ''}{nodeData.ratings.join(', ')}</span>
+                <span>
+                  {nodeData.response ? ' - ' : ''}
+                  {nodeData.ratings.join(', ')}
+                </span>
               )}
               {nodeData?.scalars?.length && nodeData?.scalars?.length > 0 && (
-                <span>{(nodeData.response || nodeData.ratings?.length && nodeData.ratings?.length > 0) ? ' - ' : ''}{nodeData.scalars.join(', ')}</span>
+                <span>
+                  {nodeData.response || (nodeData.ratings?.length && nodeData.ratings?.length > 0) ? ' - ' : ''}
+                  {nodeData.scalars.join(', ')}
+                </span>
               )}
             </p>
           </>
@@ -59,8 +65,9 @@ const PerResponseTab: React.FC<TabProps> = ({ data }) => {
             <button
               key={`${id}-${userId}`}
               onClick={() => setSelectedUser((prev) => (prev === id ? null : (id as string)))}
-              className={`p-2 text-sm rounded-md ${selectedUser === id ? 'bg-blue-500 text-white' : 'bg-slate-200 text-black'
-                }`}
+              className={`p-2 text-sm rounded-md ${
+                selectedUser === id ? 'bg-blue-500 text-white' : 'bg-slate-200 text-black'
+              }`}
             >
               {userId || 'Unknown'}
             </button>

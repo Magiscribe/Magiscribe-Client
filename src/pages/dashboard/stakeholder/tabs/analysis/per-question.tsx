@@ -26,12 +26,10 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
   const currentNode = conversationNodes[currentQuestionIndex];
   const nodeData = currentNode.data;
 
-
   const currentSummary = summary?.perQuestion?.questions?.find((q) => q.nodeId === currentNode.id);
 
   const renderBarChart = (ratingSummary: { counts: { [key: string]: number } } | undefined) => {
     if (!ratingSummary) return null;
-
 
     const chartData: ChartData[] = Object.entries(ratingSummary.counts).map(([name, value]) => ({ name, value }));
     const chartProps: ChartProps = {

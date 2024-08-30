@@ -118,7 +118,9 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
     }
 
     // Carries over data if the node has dynamic generation so we know what the node generated.
-    const carryOverdata = graph.current.getCurrentNode()?.data?.dynamicGeneration ? graph.current.getCurrentNode()?.data : {};
+    const carryOverdata = graph.current.getCurrentNode()?.data?.dynamicGeneration
+      ? graph.current.getCurrentNode()?.data
+      : {};
 
     await graph.current.updateCurrentNodeData({
       ...data,

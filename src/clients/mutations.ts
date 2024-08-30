@@ -97,6 +97,7 @@ export const DELETE_PROMPT = gql`
 export const CREATE_INQUIRY = gql`
   mutation Mutation($data: JSONObject!) {
     upsertInquiry(data: $data) {
+      id
       data
     }
   }

@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { faPaperPlane, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPaperPlane, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 
 import { ChartProps } from '@/components/chart';
-import MarkdownCustom from '@/components/markdown-custom';
 import RatingInput from '@/components/graph/rating-input';
+import MarkdownCustom from '@/components/markdown-custom';
 import { InquiryProvider, useInquiry } from '@/providers/inquiry-provider';
-import { StrippedNode, NodeData } from '@/utils/graphs/graph';
+import { StrippedNode } from '@/utils/graphs/graph';
 
 interface Message {
   type: 'text' | 'chart';
@@ -127,7 +127,7 @@ function InquiryContent() {
           <>
             {currentNode.data && currentNode.data.type && (currentNode.data.type as string).startsWith('rating') && (
               <RatingInput
-                ratings={currentNode.data.ratings as any}
+                ratings={currentNode.data.ratings as string[]}
                 isMulti={currentNode.data.type === 'rating-multi'}
                 onRatingChange={setSelectedRatings}
               />
