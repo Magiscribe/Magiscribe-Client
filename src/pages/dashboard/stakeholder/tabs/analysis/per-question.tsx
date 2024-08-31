@@ -18,13 +18,14 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
     () =>
       graph.nodes.filter(
         (node): node is GraphNode & { data: ConversationNodeData } =>
-          node.type === 'conversation' && node.data !== undefined && 'type' in node.data,
+          node.type === 'conversation' && node.data !== undefined,
       ),
     [graph.nodes],
   );
 
   const groupedResponses = useMemo(() => {
     const grouped: { [nodeId: string]: { [userId: string]: NodeVisitData[] } } = {};
+    console.log('RESPONSES', responses);
     responses.forEach((response: IndividualConversationData) => {
       response.data.forEach((nodeVisit: NodeVisitData) => {
         if (!grouped[nodeVisit.id]) {
@@ -38,6 +39,9 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
     });
     return grouped;
   }, [responses]);
+
+  console.log('REZ PONS', responses);
+  console.log('CONVO NODE', conversationNodes);
 
   if (!responses || !conversationNodes.length) {
     return <div className="p-4">No data available</div>;
@@ -60,16 +64,13 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
 
   const renderAnswers = (nodeId: string) => {
     const nodeResponses = groupedResponses[nodeId] || {};
+    console.log('NODE RESPONSES', nodeResponses);
     return Object.entries(nodeResponses).map(([userId, userResponses]) => (
       <div key={`${userId}-${nodeId}`} className="ml-4 mb-4">
         <p className="text-black font-semibold">{userId}:</p>
         {userResponses.map((response, index) => {
           const isDynamicGeneration = response.data?.text !== undefined;
-          const answerContent =
-            response.data?.response ||
-            response.data?.ratings?.join(', ') ||
-            response.data?.scalars?.join(', ') ||
-            'No response';
+          const answerContent = response.data?.text || response.data?.ratings?.join(', ') || 'No response';
 
           return (
             <div key={`${userId}-${nodeId}-${index}`} className="ml-4 mt-2">
