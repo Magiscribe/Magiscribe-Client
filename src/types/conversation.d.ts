@@ -49,6 +49,7 @@ export interface GraphEdge {
 }
 
 export interface IndividualConversationData {
+  id: string;
   userId?: string;
   data: NodeVisitData[];
 }
@@ -56,8 +57,11 @@ export interface IndividualConversationData {
 export interface NodeVisitData {
   id: string;
   data?: {
-    question?: string;
-    response?: string;
+    text?: string;
+    response?: {
+      text?: string;
+      ratings?: string[];
+    };
     ratings?: string[];
     scalars?: number[];
   };

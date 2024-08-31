@@ -1,7 +1,7 @@
-import React, { useMemo, useState } from 'react';
+import { NodeVisitData, TabProps } from '@/types/conversation';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { ConversationNodeData, GraphNode, NodeVisitData, TabProps } from '@/types/conversation';
+import React, { useMemo, useState } from 'react';
 
 const PerResponseTab: React.FC<TabProps> = ({ data }) => {
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
@@ -16,36 +16,30 @@ const PerResponseTab: React.FC<TabProps> = ({ data }) => {
     [graph?.nodes],
   );
 
-  const renderNodeContent = (node: NodeVisitData, graphNode: GraphNode) => {
-    if (graphNode?.data && 'type' in graphNode.data) {
-      const { text: graphText } = graphNode.data as ConversationNodeData;
-      const { data: nodeData } = node;
+  const renderNodeContent = (node: NodeVisitData) => {
+    if (node?.data?.response) {
+      console.log(node.data);
+      const title = node.data.text;
+      const responseText = node.data.response.text;
+      const ratings = node.data.response.ratings;
 
-      if (graphText) {
-        return (
-          <>
-            <p className="font-semibold text-black">
-              {node.id}. {graphText || nodeData?.question}
-            </p>
-            <hr className="my-2" />
-            <p className="text-black">
-              {nodeData?.response && <span>{nodeData.response}</span>}
-              {nodeData?.ratings?.length && nodeData?.ratings?.length > 0 && (
-                <span>
-                  {nodeData.response ? ' - ' : ''}
-                  {nodeData.ratings.join(', ')}
-                </span>
-              )}
-              {nodeData?.scalars?.length && nodeData?.scalars?.length > 0 && (
-                <span>
-                  {nodeData.response || (nodeData.ratings?.length && nodeData.ratings?.length > 0) ? ' - ' : ''}
-                  {nodeData.scalars.join(', ')}
-                </span>
-              )}
-            </p>
-          </>
-        );
-      }
+      return (
+        <>
+          <p className="font-semibold text-black">
+            {node.id}. {title}
+          </p>
+          <hr className="my-2" />
+          <p className="text-black">
+            {responseText && <span>{responseText}</span>}
+            {ratings?.length && ratings?.length > 0 && (
+              <span>
+                {responseText ? ' - ' : ''}
+                {ratings.join(', ')}
+              </span>
+            )}
+          </p>
+        </>
+      );
     }
     return null;
   };
@@ -97,12 +91,12 @@ const PerResponseTab: React.FC<TabProps> = ({ data }) => {
         {selectedUser &&
           nodeVisitData
             .find((u) => u.id === selectedUser)
-            ?.data?.map((node) => {
+            ?.data?.map((node, i) => {
               const graphNode = nodesMap[node.id];
               if (graphNode?.type === 'conversation') {
                 return (
-                  <div key={node.id} className="mb-4 p-4 bg-slate-200 rounded-2xl">
-                    {renderNodeContent(node, graphNode)}
+                  <div key={i} className="mb-4 p-4 bg-slate-200 rounded-2xl">
+                    {renderNodeContent(node)}
                   </div>
                 );
               }

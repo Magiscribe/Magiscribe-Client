@@ -57,7 +57,7 @@ function InquiryContent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const responseData: { response: string; ratings?: string[] } = { response: inputMessage };
+    const responseData: { text: string; ratings?: string[] } = { text: inputMessage };
 
     if (selectedRatings.length > 0) {
       responseData.ratings = selectedRatings;

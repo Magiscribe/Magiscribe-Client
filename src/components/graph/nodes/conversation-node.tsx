@@ -87,14 +87,13 @@ export default function ConversationNode({ id, data }: ConversationNodeProps) {
           <label className="text-sm font-medium text-gray-700">Message</label>
           <textarea
             ref={textareaRef}
+            defaultValue={data.text}
             name="text"
             onChange={(e) => handleUpdate({ text: e.target.value })}
             rows={1}
             placeholder="Enter your text here..."
             className="w-full px-3 py-2 bg-white rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 resize-none overflow-hidden"
-          >
-            {data.text}
-          </textarea>
+          />
         </div>
         {(data.type === NodeType.RatingSingle || data.type === NodeType.RatingMulti) && (
           <div className="flex flex-col gap-2">
