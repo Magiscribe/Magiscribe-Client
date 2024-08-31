@@ -42,8 +42,8 @@ export class GraphManager {
    * Adds a node to the history.
    * @param {Object} node - Node to add to the history
    */
-  private addNodeToHistory({ id, data }: StrippedNode): void {
-    this.nodeHistory.push({ id, data });
+  private addNodeToHistory({ id, data, type }: StrippedNode): void {
+    this.nodeHistory.push({ id, type, data });
   }
 
   /**

@@ -125,7 +125,7 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
       : {};
 
     await graph.current.updateCurrentNodeData({
-      ...data,
+      response: data,
       ...carryOverdata,
     });
     await graph.current.goToNextNode(nextNodeId);
@@ -182,7 +182,7 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
       if (currentNode) {
         currentNode.data = {
           ...currentNode.data,
-          text: result.text,
+          ...result,
         };
       }
       if (onNodeUpdate.current) {
