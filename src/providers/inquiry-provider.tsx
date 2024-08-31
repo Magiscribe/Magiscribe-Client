@@ -182,7 +182,7 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
       if (currentNode) {
         currentNode.data = {
           ...currentNode.data,
-          text: result.text,
+          ...result,
         };
       }
       if (onNodeUpdate.current) {
