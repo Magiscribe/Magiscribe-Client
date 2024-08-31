@@ -20,12 +20,22 @@ export class GraphManager {
   constructor(graphData: { nodes: Node[]; edges: Edge[] }) {
     this.graph = stripAndOptimizeGraph(graphData);
     this.currentNode = Object.values(this.graph.nodes).find((node) => node.type === 'start') ?? null;
+    this.currentNode = this.currentNode ? this.deepCopy(this.currentNode) : null;
     this.nodeHistory = [];
     this.onNodeVisitCallback = () => {};
 
     if (!this.currentNode) {
       throw new Error('Graph must have a start node.');
     }
+  }
+
+  /**
+   * Deep copies an object.
+   * @param obj {Object} - Object to deep copy
+   * @returns {Object} - Deep copied object
+   */
+  private deepCopy<T>(obj: T): T {
+    return JSON.parse(JSON.stringify(obj));
   }
 
   /**
@@ -38,6 +48,9 @@ export class GraphManager {
 
   /**
    * Updates the current node data.
+   * @note This is emphemeral and does not update the graph structure.
+   *       When you revisit the node, the data will be reset.
+   *       This is useful to having a node history with different data or to modify the data temporarily.
    * @param {Object} data - New data for the current node
    */
   async updateCurrentNodeData(data: NodeData): Promise<void> {
@@ -70,7 +83,7 @@ export class GraphManager {
 
     this.addNodeToHistory(this.currentNode);
 
-    this.currentNode = nextNode;
+    this.currentNode = this.deepCopy(nextNode);
     this.onNodeVisitCallback(nextNode);
   }
 
