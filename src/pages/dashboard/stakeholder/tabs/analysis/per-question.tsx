@@ -8,7 +8,6 @@ import {
   IndividualConversationData,
   NodeVisitData,
 } from '@/types/conversation';
-// import Chart, { ChartProps, ChartData } from '@/components/chart';
 
 const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -25,7 +24,6 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
 
   const groupedResponses = useMemo(() => {
     const grouped: { [nodeId: string]: { [userId: string]: NodeVisitData[] } } = {};
-    console.log('RESPONSES', responses);
     responses.forEach((response: IndividualConversationData) => {
       response.data.forEach((nodeVisit: NodeVisitData) => {
         if (!grouped[nodeVisit.id]) {
@@ -40,9 +38,6 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
     return grouped;
   }, [responses]);
 
-  console.log('REZ PONS', responses);
-  console.log('CONVO NODE', conversationNodes);
-
   if (!responses || !conversationNodes.length) {
     return <div className="p-4">No data available</div>;
   }
@@ -50,21 +45,8 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
   const currentNode = conversationNodes[currentQuestionIndex];
   const nodeData = currentNode.data;
 
-  // const renderBarChart = (ratingSummary: { counts: { [key: string]: number } } | undefined) => {
-  //   if (!ratingSummary) return null;
-
-  //   const chartData: ChartData[] = Object.entries(ratingSummary.counts).map(([name, value]) => ({ name, value }));
-  //   const chartProps: ChartProps = {
-  //     title: 'Rating Distribution',
-  //     chartType: 'BarChart',
-  //     data: chartData,
-  //   };
-  //   return <Chart {...chartProps} />;
-  // };
-
   const renderAnswers = (nodeId: string) => {
     const nodeResponses = groupedResponses[nodeId] || {};
-    console.log('NODE RESPONSES', nodeResponses);
     return Object.entries(nodeResponses).map(([userId, userResponses]) => (
       <div key={`${userId}-${nodeId}`} className="ml-4 mb-4">
         <p className="text-black font-semibold">{userId}:</p>
