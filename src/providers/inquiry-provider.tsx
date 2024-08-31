@@ -99,6 +99,8 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
   async function handleNextNode({ nextNodeId, data }: HandleNextNodeProps = {}): Promise<void> {
     if (!graph.current) return;
 
+    setLoading(true);
+
     if (!inquiryResponseId.current) {
       const result = await createResponse({
         variables: {
@@ -140,6 +142,7 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
     } else if (node.type === 'condition') {
       await handleConditionNode();
     } else if (onNodeUpdate.current) {
+      setLoading(false);
       onNodeUpdate.current(node);
     }
   }

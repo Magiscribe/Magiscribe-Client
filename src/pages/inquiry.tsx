@@ -125,13 +125,16 @@ function InquiryContent() {
         </div>
         {currentNode && currentNode.type != 'end' && (
           <>
-            {currentNode.data && currentNode.data.type && (currentNode.data.type as string).startsWith('rating') && (
-              <RatingInput
-                ratings={currentNode.data.ratings as string[]}
-                isMulti={currentNode.data.type === 'rating-multi'}
-                onRatingChange={setSelectedRatings}
-              />
-            )}
+            {!loading &&
+              currentNode.data &&
+              currentNode.data.type &&
+              (currentNode.data.type as string).startsWith('rating') && (
+                <RatingInput
+                  ratings={currentNode.data.ratings as string[]}
+                  isMulti={currentNode.data.type === 'rating-multi'}
+                  onRatingChange={setSelectedRatings}
+                />
+              )}
             <form onSubmit={handleSubmit} className="flex">
               <input
                 type="text"
