@@ -21,6 +21,7 @@ interface InquiryContextType {
   handleNextNode: (props?: HandleNextNodeProps) => Promise<void>;
   onNodeUpdate: (callback: (node: OptimizedNode) => void) => void;
 
+  form: { [key: string]: string };
   initialized: boolean;
   loading: boolean;
 }
@@ -29,6 +30,7 @@ const InquiryContext = createContext<InquiryContextType | undefined>(undefined);
 
 function InquiryProvider({ children, id }: InquiryProviderProps) {
   // Refs
+  const form = useRef<{ [key: string]: string }>({});
   const graph = useRef<GraphManager | null>(null);
 
   // States
@@ -57,6 +59,7 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
     errorPolicy: 'all',
     onCompleted: ({ getInquiry }) => {
       if (getInquiry.data.graph) {
+        form.current = getInquiry.data.form;
         graph.current = new GraphManager(getInquiry.data.graph);
         graph.current.onNodeVisit(handleOnNodeVisit);
         setInitialized(true);
@@ -230,6 +233,7 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
       value={{
         onNodeUpdate: setOnNodeUpdate,
         handleNextNode,
+        form: form.current,
         loading,
         initialized,
       }}

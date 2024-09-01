@@ -30,7 +30,8 @@ export default function Inquiry() {
       variables: {
         data: {
           form: {
-            title: '',
+            title: 'Untitled Inquiry',
+            description: '',
             organizationName: '',
             organizationRole: '',
             inputGoals: '',

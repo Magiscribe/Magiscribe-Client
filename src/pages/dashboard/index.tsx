@@ -1,4 +1,4 @@
-import LinkCard from '@/components/card';
+import LinkCard from '@/components/cards/card';
 import { useSetTitle } from '@/hooks/TitleHook';
 import { useSession } from '@clerk/clerk-react';
 

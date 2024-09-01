@@ -17,6 +17,7 @@ import { useNavigate } from 'react-router-dom';
 
 export interface SetupFormData {
   title: string;
+  description: string;
   organizationName: string;
   organizationRole: string;
   inputGoals: string;
@@ -45,20 +46,54 @@ export const SetupForm: React.FC<SetupFormProps> = ({ form, updateForm }) => {
         <h2 className="text-2xl font-bold">Setup</h2>
       </div>
       <form className="space-y-4">
-        {(['title', 'organizationName', 'organizationRole'] as const).map((field) => (
-          <div key={field}>
-            <label className="block text-sm font-bold mb-2" htmlFor={field}>
-              {field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' $1')}
-            </label>
-            <input
-              type="text"
-              id={field}
-              value={form[field]}
-              onChange={handleInputChange(field)}
-              className="border-2 border-gray-200 p-2 rounded-lg w-full"
-            />
-          </div>
-        ))}
+        <div>
+          <label className="block text-sm font-bold mb-2" htmlFor="title">
+            Title
+          </label>
+          <input
+            type="text"
+            id="title"
+            value={form.title}
+            onChange={handleInputChange('title')}
+            className="border-2 border-gray-200 p-2 rounded-lg w-full"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-bold mb-2" htmlFor="inputGoals">
+            Description
+          </label>
+          <textarea
+            id="inputGoals"
+            value={form.description}
+            onChange={handleInputChange('description')}
+            rows={2}
+            className="border-2 border-gray-200 p-2 rounded-lg w-full"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-bold mb-2" htmlFor="organizationName">
+            Organization Name
+          </label>
+          <input
+            type="text"
+            id="organizationName"
+            value={form.organizationName}
+            onChange={handleInputChange('organizationName')}
+            className="border-2 border-gray-200 p-2 rounded-lg w-full"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-bold mb-2" htmlFor="organizationRole">
+            Organization Role
+          </label>
+          <input
+            type="text"
+            id="organizationRole"
+            value={form.organizationRole}
+            onChange={handleInputChange('organizationRole')}
+            className="border-2 border-gray-200 p-2 rounded-lg w-full"
+          />
+        </div>
         <div>
           <label className="block text-sm font-bold mb-2" htmlFor="inputGoals">
             Who are you looking to get input from and what insights are you trying to capture?
@@ -84,6 +119,7 @@ export const SetupForm: React.FC<SetupFormProps> = ({ form, updateForm }) => {
 const Setup: React.FC<{ id: string }> = ({ id }) => {
   const [form, setForm] = useState<SetupFormData>({
     title: '',
+    description: '',
     organizationName: '',
     organizationRole: '',
     inputGoals: '',
