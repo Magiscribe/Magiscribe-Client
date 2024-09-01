@@ -13,13 +13,15 @@ import {
   NodeVisitData,
 } from '@/types/conversation';
 
+export type ResponseSummary = { [nodeId: string]: string }
+
 const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [summaries, setSummaries] = useState<{ [nodeId: string]: string }>({});
+  
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
   const [subscriptionId] = useState<string>(`per_question_summary_${Date.now()}`);
-  const { graph, nodeVisitData: responses } = data;
-
+  const { graph, nodeVisitData: responses, summaries, setSummary: setSummary } = data;
+  
   const client = useApolloClient();
   const [addPrediction] = useMutation(ADD_PREDICTION);
 
@@ -60,7 +62,7 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
         const result = JSON.parse(JSON.parse(prediction.result)[0]);
         console.log('LOGGY DOGGY', result);
         if (result && result.summary) {
-          setSummaries((prev) => ({ ...prev, [conversationNodes[currentQuestionIndex].id]: result.summary }));
+          setSummary(result.summary, conversationNodes[currentQuestionIndex].id);
         }
       }
     },
