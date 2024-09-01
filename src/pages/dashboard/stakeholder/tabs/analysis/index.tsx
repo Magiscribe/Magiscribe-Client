@@ -5,18 +5,19 @@ import clsx from 'clsx';
 import { motion } from 'framer-motion';
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import ViaChatTab from './chat';
+import ViaChatTab from './via-chat';
 import PerResponseTab from './per-response';
 import PerQuestionTab, { ResponseSummary } from './per-question';
 
-
-
 const AnalysisTab: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [summaries, setSummaries] = useState<ResponseSummary>({}); 
-  const setSummary = React.useCallback((summary: string, nodeId: string) => {
-    setSummaries((prev) => ({ ...prev, [nodeId]: summary }));
-  },[setSummaries])
+  const [summaries, setSummaries] = useState<ResponseSummary>({});
+  const setSummary = React.useCallback(
+    (summary: string, nodeId: string) => {
+      setSummaries((prev) => ({ ...prev, [nodeId]: summary }));
+    },
+    [setSummaries],
+  );
   const {
     loading: graphLoading,
     data: inquiryData,
@@ -41,11 +42,12 @@ const AnalysisTab: React.FC = () => {
   if (dataError || graphError) return <p>Error</p>;
 
   const data = {
+    id: inquiryData?.getInquiry?.data?.id,
     form: inquiryData?.getInquiry?.data?.form,
     graph: inquiryData?.getInquiry?.data?.graph,
     nodeVisitData: inquiryResponseData?.getInquiryResponses,
     summaries,
-    setSummary
+    setSummary,
   };
 
   const tabCategories = ['Per Response', 'Per Question', 'Via Chat'];

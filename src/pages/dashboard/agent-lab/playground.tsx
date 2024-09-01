@@ -29,6 +29,7 @@ interface Form {
   voice: string;
   agent: string;
   customVariables: CustomVariable[];
+  prompt: string;
 }
 
 const initialForm: Form = {
@@ -36,6 +37,7 @@ const initialForm: Form = {
   voice: 'PHOEBE',
   agent: '',
   customVariables: [{ key: 'userMessage', value: 'Placeholder' }],
+  prompt: '',
 };
 
 export default function PlaygroundDashboard() {

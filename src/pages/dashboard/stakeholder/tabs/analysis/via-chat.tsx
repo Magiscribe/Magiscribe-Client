@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
+import { useWithLocalStorage } from '../../../../../hooks/local-storage-hook';
 
 interface Message {
   type: 'text' | 'chart';
@@ -22,7 +23,8 @@ export default function ViaChatTab({ data }: TabProps) {
   const [inputMessage, setInputMessage] = useState('');
   const [loading, setLoading] = useState<boolean>(false);
   const [subscriptionId] = useState<string>(`advanced_analysis_${Date.now()}`);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const key = data.id;
+  const [messages, setMessages] = useWithLocalStorage<Message[]>([], key);
 
   if (!data.nodeVisitData) return <div className="p-4">No data available</div>;
 

@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const useWithLocalStorage = (initialState: any, itemName: string) => {
-  const [form, setForm] = useState(() => {
+export const useWithLocalStorage = <T,>(
+  initialState: T,
+  itemName: string,
+): [T, React.Dispatch<React.SetStateAction<T>>] => {
+  const [form, setForm] = useState<T>(() => {
     // Attempt to get the stored form data from local storage
     const storedFormData = localStorage.getItem(itemName);
     if (storedFormData) {
-      return JSON.parse(storedFormData);
+      return JSON.parse(storedFormData) as T;
     }
     return initialState;
   });
@@ -14,7 +16,7 @@ export const useWithLocalStorage = (initialState: any, itemName: string) => {
   useEffect(() => {
     // Update local storage whenever the form state changes
     localStorage.setItem(itemName, JSON.stringify(form));
-  }, [form]);
+  }, [form, itemName]);
 
   return [form, setForm];
 };

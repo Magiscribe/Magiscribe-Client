@@ -12,16 +12,25 @@ import {
   IndividualConversationData,
   NodeVisitData,
 } from '@/types/conversation';
+import { useWithLocalStorage } from '@/hooks/local-storage-hook';
 
-export type ResponseSummary = { [nodeId: string]: string }
+export type ResponseSummary = {
+  [nodeId: string]: {
+    text: string;
+    lastUpdated: string;
+  };
+};
 
 const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  
+
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
   const [subscriptionId] = useState<string>(`per_question_summary_${Date.now()}`);
-  const { graph, nodeVisitData: responses, summaries, setSummary: setSummary } = data;
-  
+  const { graph, nodeVisitData: responses } = data;
+
+  const summaryStorageKey = `summaries_${data.id}`;
+  const [summaries, setSummaries] = useWithLocalStorage<ResponseSummary>({}, summaryStorageKey);
+
   const client = useApolloClient();
   const [addPrediction] = useMutation(ADD_PREDICTION);
 
@@ -50,6 +59,18 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
     return grouped;
   }, [responses]);
 
+  const formatTimestamp = (date: Date): string => {
+    return date.toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true,
+    });
+  };
+
   useSubscription(GRAPHQL_SUBSCRIPTION, {
     variables: {
       subscriptionId,
@@ -62,7 +83,13 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
         const result = JSON.parse(JSON.parse(prediction.result)[0]);
         console.log('LOGGY DOGGY', result);
         if (result && result.summary) {
-          setSummary(result.summary, conversationNodes[currentQuestionIndex].id);
+          setSummaries((prevSummaries) => ({
+            ...prevSummaries,
+            [conversationNodes[currentQuestionIndex].id]: {
+              text: result.summary,
+              lastUpdated: formatTimestamp(new Date()),
+            },
+          }));
         }
       }
     },
@@ -198,7 +225,8 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
       {currentSummary && (
         <div className="my-4 p-4 bg-blue-100 rounded-md">
           <h3 className="font-bold mb-2">Summary</h3>
-          <p>{currentSummary}</p>
+          <p>{currentSummary.text}</p>
+          <p className="text-sm text-gray-600 mt-2">Last Updated: {currentSummary.lastUpdated}</p>
         </div>
       )}
       <div>

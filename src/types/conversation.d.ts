@@ -1,4 +1,4 @@
-import { ResponseSummary } from "@/pages/dashboard/stakeholder/tabs/analysis/per-question";
+import { ResponseSummary } from '@/pages/dashboard/stakeholder/tabs/analysis/per-question';
 
 export interface ConversationData {
   userId: string;
@@ -71,6 +71,7 @@ export interface NodeVisitData {
 
 export interface TabProps {
   data: {
+    id: string;
     form: Form;
     graph: Graph;
     nodeVisitData: IndividualConversationData[];
