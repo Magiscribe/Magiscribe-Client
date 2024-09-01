@@ -33,10 +33,10 @@ const RatingInput: React.FC<RatingInputProps> = ({ ratings, isMulti, onRatingCha
           <button
             key={rating}
             onClick={() => handleRatingClick(rating)}
-            className={`px-3 py-1 rounded ${
+            className={`px-3 py-1 rounded-xl ${
               selectedRatings.includes(rating)
                 ? 'bg-blue-500 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                : 'bg-slate-200 text-slate-800 hover:bg-slate-300'
             }`}
           >
             {rating}
