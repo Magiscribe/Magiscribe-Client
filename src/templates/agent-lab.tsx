@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router-dom';
-import LinkCard from '../components/card';
+import LinkCard from '../components/cards/card';
 import { useSetTitle } from '../hooks/TitleHook';
 
 export default function AgentLabTemplate() {
