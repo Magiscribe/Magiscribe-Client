@@ -12,16 +12,18 @@ import {
   IndividualConversationData,
   NodeVisitData,
 } from '@/types/conversation';
+import { useWithLocalStorage } from '@/hooks/local-storage-hook';
 
-export type ResponseSummary = { [nodeId: string]: string }
+export type ResponseSummary = { [nodeId: string]: string };
 
 const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  
+
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
   const [subscriptionId] = useState<string>(`per_question_summary_${Date.now()}`);
-  const { graph, nodeVisitData: responses, summaries, setSummary: setSummary } = data;
-  
+  const [summaries, setSummaries] = useWithLocalStorage<ResponseSummary>({}, `${data.id}-per-question-summary`);
+  const { graph, nodeVisitData: responses } = data;
+
   const client = useApolloClient();
   const [addPrediction] = useMutation(ADD_PREDICTION);
 
@@ -62,7 +64,7 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
         const result = JSON.parse(JSON.parse(prediction.result)[0]);
         console.log('LOGGY DOGGY', result);
         if (result && result.summary) {
-          setSummary(result.summary, conversationNodes[currentQuestionIndex].id);
+          setSummaries((prev) => ({ ...prev, [conversationNodes[currentQuestionIndex].id]: result.summary }));
         }
       }
     },

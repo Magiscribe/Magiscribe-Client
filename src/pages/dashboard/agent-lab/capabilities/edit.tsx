@@ -3,7 +3,7 @@ import { GET_ALL_MODELS, GET_ALL_PROMPTS, GET_CAPABILITY } from '@/clients/queri
 import ListBox from '@/components/list/ListBox';
 import ReorderableList from '@/components/list/ReorderableList';
 import CustomModal from '@/components/modal';
-import { useAddAlert } from '@/hooks/AlertHooks';
+import { useAddAlert } from '@/hooks/alert-hook';
 import { Prompt } from '@/types/agents';
 import { useMutation, useQuery } from '@apollo/client';
 import { useState } from 'react';

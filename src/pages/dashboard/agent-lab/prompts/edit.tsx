@@ -1,6 +1,6 @@
 import { ADD_UPDATE_PROMPT } from '@/clients/mutations';
 import { GET_PROMPT } from '@/clients/queries';
-import { useAddAlert } from '@/hooks/AlertHooks';
+import { useAddAlert } from '@/hooks/alert-hook';
 import { useMutation, useQuery } from '@apollo/client';
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';

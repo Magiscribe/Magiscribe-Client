@@ -132,7 +132,7 @@ function Inquiry() {
               <h2 className="text-3xl font-bold mb-6 text-indigo-900 text-center">{form.title}</h2>
               <div className="h-1 mx-auto gradient w-64 opacity-50 my-0 py-0 rounded-t mb-8"></div>
 
-              <div className="flex-grow mb-8 rounded-lg max-h-[60vh]">
+              <div className="flex-grow mb-8 rounded-lg">
                 {messages.map((message, index) => (
                   <div
                     key={index}

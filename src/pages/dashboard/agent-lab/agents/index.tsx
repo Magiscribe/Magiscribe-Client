@@ -6,7 +6,7 @@ import { GET_ALL_AGENTS } from '@/clients/queries';
 import { Agent, Capability } from '@/types/agents';
 import { motion } from 'framer-motion';
 import DeleteConfirmationModal from '@/components/modals/delete-modal';
-import { useAddAlert } from '@/hooks/AlertHooks';
+import { useAddAlert } from '@/hooks/alert-hook';
 
 function AgentCard({ agent, onUpdate, onCopy }: { agent: Agent; onUpdate?: () => void; onCopy: (id: string) => void }) {
   const [deleteAgent] = useMutation(DELETE_AGENT);

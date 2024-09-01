@@ -6,7 +6,7 @@ import SandcastleShape from '../components/shapes/beach';
 import PencilShape from '../components/shapes/drawing';
 import { GradientWaveBottom, GradientWaveTop } from '../components/shapes/gradient-wave';
 import { SectionTemplate } from '../components/templates/section';
-import { useSetTitle } from '../hooks/TitleHook';
+import { useSetTitle } from '../hooks/title-hook';
 
 function AboutSection() {
   return (

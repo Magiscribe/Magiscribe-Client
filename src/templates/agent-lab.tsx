@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import LinkCard from '../components/cards/card';
-import { useSetTitle } from '../hooks/TitleHook';
+import { useSetTitle } from '../hooks/title-hook';
 
 export default function AgentLabTemplate() {
   useSetTitle()('Agent Lab');

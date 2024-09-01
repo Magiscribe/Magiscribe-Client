@@ -6,7 +6,7 @@ import { GET_ALL_AGENTS } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import { useElevenLabsAudio } from '@/components/audio-player';
 import ListBox from '@/components/list/ListBox';
-import { useTranscribe } from '@/hooks/AudioHooks';
+import { useTranscribe } from '@/hooks/audio-hook';
 import { Agent } from '@/types/agents';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
 import { ADD_PREDICTION } from '@/clients/mutations';
@@ -29,6 +29,7 @@ interface Form {
   voice: string;
   agent: string;
   customVariables: CustomVariable[];
+  prompt: string;
 }
 
 const initialForm: Form = {
@@ -36,6 +37,7 @@ const initialForm: Form = {
   voice: 'PHOEBE',
   agent: '',
   customVariables: [{ key: 'userMessage', value: 'Placeholder' }],
+  prompt: '',
 };
 
 export default function PlaygroundDashboard() {

@@ -5,7 +5,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import '@xyflow/react/dist/style.css';
 import './assets/styles/index.css';
 import { ApolloProviderWrapper } from './clients/graphqlClient';
-import { TitleProvider } from './hooks/TitleHook';
+import { TitleProvider } from './hooks/title-hook';
 import HomeHero from './pages/home';
 import AlertProvider from './providers/alert-provider';
 import Main from './templates/main';

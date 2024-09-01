@@ -1,4 +1,4 @@
-import useAutoResizeTextareaRef from '@/hooks/AutoResizerTextarea';
+import useAutoResizeTextareaRef from '@/hooks/auto-resize-textarea';
 import { ConversationNodeData } from '@/types/conversation';
 import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import { Handle, NodeProps, Position } from '@xyflow/react';

@@ -1,5 +1,5 @@
 import LinkCard from '@/components/cards/card';
-import { useSetTitle } from '@/hooks/TitleHook';
+import { useSetTitle } from '@/hooks/title-hook';
 import { useSession } from '@clerk/clerk-react';
 
 export default function DashboardPage() {

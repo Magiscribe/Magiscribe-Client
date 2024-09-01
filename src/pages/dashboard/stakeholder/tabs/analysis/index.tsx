@@ -3,20 +3,14 @@ import { useQuery } from '@apollo/client';
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
-import React, { useState } from 'react';
+import React from 'react';
 import { useParams } from 'react-router-dom';
-import ViaChatTab from './chat';
+import ViaChatTab from './via-chat';
+import PerQuestionTab from './per-question';
 import PerResponseTab from './per-response';
-import PerQuestionTab, { ResponseSummary } from './per-question';
-
-
 
 const AnalysisTab: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [summaries, setSummaries] = useState<ResponseSummary>({}); 
-  const setSummary = React.useCallback((summary: string, nodeId: string) => {
-    setSummaries((prev) => ({ ...prev, [nodeId]: summary }));
-  },[setSummaries])
   const {
     loading: graphLoading,
     data: inquiryData,
@@ -37,15 +31,14 @@ const AnalysisTab: React.FC = () => {
     errorPolicy: 'all',
   });
 
-  if (dataLoading || graphLoading) return <p>Loading...</p>;
+  if (!id || dataLoading || graphLoading) return <p>Loading...</p>;
   if (dataError || graphError) return <p>Error</p>;
 
   const data = {
+    id,
     form: inquiryData?.getInquiry?.data?.form,
     graph: inquiryData?.getInquiry?.data?.graph,
     nodeVisitData: inquiryResponseData?.getInquiryResponses,
-    summaries,
-    setSummary
   };
 
   const tabCategories = ['Per Response', 'Per Question', 'Via Chat'];

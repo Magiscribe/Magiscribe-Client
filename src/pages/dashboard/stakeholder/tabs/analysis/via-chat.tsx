@@ -2,6 +2,7 @@ import { ADD_PREDICTION } from '@/clients/mutations';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import Chart, { ChartProps } from '@/components/chart';
 import MarkdownCustom from '@/components/markdown-custom';
+import { useWithLocalStorage } from '@/hooks/local-storage-hook';
 import { TabProps } from '@/types/conversation';
 import { getAgentIdByName } from '@/utils/agents';
 import { useApolloClient, useMutation, useSubscription } from '@apollo/client';
@@ -22,7 +23,7 @@ export default function ViaChatTab({ data }: TabProps) {
   const [inputMessage, setInputMessage] = useState('');
   const [loading, setLoading] = useState<boolean>(false);
   const [subscriptionId] = useState<string>(`advanced_analysis_${Date.now()}`);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useWithLocalStorage<Message[]>([], `${data.id}-chat`);
 
   if (!data.nodeVisitData) return <div className="p-4">No data available</div>;
 

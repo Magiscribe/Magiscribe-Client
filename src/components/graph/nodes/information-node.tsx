@@ -1,4 +1,4 @@
-import useAutoResizeTextareaRef from '@/hooks/AutoResizerTextarea';
+import useAutoResizeTextareaRef from '@/hooks/auto-resize-textarea';
 import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { Handle, NodeProps, Position } from '@xyflow/react';
 import NodeContainer from '../elements/node-container';

@@ -2,7 +2,7 @@ import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-reac
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useTitle } from '../../hooks/TitleHook';
+import { useTitle } from '../../hooks/title-hook';
 import { Logo } from '../logo';
 
 export function NavBar() {

@@ -2,7 +2,7 @@ import { ADD_UPDATE_AGENT } from '@/clients/mutations';
 import { GET_AGENT, GET_ALL_CAPABILITIES, GET_ALL_MODELS } from '@/clients/queries';
 import ListBox from '@/components/list/ListBox';
 import ListBoxMultiple from '@/components/list/ListBoxMultiple';
-import { useAddAlert } from '@/hooks/AlertHooks';
+import { useAddAlert } from '@/hooks/alert-hook';
 import { Capability } from '@/types/agents';
 import { useMutation, useQuery } from '@apollo/client';
 import { useState } from 'react';

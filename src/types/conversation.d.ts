@@ -1,5 +1,3 @@
-import { ResponseSummary } from "@/pages/dashboard/stakeholder/tabs/analysis/per-question";
-
 export interface ConversationData {
   userId: string;
   data: {
@@ -71,11 +69,10 @@ export interface NodeVisitData {
 
 export interface TabProps {
   data: {
+    id: string;
     form: Form;
     graph: Graph;
     nodeVisitData: IndividualConversationData[];
-    summaries: ResponseSummary;
-    setSummary: (summary: string, index: string) => void;
   };
 }
 
