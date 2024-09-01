@@ -1,34 +1,30 @@
 import React from 'react';
 import {
+  ResponsiveContainer,
   PieChart,
   Pie,
+  Cell,
+  Tooltip,
+  Legend,
   BarChart,
-  Bar,
+  CartesianGrid,
   XAxis,
   YAxis,
-  Tooltip,
-  Cell,
-  ResponsiveContainer,
-  CartesianGrid,
-  Legend,
+  Bar,
 } from 'recharts';
-
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
-
-export interface ChartData {
-  name: string;
-  value: number;
-}
 
 export interface ChartProps {
   title: string;
-  chartType: string;
-  data: ChartData[];
+  chartType: 'pie' | 'bar';
+  data: Array<{ name: string; value: number }>;
+  fullWidth?: boolean;
 }
 
-const Chart: React.FC<ChartProps> = ({ title, chartType, data }) => {
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+
+const Chart: React.FC<ChartProps> = ({ title, chartType, data, fullWidth = false }) => {
   const renderPieChart = () => (
-    <ResponsiveContainer width="100%" height={300}>
+    <ResponsiveContainer width="100%" height={420}>
       <PieChart>
         <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} fill="#8884d8" label>
           {data.map((_entry, index) => (
@@ -59,22 +55,9 @@ const Chart: React.FC<ChartProps> = ({ title, chartType, data }) => {
   );
 
   return (
-    <div className="chart-container">
-      <h3 className="text-center font-bold mb-4">{title}</h3>
-      {chartType === 'PieChart' && renderPieChart()}
-      {chartType === 'BarChart' && renderBarChart()}
-      {chartType === 'Both' && (
-        <div className="flex flex-wrap justify-around">
-          <div className="w-full md:w-1/2">
-            <h5 className="text-lg font-semibold mb-2">Pie Chart</h5>
-            {renderPieChart()}
-          </div>
-          <div className="w-full md:w-1/2">
-            <h5 className="text-lg font-semibold mb-2">Bar Chart</h5>
-            {renderBarChart()}
-          </div>
-        </div>
-      )}
+    <div className={`chart-container ${fullWidth ? 'w-full' : 'w-4/5'} mx-auto`}>
+      <h3 className="text-lg font-semibold mb-2">{title}</h3>
+      {chartType === 'pie' ? renderPieChart() : renderBarChart()}
     </div>
   );
 };
