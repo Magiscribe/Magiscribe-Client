@@ -123,9 +123,7 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
     }
 
     // Carries over data if the node has dynamic generation so we know what the node generated.
-    const carryOverdata = graph.current.getCurrentNode()?.data?.dynamicGeneration
-      ? graph.current.getCurrentNode()?.data
-      : {};
+    const carryOverdata = graph.current.getCurrentNode()?.data;
 
     await graph.current.updateCurrentNodeData({
       response: data,
@@ -140,7 +138,7 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
    * @returns {Promise<void>} A promise that resolves when the node is visited
    */
   async function handleOnNodeVisit(node: OptimizedNode): Promise<void> {
-    if (node.data.dynamicGeneration) {
+    if (node.data?.dynamicGeneration) {
       await handleDynamicGeneration();
     } else if (node.type === 'condition') {
       await handleConditionNode();
