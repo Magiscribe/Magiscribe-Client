@@ -6,7 +6,7 @@ import { useWithLocalStorage } from '@/hooks/local-storage-hook';
 import { TabProps } from '@/types/conversation';
 import { getAgentIdByName } from '@/utils/agents';
 import { useApolloClient, useMutation, useSubscription } from '@apollo/client';
-import { faPaperPlane, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { faPaperPlane, faSpinner, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
@@ -19,34 +19,23 @@ interface Message {
 }
 
 export default function ViaChatTab({ data }: TabProps) {
-  // State
   const [inputMessage, setInputMessage] = useState('');
   const [loading, setLoading] = useState<boolean>(false);
   const [subscriptionId] = useState<string>(`advanced_analysis_${Date.now()}`);
   const [messages, setMessages] = useWithLocalStorage<Message[]>([], `${data.id}-chat`);
 
-  if (!data.nodeVisitData) return <div className="p-4">No data available</div>;
-
-  // Ref
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  // Queries and Mutations
   const client = useApolloClient();
   const [addPrediction] = useMutation(ADD_PREDICTION);
 
-  const scrollToBottom = () => {
+  useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(scrollToBottom, [messages]);
+  }, [messages]);
 
   useSubscription(GRAPHQL_SUBSCRIPTION, {
-    variables: {
-      subscriptionId,
-    },
+    variables: { subscriptionId },
     onSubscriptionData: ({ subscriptionData }) => {
       const prediction = subscriptionData.data?.predictionAdded;
-
       if (prediction && prediction.type === 'SUCCESS') {
         setLoading(false);
         parseAndDisplayAnalysisResults(JSON.parse(prediction.result));
@@ -59,49 +48,33 @@ export default function ViaChatTab({ data }: TabProps) {
   });
 
   const parseAndDisplayAnalysisResults = (result: string[]) => {
-    console.log('Received result:', result);
+    if (result.length === 0) {
+      console.error('Result array is empty');
+      return;
+    }
 
-    try {
-      if (result.length === 0) {
-        console.error('Result array is empty');
-        return;
+    const content = result[0];
+    const jsonMatch = content.match(/```json\n([\s\S]*?)\n```/);
+    const markdownMatch = content.match(/```markdown\n([\s\S]*?)\n```/);
+
+    if (jsonMatch) {
+      const parsedResult = JSON.parse(jsonMatch[1]);
+      if (parsedResult.chartType && Array.isArray(parsedResult.data)) {
+        const chartProps: ChartProps = {
+          title: parsedResult.title || '',
+          chartType: parsedResult.chartType,
+          data: parsedResult.data.map((item: { name: string; value: number }) => ({
+            name: item.name,
+            value: item.value,
+          })),
+          fullWidth: true,
+        };
+        setMessages((prevMessages) => [...prevMessages, { type: 'chart', content: chartProps, sender: 'bot' }]);
       }
+    }
 
-      const content = result[0];
-
-      // Extract JSON content
-      const jsonMatch = content.match(/```json\n([\s\S]*?)\n```/);
-      const jsonContent = jsonMatch ? jsonMatch[1] : null;
-
-      // Extract Markdown content
-      const markdownMatch = content.match(/```markdown\n([\s\S]*?)\n```/);
-      const markdownContent = markdownMatch ? markdownMatch[1] : null;
-
-      if (jsonContent) {
-        const parsedResult = JSON.parse(jsonContent);
-
-        // Handle chart data
-        if (parsedResult.chartType && Array.isArray(parsedResult.data)) {
-          const chartProps: ChartProps = {
-            title: parsedResult.title || '',
-            chartType: parsedResult.chartType,
-            data: parsedResult.data.map((item: { name: string; value: number }) => ({
-              name: item.name,
-              value: item.value,
-            })),
-          };
-          console.log('Created chart props:', chartProps);
-          setMessages((prevMessages) => [...prevMessages, { type: 'chart', content: chartProps, sender: 'bot' }]);
-        }
-      }
-
-      // Handle Markdown content
-      if (markdownContent) {
-        console.log('Adding Markdown content to messages');
-        setMessages((prevMessages) => [...prevMessages, { type: 'text', content: markdownContent, sender: 'bot' }]);
-      }
-    } catch (error) {
-      console.error('Error in parseAndDisplayAnalysisResults:', error);
+    if (markdownMatch) {
+      setMessages((prevMessages) => [...prevMessages, { type: 'text', content: markdownMatch[1], sender: 'bot' }]);
     }
   };
 
@@ -110,9 +83,9 @@ export default function ViaChatTab({ data }: TabProps) {
     if (inputMessage.trim() === '') return;
 
     setMessages((prevMessages) => [...prevMessages, { type: 'text', content: inputMessage, sender: 'user' }]);
+    setInputMessage('');
 
     const agentId = await getAgentIdByName('Stakeholder | Chat Analysis', client);
-
     if (agentId) {
       setLoading(true);
       try {
@@ -134,16 +107,27 @@ export default function ViaChatTab({ data }: TabProps) {
     } else {
       console.error('Chat Analysis Agent not found');
     }
-
-    setInputMessage('');
   };
+
+  const handleClearChat = () => {
+    setMessages([]);
+  };
+
+  if (!data.nodeVisitData) return <div className="p-4">No data available</div>;
 
   return (
     <div className="bg-white px-4 py-8 rounded-2xl shadow-xl text-slate-700">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">Chat</h2>
+        <button
+          onClick={handleClearChat}
+          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+        >
+          <FontAwesomeIcon icon={faTrash} className="mr-2" />
+          Clear Chat
+        </button>
       </div>
-      <div className="flex-grow mb-4 rounded-lg">
+      <div className="flex-grow mb-4 rounded-lg overflow-y-auto max-h-[60vh]">
         {messages.map((message, index) => (
           <div key={index} className={clsx('pt-4 flex', message.sender === 'user' ? 'justify-end' : 'justify-start')}>
             <motion.div
@@ -151,14 +135,17 @@ export default function ViaChatTab({ data }: TabProps) {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
               className={clsx(
-                'shadow-3xl max-w-[80%] p-2 rounded-lg',
-                message.sender === 'user' ? 'bg-blue-500 text-white' : 'bg-slate-300 text-gray-800',
+                'shadow-3xl p-2 rounded-lg',
+                message.type === 'chart' ? 'w-full max-w-[80%]' : 'max-w-[80%]',
+                message.sender === 'user' ? 'bg-blue-500 text-white' : 'bg-slate-200 text-gray-800',
               )}
             >
               {message.type === 'text' ? (
                 <MarkdownCustom>{message.content as string}</MarkdownCustom>
               ) : (
-                <Chart {...(message.content as ChartProps)} />
+                <div className="w-full">
+                  <Chart {...(message.content as ChartProps)} />
+                </div>
               )}
             </motion.div>
           </div>

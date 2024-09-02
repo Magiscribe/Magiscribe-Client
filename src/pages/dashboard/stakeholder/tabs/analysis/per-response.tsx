@@ -18,16 +18,14 @@ const PerResponseTab: React.FC<TabProps> = ({ data }) => {
 
   const renderNodeContent = (node: NodeVisitData) => {
     if (node?.data?.response) {
-      console.log(node.data);
-      const title = node.data.text;
+      console.log('NODE DIRTY', node.data);
+      const question = node.data.text;
       const responseText = node.data.response.text;
       const ratings = node.data.response.ratings;
 
       return (
         <>
-          <p className="font-semibold text-black">
-            {node.id}. {title}
-          </p>
+          <p className="font-semibold text-black">{question}</p>
           <hr className="my-2" />
           <p className="text-black">
             {responseText && <span>{responseText}</span>}
