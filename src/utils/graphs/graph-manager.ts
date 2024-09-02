@@ -1,6 +1,7 @@
 import { Edge, Node } from '@xyflow/react';
 import { NodeData, OptimizedGraph, OptimizedNode, StrippedNode } from '@/utils/graphs/graph';
 import { stripAndOptimizeGraph } from './graph-utils';
+import { NodeVisitData } from '@/types/conversation';
 
 /**
  * Graph manager class.
@@ -116,5 +117,48 @@ export class GraphManager {
    */
   getNodeHistory(): StrippedNode[] {
     return this.nodeHistory;
+  }
+
+  /**
+   * Converts the node history into a readable conversation format
+   * @returns {string} A stringified version of the conversation history
+   */
+  processNodeVisitData(): string {
+    const nodeVisitData = this.nodeHistory as NodeVisitData[];
+    let conversation = '';
+
+    for (const node of nodeVisitData) {
+      switch (node.type) {
+        case 'information':
+          if (node.data?.text) {
+            conversation += `Bot: ${node.data?.text}\n\n`;
+          }
+          break;
+
+        case 'conversation':
+          const botText = node.data?.text;
+          const userText = node.data?.response?.text;
+
+          if (botText) {
+            conversation += `Bot: ${botText}\n`;
+          }
+          // Add ratings information if available
+          if (node.data?.ratings) {
+            conversation += `Available ratings: ${JSON.stringify(node.data.ratings)}\n`;
+          }
+
+          if (userText) {
+            conversation += `User: ${userText}\n`;
+          }
+          if (node.data?.response?.ratings) {
+            conversation += `User selected ratings: ${JSON.stringify(node.data.response.ratings)}\n`;
+          }
+
+          conversation += '\n';
+          break;
+      }
+    }
+
+    return conversation.trim();
   }
 }

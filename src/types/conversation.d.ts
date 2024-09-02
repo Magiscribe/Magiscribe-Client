@@ -56,6 +56,7 @@ export interface IndividualConversationData {
 
 export interface NodeVisitData {
   id: string;
+  type: string;
   data?: {
     text?: string;
     response?: {

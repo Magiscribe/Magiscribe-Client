@@ -172,9 +172,8 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
         subscriptionId,
         agentId,
         variables: {
-          userMessage: `We are at at node ${currentNode.id}`,
-          conversationGraph: JSON.stringify(graph.current.getGraph()),
-          nodeVisitData: JSON.stringify(graph.current.getNodeHistory()),
+          userMessage: currentNode.data.text,
+          nodeVisitData: graph.current.processNodeVisitData(),
         },
       },
     });
@@ -203,9 +202,9 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
         subscriptionId,
         agentId,
         variables: {
-          userMessage: `We are at at node ${graph.current.getCurrentNode()?.id}`,
+          userMessage: `The current node is: ${graph.current.getCurrentNode()?.id}. \nThe instruction is: ${graph.current.getCurrentNode()?.data.text}`,
           conversationGraph: JSON.stringify(graph.current.getGraph()),
-          nodeVisitData: JSON.stringify(graph.current.getNodeHistory()),
+          nodeVisitData: graph.current.processNodeVisitData(),
         },
       },
     });
