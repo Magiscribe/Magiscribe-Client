@@ -6,6 +6,7 @@ import { GraphManager } from '@/utils/graphs/graph-manager';
 import { NodeData, OptimizedNode } from '@/utils/graphs/graph';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
 import React, { createContext, useContext, useRef, useState } from 'react';
+import { NodeVisitData } from '@/types/conversation';
 
 interface InquiryProviderProps {
   children: React.ReactNode;
@@ -167,13 +168,17 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
       client,
     );
 
+    const conversationString = convertNodeVisitDataToConversationString(
+      graph.current.getNodeHistory() as NodeVisitData[],
+    );
+
     await addPrediction({
       variables: {
         subscriptionId,
         agentId,
         variables: {
           userMessage: currentNode.data.text,
-          nodeVisitData: graph.current.processNodeVisitData(),
+          nodeVisitData: conversationString,
         },
       },
     });
@@ -196,6 +201,9 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
     if (!graph.current) return;
 
     const agentId = await getAgentIdByName('Stakeholder | Condition Node', client);
+    const conversationString = convertNodeVisitDataToConversationString(
+      graph.current.getNodeHistory() as NodeVisitData[],
+    );
 
     await addPrediction({
       variables: {
@@ -204,7 +212,7 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
         variables: {
           userMessage: `The current node is: ${graph.current.getCurrentNode()?.id}. \nThe instruction is: ${graph.current.getCurrentNode()?.data.text}`,
           conversationGraph: JSON.stringify(graph.current.getGraph()),
-          nodeVisitData: graph.current.processNodeVisitData(),
+          nodeVisitData: conversationString,
         },
       },
     });
@@ -223,6 +231,47 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
    */
   function setOnNodeUpdate(callback: (node: OptimizedNode) => void) {
     onNodeUpdate.current = callback;
+  }
+
+  /**
+   * Converts the node history into a readable conversation format
+   * @returns {string} A stringified version of the conversation history
+   */
+  function convertNodeVisitDataToConversationString(nodeVisitData: NodeVisitData[]): string {
+    let conversation = '';
+
+    for (const node of nodeVisitData) {
+      switch (node.type) {
+        case 'information':
+          if (node.data?.text) {
+            conversation += `Bot: ${node.data?.text}\n\n`;
+          }
+          break;
+
+        case 'conversation':
+          const botText = node.data?.text;
+          const userText = node.data?.response?.text;
+
+          if (botText) {
+            conversation += `Bot: ${botText}\n`;
+          }
+          // Add ratings information if available
+          if (node.data?.ratings) {
+            conversation += `Available ratings: ${JSON.stringify(node.data.ratings)}\n`;
+          }
+
+          if (userText) {
+            conversation += `User: ${userText}\n`;
+          }
+          if (node.data?.response?.ratings) {
+            conversation += `User selected ratings: ${JSON.stringify(node.data.response.ratings)}\n`;
+          }
+
+          conversation += '\n';
+          break;
+      }
+    }
+    return conversation.trim();
   }
 
   return (
