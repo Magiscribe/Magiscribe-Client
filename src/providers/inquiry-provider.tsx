@@ -2,11 +2,10 @@ import { ADD_PREDICTION, CREATE_INQUIRY_REPONSE, UPDATE_INQUIRY_RESPONSE } from 
 import { GET_INQUIRY } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import { getAgentIdByName } from '@/utils/agents';
-import { GraphManager } from '@/utils/graphs/graph-manager';
 import { NodeData, OptimizedNode } from '@/utils/graphs/graph';
+import { GraphManager } from '@/utils/graphs/graph-manager';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
-import React, { createContext, useContext, useRef, useState } from 'react';
-import { NodeVisitData } from '@/types/conversation';
+import React, { createContext, useContext, useCallback, useState, useRef, useEffect } from 'react';
 
 interface InquiryProviderProps {
   children: React.ReactNode;
@@ -18,31 +17,34 @@ interface HandleNextNodeProps {
   data?: NodeData;
 }
 
+interface State {
+  loading: boolean;
+  initialized: boolean;
+}
+
 interface InquiryContextType {
   handleNextNode: (props?: HandleNextNodeProps) => Promise<void>;
   onNodeUpdate: (callback: (node: OptimizedNode) => void) => void;
-
   form: { [key: string]: string };
-  initialized: boolean;
-  loading: boolean;
+  state: State;
 }
 
 const InquiryContext = createContext<InquiryContextType | undefined>(undefined);
 
 function InquiryProvider({ children, id }: InquiryProviderProps) {
   // Refs
-  const form = useRef<{ [key: string]: string }>({});
-  const graph = useRef<GraphManager | null>(null);
-
+  const formRef = useRef<{ [key: string]: string }>({});
+  const graphRef = useRef<GraphManager | null>(null);
+  const inquiryResponseIdRef = useRef<string | undefined>(undefined);
+  const inquiryHistoryRef = useRef<string[]>([]);
+  
   // States
-  const inquiryResponseId = useRef<string | undefined>(undefined);
-  const [subscriptionId] = useState<string>(`inquiry_${Date.now()}`);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [initialized, setInitialized] = useState<boolean>(false);
-
+  const [state, setState] = useState<State>({ loading: false, initialized: false });
+  const subscriptionId = useRef<string>(`inquiry_${Date.now()}`).current;
+  
   // Event handlers
-  const onSubscriptionData = useRef<(data: NodeData) => void>(() => {});
-  const onNodeUpdate = useRef<(node: OptimizedNode) => void>(() => {});
+  const onSubscriptionDataRef = useRef<(data: NodeData) => void>(() => {});
+  const onNodeUpdateRef = useRef<(node: OptimizedNode) => void>(() => {});
 
   // Mutations and Apollo client
   const [addPrediction] = useMutation(ADD_PREDICTION);
@@ -60,10 +62,11 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
     errorPolicy: 'all',
     onCompleted: ({ getInquiry }) => {
       if (getInquiry.data.graph) {
-        form.current = getInquiry.data.form;
-        graph.current = new GraphManager(getInquiry.data.graph);
-        graph.current.onNodeVisit(handleOnNodeVisit);
-        setInitialized(true);
+        formRef.current = getInquiry.data.form;
+        graphRef.current = new GraphManager(getInquiry.data.graph);
+        graphRef.current.onNodeVisit = handleOnNodeVisit;
+        graphRef.current.onNodeAddedToHistory = addNodeToHistory;
+        setState((prev) => ({ ...prev, initialized: true }));
       }
     },
     onError: () => {
@@ -81,17 +84,17 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
       const prediction = subscriptionData.data?.predictionAdded;
 
       if (prediction?.type === 'SUCCESS') {
-        setLoading(false);
+        setState((prev) => ({ ...prev, loading: true }));
 
         // TODO: Avoid double parsing. Will require changes to the backend.
         const result = JSON.parse(JSON.parse(prediction.result));
-        if (onSubscriptionData.current) {
-          onSubscriptionData.current(result);
+        if (onSubscriptionDataRef.current) {
+          onSubscriptionDataRef.current(result);
         }
       }
     },
     onError: () => {
-      setLoading(false);
+      setState((prev) => ({ ...prev, loading: false }));
     },
   });
 
@@ -100,54 +103,49 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
    * @param {HandleNextNodeProps} props - The next node ID and data to pass to the next node.
    * @returns {Promise<void>} A promise that resolves when the next node is visited
    */
-  async function handleNextNode({ nextNodeId, data }: HandleNextNodeProps = {}): Promise<void> {
-    if (!graph.current) return;
+  const handleNextNode = useCallback(async ({ nextNodeId, data }: HandleNextNodeProps = {}) => {
+    if (!graphRef.current) return;
 
-    setLoading(true);
+    setState((prev) => ({ ...prev, loading: true }));
 
-    if (!inquiryResponseId.current) {
+    if (!inquiryResponseIdRef.current) {
       const result = await createResponse({
         variables: {
           inquiryId: id,
-          data: graph.current.getNodeHistory(),
+          data: graphRef.current.getNodeHistory(),
         },
       });
-      inquiryResponseId.current = result.data.upsertInquiryResponse.id;
+      inquiryResponseIdRef.current = result.data.upsertInquiryResponse.id;
     } else {
       await updateResponse({
         variables: {
-          id: inquiryResponseId.current,
+          id: inquiryResponseIdRef.current,
           inquiryId: id,
-          data: graph.current.getNodeHistory(),
+          data: graphRef.current.getNodeHistory(),
         },
       });
     }
 
-    // Carries over data if the node has dynamic generation so we know what the node generated.
-    const carryOverdata = graph.current.getCurrentNode()?.data;
-
-    await graph.current.updateCurrentNodeData({
-      response: data,
-      ...carryOverdata,
-    });
-    await graph.current.goToNextNode(nextNodeId);
-  }
+    const carryOverData = graphRef.current.getCurrentNode()?.data;
+    await graphRef.current.updateCurrentNodeData({ response: data, ...carryOverData });
+    await graphRef.current.goToNextNode(nextNodeId);
+  }, [createResponse, id, updateResponse]);
 
   /**
    * Handles when a new node is visited.
    * @param node {OptimizedNode} The node that was visited
    * @returns {Promise<void>} A promise that resolves when the node is visited
    */
-  async function handleOnNodeVisit(node: OptimizedNode): Promise<void> {
+  const handleOnNodeVisit = useCallback(async (node: OptimizedNode) => {
     if (node.data?.dynamicGeneration) {
       await handleDynamicGeneration();
     } else if (node.type === 'condition') {
       await handleConditionNode();
-    } else if (onNodeUpdate.current) {
-      setLoading(false);
-      onNodeUpdate.current(node);
+    } else if (onNodeUpdateRef.current) {
+      setState((prev) => ({ ...prev, loading: false }));
+      onNodeUpdateRef.current(node);
     }
-  }
+  }, []);
 
   /**
    * Handles visiting a node with dynamic generation.
@@ -155,21 +153,17 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
    * on the node. A callback is triggered at the end to notify subscribers of the new node data.
    * @returns {Promise<void>} A promise that resolves when the dynamic generation is complete
    */
-  async function handleDynamicGeneration(): Promise<void> {
+  const handleDynamicGeneration = useCallback(async () => {
     // Base Case 1: The graph manager is initialized.
-    if (!graph.current) return;
+    if (!graphRef.current) return;
 
     // Base Case 2: The current node is defined (may be the case if the graph is empty).
-    const currentNode = graph.current.getCurrentNode();
+    const currentNode = graphRef.current.getCurrentNode();
     if (!currentNode) return;
 
     const agentId = await getAgentIdByName(
       `Stakeholder | Dynamic ${currentNode.type === 'conversation' ? 'Question' : 'Information'} Generation`,
       client,
-    );
-
-    const conversationString = convertNodeVisitDataToConversationString(
-      graph.current.getNodeHistory() as NodeVisitData[],
     );
 
     await addPrediction({
@@ -178,118 +172,98 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
         agentId,
         variables: {
           userMessage: currentNode.data.text,
-          nodeVisitData: conversationString,
+          nodeVisitData: inquiryHistoryRef.current.join('\n\n'),
         },
       },
     });
 
-    onSubscriptionData.current = (result) => {
+    onSubscriptionDataRef.current = (result) => {
       if (currentNode) {
-        currentNode.data = {
-          ...currentNode.data,
-          ...result,
-        };
+        currentNode.data = { ...currentNode.data, ...result };
       }
-      if (onNodeUpdate.current) {
-        onNodeUpdate.current(currentNode);
+      if (onNodeUpdateRef.current) {
+        onNodeUpdateRef.current(currentNode);
       }
     };
-  }
+  }, [addPrediction, client, subscriptionId]);
 
-  async function handleConditionNode() {
+  const handleConditionNode = useCallback(async () => {
     // Base Case 1: The graph manager is initialized.
-    if (!graph.current) return;
+    if (!graphRef.current) return;
 
     const agentId = await getAgentIdByName('Stakeholder | Condition Node', client);
-    const conversationString = convertNodeVisitDataToConversationString(
-      graph.current.getNodeHistory() as NodeVisitData[],
-    );
 
     await addPrediction({
       variables: {
         subscriptionId,
         agentId,
         variables: {
-          userMessage: `The current node is: ${graph.current.getCurrentNode()?.id}. \nThe instruction is: ${graph.current.getCurrentNode()?.data.text}`,
-          conversationGraph: JSON.stringify(graph.current.getGraph()),
-          nodeVisitData: conversationString,
+          userMessage: `The current node is: ${graphRef.current.getCurrentNode()?.id}. \nThe instruction is: ${graphRef.current.getCurrentNode()?.data.text}`,
+          conversationGraph: JSON.stringify(graphRef.current.getGraph()),
+          nodeVisitData: inquiryHistoryRef.current.join('\n\n'),
         },
       },
     });
 
-    onSubscriptionData.current = (result) => {
+    onSubscriptionDataRef.current = (result) => {
       handleNextNode({
         nextNodeId: result.nextNodeId as string,
         data: result,
       });
     };
-  }
-
-  /**
-   * Sets a callback for when a node is updated.
-   * @param callback {Function} A callback function that receives the updated node.
-   */
-  function setOnNodeUpdate(callback: (node: OptimizedNode) => void) {
-    onNodeUpdate.current = callback;
-  }
+  }, [addPrediction, client, handleNextNode, subscriptionId]);
 
   /**
    * Converts the node history into a readable conversation format
    * @returns {string} A stringified version of the conversation history
    */
-  function convertNodeVisitDataToConversationString(nodeVisitData: NodeVisitData[]): string {
+  const addNodeToHistory = useCallback((node: OptimizedNode) => {
+    if (!node.data) return;
+  
+    const { type, data } = node as any;
     let conversation = '';
-
-    for (const node of nodeVisitData) {
-      switch (node.type) {
-        case 'information':
-          if (node.data?.text) {
-            conversation += `Bot: ${node.data?.text}\n\n`;
-          }
-          break;
-
-        case 'conversation':
-          const botText = node.data?.text;
-          const userText = node.data?.response?.text;
-
-          if (botText) {
-            conversation += `Bot: ${botText}\n`;
-          }
-          // Add ratings information if available
-          if (node.data?.ratings) {
-            conversation += `Available ratings: ${JSON.stringify(node.data.ratings)}\n`;
-          }
-
-          if (userText) {
-            conversation += `User: ${userText}\n`;
-          }
-          if (node.data?.response?.ratings) {
-            conversation += `User selected ratings: ${JSON.stringify(node.data.response.ratings)}\n`;
-          }
-
-          conversation += '\n';
-          break;
-      }
+  
+    switch (type) {
+      case 'information':
+        if (data.text) {
+          conversation = `Bot: ${data.text}`;
+        }
+        break;
+  
+      case 'conversation':
+        const parts = [
+          data.text && `Bot: ${data.text}`,
+          data.ratings && `Available ratings: ${JSON.stringify(data.ratings)}`,
+          data.response?.text && `User: ${data.response.text}`,
+          data.response?.ratings && `User selected ratings: ${JSON.stringify(data.response.ratings)}`
+        ].filter(Boolean);
+        
+        conversation = parts.join('\n');
+        break;
     }
-    return conversation.trim();
-  }
+  
+    if (conversation) {
+      inquiryHistoryRef.current.push(conversation);
+    }
+  }, []);
+
+  const contextValue = {
+    onNodeUpdate: useCallback((callback: (node: OptimizedNode) => void) => {
+      onNodeUpdateRef.current = callback;
+    }, []),
+    handleNextNode,
+    form: formRef.current,
+    state
+  };
 
   return (
-    <InquiryContext.Provider
-      value={{
-        onNodeUpdate: setOnNodeUpdate,
-        handleNextNode,
-        form: form.current,
-        loading,
-        initialized,
-      }}
-    >
+    <InquiryContext.Provider value={contextValue}>
       {children}
     </InquiryContext.Provider>
   );
 }
 
-export function useInquiry() {
+function useInquiry() {
   const context = useContext(InquiryContext);
   if (context === undefined) {
     throw new Error('useInquiry must be used within an InquiryProvider');
@@ -297,4 +271,4 @@ export function useInquiry() {
   return context;
 }
 
-export { InquiryProvider };
+export { InquiryProvider, useInquiry };

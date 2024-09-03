@@ -54,20 +54,6 @@ export interface IndividualConversationData {
   data: NodeVisitData[];
 }
 
-export interface NodeVisitData {
-  id: string;
-  type: string;
-  data?: {
-    text?: string;
-    response?: {
-      text?: string;
-      ratings?: string[];
-    };
-    ratings?: string[];
-    scalars?: number[];
-  };
-}
-
 export interface TabProps {
   data: {
     id: string;
