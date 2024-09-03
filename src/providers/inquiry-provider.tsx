@@ -5,7 +5,7 @@ import { getAgentIdByName } from '@/utils/agents';
 import { NodeData, OptimizedNode } from '@/utils/graphs/graph';
 import { GraphManager } from '@/utils/graphs/graph-manager';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
-import React, { createContext, useContext, useCallback, useState, useRef, useEffect } from 'react';
+import React, { createContext, useCallback, useContext, useRef, useState } from 'react';
 
 interface InquiryProviderProps {
   children: React.ReactNode;
@@ -37,11 +37,11 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
   const graphRef = useRef<GraphManager | null>(null);
   const inquiryResponseIdRef = useRef<string | undefined>(undefined);
   const inquiryHistoryRef = useRef<string[]>([]);
-  
+
   // States
   const [state, setState] = useState<State>({ loading: false, initialized: false });
   const subscriptionId = useRef<string>(`inquiry_${Date.now()}`).current;
-  
+
   // Event handlers
   const onSubscriptionDataRef = useRef<(data: NodeData) => void>(() => {});
   const onNodeUpdateRef = useRef<(node: OptimizedNode) => void>(() => {});
@@ -103,33 +103,36 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
    * @param {HandleNextNodeProps} props - The next node ID and data to pass to the next node.
    * @returns {Promise<void>} A promise that resolves when the next node is visited
    */
-  const handleNextNode = useCallback(async ({ nextNodeId, data }: HandleNextNodeProps = {}) => {
-    if (!graphRef.current) return;
+  const handleNextNode = useCallback(
+    async ({ nextNodeId, data }: HandleNextNodeProps = {}) => {
+      if (!graphRef.current) return;
 
-    setState((prev) => ({ ...prev, loading: true }));
+      setState((prev) => ({ ...prev, loading: true }));
 
-    if (!inquiryResponseIdRef.current) {
-      const result = await createResponse({
-        variables: {
-          inquiryId: id,
-          data: graphRef.current.getNodeHistory(),
-        },
-      });
-      inquiryResponseIdRef.current = result.data.upsertInquiryResponse.id;
-    } else {
-      await updateResponse({
-        variables: {
-          id: inquiryResponseIdRef.current,
-          inquiryId: id,
-          data: graphRef.current.getNodeHistory(),
-        },
-      });
-    }
+      if (!inquiryResponseIdRef.current) {
+        const result = await createResponse({
+          variables: {
+            inquiryId: id,
+            data: graphRef.current.getNodeHistory(),
+          },
+        });
+        inquiryResponseIdRef.current = result.data.upsertInquiryResponse.id;
+      } else {
+        await updateResponse({
+          variables: {
+            id: inquiryResponseIdRef.current,
+            inquiryId: id,
+            data: graphRef.current.getNodeHistory(),
+          },
+        });
+      }
 
-    const carryOverData = graphRef.current.getCurrentNode()?.data;
-    await graphRef.current.updateCurrentNodeData({ response: data, ...carryOverData });
-    await graphRef.current.goToNextNode(nextNodeId);
-  }, [createResponse, id, updateResponse]);
+      const carryOverData = graphRef.current.getCurrentNode()?.data;
+      await graphRef.current.updateCurrentNodeData({ response: data, ...carryOverData });
+      await graphRef.current.goToNextNode(nextNodeId);
+    },
+    [createResponse, id, updateResponse],
+  );
 
   /**
    * Handles when a new node is visited.
@@ -219,29 +222,25 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
    */
   const addNodeToHistory = useCallback((node: OptimizedNode) => {
     if (!node.data) return;
-  
-    const { type, data } = node as any;
+
+    const { type, data } = node as { type: string; data: { [key: string]: { [key: string]: string } } };
     let conversation = '';
-  
-    switch (type) {
-      case 'information':
-        if (data.text) {
-          conversation = `Bot: ${data.text}`;
-        }
-        break;
-  
-      case 'conversation':
-        const parts = [
-          data.text && `Bot: ${data.text}`,
-          data.ratings && `Available ratings: ${JSON.stringify(data.ratings)}`,
-          data.response?.text && `User: ${data.response.text}`,
-          data.response?.ratings && `User selected ratings: ${JSON.stringify(data.response.ratings)}`
-        ].filter(Boolean);
-        
-        conversation = parts.join('\n');
-        break;
+
+    if (type === 'information') {
+      if (data.text) {
+        conversation = `Bot: ${data.text}`;
+      }
+    } else if (type === 'conversation') {
+      const parts = [
+        data.text && `Bot: ${data.text}`,
+        data.ratings && `Available ratings: ${JSON.stringify(data.ratings)}`,
+        data.response?.text && `User: ${data.response.text}`,
+        data.response?.ratings && `User selected ratings: ${JSON.stringify(data.response.ratings)}`,
+      ].filter(Boolean);
+
+      conversation = parts.join('\n');
     }
-  
+
     if (conversation) {
       inquiryHistoryRef.current.push(conversation);
     }
@@ -253,14 +252,10 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
     }, []),
     handleNextNode,
     form: formRef.current,
-    state
+    state,
   };
 
-  return (
-    <InquiryContext.Provider value={contextValue}>
-      {children}
-    </InquiryContext.Provider>
-  );
+  return <InquiryContext.Provider value={contextValue}>{children}</InquiryContext.Provider>;
 }
 
 function useInquiry() {

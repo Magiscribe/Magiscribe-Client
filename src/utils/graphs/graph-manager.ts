@@ -18,12 +18,12 @@ export class GraphManager {
   //  Callbacks
   private onNodeVisitCallback?: (node: OptimizedNode) => void;
   public set onNodeVisit(callback: (node: OptimizedNode) => void) {
-    this.onNodeVisitCallback = callback
+    this.onNodeVisitCallback = callback;
   }
 
-  private onNodeAddedToHistoryCallback?:  (node: OptimizedNode) => void;
+  private onNodeAddedToHistoryCallback?: (node: OptimizedNode) => void;
   public set onNodeAddedToHistory(callback: (node: OptimizedNode) => void) {
-    this.onNodeAddedToHistoryCallback = callback
+    this.onNodeAddedToHistoryCallback = callback;
   }
 
   /**
@@ -35,7 +35,7 @@ export class GraphManager {
     // Graphs
     this.originalGraph = stripGraph(graph);
     this.traversalGraph = convertToOptimizedGraph(this.originalGraph);
-    
+
     // State
     this.currentNode = Object.values(this.traversalGraph.nodes).find((node) => node.type === 'start') ?? null;
     this.currentNode = this.currentNode ? this.deepCopy(this.currentNode) : null;
