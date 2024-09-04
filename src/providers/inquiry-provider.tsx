@@ -233,10 +233,10 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
       }
     } else if (type === 'conversation') {
       const parts = [
-        data.text && `Bot: ${data.text}`,
-        data.ratings && `Available ratings: ${JSON.stringify(data.ratings)}`,
-        data.response?.text && `User: ${data.response.text}`,
-        data.response?.ratings && `User selected ratings: ${JSON.stringify(data.response.ratings)}`,
+        data.text && `Bot: ${data.text} \n`,
+        data.ratings && `Available ratings: ${JSON.stringify(data.ratings)} \n`,
+        data.response?.ratings && `User selected ratings: ${JSON.stringify(data.response.ratings)} \n`,
+        data.response?.text && `User: ${data.response.text} \n`,
       ].filter(Boolean);
 
       conversation = parts.join('\n');
