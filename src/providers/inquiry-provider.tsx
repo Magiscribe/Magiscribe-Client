@@ -84,7 +84,7 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
       const prediction = subscriptionData.data?.predictionAdded;
 
       if (prediction?.type === 'SUCCESS') {
-        setState((prev) => ({ ...prev, loading: true }));
+        setState((prev) => ({ ...prev, loading: false }));
 
         // TODO: Avoid double parsing. Will require changes to the backend.
         const result = JSON.parse(JSON.parse(prediction.result));
@@ -181,6 +181,7 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
     });
 
     onSubscriptionDataRef.current = (result) => {
+      console.log(result);
       if (currentNode) {
         currentNode.data = { ...currentNode.data, ...result };
       }
