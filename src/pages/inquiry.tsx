@@ -32,7 +32,7 @@ function Inquiry() {
   const [selectedRatings, setSelectedRatings] = useState<string[]>([]);
   const [currentNode, setCurrentNode] = useState<StrippedNode | null>(null);
 
-  const { handleNextNode, form, loading, onNodeUpdate } = useInquiry();
+  const { handleNextNode, form, state, onNodeUpdate } = useInquiry();
 
   const handleStart = () => {
     setScreen('inquiry');
@@ -153,7 +153,7 @@ function Inquiry() {
                     </motion.div>
                   </div>
                 ))}
-                {loading && (
+                {state.loading && (
                   <div className="flex justify-start items-center pt-4 pl-4">
                     <AnimatedDots />
                   </div>
@@ -166,7 +166,7 @@ function Inquiry() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5 }}
                 >
-                  {!loading && ((currentNode.data?.type ?? '') as string).startsWith('rating') && (
+                  {!state.loading && ((currentNode.data?.type ?? '') as string).startsWith('rating') && (
                     <div className="mb-6">
                       <RatingInput
                         ratings={currentNode.data.ratings as string[]}
@@ -190,7 +190,7 @@ function Inquiry() {
                       <button
                         type="submit"
                         className="px-6 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-r-full hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-300 ease-in-out transform disabled:opacity-70 disabled:cursor-not-allowed"
-                        disabled={loading || (selectedRatings.length === 0 && inputMessage.trim() === '')}
+                        disabled={state.loading || (selectedRatings.length === 0 && inputMessage.trim() === '')}
                       >
                         Send
                         <FontAwesomeIcon icon={faPaperPlane} className="ml-2" />

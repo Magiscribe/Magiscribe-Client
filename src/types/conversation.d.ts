@@ -51,10 +51,10 @@ export interface GraphEdge {
 export interface IndividualConversationData {
   id: string;
   userId?: string;
-  data: NodeVisitData[];
+  data: NodeVisitAnalysisData[];
 }
 
-export interface NodeVisitData {
+export interface NodeVisitAnalysisData {
   id: string;
   data?: {
     text?: string;

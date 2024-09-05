@@ -139,13 +139,3 @@ export function convertToOptimizedGraph(graph: StrippedGraph): OptimizedGraph {
 
   return { nodes, edges };
 }
-
-/**
- * Strips graph of non-essential data and converts it to an optimized structure.
- * @param graph { nodes: Node[]; edges: Edge[] } A graph structure with nodes and edges
- * @returns {OptimizedGraph} An optimized graph structure using Maps
- */
-export function stripAndOptimizeGraph(graph: { nodes: Node[]; edges: Edge[] }): OptimizedGraph {
-  const strippedGraph = stripGraph(graph);
-  return convertToOptimizedGraph(strippedGraph);
-}

@@ -2,10 +2,10 @@ import { ADD_PREDICTION, CREATE_INQUIRY_REPONSE, UPDATE_INQUIRY_RESPONSE } from 
 import { GET_INQUIRY } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import { getAgentIdByName } from '@/utils/agents';
-import { GraphManager } from '@/utils/graphs/graph-manager';
 import { NodeData, OptimizedNode } from '@/utils/graphs/graph';
+import { GraphManager } from '@/utils/graphs/graph-manager';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
-import React, { createContext, useContext, useRef, useState } from 'react';
+import React, { createContext, useCallback, useContext, useRef, useState } from 'react';
 
 interface InquiryProviderProps {
   children: React.ReactNode;
@@ -17,31 +17,34 @@ interface HandleNextNodeProps {
   data?: NodeData;
 }
 
+interface State {
+  loading: boolean;
+  initialized: boolean;
+}
+
 interface InquiryContextType {
   handleNextNode: (props?: HandleNextNodeProps) => Promise<void>;
   onNodeUpdate: (callback: (node: OptimizedNode) => void) => void;
-
   form: { [key: string]: string };
-  initialized: boolean;
-  loading: boolean;
+  state: State;
 }
 
 const InquiryContext = createContext<InquiryContextType | undefined>(undefined);
 
 function InquiryProvider({ children, id }: InquiryProviderProps) {
   // Refs
-  const form = useRef<{ [key: string]: string }>({});
-  const graph = useRef<GraphManager | null>(null);
+  const formRef = useRef<{ [key: string]: string }>({});
+  const graphRef = useRef<GraphManager | null>(null);
+  const inquiryResponseIdRef = useRef<string | undefined>(undefined);
+  const inquiryHistoryRef = useRef<string[]>([]);
 
   // States
-  const inquiryResponseId = useRef<string | undefined>(undefined);
-  const [subscriptionId] = useState<string>(`inquiry_${Date.now()}`);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [initialized, setInitialized] = useState<boolean>(false);
+  const [state, setState] = useState<State>({ loading: false, initialized: false });
+  const subscriptionId = useRef<string>(`inquiry_${Date.now()}`).current;
 
   // Event handlers
-  const onSubscriptionData = useRef<(data: NodeData) => void>(() => {});
-  const onNodeUpdate = useRef<(node: OptimizedNode) => void>(() => {});
+  const onSubscriptionDataRef = useRef<(data: NodeData) => void>(() => {});
+  const onNodeUpdateRef = useRef<(node: OptimizedNode) => void>(() => {});
 
   // Mutations and Apollo client
   const [addPrediction] = useMutation(ADD_PREDICTION);
@@ -59,10 +62,11 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
     errorPolicy: 'all',
     onCompleted: ({ getInquiry }) => {
       if (getInquiry.data.graph) {
-        form.current = getInquiry.data.form;
-        graph.current = new GraphManager(getInquiry.data.graph);
-        graph.current.onNodeVisit(handleOnNodeVisit);
-        setInitialized(true);
+        formRef.current = getInquiry.data.form;
+        graphRef.current = new GraphManager(getInquiry.data.graph);
+        graphRef.current.onNodeVisit = handleOnNodeVisit;
+        graphRef.current.onNodeAddedToHistory = addNodeToHistory;
+        setState((prev) => ({ ...prev, initialized: true }));
       }
     },
     onError: () => {
@@ -80,17 +84,17 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
       const prediction = subscriptionData.data?.predictionAdded;
 
       if (prediction?.type === 'SUCCESS') {
-        setLoading(false);
+        setState((prev) => ({ ...prev, loading: false }));
 
         // TODO: Avoid double parsing. Will require changes to the backend.
         const result = JSON.parse(JSON.parse(prediction.result));
-        if (onSubscriptionData.current) {
-          onSubscriptionData.current(result);
+        if (onSubscriptionDataRef.current) {
+          onSubscriptionDataRef.current(result);
         }
       }
     },
     onError: () => {
-      setLoading(false);
+      setState((prev) => ({ ...prev, loading: false }));
     },
   });
 
@@ -99,54 +103,52 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
    * @param {HandleNextNodeProps} props - The next node ID and data to pass to the next node.
    * @returns {Promise<void>} A promise that resolves when the next node is visited
    */
-  async function handleNextNode({ nextNodeId, data }: HandleNextNodeProps = {}): Promise<void> {
-    if (!graph.current) return;
+  const handleNextNode = useCallback(
+    async ({ nextNodeId, data }: HandleNextNodeProps = {}) => {
+      if (!graphRef.current) return;
 
-    setLoading(true);
+      setState((prev) => ({ ...prev, loading: true }));
 
-    if (!inquiryResponseId.current) {
-      const result = await createResponse({
-        variables: {
-          inquiryId: id,
-          data: graph.current.getNodeHistory(),
-        },
-      });
-      inquiryResponseId.current = result.data.upsertInquiryResponse.id;
-    } else {
-      await updateResponse({
-        variables: {
-          id: inquiryResponseId.current,
-          inquiryId: id,
-          data: graph.current.getNodeHistory(),
-        },
-      });
-    }
+      if (!inquiryResponseIdRef.current) {
+        const result = await createResponse({
+          variables: {
+            inquiryId: id,
+            data: graphRef.current.getNodeHistory(),
+          },
+        });
+        inquiryResponseIdRef.current = result.data.upsertInquiryResponse.id;
+      } else {
+        await updateResponse({
+          variables: {
+            id: inquiryResponseIdRef.current,
+            inquiryId: id,
+            data: graphRef.current.getNodeHistory(),
+          },
+        });
+      }
 
-    // Carries over data if the node has dynamic generation so we know what the node generated.
-    const carryOverdata = graph.current.getCurrentNode()?.data;
-
-    await graph.current.updateCurrentNodeData({
-      response: data,
-      ...carryOverdata,
-    });
-    await graph.current.goToNextNode(nextNodeId);
-  }
+      const carryOverData = graphRef.current.getCurrentNode()?.data;
+      await graphRef.current.updateCurrentNodeData({ response: data, ...carryOverData });
+      await graphRef.current.goToNextNode(nextNodeId);
+    },
+    [createResponse, id, updateResponse],
+  );
 
   /**
    * Handles when a new node is visited.
    * @param node {OptimizedNode} The node that was visited
    * @returns {Promise<void>} A promise that resolves when the node is visited
    */
-  async function handleOnNodeVisit(node: OptimizedNode): Promise<void> {
+  const handleOnNodeVisit = useCallback(async (node: OptimizedNode) => {
     if (node.data?.dynamicGeneration) {
       await handleDynamicGeneration();
     } else if (node.type === 'condition') {
       await handleConditionNode();
-    } else if (onNodeUpdate.current) {
-      setLoading(false);
-      onNodeUpdate.current(node);
+    } else if (onNodeUpdateRef.current) {
+      setState((prev) => ({ ...prev, loading: false }));
+      onNodeUpdateRef.current(node);
     }
-  }
+  }, []);
 
   /**
    * Handles visiting a node with dynamic generation.
@@ -154,12 +156,12 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
    * on the node. A callback is triggered at the end to notify subscribers of the new node data.
    * @returns {Promise<void>} A promise that resolves when the dynamic generation is complete
    */
-  async function handleDynamicGeneration(): Promise<void> {
+  const handleDynamicGeneration = useCallback(async () => {
     // Base Case 1: The graph manager is initialized.
-    if (!graph.current) return;
+    if (!graphRef.current) return;
 
     // Base Case 2: The current node is defined (may be the case if the graph is empty).
-    const currentNode = graph.current.getCurrentNode();
+    const currentNode = graphRef.current.getCurrentNode();
     if (!currentNode) return;
 
     const agentId = await getAgentIdByName(
@@ -172,29 +174,26 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
         subscriptionId,
         agentId,
         variables: {
-          userMessage: `We are at at node ${currentNode.id}`,
-          conversationGraph: JSON.stringify(graph.current.getGraph()),
-          nodeVisitData: JSON.stringify(graph.current.getNodeHistory()),
+          userMessage: currentNode.data.text,
+          nodeVisitData: inquiryHistoryRef.current.join('\n\n'),
         },
       },
     });
 
-    onSubscriptionData.current = (result) => {
+    onSubscriptionDataRef.current = (result) => {
+      console.log(result);
       if (currentNode) {
-        currentNode.data = {
-          ...currentNode.data,
-          ...result,
-        };
+        currentNode.data = { ...currentNode.data, ...result };
       }
-      if (onNodeUpdate.current) {
-        onNodeUpdate.current(currentNode);
+      if (onNodeUpdateRef.current) {
+        onNodeUpdateRef.current(currentNode);
       }
     };
-  }
+  }, [addPrediction, client, subscriptionId]);
 
-  async function handleConditionNode() {
+  const handleConditionNode = useCallback(async () => {
     // Base Case 1: The graph manager is initialized.
-    if (!graph.current) return;
+    if (!graphRef.current) return;
 
     const agentId = await getAgentIdByName('Stakeholder | Condition Node', client);
 
@@ -203,45 +202,64 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
         subscriptionId,
         agentId,
         variables: {
-          userMessage: `We are at at node ${graph.current.getCurrentNode()?.id}`,
-          conversationGraph: JSON.stringify(graph.current.getGraph()),
-          nodeVisitData: JSON.stringify(graph.current.getNodeHistory()),
+          userMessage: `The current node is: ${graphRef.current.getCurrentNode()?.id}. \nThe instruction is: ${graphRef.current.getCurrentNode()?.data.text}`,
+          conversationGraph: JSON.stringify(graphRef.current.getGraph()),
+          nodeVisitData: inquiryHistoryRef.current.join('\n\n'),
         },
       },
     });
 
-    onSubscriptionData.current = (result) => {
+    onSubscriptionDataRef.current = (result) => {
       handleNextNode({
         nextNodeId: result.nextNodeId as string,
         data: result,
       });
     };
-  }
+  }, [addPrediction, client, handleNextNode, subscriptionId]);
 
   /**
-   * Sets a callback for when a node is updated.
-   * @param callback {Function} A callback function that receives the updated node.
+   * Converts the node history into a readable conversation format
+   * @returns {string} A stringified version of the conversation history
    */
-  function setOnNodeUpdate(callback: (node: OptimizedNode) => void) {
-    onNodeUpdate.current = callback;
-  }
+  const addNodeToHistory = useCallback((node: OptimizedNode) => {
+    if (!node.data) return;
 
-  return (
-    <InquiryContext.Provider
-      value={{
-        onNodeUpdate: setOnNodeUpdate,
-        handleNextNode,
-        form: form.current,
-        loading,
-        initialized,
-      }}
-    >
-      {children}
-    </InquiryContext.Provider>
-  );
+    const { type, data } = node as { type: string; data: { [key: string]: { [key: string]: string } } };
+    let conversation = '';
+
+    if (type === 'information') {
+      if (data.text) {
+        conversation = `Bot: ${data.text}`;
+      }
+    } else if (type === 'conversation') {
+      const parts = [
+        data.text && `Bot: ${data.text} \n`,
+        data.ratings && `Available ratings: ${JSON.stringify(data.ratings)} \n`,
+        data.response?.ratings && `User selected ratings: ${JSON.stringify(data.response.ratings)} \n`,
+        data.response?.text && `User: ${data.response.text} \n`,
+      ].filter(Boolean);
+
+      conversation = parts.join('\n');
+    }
+
+    if (conversation) {
+      inquiryHistoryRef.current.push(conversation);
+    }
+  }, []);
+
+  const contextValue = {
+    onNodeUpdate: useCallback((callback: (node: OptimizedNode) => void) => {
+      onNodeUpdateRef.current = callback;
+    }, []),
+    handleNextNode,
+    form: formRef.current,
+    state,
+  };
+
+  return <InquiryContext.Provider value={contextValue}>{children}</InquiryContext.Provider>;
 }
 
-export function useInquiry() {
+function useInquiry() {
   const context = useContext(InquiryContext);
   if (context === undefined) {
     throw new Error('useInquiry must be used within an InquiryProvider');
@@ -249,4 +267,4 @@ export function useInquiry() {
   return context;
 }
 
-export { InquiryProvider };
+export { InquiryProvider, useInquiry };

@@ -10,11 +10,16 @@ import {
   ConversationNodeData,
   TabProps,
   IndividualConversationData,
-  NodeVisitData,
+  NodeVisitAnalysisData,
 } from '@/types/conversation';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
 
-export type ResponseSummary = { [nodeId: string]: string };
+export type ResponseSummary = {
+  [nodeId: string]: {
+    text: string;
+    lastUpdated: string;
+  };
+};
 
 const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -37,9 +42,9 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
   );
 
   const groupedResponses = useMemo(() => {
-    const grouped: { [nodeId: string]: { [userId: string]: NodeVisitData[] } } = {};
+    const grouped: { [nodeId: string]: { [userId: string]: NodeVisitAnalysisData[] } } = {};
     responses.forEach((response: IndividualConversationData) => {
-      response.data.forEach((nodeVisit: NodeVisitData) => {
+      response.data.forEach((nodeVisit: NodeVisitAnalysisData) => {
         if (!grouped[nodeVisit.id]) {
           grouped[nodeVisit.id] = {};
         }
@@ -64,7 +69,13 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
         const result = JSON.parse(JSON.parse(prediction.result)[0]);
         console.log('LOGGY DOGGY', result);
         if (result && result.summary) {
-          setSummaries((prev) => ({ ...prev, [conversationNodes[currentQuestionIndex].id]: result.summary }));
+          setSummaries((prev) => ({
+            ...prev,
+            [conversationNodes[currentQuestionIndex].id]: {
+              text: result.summary,
+              lastUpdated: new Date().toLocaleString(),
+            },
+          }));
         }
       }
     },
@@ -200,7 +211,8 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
       {currentSummary && (
         <div className="my-4 p-4 bg-blue-100 rounded-md">
           <h3 className="font-bold mb-2">Summary</h3>
-          <p>{currentSummary}</p>
+          <p>{currentSummary.text}</p>
+          <p className="text-sm text-gray-600 mt-2">Last Updated: {currentSummary.lastUpdated}</p>
         </div>
       )}
       <div>

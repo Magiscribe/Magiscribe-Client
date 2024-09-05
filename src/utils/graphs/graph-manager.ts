@@ -1,28 +1,45 @@
+import { NodeData, OptimizedGraph, OptimizedNode, StrippedGraph, StrippedNode } from '@/utils/graphs/graph';
 import { Edge, Node } from '@xyflow/react';
-import { NodeData, OptimizedGraph, OptimizedNode, StrippedNode } from '@/utils/graphs/graph';
-import { stripAndOptimizeGraph } from './graph-utils';
+import { convertToOptimizedGraph, stripGraph } from './graph-utils';
 
 /**
  * Graph manager class.
  * Handles graph traversal, node history, and callbacks related to node visits and events.
  */
 export class GraphManager {
-  private graph: OptimizedGraph;
+  // Graphs
+  private originalGraph: StrippedGraph;
+  private traversalGraph: OptimizedGraph;
+
+  // State
   private currentNode: OptimizedNode | null;
   private nodeHistory: StrippedNode[];
-  private onNodeVisitCallback: (node: OptimizedNode) => void;
+
+  //  Callbacks
+  private onNodeVisitCallback?: (node: OptimizedNode) => void;
+  public set onNodeVisit(callback: (node: OptimizedNode) => void) {
+    this.onNodeVisitCallback = callback;
+  }
+
+  private onNodeAddedToHistoryCallback?: (node: OptimizedNode) => void;
+  public set onNodeAddedToHistory(callback: (node: OptimizedNode) => void) {
+    this.onNodeAddedToHistoryCallback = callback;
+  }
 
   /**
    * Creates a new graph manager instance.
    * @param graphData {Object} - Graph structure with nodes and edges
    * @throws {Error} - If graph does not have a start node
    */
-  constructor(graphData: { nodes: Node[]; edges: Edge[] }) {
-    this.graph = stripAndOptimizeGraph(graphData);
-    this.currentNode = Object.values(this.graph.nodes).find((node) => node.type === 'start') ?? null;
+  constructor(graph: { nodes: Node[]; edges: Edge[] }) {
+    // Graphs
+    this.originalGraph = stripGraph(graph);
+    this.traversalGraph = convertToOptimizedGraph(this.originalGraph);
+
+    // State
+    this.currentNode = Object.values(this.traversalGraph.nodes).find((node) => node.type === 'start') ?? null;
     this.currentNode = this.currentNode ? this.deepCopy(this.currentNode) : null;
     this.nodeHistory = [];
-    this.onNodeVisitCallback = () => {};
 
     if (!this.currentNode) {
       throw new Error('Graph must have a start node.');
@@ -70,36 +87,30 @@ export class GraphManager {
     if (!outgoingEdges.length) return;
 
     const nextEdgeId = nextNodeId
-      ? outgoingEdges.find((edgeId) => this.graph.edges[edgeId]?.target === nextNodeId)
+      ? outgoingEdges.find((edgeId) => this.traversalGraph.edges[edgeId]?.target === nextNodeId)
       : outgoingEdges[0];
 
     if (!nextEdgeId) return;
 
-    const edge = this.graph.edges[nextEdgeId];
+    const edge = this.traversalGraph.edges[nextEdgeId];
     if (!edge) return;
 
-    const nextNode = this.graph.nodes[edge.target];
+    const nextNode = this.traversalGraph.nodes[edge.target];
     if (!nextNode) return;
 
     this.addNodeToHistory(this.currentNode);
+    this.onNodeAddedToHistoryCallback?.(this.currentNode);
 
     this.currentNode = this.deepCopy(nextNode);
-    this.onNodeVisitCallback(nextNode);
-  }
-
-  /**
-   * Sets a callback for when a node is visited.
-   */
-  onNodeVisit(callback: (node: OptimizedNode) => void): void {
-    this.onNodeVisitCallback = callback;
+    this.onNodeVisitCallback?.(nextNode);
   }
 
   /**
    * Returns the graph structure.
    * @returns {Object} The graph structure
    */
-  getGraph(): OptimizedGraph {
-    return this.graph;
+  getGraph(): StrippedGraph {
+    return this.originalGraph;
   }
 
   /**
@@ -112,7 +123,7 @@ export class GraphManager {
 
   /**
    * Returns the node history.
-   * @returns {Array} The node history
+   * @returns {Object[]} The node history
    */
   getNodeHistory(): StrippedNode[] {
     return this.nodeHistory;
