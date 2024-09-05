@@ -1,4 +1,4 @@
-import { NodeVisitData, TabProps } from '@/types/conversation';
+import { NodeVisitAnalysisData, TabProps } from '@/types/conversation';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useMemo, useState } from 'react';
@@ -16,7 +16,7 @@ const PerResponseTab: React.FC<TabProps> = ({ data }) => {
     [graph?.nodes],
   );
 
-  const renderNodeContent = (node: NodeVisitData) => {
+  const renderNodeContent = (node: NodeVisitAnalysisData) => {
     if (node?.data?.response) {
       console.log('NODE DIRTY', node.data);
       const question = node.data.text;
