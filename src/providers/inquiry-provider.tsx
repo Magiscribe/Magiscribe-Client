@@ -175,7 +175,7 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
         agentId,
         variables: {
           userMessage: currentNode.data.text,
-          nodeVisitData: inquiryHistoryRef.current.join('\n\n'),
+          conversationHistory: inquiryHistoryRef.current.join('\n\n'),
         },
       },
     });
@@ -196,6 +196,7 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
     if (!graphRef.current) return;
 
     const agentId = await getAgentIdByName('Stakeholder | Condition Node', client);
+    const mostRecentMessage = inquiryHistoryRef.current[inquiryHistoryRef.current.length - 1] || '';
 
     await addPrediction({
       variables: {
@@ -204,7 +205,8 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
         variables: {
           userMessage: `The current node is: ${graphRef.current.getCurrentNode()?.id}. \nThe instruction is: ${graphRef.current.getCurrentNode()?.data.text}`,
           conversationGraph: JSON.stringify(graphRef.current.getGraph()),
-          nodeVisitData: inquiryHistoryRef.current.join('\n\n'),
+          conversationHistory: inquiryHistoryRef.current.join('\n\n'),
+          mostRecentMessage,
         },
       },
     });
@@ -233,8 +235,8 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
       }
     } else if (type === 'conversation') {
       const parts = [
+        data.ratings && `Bot created ratings: ${JSON.stringify(data.ratings)} \n`,
         data.text && `Bot: ${data.text} \n`,
-        data.ratings && `Available ratings: ${JSON.stringify(data.ratings)} \n`,
         data.response?.ratings && `User selected ratings: ${JSON.stringify(data.response.ratings)} \n`,
         data.response?.text && `User: ${data.response.text} \n`,
       ].filter(Boolean);
