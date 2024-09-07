@@ -28,7 +28,7 @@ export function NavBar() {
 
   return (
     <nav
-      className={`fixed w-full z-30 top-0 ${!atTop ? 'bg-white shadow-lg text-indigo-800' : 'text-white'} transition-all duration-300 ease-in-out`}
+      className={`relative sm:fixed w-full z-30 top-0 ${!atTop ? 'bg-white shadow-lg text-indigo-800' : 'text-white'} transition-all duration-300 ease-in-out`}
     >
       <div className="w-full container mx-auto flex flex-wrap items-center justify-between mt-0 py-2">
         <Link to="/" className="pl-4 flex items-center">
