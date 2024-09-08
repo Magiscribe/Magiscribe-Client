@@ -17,7 +17,7 @@ export default function NotReadyHero() {
             We aren't quite ready for you yet.
           </motion.h1>
           <motion.p
-            className="leading-normal text-xl md:text-2xl mb-8"
+            className="leading-normal text-xl md:text-2xl mb-4"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.25 }}
@@ -25,10 +25,18 @@ export default function NotReadyHero() {
             Magiscribe is undergoing active development and we are making sure that everything is settled before we open
             the doors.
           </motion.p>
-          <motion.div
+          <motion.p
+            className="leading-normal text-xl md:text-2xl mb-12"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.5 }}
+          >
+            Don't worry, you'll be the first to know when we're ready for you!
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.75 }}
           >
             <Link
               to="/"
