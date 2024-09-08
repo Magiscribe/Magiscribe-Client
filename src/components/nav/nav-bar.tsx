@@ -41,7 +41,7 @@ export function NavBar() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.5 }}
-                className="text-2xl lg:text-3xl font-display pl-2"
+                className="text-2xl lg:text-3xl font-display pl-2 hidden sm:block"
               >
                 | {title}
               </motion.span>

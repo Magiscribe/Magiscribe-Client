@@ -20,7 +20,16 @@ interface HandleNextNodeProps {
 interface State {
   loading: boolean;
   initialized: boolean;
+  notFound: boolean;
+  error: boolean;
 }
+
+const INITIAL_STATE: State = {
+  loading: false,
+  initialized: false,
+  notFound: false,
+  error: false,
+};
 
 interface InquiryContextType {
   handleNextNode: (props?: HandleNextNodeProps) => Promise<void>;
@@ -39,7 +48,12 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
   const inquiryHistoryRef = useRef<string[]>([]);
 
   // States
-  const [state, setState] = useState<State>({ loading: false, initialized: false });
+  const [state, setState] = useState<State>({
+    loading: false,
+    initialized: false,
+    notFound: false,
+    error: false,
+  });
   const subscriptionId = useRef<string>(`inquiry_${Date.now()}`).current;
 
   // Event handlers
@@ -66,10 +80,13 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
         graphRef.current = new GraphManager(getInquiry.data.graph);
         graphRef.current.onNodeVisit = handleOnNodeVisit;
         graphRef.current.onNodeAddedToHistory = addNodeToHistory;
-        setState((prev) => ({ ...prev, initialized: true }));
+        setState({ ...INITIAL_STATE, initialized: true });
+      } else {
+        setState({ ...INITIAL_STATE, notFound: true });
       }
     },
     onError: () => {
+      setState({ ...INITIAL_STATE, notFound: true });
       console.log('error');
     },
   });
@@ -81,16 +98,20 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
   useSubscription(GRAPHQL_SUBSCRIPTION, {
     variables: { subscriptionId },
     onSubscriptionData: ({ subscriptionData }) => {
-      const prediction = subscriptionData.data?.predictionAdded;
+      try {
+        const prediction = subscriptionData.data?.predictionAdded;
 
-      if (prediction?.type === 'SUCCESS') {
-        setState((prev) => ({ ...prev, loading: false }));
+        if (prediction?.type === 'SUCCESS') {
+          setState((prev) => ({ ...prev, loading: false }));
 
-        // TODO: Avoid double parsing. Will require changes to the backend.
-        const result = JSON.parse(JSON.parse(prediction.result));
-        if (onSubscriptionDataRef.current) {
-          onSubscriptionDataRef.current(result);
+          // TODO: Avoid double parsing. Will require changes to the backend.
+          const result = JSON.parse(JSON.parse(prediction.result));
+          if (onSubscriptionDataRef.current) {
+            onSubscriptionDataRef.current(result);
+          }
         }
+      } catch {
+        setState((prev) => ({ ...prev, error: true }));
       }
     },
     onError: () => {
