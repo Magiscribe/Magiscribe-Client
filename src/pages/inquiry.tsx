@@ -27,7 +27,7 @@ interface Message {
  */
 function Inquiry() {
   const { id } = useParams<{ id: string }>();
-  const [screen, setScreen] = useState<'start' | 'inquiry' | 'end' | 'summary'>('summary');
+  const [screen, setScreen] = useState<'start' | 'inquiry' | 'end' | 'summary'>('start');
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [selectedRatings, setSelectedRatings] = useState<string[]>([]);
