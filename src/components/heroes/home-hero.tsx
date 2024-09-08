@@ -12,7 +12,8 @@ export default function HomeHero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            Write your ideas, <br />
+            Ask the right questions,
+            <br />
             let magic take care of the rest.
           </motion.h1>
           <motion.p
@@ -21,8 +22,8 @@ export default function HomeHero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.25 }}
           >
-            With Magiscribe, you can focus on your ideas and let the magic of technology take care of the rest through
-            multi-modal automation.
+            With Magiscribe, you can focus on gathering insights from your users while we create inquiries tailored to
+            their needs.
           </motion.p>
           <motion.a
             href="#signup"
