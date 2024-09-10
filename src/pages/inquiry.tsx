@@ -104,8 +104,9 @@ function Inquiry() {
   if (state.notFound) {
     return (
       <div className="text-center">
-        <h1 className="text-3xl md:text-4xl font-bold mb-4 text-indigo-900">Inquiry Not Found</h1>
-        <p className="text-lg text-slate-700">
+        <h2 className="text-2xl md:text-3xl font-bold text-indigo-900 text-center">Inquiry Not Found</h2>
+        <div className="h-1 mx-auto w-32 md:w-64 bg-gradient-to-r from-violet-600 to-pink-600 opacity-50 rounded-full"></div>
+        <p className="mt-4 text-lg text-slate-700">
           The inquiry you are looking for does not exist. Please check the URL and try again.
         </p>
       </div>
@@ -115,8 +116,11 @@ function Inquiry() {
   if (state.error) {
     return (
       <div className="text-center">
-        <h1 className="text-3xl md:text-4xl font-bold mb-4 text-indigo-900">Error</h1>
-        <p className="text-lg text-slate-700">An error occurred while fetching the inquiry. Please try again later.</p>
+        <h2 className="text-2xl md:text-3xl font-bold text-indigo-900 text-center">Something went wrong!</h2>
+        <div className="h-1 mx-auto w-32 md:w-64 bg-gradient-to-r from-violet-600 to-pink-600 opacity-50 rounded-full"></div>
+        <p className="mt-4 text-lg text-slate-700">
+          Hmm, looks like something broke on our end. Please try again later.
+        </p>
       </div>
     );
   }
@@ -124,7 +128,7 @@ function Inquiry() {
   if (screen === 'start') {
     return (
       <div className="space-y-8">
-        <div className="text-center">
+        <div className="text-center space-y-6">
           <h2 className="text-2xl md:text-3xl font-bold text-indigo-900 text-center">{form.title}</h2>
           <div className="h-1 mx-auto w-32 md:w-64 bg-gradient-to-r from-violet-600 to-pink-600 opacity-50 rounded-full"></div>
           {form.description && <p className="mt-4 text-lg text-slate-700">{form.description}</p>}
@@ -248,9 +252,6 @@ function Inquiry() {
             )}
           </motion.div>
         )}
-        <button onClick={() => handleReset()} className="text-indigo-600 hover:underline mt-4">
-          Restart Inquiry
-        </button>
       </div>
     );
   }
