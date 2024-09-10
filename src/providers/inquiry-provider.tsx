@@ -106,6 +106,7 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
 
           // TODO: Avoid double parsing. Will require changes to the backend.
           const result = JSON.parse(JSON.parse(prediction.result));
+
           if (onSubscriptionDataRef.current) {
             onSubscriptionDataRef.current(result);
           }

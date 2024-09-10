@@ -119,8 +119,12 @@ function Inquiry() {
         <h2 className="text-2xl md:text-3xl font-bold text-indigo-900 text-center">Something went wrong!</h2>
         <div className="h-1 mx-auto w-32 md:w-64 bg-gradient-to-r from-violet-600 to-pink-600 opacity-50 rounded-full"></div>
         <p className="mt-4 text-lg text-slate-700">
-          Hmm, looks like something broke on our end. Please try again later.
+          Looks like something broke on our end. Your previous answers have been recorded. Please feel free to try
+          again.
         </p>
+        <button onClick={() => handleReset()} className="text-indigo-600 hover:underline mt-4">
+          Restart Inquiry
+        </button>
       </div>
     );
   }
