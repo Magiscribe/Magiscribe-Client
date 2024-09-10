@@ -107,6 +107,17 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
           // TODO: Avoid double parsing. Will require changes to the backend.
           const result = JSON.parse(JSON.parse(prediction.result));
 
+          // TODO: Either implement this or discard it.
+          // This is for if we decide to use ```markdown and ```json instead of just json directly
+          // const content = JSON.parse(prediction.result);
+          // let jsonMatch = content[0].match(/```json\n([\s\S]*?)\n```/);
+          // let parsedResult = JSON.parse(jsonMatch[1]);
+
+          // const markdownMatch = content[0].match(/```markdown\n([\s\S]*?)\n```/);
+          // if (markdownMatch) {
+          //   parsedResult['text'] = markdownMatch[1];
+          // }
+
           if (onSubscriptionDataRef.current) {
             onSubscriptionDataRef.current(result);
           }
