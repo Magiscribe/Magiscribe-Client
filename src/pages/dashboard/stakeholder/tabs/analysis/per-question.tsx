@@ -21,6 +21,11 @@ export type ResponseSummary = {
   };
 };
 
+const truncateText = (text: string, maxLength: number = 250): string => {
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength - 3) + '...';
+};
+
 const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
@@ -42,16 +47,16 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
   );
 
   const groupedResponses = useMemo(() => {
-    const grouped: { [nodeId: string]: { [userId: string]: NodeVisitAnalysisData[] } } = {};
+    const grouped: { [nodeId: string]: { [id: string]: NodeVisitAnalysisData[] } } = {};
     responses.forEach((response: IndividualConversationData) => {
       response.data.forEach((nodeVisit: NodeVisitAnalysisData) => {
         if (!grouped[nodeVisit.id]) {
           grouped[nodeVisit.id] = {};
         }
-        if (!grouped[nodeVisit.id][response.userId || 'anonymous']) {
-          grouped[nodeVisit.id][response.userId || 'anonymous'] = [];
+        if (!grouped[nodeVisit.id][response.id || 'anonymous']) {
+          grouped[nodeVisit.id][response.id || 'anonymous'] = [];
         }
-        grouped[nodeVisit.id][response.userId || 'anonymous'].push(nodeVisit);
+        grouped[nodeVisit.id][response.id || 'anonymous'].push(nodeVisit);
       });
     });
     return grouped;
@@ -67,7 +72,6 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
       if (prediction && prediction.type === 'SUCCESS') {
         setIsGeneratingSummary(false);
         const result = JSON.parse(JSON.parse(prediction.result)[0]);
-        console.log('LOGGY DOGGY', result);
         if (result && result.summary) {
           setSummaries((prev) => ({
             ...prev,
@@ -201,9 +205,10 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
               onClick={() => setCurrentQuestionIndex(index)}
               className={`p-2 text-sm rounded-md ${
                 currentQuestionIndex === index ? 'bg-blue-500 text-white' : 'bg-slate-200 text-black'
-              }`}
+              } overflow-hidden`}
+              title={node.data.text || `Question ${index + 1}`}
             >
-              {node.data.text || `Question ${index + 1}`}
+              {truncateText(node.data.text || `Question ${index + 1}`)}
             </button>
           ))}
         </div>

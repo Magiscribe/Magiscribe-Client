@@ -1,45 +1,22 @@
-import { GET_INQUIRIES_RESPONSES, GET_INQUIRY } from '@/clients/queries';
-import { useQuery } from '@apollo/client';
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
 import React from 'react';
-import { useParams } from 'react-router-dom';
 import ViaChatTab from './via-chat';
 import PerQuestionTab from './per-question';
 import PerResponseTab from './per-response';
 
-const AnalysisTab: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
-  const {
-    loading: graphLoading,
-    data: inquiryData,
-    error: graphError,
-  } = useQuery(GET_INQUIRY, {
-    variables: { id: id },
-    skip: !id,
-    errorPolicy: 'all',
-  });
+interface AnalysisTabProps {
+  data: {
+    id: string;
+    form: any;
+    graph: any;
+    nodeVisitData: any[];
+  } | null;
+}
 
-  const {
-    loading: dataLoading,
-    data: inquiryResponseData,
-    error: dataError,
-  } = useQuery(GET_INQUIRIES_RESPONSES, {
-    variables: { id: id },
-    skip: !id,
-    errorPolicy: 'all',
-  });
-
-  if (!id || dataLoading || graphLoading) return <p>Loading...</p>;
-  if (dataError || graphError) return <p>Error</p>;
-
-  const data = {
-    id,
-    form: inquiryData?.getInquiry?.data?.form,
-    graph: inquiryData?.getInquiry?.data?.graph,
-    nodeVisitData: inquiryResponseData?.getInquiryResponses,
-  };
+const AnalysisTab: React.FC<AnalysisTabProps> = ({ data }) => {
+  if (!data) return <p>No data available</p>;
 
   const tabCategories = ['Per Response', 'Per Question', 'Via Chat'];
 
@@ -54,9 +31,7 @@ const AnalysisTab: React.FC = () => {
                 clsx(
                   'w-full rounded-lg py-2.5 text-sm font-medium leading-5',
                   'ring-white ring-opacity-60 focus:outline-none focus:ring-2',
-                  selected
-                    ? 'bg-white shadow text-slate-700'
-                    : 'text-slate-100 hover:bg-white/[0.12] hover:text-slate-700',
+                  selected ? 'bg-white shadow text-slate-700' : 'text-slate-100 hover:bg-white/[0.12]',
                 )
               }
             >

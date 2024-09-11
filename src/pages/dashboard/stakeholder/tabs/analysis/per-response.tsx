@@ -1,13 +1,32 @@
-import { NodeVisitAnalysisData, TabProps } from '@/types/conversation';
-import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import React, { useMemo, useState, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useMemo, useState } from 'react';
+import { faChevronLeft, faChevronRight, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { useApolloClient, useMutation, useSubscription } from '@apollo/client';
+import { ADD_PREDICTION } from '@/clients/mutations';
+import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
+import { getAgentIdByName } from '@/utils/agents';
+import { NodeVisitAnalysisData, TabProps } from '@/types/conversation';
+import { useWithLocalStorage } from '@/hooks/local-storage-hook';
+
+type ResponseSummary = {
+  [userId: string]: {
+    text: string;
+    lastUpdated: string;
+  };
+};
 
 const PerResponseTab: React.FC<TabProps> = ({ data }) => {
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
+  const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
+  const [subscriptionId] = useState<string>(`per_response_summary_${Date.now()}`);
+  const [summaries, setSummaries] = useWithLocalStorage<ResponseSummary>({}, `${data.id}-per-response-summary`);
+
   const { nodeVisitData = [], graph } = data;
   const usersPerPage = 42;
+
+  const client = useApolloClient();
+  const [addPrediction] = useMutation(ADD_PREDICTION);
 
   if (!nodeVisitData.length) return <div className="p-4">No data available</div>;
 
@@ -16,9 +35,73 @@ const PerResponseTab: React.FC<TabProps> = ({ data }) => {
     [graph?.nodes],
   );
 
+  const generateSummary = useCallback(async () => {
+    if (!selectedUser) return;
+
+    setIsGeneratingSummary(true);
+    const agentId = await getAgentIdByName('Stakeholder | Per Question Summary', client);
+
+    if (agentId) {
+      const userResponses = nodeVisitData.find((u) => u.id === selectedUser)?.data || [];
+      const formattedResponses = userResponses.map((node) => ({
+        question: node.data?.text || '',
+        answer: node.data?.response?.text || '',
+        ratings: node.data?.response?.ratings?.join(', ') || 'No rating',
+      }));
+
+      const input = {
+        userId: selectedUser,
+        responses: formattedResponses,
+      };
+
+      try {
+        await addPrediction({
+          variables: {
+            subscriptionId,
+            agentId,
+            variables: { userMessage: JSON.stringify(input) },
+          },
+        });
+      } catch (error) {
+        console.error('Error sending message to agent:', error);
+        setIsGeneratingSummary(false);
+      }
+    } else {
+      console.error('Per Response Summary Agent not found');
+      setIsGeneratingSummary(false);
+    }
+  }, [selectedUser, nodeVisitData, client, addPrediction, subscriptionId]);
+
+  useSubscription(GRAPHQL_SUBSCRIPTION, {
+    variables: {
+      subscriptionId,
+    },
+    onSubscriptionData: ({ subscriptionData }) => {
+      const prediction = subscriptionData.data?.predictionAdded;
+
+      if (prediction && prediction.type === 'SUCCESS' && selectedUser) {
+        setIsGeneratingSummary(false);
+        const result = JSON.parse(JSON.parse(prediction.result)[0]);
+        console.log('Summary generated:', result);
+        if (result && result.summary) {
+          setSummaries((prev) => ({
+            ...prev,
+            [selectedUser]: {
+              text: result.summary,
+              lastUpdated: new Date().toLocaleString(),
+            },
+          }));
+        }
+      }
+    },
+    onError: (error) => {
+      console.error('Subscription error:', error);
+      setIsGeneratingSummary(false);
+    },
+  });
+
   const renderNodeContent = (node: NodeVisitAnalysisData) => {
     if (node?.data?.response) {
-      console.log('NODE DIRTY', node.data);
       const question = node.data.text;
       const responseText = node.data.response.text;
       const ratings = node.data.response.ratings;
@@ -49,6 +132,25 @@ const PerResponseTab: React.FC<TabProps> = ({ data }) => {
     <div className="bg-white px-4 py-8 rounded-2xl shadow-xl text-slate-700">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Per Response</h2>
+        {selectedUser && (
+          <button
+            onClick={generateSummary}
+            disabled={isGeneratingSummary}
+            className={`px-4 py-2 rounded-md text-white ${
+              isGeneratingSummary ? 'bg-gray-400' : 'bg-blue-500 hover:bg-blue-600'
+            }`}
+          >
+            {isGeneratingSummary ? (
+              <>
+                Generating... <FontAwesomeIcon icon={faSpinner} spin className="ml-2" />
+              </>
+            ) : summaries[selectedUser] ? (
+              'Regenerate Summary'
+            ) : (
+              'Generate Summary'
+            )}
+          </button>
+        )}
       </div>
       <div className="my-4">
         <h2 className="font-bold mb-2">Select User</h2>
@@ -61,7 +163,7 @@ const PerResponseTab: React.FC<TabProps> = ({ data }) => {
                 selectedUser === id ? 'bg-blue-500 text-white' : 'bg-slate-200 text-black'
               }`}
             >
-              {userId || 'Unknown'}
+              {id || 'Unknown'}
             </button>
           ))}
         </div>
@@ -80,6 +182,13 @@ const PerResponseTab: React.FC<TabProps> = ({ data }) => {
           </div>
         )}
       </div>
+      {selectedUser && summaries[selectedUser] && (
+        <div className="my-4 p-4 bg-blue-100 rounded-md">
+          <h3 className="font-bold mb-2">Summary</h3>
+          <p>{summaries[selectedUser].text}</p>
+          <p className="text-sm text-gray-600 mt-2">Last Updated: {summaries[selectedUser].lastUpdated}</p>
+        </div>
+      )}
       <div>
         {selectedUser && (
           <h2 className="font-bold mb-2">

@@ -1,5 +1,5 @@
 import { CREATE_INQUIRY } from '@/clients/mutations';
-import { GET_USER_INQUIRIES } from '@/clients/queries';
+import { GET_USER_INQUIRIES, GET_INQUIRY, GET_INQUIRIES_RESPONSES } from '@/clients/queries';
 import CustomModal from '@/components/modal';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useMutation, useQuery } from '@apollo/client';
@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import AnalysisTab from './tabs/analysis';
 import SetupForm from './tabs/setup';
@@ -16,6 +16,7 @@ import SetupForm from './tabs/setup';
 export default function Inquiry() {
   // Modals
   const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [responseCount, setResponseCount] = useState(0);
 
   // Hooks
   const { id } = useParams<{ id: string }>();
@@ -24,6 +25,32 @@ export default function Inquiry() {
   // Queries and Mutations
   const { data: userFormsData } = useQuery(GET_USER_INQUIRIES);
   const [createObject] = useMutation(CREATE_INQUIRY);
+
+  const {
+    loading: graphLoading,
+    data: inquiryData,
+    error: graphError,
+  } = useQuery(GET_INQUIRY, {
+    variables: { id: id },
+    skip: !id,
+    errorPolicy: 'all',
+  });
+
+  const {
+    loading: dataLoading,
+    data: inquiryResponseData,
+    error: dataError,
+  } = useQuery(GET_INQUIRIES_RESPONSES, {
+    variables: { id: id },
+    skip: !id,
+    errorPolicy: 'all',
+  });
+
+  useEffect(() => {
+    if (inquiryResponseData?.getInquiryResponses) {
+      setResponseCount(inquiryResponseData.getInquiryResponses.length);
+    }
+  }, [inquiryResponseData]);
 
   const createForm = async () => {
     const result = await createObject({
@@ -133,6 +160,23 @@ export default function Inquiry() {
     );
   };
 
+  if (id && (graphLoading || dataLoading)) {
+    return <p>Loading...</p>;
+  }
+
+  if (id && (graphError || dataError)) {
+    return <p>Error loading data</p>;
+  }
+
+  const analysisData = id
+    ? {
+        id,
+        form: inquiryData?.getInquiry?.data?.form,
+        graph: inquiryData?.getInquiry?.data?.graph,
+        nodeVisitData: inquiryResponseData?.getInquiryResponses,
+      }
+    : null;
+
   return (
     <>
       {!id && (
@@ -159,16 +203,14 @@ export default function Inquiry() {
           </div>
           <TabGroup>
             <TabList className="flex space-x-1 rounded-xl border-2 border-white mb-4">
-              {['Setup', 'Analysis'].map((category) => (
+              {['Setup', `Analysis (${responseCount})`].map((category) => (
                 <Tab
                   key={category}
                   className={({ selected }) =>
                     clsx(
                       'w-full rounded-lg py-2.5 text-sm font-medium leading-5',
                       'ring-white ring-opacity-60 focus:outline-none focus:ring-2',
-                      selected
-                        ? 'bg-white shadow text-slate-700'
-                        : 'text-slate-100 hover:bg-white/[0.12] hover:text-slate-700',
+                      selected ? 'bg-white shadow text-slate-700' : 'text-slate-100 hover:bg-white/[0.12]',
                     )
                   }
                 >
@@ -192,7 +234,7 @@ export default function Inquiry() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 100 }}
                 >
-                  <AnalysisTab />
+                  <AnalysisTab data={analysisData} />
                 </motion.div>
               </TabPanel>
             </TabPanels>
