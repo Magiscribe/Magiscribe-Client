@@ -46,6 +46,7 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
   const graphRef = useRef<GraphManager | null>(null);
   const inquiryResponseIdRef = useRef<string | undefined>(undefined);
   const inquiryHistoryRef = useRef<string[]>([]);
+  const errorCountRef = useRef<number>(0);
 
   // States
   const [state, setState] = useState<State>({
@@ -87,7 +88,6 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
     },
     onError: () => {
       setState({ ...INITIAL_STATE, notFound: true });
-      console.log('error');
     },
   });
 
@@ -110,9 +110,19 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
           if (onSubscriptionDataRef.current) {
             onSubscriptionDataRef.current(result);
           }
+
+          // Reset the error count if the prediction was successful
+          errorCountRef.current = 0;
         }
       } catch {
-        setState((prev) => ({ ...prev, error: true }));
+        errorCountRef.current += 1;
+
+        if (errorCountRef.current >= 3) {
+          setState({ ...INITIAL_STATE, error: true });
+        } else {
+          setState({ ...INITIAL_STATE, loading: true });
+          handleOnNodeVisit(graphRef.current?.getCurrentNode() as OptimizedNode);
+        }
       }
     },
     onError: () => {
