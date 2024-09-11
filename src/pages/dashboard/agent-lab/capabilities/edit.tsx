@@ -410,7 +410,7 @@ export default function CapabilityEdit() {
                           <button
                             type="button"
                             onClick={(e) => handlePromptSave(item, () => cancelEdit(e))}
-                            className="bg-green-500 text-white px-2 py-1 rounded-lg"
+                            className="bg-blue-500 text-white px-2 py-1 rounded-lg"
                           >
                             Save
                           </button>
