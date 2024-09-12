@@ -190,6 +190,7 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
       `Stakeholder | Dynamic ${currentNode.type === 'conversation' ? 'Question' : 'Information'} Generation`,
       client,
     );
+    const mostRecentMessage = inquiryHistoryRef.current[inquiryHistoryRef.current.length - 1] || '';
 
     await addPrediction({
       variables: {
@@ -198,6 +199,7 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
         variables: {
           userMessage: currentNode.data.text,
           conversationHistory: inquiryHistoryRef.current.join('\n\n'),
+          mostRecentMessage,
         },
       },
     });
