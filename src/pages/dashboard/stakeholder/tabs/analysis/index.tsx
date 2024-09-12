@@ -1,4 +1,6 @@
+import { GET_INQUIRY, GET_INQUIRIES_RESPONSES } from '@/clients/queries';
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
+import { useQuery } from '@apollo/client';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
 import React from 'react';
@@ -7,16 +9,37 @@ import PerQuestionTab from './per-question';
 import PerResponseTab from './per-response';
 
 interface AnalysisTabProps {
-  data: {
-    id: string;
-    form: any;
-    graph: any;
-    nodeVisitData: any[];
-  } | null;
+  id: string;
 }
 
-const AnalysisTab: React.FC<AnalysisTabProps> = ({ data }) => {
-  if (!data) return <p>No data available</p>;
+const AnalysisTab: React.FC<AnalysisTabProps> = ({ id }) => {
+  const {
+    loading: graphLoading,
+    data: inquiryData,
+    error: graphError,
+  } = useQuery(GET_INQUIRY, {
+    variables: { id },
+    errorPolicy: 'all',
+  });
+
+  const {
+    loading: dataLoading,
+    data: inquiryResponseData,
+    error: dataError,
+  } = useQuery(GET_INQUIRIES_RESPONSES, {
+    variables: { id },
+    errorPolicy: 'all',
+  });
+
+  if (graphLoading || dataLoading) return <p>Loading...</p>;
+  if (graphError || dataError) return <p>Error loading data</p>;
+
+  const data = {
+    id,
+    form: inquiryData?.getInquiry?.data?.form,
+    graph: inquiryData?.getInquiry?.data?.graph,
+    nodeVisitData: inquiryResponseData?.getInquiryResponses,
+  };
 
   const tabCategories = ['Per Response', 'Per Question', 'Via Chat'];
 

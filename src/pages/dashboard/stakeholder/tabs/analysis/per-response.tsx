@@ -82,7 +82,6 @@ const PerResponseTab: React.FC<TabProps> = ({ data }) => {
       if (prediction && prediction.type === 'SUCCESS' && selectedUser) {
         setIsGeneratingSummary(false);
         const result = JSON.parse(JSON.parse(prediction.result)[0]);
-        console.log('Summary generated:', result);
         if (result && result.summary) {
           setSummaries((prev) => ({
             ...prev,

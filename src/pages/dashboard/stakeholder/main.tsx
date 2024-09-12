@@ -1,5 +1,5 @@
 import { CREATE_INQUIRY } from '@/clients/mutations';
-import { GET_USER_INQUIRIES, GET_INQUIRY, GET_INQUIRIES_RESPONSES } from '@/clients/queries';
+import { GET_USER_INQUIRIES, GET_INQUIRY_RESPONSE_COUNT } from '@/clients/queries';
 import CustomModal from '@/components/modal';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useMutation, useQuery } from '@apollo/client';
@@ -8,49 +8,24 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import AnalysisTab from './tabs/analysis';
 import SetupForm from './tabs/setup';
 
 export default function Inquiry() {
-  // Modals
   const [shareModalOpen, setShareModalOpen] = useState(false);
-  const [responseCount, setResponseCount] = useState(0);
-
-  // Hooks
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  // Queries and Mutations
   const { data: userFormsData } = useQuery(GET_USER_INQUIRIES);
   const [createObject] = useMutation(CREATE_INQUIRY);
 
-  const {
-    loading: graphLoading,
-    data: inquiryData,
-    error: graphError,
-  } = useQuery(GET_INQUIRY, {
-    variables: { id: id },
-    skip: !id,
-    errorPolicy: 'all',
+  // New query for fetching response count
+  const { data: responseCountData } = useQuery(GET_INQUIRY_RESPONSE_COUNT, {
+    variables: { id },
+    skip: !id, // Skip this query if there's no id (we're on the main page)
   });
-
-  const {
-    loading: dataLoading,
-    data: inquiryResponseData,
-    error: dataError,
-  } = useQuery(GET_INQUIRIES_RESPONSES, {
-    variables: { id: id },
-    skip: !id,
-    errorPolicy: 'all',
-  });
-
-  useEffect(() => {
-    if (inquiryResponseData?.getInquiryResponses) {
-      setResponseCount(inquiryResponseData.getInquiryResponses.length);
-    }
-  }, [inquiryResponseData]);
 
   const createForm = async () => {
     const result = await createObject({
@@ -160,23 +135,6 @@ export default function Inquiry() {
     );
   };
 
-  if (id && (graphLoading || dataLoading)) {
-    return <p>Loading...</p>;
-  }
-
-  if (id && (graphError || dataError)) {
-    return <p>Error loading data</p>;
-  }
-
-  const analysisData = id
-    ? {
-        id,
-        form: inquiryData?.getInquiry?.data?.form,
-        graph: inquiryData?.getInquiry?.data?.graph,
-        nodeVisitData: inquiryResponseData?.getInquiryResponses,
-      }
-    : null;
-
   return (
     <>
       {!id && (
@@ -203,7 +161,7 @@ export default function Inquiry() {
           </div>
           <TabGroup>
             <TabList className="flex space-x-1 rounded-xl border-2 border-white mb-4">
-              {['Setup', `Analysis (${responseCount})`].map((category) => (
+              {['Setup', 'Analysis'].map((category) => (
                 <Tab
                   key={category}
                   className={({ selected }) =>
@@ -215,6 +173,7 @@ export default function Inquiry() {
                   }
                 >
                   {category}
+                  {category === 'Analysis' && <> ({responseCountData?.getInquiryResponseCount ?? 0})</>}
                 </Tab>
               ))}
             </TabList>
@@ -234,7 +193,7 @@ export default function Inquiry() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 100 }}
                 >
-                  <AnalysisTab data={analysisData} />
+                  <AnalysisTab id={id} />
                 </motion.div>
               </TabPanel>
             </TabPanels>
