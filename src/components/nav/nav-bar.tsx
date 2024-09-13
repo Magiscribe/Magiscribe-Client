@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
+import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from '@clerk/clerk-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useTitle } from '../../hooks/title-hook';
@@ -54,14 +54,15 @@ export function NavBar({ isFixed = true }) {
         >
           <ul className="list-reset lg:flex justify-end flex-1 items-center">{/* Add menu items here if needed */}</ul>
           <SignedOut>
-            <a
-              href="#signup"
-              className={`mx-auto lg:mx-0 hover:underline font-bold rounded-full mt-4 lg:mt-0 py-3 px-5 shadow opacity-75 focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out ${
-                atTop ? 'bg-white text-slate-800' : 'bg-indigo-800 text-white'
-              }`}
-            >
-              Get Pre-Alpha Access
-            </a>
+            <SignUpButton signInForceRedirectUrl="/dashboard" forceRedirectUrl="/dashboard">
+              <button
+                className={`mx-auto lg:mx-0 hover:underline font-bold rounded-full mt-4 lg:mt-0 py-3 px-5 shadow opacity-75 focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out ${
+                  atTop ? 'bg-white text-slate-800' : 'bg-indigo-800 text-white'
+                }`}
+              >
+                Get Pre-Alpha Access
+              </button>
+            </SignUpButton>
           </SignedOut>
           <SignedIn>
             <div className="flex space-x-4">
@@ -88,7 +89,7 @@ export function NavBar({ isFixed = true }) {
             />
           </SignedIn>
           <SignedOut>
-            <SignInButton forceRedirectUrl={'/dashboard'}>
+            <SignInButton forceRedirectUrl="/dashboard">
               <button className="px-4">Sign In</button>
             </SignInButton>
           </SignedOut>

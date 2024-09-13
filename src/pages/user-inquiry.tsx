@@ -15,6 +15,7 @@ import { motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import goHomeGif from '../assets/imgs/go-home.gif';
+import { SignedOut, SignUpButton } from '@clerk/clerk-react';
 
 /**
  * Represents a message in the chat.
@@ -295,9 +296,21 @@ function UserInquiryPage() {
         </p>
         <p className="text-lg text-slate-700">Thank you for your time... you can leave now!</p>
         <img src={goHomeGif} alt="Thank You" className="mx-auto rounded-3xl" />
-        <button onClick={() => handleReset()} className="text-indigo-600 hover:underline mt-4">
-          Restart Inquiry
-        </button>
+        <div className="w-full max-w-3xl mx-auto flex flex-col items-center">
+          {/* Form */}
+          <button onClick={() => handleReset()} className="text-indigo-600 hover:underline">
+            Restart Inquiry
+          </button>
+
+          <SignedOut>
+            <p className="text-lg text-center text-gray-600 mt-4">
+              Want to make your own inquiry?{' '}
+              <SignUpButton signInForceRedirectUrl="/dashboard" forceRedirectUrl="/dashboard">
+                <button className="text-lg text-indigo-600 hover:underline">Sign Up Now</button>
+              </SignUpButton>
+            </p>
+          </SignedOut>
+        </div>
       </div>
     );
   }

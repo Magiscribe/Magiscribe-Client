@@ -1,12 +1,12 @@
 import { motion } from 'framer-motion';
 import ContentSection from '../components/content-section';
-import { SignupForm } from '../components/forms/alpha';
 import HomeHero from '../components/heroes/home-hero';
 import SandcastleShape from '../components/shapes/beach';
 import PencilShape from '../components/shapes/drawing';
 import { GradientWaveBottom, GradientWaveTop } from '../components/shapes/gradient-wave';
 import { SectionTemplate } from '../components/templates/section';
 import { useSetTitle } from '../hooks/title-hook';
+import { SignupForm } from '@/components/forms/alpha';
 
 function AboutSection() {
   return (

@@ -12,7 +12,7 @@ export default function NotReadyHero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            Sorry...
+            Thank you for signing up!
             <br />
             We aren't quite ready for you yet.
           </motion.h1>
@@ -31,7 +31,7 @@ export default function NotReadyHero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.5 }}
           >
-            Don't worry, you'll be the first to know when we're ready for you!
+            But don't worry, you'll be the first to know when we're ready for you!
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
