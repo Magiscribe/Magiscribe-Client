@@ -37,7 +37,7 @@ const Container = ({ children }: { children: React.ReactNode }) => (
 /**
  * Main Inquiry component that handles the chat interface and inquiry flow.
  */
-function Inquiry() {
+function UserInquiryPage() {
   // States
   const [screen, setScreen] = useState<'start' | 'inquiry' | 'end' | 'summary'>('start');
   const [messages, setMessages] = useState<Message[]>([]);
@@ -314,7 +314,7 @@ export default function InquiryWrapper() {
   return (
     <InquiryProvider id={id}>
       <Container>
-        <Inquiry />
+        <UserInquiryPage />
       </Container>
     </InquiryProvider>
   );

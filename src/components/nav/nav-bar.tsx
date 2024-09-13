@@ -1,13 +1,12 @@
+import React, { useEffect, useState } from 'react';
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTitle } from '../../hooks/title-hook';
 import { Logo } from '../logo';
 
-export function NavBar() {
+export function NavBar({ isFixed = true }) {
   const [atTop, setAtTop] = useState(true);
-
   const { title } = useTitle();
 
   useEffect(() => {
@@ -28,7 +27,9 @@ export function NavBar() {
 
   return (
     <nav
-      className={`relative sm:fixed w-full z-30 top-0 ${!atTop ? 'bg-white shadow-lg text-indigo-800' : 'text-white'} transition-all duration-300 ease-in-out`}
+      className={`relative ${isFixed ? 'sm:fixed' : ''} w-full z-30 top-0 ${
+        !atTop ? 'bg-white shadow-lg text-indigo-800' : 'text-white'
+      } transition-all duration-300 ease-in-out`}
     >
       <div className="w-full container mx-auto flex flex-wrap items-center justify-between mt-0 py-2">
         <Link to="/" className="pl-4 flex items-center">
@@ -51,14 +52,7 @@ export function NavBar() {
         <div
           className={`w-full flex-grow lg:flex lg:items-center lg:w-auto hidden mt-2 lg:mt-0 p-4 lg:p-0 z-20 bg-white lg:bg-transparent`}
         >
-          <ul className="list-reset lg:flex justify-end flex-1 items-center">
-            {/* <li className="mr-3">
-              <a className="inline-block text-black no-underline hover:text-gray-800 hover:text-underline py-2 px-4" href="#">link</a>
-            </li>
-            <li className="mr-3">
-              <a className="inline-block text-black no-underline hover:text-gray-800 hover:text-underline py-2 px-4" href="#">link</a>
-            </li> */}
-          </ul>
+          <ul className="list-reset lg:flex justify-end flex-1 items-center">{/* Add menu items here if needed */}</ul>
           <SignedOut>
             <a
               href="#signup"

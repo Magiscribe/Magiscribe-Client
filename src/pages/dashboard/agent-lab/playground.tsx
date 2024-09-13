@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useCallback, useEffect, useState } from 'react';
 import { GET_ALL_AGENTS } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
-import { useElevenLabsAudio } from '@/components/audio-player';
+import { useElevenLabsAudio } from '@/hooks/audio-player';
 import ListBox from '@/components/list/ListBox';
 import { Agent } from '@/types/agents';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';

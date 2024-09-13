@@ -12,7 +12,13 @@ const CustomHandle = (props: CustomHandleProps) => {
   // Remove connectionCount prop from the Handle component
   const { connectionCount, ...rest } = props;
 
-  return <Handle {...rest} isConnectable={connections.length < connectionCount} />;
+  return (
+    <Handle
+      {...rest}
+      isConnectable={connections.length < connectionCount}
+      className={connections.length < connectionCount ? 'w-4 h-4 !bg-teal-500' : 'opacity-0'}
+    />
+  );
 };
 
 export default CustomHandle;

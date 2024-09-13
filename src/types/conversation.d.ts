@@ -9,7 +9,6 @@ export interface ConversationData {
 
 export interface Form {
   organizationName: string;
-  organizationRole: string;
   inputGoals: string;
   title: string;
   createdAt: number;

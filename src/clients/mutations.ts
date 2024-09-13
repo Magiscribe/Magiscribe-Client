@@ -104,8 +104,8 @@ export const CREATE_INQUIRY = gql`
 `;
 
 export const UPDATE_INQUIRY = gql`
-  mutation Mutation($id: ID!, $data: JSONObject!) {
-    upsertInquiry(id: $id, data: $data) {
+  mutation Mutation($id: ID!, $data: JSONObject!, $fields: [String!]) {
+    upsertInquiry(id: $id, data: $data, fields: $fields) {
       id
       data
     }
