@@ -105,10 +105,20 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
           setState((prev) => ({ ...prev, loading: false }));
 
           // TODO: Avoid double parsing. Will require changes to the backend.
-          const result = JSON.parse(JSON.parse(prediction.result));
+          const result = JSON.parse(prediction.result);
+          const content = result[0];
+          const jsonMatch = content.match(/```json\n([\s\S]*?)\n```/);
+          const markdownMatch = content.match(/```markdown\n([\s\S]*?)\n```/);
 
+          let parsedResult = { text: '' };
+          if (jsonMatch) {
+            parsedResult = JSON.parse(jsonMatch[1]);
+          }
+          if (markdownMatch) {
+            parsedResult['text'] = markdownMatch[1];
+          }
           if (onSubscriptionDataRef.current) {
-            onSubscriptionDataRef.current(result);
+            onSubscriptionDataRef.current(parsedResult);
           }
         }
       } catch {
@@ -227,8 +237,7 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
         subscriptionId,
         agentId,
         variables: {
-          userMessage: `The current node is: ${graphRef.current.getCurrentNode()?.id}. \nThe instruction is: ${graphRef.current.getCurrentNode()?.data.text}`,
-          conversationGraph: JSON.stringify(graphRef.current.getGraph()),
+          userMessage: `The instruction is: ${graphRef.current.getCurrentNode()?.data.text}`,
           conversationHistory: inquiryHistoryRef.current.join('\n\n'),
           mostRecentMessage,
         },
