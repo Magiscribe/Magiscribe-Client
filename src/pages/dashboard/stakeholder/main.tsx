@@ -1,5 +1,5 @@
 import { CREATE_INQUIRY } from '@/clients/mutations';
-import { GET_USER_INQUIRIES } from '@/clients/queries';
+import { GET_USER_INQUIRIES, GET_INQUIRY_RESPONSE_COUNT } from '@/clients/queries';
 import CustomModal from '@/components/modal';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useMutation, useQuery } from '@apollo/client';
@@ -14,16 +14,18 @@ import AnalysisTab from './tabs/analysis';
 import SetupForm from './tabs/setup';
 
 export default function Inquiry() {
-  // Modals
   const [shareModalOpen, setShareModalOpen] = useState(false);
-
-  // Hooks
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  // Queries and Mutations
   const { data: userFormsData } = useQuery(GET_USER_INQUIRIES);
   const [createObject] = useMutation(CREATE_INQUIRY);
+
+  // New query for fetching response count
+  const { data: responseCountData } = useQuery(GET_INQUIRY_RESPONSE_COUNT, {
+    variables: { id },
+    skip: !id, // Skip this query if there's no id (we're on the main page)
+  });
 
   const createForm = async () => {
     const result = await createObject({
@@ -166,13 +168,12 @@ export default function Inquiry() {
                     clsx(
                       'w-full rounded-lg py-2.5 text-sm font-medium leading-5',
                       'ring-white ring-opacity-60 focus:outline-none focus:ring-2',
-                      selected
-                        ? 'bg-white shadow text-slate-700'
-                        : 'text-slate-100 hover:bg-white/[0.12] hover:text-slate-700',
+                      selected ? 'bg-white shadow text-slate-700' : 'text-slate-100 hover:bg-white/[0.12]',
                     )
                   }
                 >
                   {category}
+                  {category === 'Analysis' && <> ({responseCountData?.getInquiryResponseCount ?? 0})</>}
                 </Tab>
               ))}
             </TabList>
@@ -192,7 +193,7 @@ export default function Inquiry() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 100 }}
                 >
-                  <AnalysisTab />
+                  <AnalysisTab id={id} />
                 </motion.div>
               </TabPanel>
             </TabPanels>

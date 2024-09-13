@@ -158,3 +158,9 @@ export const GET_INQUIRIES_RESPONSES = gql`
     }
   }
 `;
+
+export const GET_INQUIRY_RESPONSE_COUNT = gql`
+  query GetInquiryResponseCount($id: ID!) {
+    getInquiryResponseCount(id: $id)
+  }
+`;
