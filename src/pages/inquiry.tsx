@@ -4,9 +4,11 @@ import { ChartProps } from '@/components/chart';
 import RatingInput from '@/components/graph/rating-input';
 import MarkdownCustom from '@/components/markdown-custom';
 import { useSetTitle } from '@/hooks/title-hook';
+import { useTranscribe } from '@/hooks/audio-hook';
 import { InquiryProvider, useInquiry } from '@/providers/inquiry-provider';
 import { StrippedNode } from '@/utils/graphs/graph';
 import { faChevronRight, faComments, faLightbulb, faPaperPlane, faRocket } from '@fortawesome/free-solid-svg-icons';
+import { faMicrophone, faMicrophoneSlash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
@@ -42,6 +44,7 @@ function Inquiry() {
   const [inputMessage, setInputMessage] = useState('');
   const [selectedRatings, setSelectedRatings] = useState<string[]>([]);
   const [currentNode, setCurrentNode] = useState<StrippedNode | null>(null);
+  const { isTranscribing, transcript, handleTranscribe } = useTranscribe();
 
   // Hooks
   const { id } = useParams<{ id: string }>();
@@ -94,6 +97,18 @@ function Inquiry() {
       }
     }
   };
+
+    /**
+   * Updates the prompt with the transcript.
+   * @param transcript {string} The transcript.
+   * @returns {void}
+   * @sideeffect Updates the prompt with the transcript.
+   */
+    useEffect(() => {
+      if (isTranscribing) {
+        setInputMessage((current) => current + transcript)
+      }
+    }, [transcript]);
 
   useEffect(() => {
     onNodeUpdate(onNodeVisit);
@@ -224,13 +239,22 @@ function Inquiry() {
 
             {screen === 'inquiry' && (
               <form onSubmit={handleSubmit} className="flex">
-                <input
-                  type="text"
-                  value={inputMessage}
-                  onChange={(e) => setInputMessage(e.target.value)}
-                  placeholder="Type your message here..."
-                  className="flex-grow p-2 sm:p-3 border border-slate-300 rounded-l-full text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
+                <div className="rounded-l-lg flex-grow flex border border-slate-300">
+                  <input
+                    type="text"
+                    value={inputMessage}
+                    onChange={(e) => setInputMessage(e.target.value)}
+                    placeholder="Type your message here..."
+                    className="flex-grow p-2 sm:p-3 rounded-l-full text-slate-800 focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    className="focus:outline-none text-black px-4 py-2 rounded-lg ml-2 hover:from-indigo-700 hover:to-purple-700 transition-colors"
+                    onClick={handleTranscribe}
+                  >
+                    <FontAwesomeIcon icon={isTranscribing ? faMicrophone : faMicrophoneSlash} className={isTranscribing ? "text-green-500" : ""}/>
+                  </button>
+                </div>
                 <button
                   type="submit"
                   className="px-6 py-2 sm:py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-r-full hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-300 ease-in-out disabled:opacity-70 disabled:cursor-not-allowed"
