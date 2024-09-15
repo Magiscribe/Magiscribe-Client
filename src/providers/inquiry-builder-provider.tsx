@@ -1,6 +1,12 @@
 import { ADD_PREDICTION, CREATE_INQUIRY, DELETE_INQUIRY, UPDATE_INQUIRY } from '@/clients/mutations';
 import { GET_INQUIRY } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
+import {
+  AddPredictionMutation,
+  CreateInquiryMutation,
+  DeleteInquiryMutation,
+  UpdateInquiryMutation,
+} from '@/graphql/graphql';
 import useReactFlowGraph from '@/hooks/graph';
 import { getAgentIdByName } from '@/utils/agents';
 import { createGraph, formatGraph } from '@/utils/graphs/graph-utils';
@@ -24,14 +30,6 @@ export interface FormData {
 export interface GraphData {
   nodes: Node[];
   edges: Edge[];
-}
-
-export interface Inquiry {
-  id: string;
-  data: {
-    form: FormData;
-    graph: GraphData;
-  };
 }
 
 interface ContextType {
@@ -100,10 +98,10 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
 
   // Mutations
   const client = useApolloClient();
-  const [createFormMutation] = useMutation<{ upsertInquiry: Inquiry }>(CREATE_INQUIRY);
-  const [updateFormMutation] = useMutation<{ upsertInquiry: Inquiry }>(UPDATE_INQUIRY);
-  const [addPrediction] = useMutation(ADD_PREDICTION);
-  const [deleteObject] = useMutation(DELETE_INQUIRY);
+  const [createFormMutation] = useMutation<CreateInquiryMutation>(CREATE_INQUIRY);
+  const [updateFormMutation] = useMutation<UpdateInquiryMutation>(UPDATE_INQUIRY);
+  const [addPrediction] = useMutation<AddPredictionMutation>(ADD_PREDICTION);
+  const [deleteObject] = useMutation<DeleteInquiryMutation>(DELETE_INQUIRY);
 
   /**
    * Deletes the inquiry.

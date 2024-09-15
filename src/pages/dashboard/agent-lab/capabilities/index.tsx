@@ -4,9 +4,9 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ADD_UPDATE_CAPABILITY, DELETE_CAPABILITY } from '@/clients/mutations';
 import { GET_ALL_CAPABILITIES } from '@/clients/queries';
-import { Capability, Prompt } from '@/types/agents';
 import { useAddAlert } from '@/hooks/alert-hook';
 import DeleteConfirmationModal from '@/components/modals/delete-modal'; // Adjust the import path as needed
+import { Capability, Prompt } from '@/graphql/graphql';
 
 function CapabilityCard({
   capability,

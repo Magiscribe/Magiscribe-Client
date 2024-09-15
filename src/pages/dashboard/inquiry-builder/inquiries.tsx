@@ -1,5 +1,6 @@
-import { GET_USER_INQUIRIES } from '@/clients/queries';
+import { GET_INQUIRIES } from '@/clients/queries';
 import ModalUpsertInquiry from '@/components/modals/upsert-inquiry-modal';
+import { GetInquiriesQuery } from '@/graphql/graphql';
 import { InquiryBuilderProvider } from '@/providers/inquiry-builder-provider';
 import { useQuery } from '@apollo/client';
 import { motion } from 'framer-motion';
@@ -14,7 +15,7 @@ export default function Inquiry() {
   const navigate = useNavigate();
 
   // Queries
-  const { data: userFormsData } = useQuery(GET_USER_INQUIRIES);
+  const { data } = useQuery<GetInquiriesQuery>(GET_INQUIRIES);
 
   /**
    * Redirects to the inquiry form creation page on form creation.
@@ -47,31 +48,28 @@ export default function Inquiry() {
       </div>
       <h2 className="text-2xl font-semibold text-slate-100 mb-4">Your Inquiries</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-        {userFormsData?.getInquiries.map(
-          (userForm: {
-            data: {
-              form: { title: string; organizationName: string };
-            };
-            id: string;
-          }) => {
-            const formData = userForm.data;
-            return (
-              <motion.div
-                key={userForm.id}
-                className="bg-white p-4 text-black rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow"
-                whileHover={{ scale: 1.05 }}
-                onClick={() => navigate(userForm.id)}
-              >
-                <h3 className="text-lg font-semibold mb-2">
-                  {formData.form.title === '' ? 'Untitled Form' : formData.form.title}
-                </h3>
-                <p className="text-sm text-gray-500 mb-2">
-                  {formData.form.organizationName === '' ? 'No Organization' : formData.form.organizationName}
-                </p>
-              </motion.div>
-            );
-          },
-        )}
+        {(data?.getInquiries ?? []).map((inquiry) => {
+          const form = inquiry.data.form;
+          const updatedAt = new Date(inquiry.updatedAt);
+          const formattedDate = updatedAt.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+          });
+          return (
+            <motion.div
+              key={inquiry.id}
+              className="bg-white p-4 text-black rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow"
+              whileHover={{ scale: 1.05 }}
+              onClick={() => navigate(inquiry.id)}
+            >
+              <h3 className="text-lg font-semibold mb-2">{form.title === '' ? 'Untitled Form' : form.title}</h3>
+              <p className="text-sm text-gray-500 mb-2">
+                {form.organizationName === '' ? 'No Organization' : form.organizationName} - {formattedDate}
+              </p>
+            </motion.div>
+          );
+        })}
         <motion.div
           className="bg-blue-500 p-4 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow flex items-center justify-center"
           whileHover={{ scale: 1.05 }}

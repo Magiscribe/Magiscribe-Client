@@ -1,7 +1,7 @@
 import { gql } from '@apollo/client';
 
 export const GENERATE_TRANSCRIPTION_CREDENTIALS = gql`
-  mutation Mutation {
+  mutation generateTranscriptionStreamingCredentials {
     generateTranscriptionStreamingCredentials {
       accessKeyId
       secretAccessKey
@@ -11,7 +11,7 @@ export const GENERATE_TRANSCRIPTION_CREDENTIALS = gql`
 `;
 
 export const GENERATE_AUDIO = gql`
-  mutation Mutation($voice: String!, $text: String!) {
+  mutation generateAudio($voice: String!, $text: String!) {
     generateAudio(voice: $voice, text: $text)
   }
 `;
@@ -23,7 +23,7 @@ export const ADD_PREDICTION = gql`
 `;
 
 export const ADD_UPDATE_AGENT = gql`
-  mutation Mutation($agent: AgentInput!) {
+  mutation upsertAgent($agent: AgentInput!) {
     upsertAgent(agent: $agent) {
       id
       name
@@ -41,7 +41,7 @@ export const ADD_UPDATE_AGENT = gql`
 `;
 
 export const DELETE_AGENT = gql`
-  mutation Mutation($agentId: ID!) {
+  mutation deleteAgent($agentId: ID!) {
     deleteAgent(agentId: $agentId) {
       id
     }
@@ -49,7 +49,7 @@ export const DELETE_AGENT = gql`
 `;
 
 export const ADD_UPDATE_CAPABILITY = gql`
-  mutation Mutation($capability: CapabilityInput!) {
+  mutation upsertCapability($capability: CapabilityInput!) {
     upsertCapability(capability: $capability) {
       id
       name
@@ -69,7 +69,7 @@ export const ADD_UPDATE_CAPABILITY = gql`
 `;
 
 export const DELETE_CAPABILITY = gql`
-  mutation Mutation($capabilityId: ID!) {
+  mutation deleteCapability($capabilityId: ID!) {
     deleteCapability(capabilityId: $capabilityId) {
       id
     }
@@ -77,7 +77,7 @@ export const DELETE_CAPABILITY = gql`
 `;
 
 export const ADD_UPDATE_PROMPT = gql`
-  mutation Mutation($prompt: PromptInput!) {
+  mutation upsertPrompt($prompt: PromptInput!) {
     upsertPrompt(prompt: $prompt) {
       id
       name
@@ -87,7 +87,7 @@ export const ADD_UPDATE_PROMPT = gql`
 `;
 
 export const DELETE_PROMPT = gql`
-  mutation Mutation($promptId: ID!) {
+  mutation deletePrompt($promptId: ID!) {
     deletePrompt(promptId: $promptId) {
       id
     }
@@ -95,7 +95,7 @@ export const DELETE_PROMPT = gql`
 `;
 
 export const CREATE_INQUIRY = gql`
-  mutation Mutation($data: JSONObject!) {
+  mutation createInquiry($data: JSONObject!) {
     upsertInquiry(data: $data) {
       id
       data
@@ -104,7 +104,7 @@ export const CREATE_INQUIRY = gql`
 `;
 
 export const UPDATE_INQUIRY = gql`
-  mutation Mutation($id: ID!, $data: JSONObject!, $fields: [String!]) {
+  mutation updateInquiry($id: ID!, $data: JSONObject!, $fields: [String!]) {
     upsertInquiry(id: $id, data: $data, fields: $fields) {
       id
       data
@@ -113,15 +113,15 @@ export const UPDATE_INQUIRY = gql`
 `;
 
 export const DELETE_INQUIRY = gql`
-  mutation Mutation($id: ID!) {
+  mutation deleteInquiry($id: ID!) {
     deleteInquiry(id: $id) {
       id
     }
   }
 `;
 
-export const CREATE_INQUIRY_REPONSE = gql`
-  mutation Mutation($inquiryId: ID, $data: [JSONObject!]!) {
+export const CREATE_INQUIRY_RESPONSE = gql`
+  mutation createInquiryResponse($inquiryId: ID!, $data: [JSONObject!]!) {
     upsertInquiryResponse(inquiryId: $inquiryId, data: $data) {
       id
       data
@@ -130,7 +130,7 @@ export const CREATE_INQUIRY_REPONSE = gql`
 `;
 
 export const UPDATE_INQUIRY_RESPONSE = gql`
-  mutation Mutation($id: ID, $inquiryId: ID, $data: [JSONObject!]!) {
+  mutation updateInquiryResponse($id: ID, $inquiryId: ID!, $data: [JSONObject!]!) {
     upsertInquiryResponse(id: $id, inquiryId: $inquiryId, data: $data) {
       id
       data

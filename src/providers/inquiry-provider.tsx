@@ -1,6 +1,7 @@
-import { ADD_PREDICTION, CREATE_INQUIRY_REPONSE, UPDATE_INQUIRY_RESPONSE } from '@/clients/mutations';
+import { ADD_PREDICTION, CREATE_INQUIRY_RESPONSE, UPDATE_INQUIRY_RESPONSE } from '@/clients/mutations';
 import { GET_INQUIRY } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
+import { CreateInquiryResponseMutation, UpdateInquiryResponseMutation } from '@/graphql/graphql';
 import { getAgentIdByName } from '@/utils/agents';
 import { NodeData, OptimizedNode } from '@/utils/graphs/graph';
 import { GraphManager } from '@/utils/graphs/graph-manager';
@@ -63,8 +64,8 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
 
   // Mutations and Apollo client
   const [addPrediction] = useMutation(ADD_PREDICTION);
-  const [createResponse] = useMutation(CREATE_INQUIRY_REPONSE);
-  const [updateResponse] = useMutation(UPDATE_INQUIRY_RESPONSE);
+  const [createResponse] = useMutation<CreateInquiryResponseMutation>(CREATE_INQUIRY_RESPONSE);
+  const [updateResponse] = useMutation<UpdateInquiryResponseMutation>(UPDATE_INQUIRY_RESPONSE);
   const client = useApolloClient();
 
   /**
@@ -158,7 +159,7 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
             data: graphRef.current.getNodeHistory(),
           },
         });
-        inquiryResponseIdRef.current = result.data.upsertInquiryResponse.id;
+        inquiryResponseIdRef.current = result.data?.upsertInquiryResponse.id;
       } else {
         await updateResponse({
           variables: {

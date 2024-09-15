@@ -4,9 +4,9 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { DELETE_PROMPT, ADD_UPDATE_PROMPT } from '@/clients/mutations';
 import { GET_ALL_PROMPTS } from '@/clients/queries';
-import { Prompt } from '@/types/agents';
 import DeleteConfirmationModal from '@/components/modals/delete-modal';
 import { useAddAlert } from '@/hooks/alert-hook';
+import { Prompt } from '@/graphql/graphql';
 
 function PromptCard({
   prompt,

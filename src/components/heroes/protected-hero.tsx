@@ -1,10 +1,10 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
-export default function NotReadyHero() {
+export default function ProtectedHero() {
   return (
     <div>
-      <div className="container px-12 mx-auto flex flex-wrap flex-col md:flex-row items-center">
+      <div className="container mx-auto flex flex-wrap flex-col md:flex-row items-center">
         <div className="flex flex-col w-full md:w-3/5 justify-center items-start text-left">
           <motion.h1
             className="my-4 text-4xl md:text-5xl font-bold leading-tight"

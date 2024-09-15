@@ -3,7 +3,7 @@ import { Protect, RedirectToSignIn, SignedIn, SignedOut, useSession } from '@cle
 import { useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import AnimatedOutlet from '@/components/animated/animated-outlet';
-import NotReadyHero from '@/components/heroes/not-ready';
+import ProtectedHero from '@/components/heroes/protected-hero';
 
 export default function DashboardTemplate() {
   const { session } = useSession();
@@ -23,7 +23,7 @@ export default function DashboardTemplate() {
         <>
           <SignedIn>
             <div className="mt-36">
-              <NotReadyHero />
+              <ProtectedHero />
             </div>
           </SignedIn>
           <SignedOut>

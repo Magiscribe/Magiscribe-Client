@@ -2,8 +2,8 @@ import { ADD_UPDATE_AGENT } from '@/clients/mutations';
 import { GET_AGENT, GET_ALL_CAPABILITIES, GET_ALL_MODELS } from '@/clients/queries';
 import ListBox from '@/components/list/ListBox';
 import ListBoxMultiple from '@/components/list/ListBoxMultiple';
+import { GetAgentQuery, GetAllCapabilitiesQuery, GetAllModelsQuery, UpsertAgentMutation } from '@/graphql/graphql';
 import { useAddAlert } from '@/hooks/alert-hook';
-import { Capability } from '@/types/agents';
 import { useMutation, useQuery } from '@apollo/client';
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -19,8 +19,8 @@ interface Form {
   } | null;
   capabilities: string[];
   memoryEnabled: boolean;
-  subscriptionFilter: string | null;
-  outputFilter: string | null;
+  subscriptionFilter: string | null | undefined;
+  outputFilter: string | null | undefined;
 }
 
 export default function AgentEdit() {
@@ -42,15 +42,20 @@ export default function AgentEdit() {
   const [searchParams] = useSearchParams();
 
   // Queries and Mutations
-  const [upsertAgent] = useMutation(ADD_UPDATE_AGENT);
-  const { data: models } = useQuery(GET_ALL_MODELS);
-  const { data: capabilities } = useQuery(GET_ALL_CAPABILITIES);
-  useQuery(GET_AGENT, {
+  const [upsertAgent] = useMutation<UpsertAgentMutation>(ADD_UPDATE_AGENT);
+  const { data: models } = useQuery<GetAllModelsQuery>(GET_ALL_MODELS);
+  const { data: capabilities } = useQuery<GetAllCapabilitiesQuery>(GET_ALL_CAPABILITIES);
+
+  useQuery<GetAgentQuery>(GET_AGENT, {
     skip: !searchParams.has('id'),
     variables: {
       agentId: searchParams.get('id'),
     },
     onCompleted: (data) => {
+      if (!data.getAgent) {
+        return;
+      }
+
       setForm({
         id: data.getAgent.id,
         name: data.getAgent.name,
@@ -62,7 +67,7 @@ export default function AgentEdit() {
               variablePassThrough: data.getAgent.reasoning.variablePassThrough,
             }
           : null,
-        capabilities: data.getAgent.capabilities.map((capability: Capability) => capability.id),
+        capabilities: data.getAgent.capabilities.map((capability) => capability.id),
         memoryEnabled: data.getAgent.memoryEnabled,
         subscriptionFilter: data.getAgent.subscriptionFilter,
         outputFilter: data.getAgent.outputFilter,
@@ -181,10 +186,10 @@ export default function AgentEdit() {
                   capabilities: value.map((capability) => capability.id),
                 })
               }
-              selected={(capabilities?.getAllCapabilities ?? []).filter((capability: Capability) =>
+              selected={(capabilities?.getAllCapabilities ?? []).filter((capability) =>
                 form.capabilities.includes(capability.id),
               )}
-              values={(capabilities?.getAllCapabilities ?? []).map((capability: Capability) => ({
+              values={(capabilities?.getAllCapabilities ?? []).map((capability) => ({
                 name: capability.name ?? '',
                 id: capability.id,
               }))}
