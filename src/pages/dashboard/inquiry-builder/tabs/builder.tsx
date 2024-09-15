@@ -31,6 +31,7 @@ export default function InquiryBuilder() {
   const {
     form,
     graph,
+    lastUpdated,
     updateGraph,
     saveGraph,
     onEdgesChange,
@@ -93,7 +94,12 @@ export default function InquiryBuilder() {
         <div className="bg-white p-4 space-y-4 text-slate-700">
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-bold flex flex-col items-start">
-              {form.title} Graph
+              <span>
+                {form.title} Graph{' '}
+                <span className="text-sm font-normal text-slate-500">
+                  Last updated {lastUpdated ? new Date(lastUpdated).toLocaleString() : 'Never'}
+                </span>
+              </span>
               <button onClick={() => setUpsertFormModal(true)} className="text-blue-500 text-sm font-semibold">
                 Edit Inquiry
               </button>

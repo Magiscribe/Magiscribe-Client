@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import React, { ReactElement } from 'react';
 
 interface ContextMenuProps {
   /**
@@ -22,9 +23,9 @@ interface ContextMenuProps {
   bottom?: number;
 
   /**
-   * The callback triggered when the user clicks the "Add Node" button.
+   * The buttons to display in the context menu.
    */
-  onAddNode: (e: React.MouseEvent) => void;
+  buttons: ReactElement[];
 }
 
 export default function ContextMenu({
@@ -33,7 +34,7 @@ export default function ContextMenu({
   right,
   bottom,
 
-  onAddNode,
+  buttons,
 
   ...props
 }: ContextMenuProps) {
@@ -48,13 +49,10 @@ export default function ContextMenu({
       {...props}
     >
       <div className="text-sm ">
-        <p className="text-gray-800 border-b border-gray-200 pb-2 mb-2">Context Menu</p>
-        <button
-          onClick={onAddNode}
-          className="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded-full flex items-center"
-        >
-          Add Node
-        </button>
+        <p className="text-gray-800 border-b border-gray-200 pb-2 mb-2">Add Node</p>
+        <div className="flex flex-col space-y-2">
+          {buttons.map((button, index) => React.cloneElement(button, { key: index }))}
+        </div>
       </div>
     </motion.div>
   );

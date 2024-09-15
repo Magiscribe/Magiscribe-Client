@@ -1,4 +1,3 @@
-import ModalShareInquiry from '@/components/modals/share-inquiry-modal';
 import { InquiryBuilderProvider } from '@/providers/inquiry-builder-provider';
 import { faArrowLeft, faLink } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -9,13 +8,14 @@ import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import AnalysisTab from './tabs/analysis';
 import InquiryBuilder from './tabs/builder';
+import ModalSendInquiry from '@/components/modals/send-inquiry-modal';
 
 export default function InquiryPage() {
   // Hooks
   const { id } = useParams<{ id: string }>();
 
   // States
-  const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [sendModalOpen, setSendModalOpen] = useState(false);
 
   if (!id) {
     return <></>;
@@ -24,16 +24,19 @@ export default function InquiryPage() {
   return (
     <InquiryBuilderProvider id={id}>
       <div className="w-full flex items-center justify-between mb-4">
-        <Link to="../" className="flex items-center text-slate-100 hover:text-slate-200 transition-colors">
+        <Link
+          to="/dashboard/inquiry-builder"
+          className="flex items-center text-slate-100 hover:text-slate-200 transition-colors"
+        >
           <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
           Back
         </Link>
         <button
-          onClick={() => setShareModalOpen(true)}
+          onClick={() => setSendModalOpen(true)}
           className="flex items-center text-slate-100 hover:text-slate-200 transition-colors"
         >
           <FontAwesomeIcon icon={faLink} className="mr-2" />
-          Share
+          Send
         </button>
       </div>
       <TabGroup>
@@ -67,7 +70,7 @@ export default function InquiryPage() {
         </TabPanels>
       </TabGroup>
 
-      <ModalShareInquiry id={id} open={shareModalOpen} onClose={() => setShareModalOpen(false)} />
+      <ModalSendInquiry id={id} open={sendModalOpen} onClose={() => setSendModalOpen(false)} />
     </InquiryBuilderProvider>
   );
 }

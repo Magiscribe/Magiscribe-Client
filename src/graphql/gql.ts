@@ -31,9 +31,9 @@ const documents = {
     types.UpsertPromptDocument,
   '\n  mutation deletePrompt($promptId: ID!) {\n    deletePrompt(promptId: $promptId) {\n      id\n    }\n  }\n':
     types.DeletePromptDocument,
-  '\n  mutation createInquiry($data: JSONObject!) {\n    upsertInquiry(data: $data) {\n      id\n      data\n    }\n  }\n':
+  '\n  mutation createInquiry($data: JSONObject!) {\n    upsertInquiry(data: $data) {\n      id\n      data\n      createdAt\n      updatedAt\n    }\n  }\n':
     types.CreateInquiryDocument,
-  '\n  mutation updateInquiry($id: ID!, $data: JSONObject!, $fields: [String!]) {\n    upsertInquiry(id: $id, data: $data, fields: $fields) {\n      id\n      data\n    }\n  }\n':
+  '\n  mutation updateInquiry($id: ID!, $data: JSONObject!, $fields: [String!]) {\n    upsertInquiry(id: $id, data: $data, fields: $fields) {\n      id\n      data\n      createdAt\n      updatedAt\n    }\n  }\n':
     types.UpdateInquiryDocument,
   '\n  mutation deleteInquiry($id: ID!) {\n    deleteInquiry(id: $id) {\n      id\n    }\n  }\n':
     types.DeleteInquiryDocument,
@@ -140,14 +140,14 @@ export function gql(
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(
-  source: '\n  mutation createInquiry($data: JSONObject!) {\n    upsertInquiry(data: $data) {\n      id\n      data\n    }\n  }\n',
-): (typeof documents)['\n  mutation createInquiry($data: JSONObject!) {\n    upsertInquiry(data: $data) {\n      id\n      data\n    }\n  }\n'];
+  source: '\n  mutation createInquiry($data: JSONObject!) {\n    upsertInquiry(data: $data) {\n      id\n      data\n      createdAt\n      updatedAt\n    }\n  }\n',
+): (typeof documents)['\n  mutation createInquiry($data: JSONObject!) {\n    upsertInquiry(data: $data) {\n      id\n      data\n      createdAt\n      updatedAt\n    }\n  }\n'];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(
-  source: '\n  mutation updateInquiry($id: ID!, $data: JSONObject!, $fields: [String!]) {\n    upsertInquiry(id: $id, data: $data, fields: $fields) {\n      id\n      data\n    }\n  }\n',
-): (typeof documents)['\n  mutation updateInquiry($id: ID!, $data: JSONObject!, $fields: [String!]) {\n    upsertInquiry(id: $id, data: $data, fields: $fields) {\n      id\n      data\n    }\n  }\n'];
+  source: '\n  mutation updateInquiry($id: ID!, $data: JSONObject!, $fields: [String!]) {\n    upsertInquiry(id: $id, data: $data, fields: $fields) {\n      id\n      data\n      createdAt\n      updatedAt\n    }\n  }\n',
+): (typeof documents)['\n  mutation updateInquiry($id: ID!, $data: JSONObject!, $fields: [String!]) {\n    upsertInquiry(id: $id, data: $data, fields: $fields) {\n      id\n      data\n      createdAt\n      updatedAt\n    }\n  }\n'];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

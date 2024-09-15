@@ -6,6 +6,7 @@ import {
   Controls,
   DefaultEdgeOptions,
   Edge,
+  MarkerType,
   MiniMap,
   Node,
   OnConnect,
@@ -23,15 +24,19 @@ import CustomTooltip from '../controls/custom-tooltip';
 import CustomModal from '../modal';
 import ContextMenu from './context-menu';
 import { edgeTypes, nodeTypes, nodeTypesInfo } from './utils';
+import colors from 'tailwindcss/colors';
 
 const defaultEdgeOptions: DefaultEdgeOptions = {
-  style: {
-    strokeWidth: 4,
-    strokeLinecap: 'butt',
-    stroke: '#ffff',
-  },
-  animated: true,
   type: 'button',
+  markerEnd: {
+    type: MarkerType.ArrowClosed,
+    color: colors.slate[200],
+  },
+  markerStart: {
+    type: MarkerType.ArrowClosed,
+    orient: 'auto-start-reverse',
+    color: colors.slate[200],
+  },
 };
 const proOptions = { hideAttribution: true };
 
@@ -272,7 +277,10 @@ function Flow({ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange }
                 />
                 {type.charAt(0).toUpperCase() + type.slice(1)}
               </button>
-              <CustomTooltip render={() => <FontAwesomeIcon icon={faQuestionCircle} className="ml-2 text-slate-400" />}>
+              <CustomTooltip
+                triggerOnHover
+                render={() => <FontAwesomeIcon icon={faQuestionCircle} className="ml-2 text-slate-400" />}
+              >
                 <p className="text-xs font-normal">{nodeTypesInfo[type as keyof typeof nodeTypesInfo].description}</p>
               </CustomTooltip>
             </div>
@@ -311,8 +319,34 @@ function Flow({ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange }
             }}
           />
           <Background />
-          <Controls position="top-right" />
-          {menu && <ContextMenu {...menu} />}
+          <Controls
+            position="top-right"
+            // TODO: Handle locking the graph.
+            showInteractive={false}
+          />
+          {menu && (
+            <ContextMenu
+              buttons={Object.keys(nodeTypesInfo).map((type) => {
+                const disabled = !validateNewNode(type);
+
+                return (
+                  <button
+                    key={type}
+                    disabled={disabled}
+                    onClick={(e) => {
+                      newNode.current = { position: screenToFlowPosition({ x: e.clientX - 150, y: e.clientY }), type };
+                      addNode();
+                      setMenu(null);
+                    }}
+                    className="w-44 px-4 py-2 bg-blue-600 text-white rounded-xl disabled:opacity-50"
+                  >
+                    {type.charAt(0).toUpperCase() + type.slice(1)} Node
+                  </button>
+                );
+              })}
+              {...menu}
+            />
+          )}
         </ReactFlow>
 
         <div className="absolute bottom-0 left-0 p-4">

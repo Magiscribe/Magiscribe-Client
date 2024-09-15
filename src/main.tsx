@@ -102,7 +102,7 @@ const router = createBrowserRouter([
     ],
   },
   {
-    path: '/dashboard/inquiry/:id',
+    path: '/dashboard/inquiry-builder/:id',
     element: <InquiryBuilderTemplate />,
     children: [{ path: '', element: <InquiryBuilderPage /> }],
   },

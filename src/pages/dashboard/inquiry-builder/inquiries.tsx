@@ -22,7 +22,7 @@ export default function Inquiry() {
    * @param id {string} The ID of the inquiry form.
    */
   const onCreateForm = (id: string) => {
-    navigate(`/dashboard/inquiry/${id}`);
+    navigate(`/dashboard/inquiry-builder/${id}`);
   };
 
   return (
@@ -65,7 +65,7 @@ export default function Inquiry() {
             >
               <h3 className="text-lg font-semibold mb-2">{form.title === '' ? 'Untitled Form' : form.title}</h3>
               <p className="text-sm text-gray-500 mb-2">
-                {form.organizationName === '' ? 'No Organization' : form.organizationName} - {formattedDate}
+                {form.organizationName ?? 'No Organization'} - {formattedDate}
               </p>
             </motion.div>
           );

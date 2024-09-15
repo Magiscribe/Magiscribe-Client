@@ -1,6 +1,7 @@
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { BaseEdge, EdgeLabelRenderer, getBezierPath, Position, useReactFlow } from '@xyflow/react';
+import colors from 'tailwindcss/colors';
 
 interface EdgeProps {
   id: string;
@@ -10,7 +11,6 @@ interface EdgeProps {
   targetY: number;
   sourcePosition: Position;
   targetPosition: Position;
-  style?: React.CSSProperties;
   markerEnd?: string;
 }
 
@@ -22,10 +22,10 @@ export default function ButtonEdge({
   targetY,
   sourcePosition,
   targetPosition,
-  style = {},
   markerEnd,
 }: EdgeProps) {
   const { setEdges } = useReactFlow();
+
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
     sourceY,
@@ -42,7 +42,15 @@ export default function ButtonEdge({
 
   return (
     <>
-      <BaseEdge path={edgePath} markerEnd={markerEnd} style={style} />
+      <BaseEdge
+        path={edgePath}
+        markerEnd={markerEnd}
+        style={{
+          strokeWidth: 4,
+          strokeLinecap: 'butt',
+          stroke: colors.slate[200],
+        }}
+      />
       <EdgeLabelRenderer>
         <div
           style={{
@@ -56,7 +64,7 @@ export default function ButtonEdge({
           className="nodrag nopan"
         >
           <button
-            className="w-6 h-6 bg-slate-200 text-slate-800 rounded-full flex items-center justify-center hover:bg-slate-300"
+            className="w-6 h-6 bg-slate-200 text-black rounded-full flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors"
             onClick={onEdgeClick}
           >
             <FontAwesomeIcon icon={faTimes} />

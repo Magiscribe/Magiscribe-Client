@@ -99,6 +99,8 @@ export const CREATE_INQUIRY = gql`
     upsertInquiry(data: $data) {
       id
       data
+      createdAt
+      updatedAt
     }
   }
 `;
@@ -108,6 +110,8 @@ export const UPDATE_INQUIRY = gql`
     upsertInquiry(id: $id, data: $data, fields: $fields) {
       id
       data
+      createdAt
+      updatedAt
     }
   }
 `;

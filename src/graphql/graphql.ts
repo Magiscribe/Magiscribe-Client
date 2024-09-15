@@ -383,7 +383,7 @@ export type CreateInquiryMutationVariables = Exact<{
 
 export type CreateInquiryMutation = {
   __typename?: 'Mutation';
-  upsertInquiry: { __typename?: 'Inquiry'; id: string; data: any };
+  upsertInquiry: { __typename?: 'Inquiry'; id: string; data: any; createdAt: number; updatedAt: number };
 };
 
 export type UpdateInquiryMutationVariables = Exact<{
@@ -394,7 +394,7 @@ export type UpdateInquiryMutationVariables = Exact<{
 
 export type UpdateInquiryMutation = {
   __typename?: 'Mutation';
-  upsertInquiry: { __typename?: 'Inquiry'; id: string; data: any };
+  upsertInquiry: { __typename?: 'Inquiry'; id: string; data: any; createdAt: number; updatedAt: number };
 };
 
 export type DeleteInquiryMutationVariables = Exact<{
@@ -1049,6 +1049,8 @@ export const CreateInquiryDocument = {
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'data' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
               ],
             },
           },
@@ -1112,6 +1114,8 @@ export const UpdateInquiryDocument = {
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'data' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
               ],
             },
           },

@@ -5,6 +5,7 @@ import {
   AddPredictionMutation,
   CreateInquiryMutation,
   DeleteInquiryMutation,
+  GetInquiryQuery,
   UpdateInquiryMutation,
 } from '@/graphql/graphql';
 import useReactFlowGraph from '@/hooks/graph';
@@ -34,6 +35,7 @@ export interface GraphData {
 
 interface ContextType {
   id?: string;
+  lastUpdated: Date;
   form: FormData;
   graph: { edges: Edge[]; nodes: Node[] };
 
@@ -59,6 +61,7 @@ const InquiryContext = createContext<ContextType | undefined>(undefined);
 function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   // States
   const [subscriptionId] = useState<string>(uuidv4());
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   const [form, updateForm] = useState<FormData>({} as FormData);
   const [generatingGraph, setGeneratingGraph] = useState(false);
 
@@ -71,10 +74,12 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   /**
    * Fetches the inquiry data from the server.
    */
-  useQuery(GET_INQUIRY, {
+  useQuery<GetInquiryQuery>(GET_INQUIRY, {
     variables: { id },
     skip: !id,
     onCompleted: ({ getInquiry }) => {
+      if (!getInquiry) return;
+      setLastUpdated(new Date(getInquiry.updatedAt));
       updateForm(getInquiry.data.form);
       updateGraph(getInquiry.data.graph);
     },
@@ -150,7 +155,13 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     try {
       const func = id ? updateFormMutation : createFormMutation;
       const result = await func({ variables: { id, data: { graph, fields: ['graph'] } } });
-      if (onSuccess) onSuccess(result.data?.upsertInquiry.id as string);
+
+      if (result.data) {
+        setLastUpdated(new Date(result.data.upsertInquiry.updatedAt));
+        if (onSuccess) onSuccess(result.data.upsertInquiry.id as string);
+      } else {
+        throw new Error('Failed to save the graph.');
+      }
     } catch {
       if (onError) onError();
     }
@@ -181,6 +192,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
 
   const contextValue = {
     id,
+    lastUpdated,
     form,
     graph,
 
