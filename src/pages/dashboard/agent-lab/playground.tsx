@@ -1,12 +1,11 @@
 import { useMutation, useQuery, useSubscription } from '@apollo/client';
-import { faMicrophone, faMicrophoneSlash, faVolumeHigh, faVolumeMute } from '@fortawesome/free-solid-svg-icons';
+import { faVolumeHigh, faVolumeMute } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useCallback, useEffect, useState } from 'react';
 import { GET_ALL_AGENTS } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import { useElevenLabsAudio } from '@/components/audio-player';
 import ListBox from '@/components/list/ListBox';
-import { useTranscribe } from '@/hooks/audio-hook';
 import { Agent } from '@/types/agents';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
 import { ADD_PREDICTION } from '@/clients/mutations';
@@ -51,9 +50,8 @@ export default function PlaygroundDashboard() {
   const { data: agents } = useQuery(GET_ALL_AGENTS);
   const [addPrediction] = useMutation(ADD_PREDICTION);
 
-  // Transcribe
+  // Text to speech
   const [enableAudio, setEnableAudio] = useState(false);
-  const { isTranscribing, transcript, startTranscribing, stopTranscribing } = useTranscribe();
   const audio = useElevenLabsAudio(form.voice);
 
   useEffect(() => {
@@ -122,29 +120,6 @@ export default function PlaygroundDashboard() {
       // Handle other types of errors
     }
   };
-
-  /**
-   * Handles the starting/stopping of transcribing.
-   */
-  const handleTranscribe = () => {
-    if (isTranscribing) {
-      stopTranscribing();
-    } else {
-      startTranscribing();
-    }
-  };
-
-  /**
-   * Updates the prompt with the transcript.
-   * @param transcript {string} The transcript.
-   * @returns {void}
-   * @sideeffect Updates the prompt with the transcript.
-   */
-  useEffect(() => {
-    if (isTranscribing) {
-      setForm({ ...form, prompt: `${form.prompt} ${transcript}` });
-    }
-  }, [transcript]);
 
   /**
    * Clears the responses.
@@ -297,14 +272,6 @@ export default function PlaygroundDashboard() {
               disabled={loading}
             >
               Run
-            </button>
-            <button
-              type="button"
-              className="bg-green-500 text-white px-4 py-2 rounded-lg ml-2 hover:bg-green-600 transition-colors"
-              onClick={handleTranscribe}
-            >
-              Transcription {isTranscribing ? 'On' : 'Off'}{' '}
-              <FontAwesomeIcon icon={isTranscribing ? faMicrophone : faMicrophoneSlash} />
             </button>
             <button
               type="button"
