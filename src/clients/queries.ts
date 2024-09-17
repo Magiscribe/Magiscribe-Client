@@ -1,7 +1,7 @@
 import { gql } from '@apollo/client';
 
 export const GET_ALL_MODELS = gql`
-  query Query {
+  query getAllModels {
     getAllModels {
       id
       name
@@ -10,7 +10,7 @@ export const GET_ALL_MODELS = gql`
 `;
 
 export const GET_AGENT_WITH_PROMPTS = gql`
-  query Query($agentId: ID!) {
+  query getAgentWithPrompts($agentId: ID!) {
     getAgentWithPrompts(agentId: $agentId) {
       id
       name
@@ -37,7 +37,7 @@ export const GET_AGENT_WITH_PROMPTS = gql`
 `;
 
 export const GET_ALL_AGENTS = gql`
-  query Query {
+  query getAllAgents {
     getAllAgents {
       id
       name
@@ -51,7 +51,7 @@ export const GET_ALL_AGENTS = gql`
 `;
 
 export const GET_AGENT = gql`
-  query Query($agentId: ID!) {
+  query getAgent($agentId: ID!) {
     getAgent(agentId: $agentId) {
       id
       name
@@ -73,7 +73,7 @@ export const GET_AGENT = gql`
 `;
 
 export const GET_ALL_CAPABILITIES = gql`
-  query Query {
+  query getAllCapabilities {
     getAllCapabilities {
       id
       prompts {
@@ -93,7 +93,7 @@ export const GET_ALL_CAPABILITIES = gql`
 `;
 
 export const GET_CAPABILITY = gql`
-  query Query($capabilityId: ID!) {
+  query getCapability($capabilityId: ID!) {
     getCapability(capabilityId: $capabilityId) {
       id
       llmModel
@@ -113,7 +113,7 @@ export const GET_CAPABILITY = gql`
 `;
 
 export const GET_ALL_PROMPTS = gql`
-  query Query {
+  query getAllPrompts {
     getAllPrompts {
       id
       name
@@ -123,7 +123,7 @@ export const GET_ALL_PROMPTS = gql`
 `;
 
 export const GET_PROMPT = gql`
-  query Query($promptId: ID!) {
+  query getPrompt($promptId: ID!) {
     getPrompt(promptId: $promptId) {
       id
       name
@@ -133,34 +133,44 @@ export const GET_PROMPT = gql`
 `;
 
 export const GET_INQUIRY = gql`
-  query Query($id: ID!) {
+  query getInquiry($id: ID!) {
     getInquiry(id: $id) {
+      id
       data
+      createdAt
+      updatedAt
     }
   }
 `;
 
-export const GET_USER_INQUIRIES = gql`
-  query DataObjectsCreated {
+export const GET_INQUIRIES = gql`
+  query getInquiries {
     getInquiries {
       id
       data
+      createdAt
+      updatedAt
     }
   }
 `;
 
 export const GET_INQUIRIES_RESPONSES = gql`
-  query Query($id: ID!) {
+  query getInquiryResponses($id: ID!) {
     getInquiryResponses(id: $id) {
       id
       userId
-      data
+      data {
+        userDetails
+        history
+      }
+      createdAt
+      updatedAt
     }
   }
 `;
 
 export const GET_INQUIRY_RESPONSE_COUNT = gql`
-  query GetInquiryResponseCount($id: ID!) {
+  query getInquiryResponseCount($id: ID!) {
     getInquiryResponseCount(id: $id)
   }
 `;

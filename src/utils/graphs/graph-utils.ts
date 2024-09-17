@@ -32,12 +32,7 @@ export function createGraph(input: { nodes: Node[]; edges: Edge[] }): { nodes: N
  * @param {Function} setNodes - Function to set nodes
  * @param {Function} setEdges - Function to set edges
  */
-export function formatAndSetGraph(
-  graph: { nodes: Node[]; edges: Edge[] },
-  autoPosition: boolean = false,
-  setNodes: (nodes: Node[]) => void,
-  setEdges: (edges: Edge[]) => void,
-) {
+export function formatGraph(graph: { nodes: Node[]; edges: Edge[] }, autoPosition: boolean = false) {
   let formattedNodes = graph.nodes;
 
   if (autoPosition) {
@@ -48,7 +43,10 @@ export function formatAndSetGraph(
     //       Currently, it sets the width and height to 400 on the first render because it does not have
     //       the measured width and height of the nodes.
     formattedNodes.forEach((node) => {
-      g.setNode(node.id, { width: node.measured?.width ?? 400, height: node.measured?.height ?? 400 });
+      g.setNode(node.id, {
+        width: node.measured?.width ? node.measured.width + 100 : 400,
+        height: node.measured?.height ? node.measured.height + 100 : 400,
+      });
     });
     graph.edges.forEach((edge) => {
       g.setEdge(edge.source, edge.target);
@@ -68,8 +66,7 @@ export function formatAndSetGraph(
     });
   }
 
-  setNodes(formattedNodes);
-  setEdges(graph.edges);
+  return { nodes: formattedNodes, edges: graph.edges };
 }
 
 /**

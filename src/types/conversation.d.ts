@@ -1,3 +1,5 @@
+import { GetInquiryResponsesQuery } from '@/graphql/graphql';
+
 export interface ConversationData {
   userId: string;
   data: {
@@ -9,7 +11,6 @@ export interface ConversationData {
 
 export interface Form {
   organizationName: string;
-  organizationRole: string;
   inputGoals: string;
   title: string;
   createdAt: number;
@@ -48,12 +49,6 @@ export interface GraphEdge {
   target: string;
 }
 
-export interface IndividualConversationData {
-  id: string;
-  userId?: string;
-  data: NodeVisitAnalysisData[];
-}
-
 export interface NodeVisitAnalysisData {
   id: string;
   data?: {
@@ -72,7 +67,7 @@ export interface TabProps {
     id: string;
     form: Form;
     graph: Graph;
-    nodeVisitData: IndividualConversationData[];
+    responses: NonNullable<GetInquiryResponsesQuery['getInquiryResponses']>;
   };
 }
 

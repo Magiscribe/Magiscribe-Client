@@ -28,3 +28,11 @@ body,
   height: 100%;
   width: 100%;
 }
+
+.react-flow__node > div {
+  @apply border-2 bg-slate-100 border-slate-400 transition-all;
+}
+
+.react-flow__node.selected > div {
+  @apply shadow-2xl bg-white border-[5px] border-green-500;
+}

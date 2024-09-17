@@ -1,12 +1,12 @@
-import { useMutation, useQuery } from '@apollo/client';
-import { Link } from 'react-router-dom';
-import { useState } from 'react';
-import { DELETE_AGENT, ADD_UPDATE_AGENT } from '@/clients/mutations';
+import { ADD_UPDATE_AGENT, DELETE_AGENT } from '@/clients/mutations';
 import { GET_ALL_AGENTS } from '@/clients/queries';
-import { Agent, Capability } from '@/types/agents';
-import { motion } from 'framer-motion';
 import DeleteConfirmationModal from '@/components/modals/delete-modal';
+import { Agent, Capability } from '@/graphql/graphql';
 import { useAddAlert } from '@/hooks/alert-hook';
+import { useMutation, useQuery } from '@apollo/client';
+import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 function AgentCard({ agent, onUpdate, onCopy }: { agent: Agent; onUpdate?: () => void; onCopy: (id: string) => void }) {
   const [deleteAgent] = useMutation(DELETE_AGENT);
@@ -35,7 +35,7 @@ function AgentCard({ agent, onUpdate, onCopy }: { agent: Agent; onUpdate?: () =>
         <h2 className="text-xl font-bold mb-2 break-words">{agent.name}</h2>
         <p className="text-sm mb-4 break-words">{agent.description}</p>
         <div className="flex flex-wrap gap-2 mb-4">
-          {agent.capabilities.map((capability: Capability) => (
+          {agent.capabilities.map((capability) => (
             <Link
               key={capability.id}
               to={`../capabilities/edit?id=${capability.id}`}

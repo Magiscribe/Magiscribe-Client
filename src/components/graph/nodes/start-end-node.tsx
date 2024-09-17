@@ -1,5 +1,5 @@
 import { faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
-import { Handle, Position } from '@xyflow/react';
+import { Position } from '@xyflow/react';
 import NodeContainer from '../elements/node-container';
 import CustomHandle from '../handles/limit-handle';
 
@@ -11,10 +11,12 @@ interface StartEndNodeProps {
 function StartEndNode({ id, type }: StartEndNodeProps) {
   return (
     <NodeContainer title={type === 'start' ? 'Start' : 'End'} faIcon={type === 'start' ? faPlay : faStop} id={id}>
-      {type === 'end' && <Handle type="target" position={Position.Top} className="w-4 h-4 !bg-teal-500" />}
-      {type === 'start' && (
-        <CustomHandle connectionCount={1} type="source" position={Position.Bottom} className="w-4 h-4 !bg-teal-500" />
-      )}
+      <CustomHandle
+        connectionCount={1}
+        type={type === 'start' ? 'source' : 'target'}
+        position={type === 'start' ? Position.Bottom : Position.Top}
+        className="w-4 h-4 !bg-green-500"
+      />
     </NodeContainer>
   );
 }

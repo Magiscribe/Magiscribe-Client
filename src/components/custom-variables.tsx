@@ -1,7 +1,7 @@
 import { GET_AGENT_WITH_PROMPTS } from '@/clients/queries';
+import { GetAgentWithPromptsQuery } from '@/graphql/graphql';
 import { useQuery } from '@apollo/client';
 import React, { useEffect, useMemo } from 'react';
-import { Agent } from '@/types/agents';
 
 interface Variable {
   key: string;
@@ -44,13 +44,10 @@ interface CustomVariablesSectionProps {
   setCustomVariables: (customVariables: CustomVariable[]) => void;
 }
 
-export function ExractPromptVariables(prompt: string): string[] {
+export function ExtractPromptVariables(prompt: string): string[] {
   if (!prompt) return [];
-  console.log(prompt);
   const regex = /{{(.*?)}}/g;
   const matches = [...prompt.matchAll(regex)];
-  console.log('Matches', matches);
-
   return matches.map((match) => match[1]);
 }
 
@@ -60,7 +57,7 @@ export const CustomVariablesSection: React.FC<CustomVariablesSectionProps> = ({
   onUpdateVariable,
   setCustomVariables,
 }) => {
-  const { data: agent } = useQuery(GET_AGENT_WITH_PROMPTS, {
+  const { data: agent } = useQuery<GetAgentWithPromptsQuery>(GET_AGENT_WITH_PROMPTS, {
     variables: {
       agentId,
     },
@@ -69,22 +66,16 @@ export const CustomVariablesSection: React.FC<CustomVariablesSectionProps> = ({
   const customPromptVariables = useMemo(() => {
     if (!agent || !agent.getAgentWithPrompts) return [];
     console.log('Agent', agent);
-    let variables = (agent.getAgentWithPrompts as Agent).capabilities
-      .map((capability) => capability.prompts.map((prompt) => ExractPromptVariables(prompt.text)))
+    let variables = agent.getAgentWithPrompts.capabilities
+      .map((capability) => capability?.prompts?.map((prompt) => ExtractPromptVariables(prompt.text)))
       .flat(Infinity);
 
     console.log('Variables before', variables);
     // Extract variables from reasoning prompt
     if (agent.getAgentWithPrompts.reasoning) {
-      console.log('HOW?');
-      const reasoningVariables = ExractPromptVariables(agent.getAgentWithPrompts.reasoning.prompt);
-      console.log('Reasoning variables', reasoningVariables);
+      const reasoningVariables = ExtractPromptVariables(agent.getAgentWithPrompts.reasoning.prompt);
       variables = [...variables, ...reasoningVariables];
     }
-
-    // Combine both sets of variables
-
-    console.log('Variables after', variables);
 
     // Remove duplicates
     const flattenedVariables = [...new Set(variables)] as string[];

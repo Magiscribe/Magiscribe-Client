@@ -128,10 +128,22 @@ export const useTranscribe = () => {
     }
   }, []);
 
+  /**
+   * Handles the starting/stopping of transcribing.
+   */
+  const handleTranscribe = () => {
+    if (isTranscribing) {
+      stopTranscribing();
+    } else {
+      startTranscribing();
+    }
+  };
+
   return {
     isTranscribing,
     transcript,
     startTranscribing,
     stopTranscribing,
+    handleTranscribe,
   };
 };

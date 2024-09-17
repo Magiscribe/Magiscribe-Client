@@ -1,6 +1,5 @@
 export interface Form {
   organizationName: string;
-  organizationRole: string;
   inputGoals: string;
   userId: string | null | undefined;
   title: string;

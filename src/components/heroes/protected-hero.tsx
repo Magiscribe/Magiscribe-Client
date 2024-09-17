@@ -1,10 +1,10 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
-export default function NotReadyHero() {
+export default function ProtectedHero() {
   return (
     <div>
-      <div className="container px-12 mx-auto flex flex-wrap flex-col md:flex-row items-center">
+      <div className="container mx-auto flex flex-wrap flex-col md:flex-row items-center">
         <div className="flex flex-col w-full md:w-3/5 justify-center items-start text-left">
           <motion.h1
             className="my-4 text-4xl md:text-5xl font-bold leading-tight"
@@ -12,7 +12,7 @@ export default function NotReadyHero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            Sorry...
+            Thank you for signing up!
             <br />
             We aren't quite ready for you yet.
           </motion.h1>
@@ -31,7 +31,7 @@ export default function NotReadyHero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.5 }}
           >
-            Don't worry, you'll be the first to know when we're ready for you!
+            But don't worry, you'll be the first to know when we're ready for you!
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}

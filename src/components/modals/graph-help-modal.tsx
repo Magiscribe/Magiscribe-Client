@@ -1,7 +1,15 @@
 import CustomModal from '../modal';
 
 interface ModalGraphHelpProps {
+  /**
+   * Whether the modal is open or not.
+   */
   open: boolean;
+
+  /**
+   * A callback triggered when the modal requests to be closed.
+   * @returns {void} Does not return anything.
+   */
   onClose: () => void;
 }
 

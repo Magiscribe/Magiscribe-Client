@@ -4,15 +4,18 @@ import { ChartProps } from '@/components/chart';
 import RatingInput from '@/components/graph/rating-input';
 import MarkdownCustom from '@/components/markdown-custom';
 import { useSetTitle } from '@/hooks/title-hook';
+import { useTranscribe } from '@/hooks/audio-hook';
 import { InquiryProvider, useInquiry } from '@/providers/inquiry-provider';
 import { StrippedNode } from '@/utils/graphs/graph';
 import { faChevronRight, faComments, faLightbulb, faPaperPlane, faRocket } from '@fortawesome/free-solid-svg-icons';
+import { faMicrophone, faMicrophoneSlash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import goHomeGif from '../assets/imgs/go-home.gif';
+import { SignedOut, SignUpButton } from '@clerk/clerk-react';
 
 /**
  * Represents a message in the chat.
@@ -35,18 +38,19 @@ const Container = ({ children }: { children: React.ReactNode }) => (
 /**
  * Main Inquiry component that handles the chat interface and inquiry flow.
  */
-function Inquiry() {
+function UserInquiryPage() {
   // States
   const [screen, setScreen] = useState<'start' | 'inquiry' | 'end' | 'summary'>('start');
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [selectedRatings, setSelectedRatings] = useState<string[]>([]);
   const [currentNode, setCurrentNode] = useState<StrippedNode | null>(null);
+  const { isTranscribing, transcript, handleTranscribe } = useTranscribe();
 
   // Hooks
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { handleNextNode, form, state, onNodeUpdate } = useInquiry();
+  const { handleNextNode, form, state, onNodeUpdate, userDetails, setUserDetails } = useInquiry();
 
   if (!id || !form) return null;
 
@@ -80,7 +84,6 @@ function Inquiry() {
 
   const onNodeVisit = (node: StrippedNode) => {
     if (node.type === 'end') {
-      console.log('End node reached');
       setScreen('end');
       return;
     }
@@ -94,6 +97,18 @@ function Inquiry() {
       }
     }
   };
+
+  /**
+   * Updates the prompt with the transcript.
+   * @param transcript {string} The transcript.
+   * @returns {void}
+   * @sideeffect Updates the prompt with the transcript.
+   */
+  useEffect(() => {
+    if (isTranscribing) {
+      setInputMessage((current) => current + transcript);
+    }
+  }, [transcript]);
 
   useEffect(() => {
     onNodeUpdate(onNodeVisit);
@@ -159,6 +174,39 @@ function Inquiry() {
           />
         </div>
 
+        {/* Ask for name and email */}
+        <div className="space-y-4">
+          <h3 className="text-xl md:text-2xl font-semibold text-indigo-900">Before we begin...</h3>
+          <p className="text-lg text-slate-700">
+            We would like to know a little bit about you before we start. These are not required fields, but we would
+            appreciate it if you could fill them out.
+          </p>
+          <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-gray-700">Name</label>
+              <input
+                type="text"
+                name="name"
+                placeholder="Your Name"
+                onChange={(e) => setUserDetails({ ...userDetails, name: e.target.value })}
+                value={userDetails.name}
+                className="w-full p-3 border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-gray-700">Email</label>
+              <input
+                type="email"
+                name="email"
+                placeholder="Your Email Address"
+                onChange={(e) => setUserDetails({ ...userDetails, email: e.target.value })}
+                value={userDetails.email}
+                className="w-full p-3 border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+          </form>
+        </div>
+
         <div className="text-center">
           <p className="text-lg mb-4 text-slate-700">Ready to start? Click the button below to begin!</p>
           <button
@@ -210,7 +258,7 @@ function Inquiry() {
             transition={{ duration: 0.5 }}
             className="space-y-4"
           >
-            {!state.loading && ((currentNode.data?.type ?? '') as string).startsWith('rating') && (
+            {!state.loading && screen !== 'end' && ((currentNode.data?.type ?? '') as string).startsWith('rating') && (
               <div>
                 <RatingInput
                   ratings={currentNode.data.ratings as string[]}
@@ -224,13 +272,25 @@ function Inquiry() {
 
             {screen === 'inquiry' && (
               <form onSubmit={handleSubmit} className="flex">
-                <input
-                  type="text"
-                  value={inputMessage}
-                  onChange={(e) => setInputMessage(e.target.value)}
-                  placeholder="Type your message here..."
-                  className="flex-grow p-2 sm:p-3 border border-slate-300 rounded-l-full text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
+                <div className="rounded-l-full flex-grow flex border border-slate-300">
+                  <button
+                    type="button"
+                    className="focus:outline-none text-black px-4 py-2 rounded-lg ml-2 mr-2 hover:from-indigo-700 hover:to-purple-700 transition-colors"
+                    onClick={handleTranscribe}
+                  >
+                    <FontAwesomeIcon
+                      icon={isTranscribing ? faMicrophone : faMicrophoneSlash}
+                      className={isTranscribing ? 'text-green-500' : ''}
+                    />
+                  </button>
+                  <input
+                    type="text"
+                    value={inputMessage}
+                    onChange={(e) => setInputMessage(e.target.value)}
+                    placeholder="Type your message here..."
+                    className="flex-grow p-2 sm:p-3 rounded-l-full text-slate-800 focus:outline-none"
+                  />
+                </div>
                 <button
                   type="submit"
                   className="px-6 py-2 sm:py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-r-full hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-300 ease-in-out disabled:opacity-70 disabled:cursor-not-allowed"
@@ -271,9 +331,21 @@ function Inquiry() {
         </p>
         <p className="text-lg text-slate-700">Thank you for your time... you can leave now!</p>
         <img src={goHomeGif} alt="Thank You" className="mx-auto rounded-3xl" />
-        <button onClick={() => handleReset()} className="text-indigo-600 hover:underline mt-4">
-          Restart Inquiry
-        </button>
+        <div className="w-full max-w-3xl mx-auto flex flex-col items-center">
+          {/* Form */}
+          <button onClick={() => handleReset()} className="text-indigo-600 hover:underline">
+            Restart Inquiry
+          </button>
+
+          <SignedOut>
+            <p className="text-lg text-center text-gray-600 mt-4">
+              Want to make your own inquiry?{' '}
+              <SignUpButton signInForceRedirectUrl="/dashboard" forceRedirectUrl="/dashboard">
+                <button className="text-lg text-indigo-600 hover:underline">Sign Up Now</button>
+              </SignUpButton>
+            </p>
+          </SignedOut>
+        </div>
       </div>
     );
   }
@@ -290,7 +362,7 @@ export default function InquiryWrapper() {
   return (
     <InquiryProvider id={id}>
       <Container>
-        <Inquiry />
+        <UserInquiryPage />
       </Container>
     </InquiryProvider>
   );
