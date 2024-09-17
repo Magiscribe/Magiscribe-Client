@@ -34,6 +34,8 @@ export interface GraphData {
 }
 
 interface ContextType {
+  initialized: boolean;
+
   id?: string;
   lastUpdated: Date;
   form: FormData;
@@ -60,6 +62,7 @@ const InquiryContext = createContext<ContextType | undefined>(undefined);
 
 function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   // States
+  const [initialized, setInitialized] = useState(false);
   const [subscriptionId] = useState<string>(uuidv4());
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   const [form, updateForm] = useState<FormData>({} as FormData);
@@ -82,6 +85,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
       setLastUpdated(new Date(getInquiry.updatedAt));
       updateForm(getInquiry.data.form);
       updateGraph(getInquiry.data.graph);
+      setInitialized(true);
     },
   });
 
@@ -191,6 +195,8 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   };
 
   const contextValue = {
+    initialized,
+
     id,
     lastUpdated,
     form,

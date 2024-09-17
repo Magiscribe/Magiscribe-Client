@@ -29,6 +29,7 @@ export default function InquiryBuilder() {
 
   // Hooks
   const {
+    initialized,
     form,
     graph,
     lastUpdated,
@@ -138,14 +139,16 @@ export default function InquiryBuilder() {
           </div>
         </div>
         <div className="flex-grow">
-          <GraphInput
-            nodes={graph.nodes}
-            setNodes={updateGraphNodes}
-            edges={graph.edges}
-            setEdges={updateGraphEdges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-          />
+          {initialized && (
+            <GraphInput
+              nodes={graph.nodes}
+              setNodes={updateGraphNodes}
+              edges={graph.edges}
+              setEdges={updateGraphEdges}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+            />
+          )}
         </div>
       </div>
 

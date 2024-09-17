@@ -19,12 +19,12 @@ import {
   useReactFlow,
   XYPosition,
 } from '@xyflow/react';
-import React, { DragEvent, useCallback, useRef, useState } from 'react';
+import React, { DragEvent, useRef, useState } from 'react';
+import colors from 'tailwindcss/colors';
 import CustomTooltip from '../controls/custom-tooltip';
 import CustomModal from '../modal';
 import ContextMenu from './context-menu';
 import { edgeTypes, nodeTypes, nodeTypesInfo } from './utils';
-import colors from 'tailwindcss/colors';
 
 const defaultEdgeOptions: DefaultEdgeOptions = {
   type: 'button',
@@ -123,7 +123,7 @@ function Flow({ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange }
     handleType?: 'source' | 'target' | null,
   ) => {
     newNode.current = {
-      position: screenToFlowPosition({ x, y }),
+      position: { x, y },
       source: handleType === 'source' ? connectedNodeId : undefined,
       target: handleType === 'target' ? connectedNodeId : undefined,
       type: '',
@@ -227,29 +227,26 @@ function Flow({ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange }
   /**
    * Handles dragging over the flow to allow dropping nodes.
    */
-  const onDragOver = useCallback((event: DragEvent<HTMLDivElement>) => {
+  const onDragOver = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = 'move';
-  }, []);
+  };
 
   /**
    * Handles dropping a node onto the flow.
    */
-  const onDrop = useCallback(
-    (event: DragEvent<HTMLDivElement>) => {
-      event.preventDefault();
-      const node = newNode.current;
-      if (!node) return;
+  const onDrop = (event: DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    const node = newNode.current;
+    if (!node) return;
 
-      node.position = screenToFlowPosition({
-        x: event.clientX - 125,
-        y: event.clientY,
-      });
+    node.position = screenToFlowPosition({
+      x: event.clientX,
+      y: event.clientY,
+    });
 
-      addNode();
-    },
-    [screenToFlowPosition, addNode],
-  );
+    addNode();
+  };
 
   const renderNodeButtonsSide = () =>
     Object.keys(nodeTypesInfo).map((type) => {
@@ -279,7 +276,7 @@ function Flow({ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange }
       );
     });
 
-  const renderNodeButtonsMenu = () =>
+  const renderNodeButtonsMenu = (position?: { x: number; y: number }, source?: string, target?: string) =>
     Object.keys(nodeTypesInfo).map((type) => {
       const disabled = !validateNewNode(type);
 
@@ -288,7 +285,12 @@ function Flow({ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange }
           key={type}
           disabled={disabled}
           onClick={(e) => {
-            newNode.current = { ...newNode.current, position: screenToFlowPosition({ x: e.clientX - 150, y: e.clientY }), type };
+            newNode.current = {
+              source,
+              target,
+              position: screenToFlowPosition({ x: (position?.x ?? e.clientX) - 125, y: position?.y ?? e.clientY }),
+              type,
+            };
             addNode();
             setMenu(null);
           }}
@@ -327,6 +329,8 @@ function Flow({ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange }
           onDrop={onDrop}
           onDragOver={onDragOver}
           fitView
+          minZoom={0.1}
+          maxZoom={2}
           defaultEdgeOptions={defaultEdgeOptions}
           proOptions={proOptions}
         >
@@ -351,7 +355,18 @@ function Flow({ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange }
 
         <div className="absolute bottom-0 left-0 p-4">
           <CustomModal open={addNodeModalOpen} onClose={() => setAddNodeModalOpen(false)} title="Add Node">
-            <div className="grid grid-cols-1 gap-4">{renderNodeButtonsMenu()}</div>
+            <div className="grid grid-cols-1 gap-4">
+              {renderNodeButtonsMenu(
+                newNode.current
+                  ? {
+                      x: newNode.current?.position.x,
+                      y: newNode.current?.position.y,
+                    }
+                  : undefined,
+                newNode.current?.source,
+                newNode.current?.target,
+              )}
+            </div>
           </CustomModal>
         </div>
       </div>
