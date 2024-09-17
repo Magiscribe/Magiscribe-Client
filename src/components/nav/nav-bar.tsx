@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
 import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from '@clerk/clerk-react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTitle } from '../../hooks/title-hook';
 import { Logo } from '../logo';

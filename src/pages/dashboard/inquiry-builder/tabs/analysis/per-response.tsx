@@ -1,12 +1,12 @@
-import React, { useMemo, useState, useCallback } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft, faChevronRight, faSpinner } from '@fortawesome/free-solid-svg-icons';
-import { useApolloClient, useMutation, useSubscription } from '@apollo/client';
 import { ADD_PREDICTION } from '@/clients/mutations';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
-import { getAgentIdByName } from '@/utils/agents';
-import { NodeVisitAnalysisData, TabProps } from '@/types/conversation';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
+import { NodeVisitAnalysisData, TabProps } from '@/types/conversation';
+import { getAgentIdByName } from '@/utils/agents';
+import { useApolloClient, useMutation, useSubscription } from '@apollo/client';
+import { faChevronLeft, faChevronRight, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useCallback, useMemo, useState } from 'react';
 
 type ResponseSummary = {
   [userId: string]: {
