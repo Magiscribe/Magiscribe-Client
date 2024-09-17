@@ -60,7 +60,7 @@ export function NavBar({ isFixed = true }) {
                   atTop ? 'bg-white text-slate-800' : 'bg-indigo-800 text-white'
                 }`}
               >
-                Get Pre-Alpha Access
+                Get Alpha Access
               </button>
             </SignUpButton>
           </SignedOut>

@@ -38,7 +38,7 @@ export default function ModalSendInquiry({ id, open, onClose }: ModalSendInquiry
 
   return (
     <CustomModal open={open} onClose={onClose} title="Send" size="4xl">
-      <p className="text-slate-600 mb-6">Send the link with anyone you want to get input from</p>
+      <p className="text-slate-600 mb-6">Send the link to anyone you want to get input from</p>
       <div className="flex items-stretch">
         <p className="flex-grow bg-white p-2 rounded-l-md border border-r-0 border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500">
           {link}
