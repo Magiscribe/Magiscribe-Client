@@ -1,12 +1,13 @@
-import { GET_INQUIRY, GET_INQUIRIES_RESPONSES } from '@/clients/queries';
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
+import { GET_INQUIRIES_RESPONSES, GET_INQUIRY } from '@/clients/queries';
+import { GetInquiryQuery, GetInquiryResponsesQuery } from '@/graphql/graphql';
 import { useQuery } from '@apollo/client';
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
 import React from 'react';
-import ViaChatTab from './via-chat';
 import PerQuestionTab from './per-question';
 import PerResponseTab from './per-response';
+import ViaChatTab from './via-chat';
 
 interface AnalysisTabProps {
   id: string;
@@ -17,7 +18,7 @@ const AnalysisTab: React.FC<AnalysisTabProps> = ({ id }) => {
     loading: graphLoading,
     data: inquiryData,
     error: graphError,
-  } = useQuery(GET_INQUIRY, {
+  } = useQuery<GetInquiryQuery>(GET_INQUIRY, {
     variables: { id },
     errorPolicy: 'all',
   });
@@ -26,7 +27,7 @@ const AnalysisTab: React.FC<AnalysisTabProps> = ({ id }) => {
     loading: dataLoading,
     data: inquiryResponseData,
     error: dataError,
-  } = useQuery(GET_INQUIRIES_RESPONSES, {
+  } = useQuery<GetInquiryResponsesQuery>(GET_INQUIRIES_RESPONSES, {
     variables: { id },
     errorPolicy: 'all',
   });
@@ -38,7 +39,7 @@ const AnalysisTab: React.FC<AnalysisTabProps> = ({ id }) => {
     id,
     form: inquiryData?.getInquiry?.data?.form,
     graph: inquiryData?.getInquiry?.data?.graph,
-    nodeVisitData: inquiryResponseData?.getInquiryResponses,
+    responses: inquiryResponseData?.getInquiryResponses ?? [],
   };
 
   const tabCategories = ['Per Response', 'Per Question', 'Via Chat'];

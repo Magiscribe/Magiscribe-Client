@@ -142,11 +142,6 @@ function Flow({ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange }
       return false;
     }
 
-    // If there is more than one end node, don't allow adding another
-    if (type === 'end' && nodes.some((node) => node.type === 'end')) {
-      return false;
-    }
-
     return true;
   };
 
@@ -256,36 +251,63 @@ function Flow({ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange }
     [screenToFlowPosition, addNode],
   );
 
+  const renderNodeButtonsSide = () =>
+    Object.keys(nodeTypesInfo).map((type) => {
+      const disabled = !validateNewNode(type);
+
+      return (
+        <div key={type} className="w-full flex items-center">
+          <button
+            draggable={!disabled}
+            onDragStart={() => (disabled ? null : onDragStart(type))}
+            disabled={disabled}
+            className="w-full max-w-xs px-4 py-2 bg-white border-2 border-slate-400 text-slate-800 font-semibold text-sm rounded-xl shadow-lg disabled:opacity-50 text-left"
+          >
+            <FontAwesomeIcon
+              icon={nodeTypesInfo[type as keyof typeof nodeTypesInfo].icon}
+              className="mr-2 text-blue-600"
+            />
+            {type.charAt(0).toUpperCase() + type.slice(1)}
+          </button>
+          <CustomTooltip
+            triggerOnHover
+            render={() => <FontAwesomeIcon icon={faQuestionCircle} className="ml-2 text-slate-400" />}
+          >
+            <p className="text-xs font-normal">{nodeTypesInfo[type as keyof typeof nodeTypesInfo].description}</p>
+          </CustomTooltip>
+        </div>
+      );
+    });
+
+  const renderNodeButtonsMenu = () =>
+    Object.keys(nodeTypesInfo).map((type) => {
+      const disabled = !validateNewNode(type);
+
+      return (
+        <button
+          key={type}
+          disabled={disabled}
+          onClick={(e) => {
+            newNode.current = { position: screenToFlowPosition({ x: e.clientX - 150, y: e.clientY }), type };
+            addNode();
+            setMenu(null);
+          }}
+          className="w-full px-4 py-2 bg-blue-600 text-white rounded-xl disabled:opacity-50"
+        >
+          {type.charAt(0).toUpperCase() + type.slice(1)} Node
+        </button>
+      );
+    });
+
   return (
     <div className="relative w-full h-full text-black">
       <div className="absolute h-full p-4 space-y-4 flex flex-col items-end z-10">
-        <h3 className="w-full text-xl font-semibold text-left text-white">Nodes</h3>
-        {Object.keys(nodeTypesInfo).map((type) => {
-          const disabled = !validateNewNode(type);
-
-          return (
-            <div key={type} className="w-full flex items-center">
-              <button
-                draggable={!disabled}
-                onDragStart={() => (disabled ? null : onDragStart(type))}
-                disabled={disabled}
-                className="w-full max-w-xs px-4 py-2 bg-white text-black font-semibold text-sm rounded-xl shadow-lg disabled:opacity-50 text-left"
-              >
-                <FontAwesomeIcon
-                  icon={nodeTypesInfo[type as keyof typeof nodeTypesInfo].icon}
-                  className="mr-2 text-blue-700"
-                />
-                {type.charAt(0).toUpperCase() + type.slice(1)}
-              </button>
-              <CustomTooltip
-                triggerOnHover
-                render={() => <FontAwesomeIcon icon={faQuestionCircle} className="ml-2 text-slate-400" />}
-              >
-                <p className="text-xs font-normal">{nodeTypesInfo[type as keyof typeof nodeTypesInfo].description}</p>
-              </CustomTooltip>
-            </div>
-          );
-        })}
+        <h3 className="w-full text-xl font-semibold text-left text-white">
+          Nodes
+          <br />
+          <span className="-mt-2 text-xs">Drag and drop to add nodes</span>
+        </h3>
+        {renderNodeButtonsSide()}
       </div>
       <div className="w-full h-full text-black" ref={reactFlowWrapper}>
         <ReactFlow
@@ -324,50 +346,12 @@ function Flow({ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange }
             // TODO: Handle locking the graph.
             showInteractive={false}
           />
-          {menu && (
-            <ContextMenu
-              buttons={Object.keys(nodeTypesInfo).map((type) => {
-                const disabled = !validateNewNode(type);
-
-                return (
-                  <button
-                    key={type}
-                    disabled={disabled}
-                    onClick={(e) => {
-                      newNode.current = { position: screenToFlowPosition({ x: e.clientX - 150, y: e.clientY }), type };
-                      addNode();
-                      setMenu(null);
-                    }}
-                    className="w-44 px-4 py-2 bg-blue-600 text-white rounded-xl disabled:opacity-50"
-                  >
-                    {type.charAt(0).toUpperCase() + type.slice(1)} Node
-                  </button>
-                );
-              })}
-              {...menu}
-            />
-          )}
+          {menu && <ContextMenu buttons={renderNodeButtonsMenu()} {...menu} />}
         </ReactFlow>
 
         <div className="absolute bottom-0 left-0 p-4">
           <CustomModal open={addNodeModalOpen} onClose={() => setAddNodeModalOpen(false)} title="Add Node">
-            <div className="grid grid-cols-1 gap-4">
-              {Object.keys(nodeTypes)
-                .filter((type) => type !== 'start')
-                .sort()
-                .map((type) => (
-                  <button
-                    key={type}
-                    onClick={() => {
-                      newNode.current!.type = type;
-                      addNode();
-                    }}
-                    className="w-full px-4 py-2 bg-blue-600 text-white rounded-xl"
-                  >
-                    {type.charAt(0).toUpperCase() + type.slice(1)} Node
-                  </button>
-                ))}
-            </div>
+            <div className="grid grid-cols-1 gap-4">{renderNodeButtonsMenu()}</div>
           </CustomModal>
         </div>
       </div>

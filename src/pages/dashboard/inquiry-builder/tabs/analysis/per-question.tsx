@@ -1,18 +1,12 @@
-import React, { useMemo, useState, useCallback } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft, faChevronRight, faSpinner } from '@fortawesome/free-solid-svg-icons';
-import { useApolloClient, useMutation, useSubscription } from '@apollo/client';
 import { ADD_PREDICTION } from '@/clients/mutations';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
-import { getAgentIdByName } from '@/utils/agents';
-import {
-  GraphNode,
-  ConversationNodeData,
-  TabProps,
-  IndividualConversationData,
-  NodeVisitAnalysisData,
-} from '@/types/conversation';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
+import { ConversationNodeData, GraphNode, NodeVisitAnalysisData, TabProps } from '@/types/conversation';
+import { getAgentIdByName } from '@/utils/agents';
+import { useApolloClient, useMutation, useSubscription } from '@apollo/client';
+import { faChevronLeft, faChevronRight, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React, { useCallback, useMemo, useState } from 'react';
 
 export type ResponseSummary = {
   [nodeId: string]: {
@@ -32,7 +26,7 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
   const [subscriptionId] = useState<string>(`per_question_summary_${Date.now()}`);
   const [summaries, setSummaries] = useWithLocalStorage<ResponseSummary>({}, `${data.id}-per-question-summary`);
-  const { graph, nodeVisitData: responses } = data;
+  const { graph, responses } = data;
 
   const client = useApolloClient();
   const [addPrediction] = useMutation(ADD_PREDICTION);
@@ -48,8 +42,8 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
 
   const groupedResponses = useMemo(() => {
     const grouped: { [nodeId: string]: { [id: string]: NodeVisitAnalysisData[] } } = {};
-    responses.forEach((response: IndividualConversationData) => {
-      response.data.forEach((nodeVisit: NodeVisitAnalysisData) => {
+    responses.forEach((response) => {
+      response.data.history.forEach((nodeVisit: NodeVisitAnalysisData) => {
         if (!grouped[nodeVisit.id]) {
           grouped[nodeVisit.id] = {};
         }

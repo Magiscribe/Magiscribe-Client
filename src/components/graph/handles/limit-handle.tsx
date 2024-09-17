@@ -16,7 +16,7 @@ const CustomHandle = (props: CustomHandleProps) => {
     <Handle
       {...rest}
       isConnectable={connections.length < connectionCount}
-      className={connections.length < connectionCount ? 'w-4 h-4 !bg-teal-500' : 'opacity-0'}
+      className={connections.length < connectionCount ? 'w-4 h-4 !bg-green-500' : 'opacity-0'}
     />
   );
 };

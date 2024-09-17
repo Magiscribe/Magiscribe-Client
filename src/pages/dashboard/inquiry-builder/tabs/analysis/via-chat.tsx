@@ -96,7 +96,7 @@ export default function ViaChatTab({ data }: TabProps) {
             variables: {
               userMessage: inputMessage,
               conversationData: JSON.stringify(data),
-              numResponses: data.nodeVisitData.length,
+              numResponses: data.responses?.length ?? 0,
             },
           },
         });
@@ -113,7 +113,7 @@ export default function ViaChatTab({ data }: TabProps) {
     setMessages([]);
   };
 
-  if (!data.nodeVisitData) return <div className="p-4">No data available</div>;
+  if (!data.responses) return <div className="p-4">No data available</div>;
 
   return (
     <div className="bg-white px-4 py-8 rounded-2xl shadow-xl text-slate-700">

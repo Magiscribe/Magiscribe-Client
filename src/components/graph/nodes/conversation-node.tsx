@@ -63,7 +63,7 @@ export default function ConversationNode({ id, data }: ConversationNodeProps) {
               name="dynamicGeneration"
               checked={data.dynamicGeneration}
               onChange={(e) => handleUpdate({ dynamicGeneration: e.target.checked })}
-              className="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 focus:ring-2"
+              className="w-4 h-4 bg-inherit text-blue-600 rounded border-gray-300 focus:ring-blue-500 focus:ring-2"
             />
             <span className="ml-2 text-sm text-gray-700">Enable</span>
           </div>
@@ -74,7 +74,7 @@ export default function ConversationNode({ id, data }: ConversationNodeProps) {
             name="type"
             value={data.type}
             onChange={(e) => handleUpdate({ type: e.target.value as NodeType })}
-            className="w-full px-3 py-2 bg-white rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 appearance-none"
+            className="w-full px-3 py-2 bg-inherit rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 appearance-none"
           >
             {Object.values(NodeType).map((value) => (
               <option key={value} value={value} className="py-1">
@@ -92,7 +92,7 @@ export default function ConversationNode({ id, data }: ConversationNodeProps) {
             onChange={(e) => handleUpdate({ text: e.target.value })}
             rows={1}
             placeholder="Enter your text here..."
-            className="w-full px-3 py-2 bg-white rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 resize-none overflow-hidden"
+            className="w-full px-3 py-2 bg-inherit rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 resize-none overflow-hidden"
           />
         </div>
         {(data.type === NodeType.RatingSingle || data.type === NodeType.RatingMulti) && (
@@ -104,7 +104,7 @@ export default function ConversationNode({ id, data }: ConversationNodeProps) {
                   type="text"
                   defaultValue={rating}
                   onChange={(e) => handleRatingChange(index, e.target.value)}
-                  className="flex-grow px-3 py-2 bg-white rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                  className="flex-grow px-3 py-2 bg-inherit rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
                 />
                 <button
                   onClick={() => removeRating(index)}
@@ -123,8 +123,8 @@ export default function ConversationNode({ id, data }: ConversationNodeProps) {
           </div>
         )}
       </div>
-      <Handle type="target" position={Position.Top} className="w-4 h-4 !bg-teal-500" />
-      <CustomHandle connectionCount={1} type="source" position={Position.Bottom} className="w-4 h-4 !bg-teal-500" />
+      <Handle type="target" position={Position.Top} className="w-4 h-4 !bg-green-500" />
+      <CustomHandle connectionCount={1} type="source" position={Position.Bottom} className="w-4 h-4 !bg-green-500" />
     </NodeContainer>
   );
 }

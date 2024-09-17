@@ -9,6 +9,9 @@ import { Link, useParams } from 'react-router-dom';
 import AnalysisTab from './tabs/analysis';
 import InquiryBuilder from './tabs/builder';
 import ModalSendInquiry from '@/components/modals/send-inquiry-modal';
+import { useQuery } from '@apollo/client';
+import { GET_INQUIRY_RESPONSE_COUNT } from '@/clients/queries';
+import { GetInquiryResponseCountQuery } from '@/graphql/graphql';
 
 export default function InquiryPage() {
   // Hooks
@@ -16,6 +19,13 @@ export default function InquiryPage() {
 
   // States
   const [sendModalOpen, setSendModalOpen] = useState(false);
+
+  const { data: responseCountData } = useQuery<GetInquiryResponseCountQuery>(GET_INQUIRY_RESPONSE_COUNT, {
+    variables: { id },
+  });
+
+  const responseCount = responseCountData?.getInquiryResponseCount;
+  const tabs = ['Builder', `Analysis${responseCount ? ` (${responseCount})` : ''}`];
 
   if (!id) {
     return <></>;
@@ -41,7 +51,7 @@ export default function InquiryPage() {
       </div>
       <TabGroup>
         <TabList className="flex space-x-1 rounded-xl border-2 border-white mb-4">
-          {['Builder', 'Analysis'].map((category) => (
+          {tabs.map((category) => (
             <Tab
               key={category}
               className={({ selected }) =>

@@ -159,7 +159,10 @@ export const GET_INQUIRIES_RESPONSES = gql`
     getInquiryResponses(id: $id) {
       id
       userId
-      data
+      data {
+        userDetails
+        history
+      }
       createdAt
       updatedAt
     }

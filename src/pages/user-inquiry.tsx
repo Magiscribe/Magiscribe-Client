@@ -50,7 +50,7 @@ function UserInquiryPage() {
   // Hooks
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { handleNextNode, form, state, onNodeUpdate } = useInquiry();
+  const { handleNextNode, form, state, onNodeUpdate, userDetails, setUserDetails } = useInquiry();
 
   if (!id || !form) return null;
 
@@ -84,7 +84,6 @@ function UserInquiryPage() {
 
   const onNodeVisit = (node: StrippedNode) => {
     if (node.type === 'end') {
-      console.log('End node reached');
       setScreen('end');
       return;
     }
@@ -99,17 +98,17 @@ function UserInquiryPage() {
     }
   };
 
-    /**
+  /**
    * Updates the prompt with the transcript.
    * @param transcript {string} The transcript.
    * @returns {void}
    * @sideeffect Updates the prompt with the transcript.
    */
-    useEffect(() => {
-      if (isTranscribing) {
-        setInputMessage((current) => current + transcript)
-      }
-    }, [transcript]);
+  useEffect(() => {
+    if (isTranscribing) {
+      setInputMessage((current) => current + transcript);
+    }
+  }, [transcript]);
 
   useEffect(() => {
     onNodeUpdate(onNodeVisit);
@@ -173,6 +172,39 @@ function UserInquiryPage() {
             description="Get instant feedback on your responses."
             color="bg-gradient-to-r from-purple-600 to-fuchsia-600"
           />
+        </div>
+
+        {/* Ask for name and email */}
+        <div className="space-y-4">
+          <h3 className="text-xl md:text-2xl font-semibold text-indigo-900">Before we begin...</h3>
+          <p className="text-lg text-slate-700">
+            We would like to know a little bit about you before we start. These are not required fields, but we would
+            appreciate it if you could fill them out.
+          </p>
+          <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-gray-700">Name</label>
+              <input
+                type="text"
+                name="name"
+                placeholder="Your Name"
+                onChange={(e) => setUserDetails({ ...userDetails, name: e.target.value })}
+                value={userDetails.name}
+                className="w-full p-3 border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-gray-700">Email</label>
+              <input
+                type="email"
+                name="email"
+                placeholder="Your Email Address"
+                onChange={(e) => setUserDetails({ ...userDetails, email: e.target.value })}
+                value={userDetails.email}
+                className="w-full p-3 border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+          </form>
         </div>
 
         <div className="text-center">
@@ -253,7 +285,10 @@ function UserInquiryPage() {
                     className="focus:outline-none text-black px-4 py-2 rounded-lg ml-2 hover:from-indigo-700 hover:to-purple-700 transition-colors"
                     onClick={handleTranscribe}
                   >
-                    <FontAwesomeIcon icon={isTranscribing ? faMicrophone : faMicrophoneSlash} className={isTranscribing ? "text-green-500" : ""}/>
+                    <FontAwesomeIcon
+                      icon={isTranscribing ? faMicrophone : faMicrophoneSlash}
+                      className={isTranscribing ? 'text-green-500' : ''}
+                    />
                   </button>
                 </div>
                 <button

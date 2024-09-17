@@ -125,19 +125,17 @@ export const DELETE_INQUIRY = gql`
 `;
 
 export const CREATE_INQUIRY_RESPONSE = gql`
-  mutation createInquiryResponse($inquiryId: ID!, $data: [JSONObject!]!) {
+  mutation createInquiryResponse($inquiryId: ID!, $data: JSONObject!) {
     upsertInquiryResponse(inquiryId: $inquiryId, data: $data) {
       id
-      data
     }
   }
 `;
 
 export const UPDATE_INQUIRY_RESPONSE = gql`
-  mutation updateInquiryResponse($id: ID, $inquiryId: ID!, $data: [JSONObject!]!) {
-    upsertInquiryResponse(id: $id, inquiryId: $inquiryId, data: $data) {
+  mutation updateInquiryResponse($id: ID, $inquiryId: ID!, $data: JSONObject!, $fields: [String!]) {
+    upsertInquiryResponse(id: $id, inquiryId: $inquiryId, data: $data, fields: $fields) {
       id
-      data
     }
   }
 `;

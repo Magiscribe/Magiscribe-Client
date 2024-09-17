@@ -4,14 +4,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useCallback, useEffect, useState } from 'react';
 import { GET_ALL_AGENTS } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
-import { useElevenLabsAudio } from '@/hooks/audio-player';
 import ListBox from '@/components/list/ListBox';
-import { Agent } from '@/types/agents';
-import { useTranscribe } from '@/hooks/audio-hook';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
 import { ADD_PREDICTION } from '@/clients/mutations';
 import { CustomVariable, CustomVariablesSection } from '@/components/custom-variables';
-import { AddPredictionMutation, GetAllAgentsQuery } from '@/graphql/graphql';
+import useElevenLabsAudio from '@/hooks/audio-player';
+import { Agent } from '@/graphql/graphql';
 
 interface predictionAdded {
   id: string;
@@ -49,8 +47,8 @@ export default function PlaygroundDashboard() {
   const [base64Images, setBase64Images] = useState<string[]>([]);
 
   // Queries and Mutations
-  const { data: agents } = useQuery<GetAllAgentsQuery>(GET_ALL_AGENTS);
-  const [addPrediction] = useMutation<AddPredictionMutation>(ADD_PREDICTION);
+  const { data: agents } = useQuery(GET_ALL_AGENTS);
+  const [addPrediction] = useMutation(ADD_PREDICTION);
 
   // Text to speech
   const [enableAudio, setEnableAudio] = useState(false);
@@ -224,8 +222,8 @@ export default function PlaygroundDashboard() {
                     agent: value.id,
                   })
                 }
-                selected={(agents?.getAllAgents ?? []).find((agent) => agent.id === form.agent)}
-                values={(agents?.getAllAgents ?? []).map((agent) => ({
+                selected={(agents?.getAllAgents ?? []).find((agent: Agent) => agent.id === form.agent)}
+                values={(agents?.getAllAgents ?? []).map((agent: Agent) => ({
                   name: agent.name ?? '',
                   id: agent.id,
                 }))}

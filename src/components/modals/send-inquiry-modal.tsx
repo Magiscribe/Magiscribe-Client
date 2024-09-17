@@ -22,7 +22,7 @@ interface ModalSendInquiryProps {
 }
 
 export default function ModalSendInquiry({ id, open, onClose }: ModalSendInquiryProps) {
-  const link = `${window.location.origin}/inquiry-builder/${id}`;
+  const link = `${window.location.origin}/inquiry/${id}`;
 
   // Hooks
   const alert = useAddAlert();

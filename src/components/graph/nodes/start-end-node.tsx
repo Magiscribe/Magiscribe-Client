@@ -15,7 +15,7 @@ function StartEndNode({ id, type }: StartEndNodeProps) {
         connectionCount={1}
         type={type === 'start' ? 'source' : 'target'}
         position={type === 'start' ? Position.Bottom : Position.Top}
-        className="w-4 h-4 !bg-teal-500"
+        className="w-4 h-4 !bg-green-500"
       />
     </NodeContainer>
   );

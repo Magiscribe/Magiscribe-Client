@@ -15,25 +15,28 @@ type ResponseSummary = {
   };
 };
 
-const PerResponseTab: React.FC<TabProps> = ({ data }) => {
+export default function PerResponseTab({ data }: TabProps) {
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
   const [subscriptionId] = useState<string>(`per_response_summary_${Date.now()}`);
   const [summaries, setSummaries] = useWithLocalStorage<ResponseSummary>({}, `${data.id}-per-response-summary`);
 
-  const { nodeVisitData = [], graph } = data;
+  const { responses = [], graph } = data;
   const usersPerPage = 42;
 
   const client = useApolloClient();
   const [addPrediction] = useMutation(ADD_PREDICTION);
 
-  if (!nodeVisitData.length) return <div className="p-4">No data available</div>;
+  if (!responses?.length) return <div className="p-4">No data available</div>;
 
   const nodesMap = useMemo(
     () => Object.fromEntries((graph?.nodes || []).map((node) => [node.id, node])),
     [graph?.nodes],
   );
+
+  const userResponse = responses.find((u) => u.id === selectedUser);
+  const userData = userResponse?.data.history ?? [];
 
   const generateSummary = useCallback(async () => {
     if (!selectedUser) return;
@@ -42,8 +45,7 @@ const PerResponseTab: React.FC<TabProps> = ({ data }) => {
     const agentId = await getAgentIdByName('Stakeholder | Per Question Summary', client);
 
     if (agentId) {
-      const userResponses = nodeVisitData.find((u) => u.id === selectedUser)?.data || [];
-      const formattedResponses = userResponses.map((node) => ({
+      const formattedResponses = userData.map((node) => ({
         question: node.data?.text || '',
         answer: node.data?.response?.text || '',
         ratings: node.data?.response?.ratings?.join(', ') || 'No rating',
@@ -70,7 +72,7 @@ const PerResponseTab: React.FC<TabProps> = ({ data }) => {
       console.error('Per Response Summary Agent not found');
       setIsGeneratingSummary(false);
     }
-  }, [selectedUser, nodeVisitData, client, addPrediction, subscriptionId]);
+  }, [selectedUser, responses, client, addPrediction, subscriptionId]);
 
   useSubscription(GRAPHQL_SUBSCRIPTION, {
     variables: {
@@ -124,8 +126,8 @@ const PerResponseTab: React.FC<TabProps> = ({ data }) => {
     return null;
   };
 
-  const totalPages = Math.ceil(nodeVisitData.length / usersPerPage);
-  const displayedUsers = nodeVisitData.slice(currentPage * usersPerPage, (currentPage + 1) * usersPerPage);
+  const totalPages = Math.ceil(responses.length / usersPerPage);
+  const displayedUsers = responses.slice(currentPage * usersPerPage, (currentPage + 1) * usersPerPage);
 
   return (
     <div className="bg-white px-4 py-8 rounded-2xl shadow-xl text-slate-700">
@@ -154,7 +156,7 @@ const PerResponseTab: React.FC<TabProps> = ({ data }) => {
       <div className="my-4">
         <h2 className="font-bold mb-2">Select User</h2>
         <div className="grid grid-cols-4 sm:grid-col-3 lg:grid-cols-4 gap-2">
-          {displayedUsers.map(({ id, userId }) => (
+          {displayedUsers.map(({ id, userId, data }) => (
             <button
               key={`${id}-${userId}`}
               onClick={() => setSelectedUser((prev) => (prev === id ? null : (id as string)))}
@@ -162,11 +164,11 @@ const PerResponseTab: React.FC<TabProps> = ({ data }) => {
                 selectedUser === id ? 'bg-blue-500 text-white' : 'bg-slate-200 text-black'
               }`}
             >
-              {id || 'Unknown'}
+              {data.userDetails?.name || 'Unknown'} ({id})
             </button>
           ))}
         </div>
-        {nodeVisitData.length > usersPerPage && (
+        {responses.length > usersPerPage && (
           <div className="flex justify-end mt-4 space-x-2">
             {[faChevronLeft, faChevronRight].map((icon, index) => (
               <button
@@ -195,22 +197,18 @@ const PerResponseTab: React.FC<TabProps> = ({ data }) => {
           </h2>
         )}
         {selectedUser &&
-          nodeVisitData
-            .find((u) => u.id === selectedUser)
-            ?.data?.map((node, i) => {
-              const graphNode = nodesMap[node.id];
-              if (graphNode?.type === 'conversation') {
-                return (
-                  <div key={i} className="mb-4 p-4 bg-slate-200 rounded-2xl">
-                    {renderNodeContent(node)}
-                  </div>
-                );
-              }
-              return null;
-            })}
+          userData.map((node, i) => {
+            const graphNode = nodesMap[node.id];
+            if (graphNode?.type === 'conversation') {
+              return (
+                <div key={i} className="mb-4 p-4 bg-slate-200 rounded-2xl">
+                  {renderNodeContent(node)}
+                </div>
+              );
+            }
+            return null;
+          })}
       </div>
     </div>
   );
-};
-
-export default PerResponseTab;
+}

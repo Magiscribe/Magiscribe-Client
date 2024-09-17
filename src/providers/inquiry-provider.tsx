@@ -6,7 +6,7 @@ import { getAgentIdByName } from '@/utils/agents';
 import { NodeData, OptimizedNode } from '@/utils/graphs/graph';
 import { GraphManager } from '@/utils/graphs/graph-manager';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
-import React, { createContext, useCallback, useContext, useRef, useState } from 'react';
+import React, { createContext, useContext, useRef, useState } from 'react';
 
 interface InquiryProviderProps {
   children: React.ReactNode;
@@ -35,6 +35,10 @@ const INITIAL_STATE: State = {
 interface InquiryContextType {
   handleNextNode: (props?: HandleNextNodeProps) => Promise<void>;
   onNodeUpdate: (callback: (node: OptimizedNode) => void) => void;
+
+  userDetails: { [key: string]: string };
+  setUserDetails: React.Dispatch<React.SetStateAction<{ [key: string]: string }>>;
+
   form: { [key: string]: string };
   state: State;
 }
@@ -50,6 +54,7 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
   const errorCountRef = useRef<number>(0);
 
   // States
+  const [userDetails, setUserDetails] = useState<{ [key: string]: string }>({});
   const [state, setState] = useState<State>({
     loading: false,
     initialized: false,
@@ -146,43 +151,46 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
    * @param {HandleNextNodeProps} props - The next node ID and data to pass to the next node.
    * @returns {Promise<void>} A promise that resolves when the next node is visited
    */
-  const handleNextNode = useCallback(
-    async ({ nextNodeId, data }: HandleNextNodeProps = {}) => {
-      if (!graphRef.current) return;
+  const handleNextNode = async ({ nextNodeId, data }: HandleNextNodeProps = {}) => {
+    if (!graphRef.current) return;
 
-      setState((prev) => ({ ...prev, loading: true }));
+    setState((prev) => ({ ...prev, loading: true }));
 
-      if (!inquiryResponseIdRef.current) {
-        const result = await createResponse({
-          variables: {
-            inquiryId: id,
-            data: graphRef.current.getNodeHistory(),
+    if (!inquiryResponseIdRef.current) {
+      const result = await createResponse({
+        variables: {
+          inquiryId: id,
+          data: {
+            userDetails,
+            history: graphRef.current.getNodeHistory(),
           },
-        });
-        inquiryResponseIdRef.current = result.data?.upsertInquiryResponse.id;
-      } else {
-        await updateResponse({
-          variables: {
-            id: inquiryResponseIdRef.current,
-            inquiryId: id,
-            data: graphRef.current.getNodeHistory(),
+        },
+      });
+      inquiryResponseIdRef.current = result.data?.upsertInquiryResponse.id;
+    } else {
+      await updateResponse({
+        variables: {
+          id: inquiryResponseIdRef.current,
+          inquiryId: id,
+          data: {
+            history: graphRef.current.getNodeHistory(),
           },
-        });
-      }
+          fields: ['history'],
+        },
+      });
+    }
 
-      const carryOverData = graphRef.current.getCurrentNode()?.data;
-      await graphRef.current.updateCurrentNodeData({ response: data, ...carryOverData });
-      await graphRef.current.goToNextNode(nextNodeId);
-    },
-    [createResponse, id, updateResponse],
-  );
+    const carryOverData = graphRef.current.getCurrentNode()?.data;
+    await graphRef.current.updateCurrentNodeData({ response: data, ...carryOverData });
+    await graphRef.current.goToNextNode(nextNodeId);
+  };
 
   /**
    * Handles when a new node is visited.
    * @param node {OptimizedNode} The node that was visited
    * @returns {Promise<void>} A promise that resolves when the node is visited
    */
-  const handleOnNodeVisit = useCallback(async (node: OptimizedNode) => {
+  const handleOnNodeVisit = async (node: OptimizedNode) => {
     if (node.data?.dynamicGeneration) {
       await handleDynamicGeneration();
     } else if (node.type === 'condition') {
@@ -191,7 +199,7 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
       setState((prev) => ({ ...prev, loading: false }));
       onNodeUpdateRef.current(node);
     }
-  }, []);
+  };
 
   /**
    * Handles visiting a node with dynamic generation.
@@ -199,7 +207,7 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
    * on the node. A callback is triggered at the end to notify subscribers of the new node data.
    * @returns {Promise<void>} A promise that resolves when the dynamic generation is complete
    */
-  const handleDynamicGeneration = useCallback(async () => {
+  const handleDynamicGeneration = async () => {
     // Base Case 1: The graph manager is initialized.
     if (!graphRef.current) return;
 
@@ -234,9 +242,9 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
         onNodeUpdateRef.current(currentNode);
       }
     };
-  }, [addPrediction, client, subscriptionId]);
+  };
 
-  const handleConditionNode = useCallback(async () => {
+  const handleConditionNode = async () => {
     // Base Case 1: The graph manager is initialized.
     if (!graphRef.current) return;
 
@@ -261,13 +269,13 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
         data: result,
       });
     };
-  }, [addPrediction, client, handleNextNode, subscriptionId]);
+  };
 
   /**
    * Converts the node history into a readable conversation format
    * @returns {string} A stringified version of the conversation history
    */
-  const addNodeToHistory = useCallback((node: OptimizedNode) => {
+  const addNodeToHistory = (node: OptimizedNode) => {
     if (!node.data) return;
 
     const { type, data } = node as { type: string; data: { [key: string]: { [key: string]: string } } };
@@ -291,13 +299,17 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
     if (conversation) {
       inquiryHistoryRef.current.push(conversation);
     }
-  }, []);
+  };
 
-  const contextValue = {
-    onNodeUpdate: useCallback((callback: (node: OptimizedNode) => void) => {
+  const contextValue: InquiryContextType = {
+    onNodeUpdate: (callback: (node: OptimizedNode) => void) => {
       onNodeUpdateRef.current = callback;
-    }, []),
+    },
     handleNextNode,
+
+    userDetails,
+    setUserDetails,
+
     form: formRef.current,
     state,
   };

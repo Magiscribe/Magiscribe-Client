@@ -91,10 +91,16 @@ export type Inquiry = {
 export type InquiryResponse = {
   __typename?: 'InquiryResponse';
   createdAt: Scalars['Float']['output'];
-  data: Array<Scalars['JSONObject']['output']>;
+  data: InquiryResponseData;
   id: Scalars['ID']['output'];
   updatedAt: Scalars['Float']['output'];
   userId?: Maybe<Scalars['ID']['output']>;
+};
+
+export type InquiryResponseData = {
+  __typename?: 'InquiryResponseData';
+  history: Array<Scalars['JSONObject']['output']>;
+  userDetails?: Maybe<Scalars['JSONObject']['output']>;
 };
 
 export type Model = {
@@ -169,7 +175,8 @@ export type MutationUpsertInquiryArgs = {
 };
 
 export type MutationUpsertInquiryResponseArgs = {
-  data: Array<Scalars['JSONObject']['input']>;
+  data: Scalars['JSONObject']['input'];
+  fields?: InputMaybe<Array<Scalars['String']['input']>>;
   id?: InputMaybe<Scalars['ID']['input']>;
   inquiryId: Scalars['ID']['input'];
 };
@@ -408,23 +415,24 @@ export type DeleteInquiryMutation = {
 
 export type CreateInquiryResponseMutationVariables = Exact<{
   inquiryId: Scalars['ID']['input'];
-  data: Array<Scalars['JSONObject']['input']> | Scalars['JSONObject']['input'];
+  data: Scalars['JSONObject']['input'];
 }>;
 
 export type CreateInquiryResponseMutation = {
   __typename?: 'Mutation';
-  upsertInquiryResponse: { __typename?: 'InquiryResponse'; id: string; data: Array<any> };
+  upsertInquiryResponse: { __typename?: 'InquiryResponse'; id: string };
 };
 
 export type UpdateInquiryResponseMutationVariables = Exact<{
   id?: InputMaybe<Scalars['ID']['input']>;
   inquiryId: Scalars['ID']['input'];
-  data: Array<Scalars['JSONObject']['input']> | Scalars['JSONObject']['input'];
+  data: Scalars['JSONObject']['input'];
+  fields?: InputMaybe<Array<Scalars['String']['input']> | Scalars['String']['input']>;
 }>;
 
 export type UpdateInquiryResponseMutation = {
   __typename?: 'Mutation';
-  upsertInquiryResponse: { __typename?: 'InquiryResponse'; id: string; data: Array<any> };
+  upsertInquiryResponse: { __typename?: 'InquiryResponse'; id: string };
 };
 
 export type GetAllModelsQueryVariables = Exact<{ [key: string]: never }>;
@@ -580,9 +588,9 @@ export type GetInquiryResponsesQuery = {
     __typename?: 'InquiryResponse';
     id: string;
     userId?: string | null;
-    data: Array<any>;
     createdAt: number;
     updatedAt: number;
+    data: { __typename?: 'InquiryResponseData'; userDetails?: any | null; history: Array<any> };
   }> | null;
 };
 
@@ -1177,13 +1185,7 @@ export const CreateInquiryResponseDocument = {
         {
           kind: 'VariableDefinition',
           variable: { kind: 'Variable', name: { kind: 'Name', value: 'data' } },
-          type: {
-            kind: 'NonNullType',
-            type: {
-              kind: 'ListType',
-              type: { kind: 'NonNullType', type: { kind: 'NamedType', name: { kind: 'Name', value: 'JSONObject' } } },
-            },
-          },
+          type: { kind: 'NonNullType', type: { kind: 'NamedType', name: { kind: 'Name', value: 'JSONObject' } } },
         },
       ],
       selectionSet: {
@@ -1206,10 +1208,7 @@ export const CreateInquiryResponseDocument = {
             ],
             selectionSet: {
               kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'data' } },
-              ],
+              selections: [{ kind: 'Field', name: { kind: 'Name', value: 'id' } }],
             },
           },
         ],
@@ -1238,12 +1237,14 @@ export const UpdateInquiryResponseDocument = {
         {
           kind: 'VariableDefinition',
           variable: { kind: 'Variable', name: { kind: 'Name', value: 'data' } },
+          type: { kind: 'NonNullType', type: { kind: 'NamedType', name: { kind: 'Name', value: 'JSONObject' } } },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'fields' } },
           type: {
-            kind: 'NonNullType',
-            type: {
-              kind: 'ListType',
-              type: { kind: 'NonNullType', type: { kind: 'NamedType', name: { kind: 'Name', value: 'JSONObject' } } },
-            },
+            kind: 'ListType',
+            type: { kind: 'NonNullType', type: { kind: 'NamedType', name: { kind: 'Name', value: 'String' } } },
           },
         },
       ],
@@ -1269,13 +1270,15 @@ export const UpdateInquiryResponseDocument = {
                 name: { kind: 'Name', value: 'data' },
                 value: { kind: 'Variable', name: { kind: 'Name', value: 'data' } },
               },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'fields' },
+                value: { kind: 'Variable', name: { kind: 'Name', value: 'fields' } },
+              },
             ],
             selectionSet: {
               kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'data' } },
-              ],
+              selections: [{ kind: 'Field', name: { kind: 'Name', value: 'id' } }],
             },
           },
         ],
@@ -1765,7 +1768,17 @@ export const GetInquiryResponsesDocument = {
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'userId' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'data' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'data' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'userDetails' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'history' } },
+                    ],
+                  },
+                },
                 { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
               ],
@@ -1935,10 +1948,16 @@ export type Inquiry = {
 export type InquiryResponse = {
   __typename?: 'InquiryResponse';
   createdAt: Scalars['Float']['output'];
-  data: Array<Scalars['JSONObject']['output']>;
+  data: InquiryResponseData;
   id: Scalars['ID']['output'];
   updatedAt: Scalars['Float']['output'];
   userId?: Maybe<Scalars['ID']['output']>;
+};
+
+export type InquiryResponseData = {
+  __typename?: 'InquiryResponseData';
+  history: Array<Scalars['JSONObject']['output']>;
+  userDetails?: Maybe<Scalars['JSONObject']['output']>;
 };
 
 export type Model = {
@@ -2013,7 +2032,8 @@ export type MutationUpsertInquiryArgs = {
 };
 
 export type MutationUpsertInquiryResponseArgs = {
-  data: Array<Scalars['JSONObject']['input']>;
+  data: Scalars['JSONObject']['input'];
+  fields?: InputMaybe<Array<Scalars['String']['input']>>;
   id?: InputMaybe<Scalars['ID']['input']>;
   inquiryId: Scalars['ID']['input'];
 };
