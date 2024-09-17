@@ -96,7 +96,7 @@ export const useTranscribe = () => {
         if (results.length && !results[0]?.IsPartial && results[0]?.Alternatives) {
           const newTranscript = results[0].Alternatives[0].Transcript;
           if (newTranscript) {
-            setTranscript(newTranscript);
+            setTranscript(newTranscript + ' ');
           }
         }
       }
