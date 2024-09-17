@@ -258,7 +258,7 @@ function UserInquiryPage() {
             transition={{ duration: 0.5 }}
             className="space-y-4"
           >
-            {!state.loading && ((currentNode.data?.type ?? '') as string).startsWith('rating') && (
+            {!state.loading && screen !== 'end' && ((currentNode.data?.type ?? '') as string).startsWith('rating') && (
               <div>
                 <RatingInput
                   ratings={currentNode.data.ratings as string[]}
@@ -272,17 +272,10 @@ function UserInquiryPage() {
 
             {screen === 'inquiry' && (
               <form onSubmit={handleSubmit} className="flex">
-                <div className="rounded-l-lg flex-grow flex border border-slate-300">
-                  <input
-                    type="text"
-                    value={inputMessage}
-                    onChange={(e) => setInputMessage(e.target.value)}
-                    placeholder="Type your message here..."
-                    className="flex-grow p-2 sm:p-3 rounded-l-full text-slate-800 focus:outline-none"
-                  />
+                <div className="rounded-l-full flex-grow flex border border-slate-300">
                   <button
                     type="button"
-                    className="focus:outline-none text-black px-4 py-2 rounded-lg ml-2 hover:from-indigo-700 hover:to-purple-700 transition-colors"
+                    className="focus:outline-none text-black px-4 py-2 rounded-lg ml-2 mr-2 hover:from-indigo-700 hover:to-purple-700 transition-colors"
                     onClick={handleTranscribe}
                   >
                     <FontAwesomeIcon
@@ -290,6 +283,13 @@ function UserInquiryPage() {
                       className={isTranscribing ? 'text-green-500' : ''}
                     />
                   </button>
+                  <input
+                    type="text"
+                    value={inputMessage}
+                    onChange={(e) => setInputMessage(e.target.value)}
+                    placeholder="Type your message here..."
+                    className="flex-grow p-2 sm:p-3 rounded-l-full text-slate-800 focus:outline-none"
+                  />
                 </div>
                 <button
                   type="submit"
