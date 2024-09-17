@@ -156,6 +156,10 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
 
     setState((prev) => ({ ...prev, loading: true }));
 
+    const carryOverData = graphRef.current.getCurrentNode()?.data;
+    await graphRef.current.updateCurrentNodeData({ response: data, ...carryOverData });
+    await graphRef.current.goToNextNode(nextNodeId);
+
     if (!inquiryResponseIdRef.current) {
       const result = await createResponse({
         variables: {
@@ -179,10 +183,6 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
         },
       });
     }
-
-    const carryOverData = graphRef.current.getCurrentNode()?.data;
-    await graphRef.current.updateCurrentNodeData({ response: data, ...carryOverData });
-    await graphRef.current.goToNextNode(nextNodeId);
   };
 
   /**

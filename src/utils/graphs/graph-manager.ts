@@ -83,6 +83,9 @@ export class GraphManager {
   async goToNextNode(nextNodeId?: string): Promise<void> {
     if (!this.currentNode) return;
 
+    this.addNodeToHistory(this.currentNode);
+    this.onNodeAddedToHistoryCallback?.(this.currentNode);
+
     const outgoingEdges = this.currentNode.outgoingEdges;
     if (!outgoingEdges.length) return;
 
@@ -97,9 +100,6 @@ export class GraphManager {
 
     const nextNode = this.traversalGraph.nodes[edge.target];
     if (!nextNode) return;
-
-    this.addNodeToHistory(this.currentNode);
-    this.onNodeAddedToHistoryCallback?.(this.currentNode);
 
     this.currentNode = this.deepCopy(nextNode);
     this.onNodeVisitCallback?.(nextNode);
