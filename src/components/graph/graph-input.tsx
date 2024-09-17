@@ -288,7 +288,7 @@ function Flow({ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange }
           key={type}
           disabled={disabled}
           onClick={(e) => {
-            newNode.current = { position: screenToFlowPosition({ x: e.clientX - 150, y: e.clientY }), type };
+            newNode.current = { ...newNode.current, position: screenToFlowPosition({ x: e.clientX - 150, y: e.clientY }), type };
             addNode();
             setMenu(null);
           }}
