@@ -35,7 +35,7 @@ export default function InquiryBuilder() {
     lastUpdated,
     updateGraph,
     saveGraph,
-    clearGraph,
+    resetGraph,
     onEdgesChange,
     onNodesChange,
     updateGraphEdges,
@@ -155,12 +155,12 @@ export default function InquiryBuilder() {
         isOpen={resetGraphModal}
         onClose={() => setResetGraphModal(false)}
         onConfirm={() => {
-          clearGraph();
+          resetGraph();
           setResetGraphModal(false);
-          alert('Graph cleared successfully!', 'success');
+          alert('Graph reset successfully!', 'success');
         }}
-        text="Are you sure you want to clear the graph?"
-        confirmText="Clear Graph"
+        text="Are you sure you want to reset the graph?"
+        confirmText="Reset Graph"
       />
 
       <ModalGraphHelp open={helpModal} onClose={() => setHelpModal(false)} />

@@ -70,7 +70,7 @@ export default function ModalGenerateInquiryGraph({ open, onSave, onClose }: Mod
           />
         </div>
       </form>
-      <div className="flex justify-end bg-white p-4 rounded-2xl space-x-4">
+      <div className="flex justify-end p-4 rounded-2xl space-x-4">
         <button
           onClick={handleSave}
           className="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded-full flex items-center"

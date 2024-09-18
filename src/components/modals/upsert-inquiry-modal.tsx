@@ -1,9 +1,9 @@
-import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
-import CustomModal from '../modal';
 import { useAddAlert } from '@/providers/alert-provider';
-import { useNavigate } from 'react-router-dom';
-import DeleteConfirmationModal from './delete-modal';
+import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import CustomModal from '../modal';
+import DeleteConfirmationModal from './delete-modal';
 
 interface ModalUpsertInquiryProps {
   open: boolean;
@@ -15,7 +15,7 @@ interface ModalUpsertInquiryProps {
 
 export default function ModalUpsertInquiry({ open, onSave, onDelete, onClose }: ModalUpsertInquiryProps) {
   // States
-  const [clearGraphModal, setClearGraphModal] = useState(false);
+  const [resetGraphModal, setResetGraphModal] = useState(false);
 
   // Hooks
   const { id, form, updateForm, saveForm, deleteInquiry } = useInquiryBuilder();
@@ -37,7 +37,7 @@ export default function ModalUpsertInquiry({ open, onSave, onDelete, onClose }: 
    * Handle deleting the inquiry, shows a confirmation dialog, and deletes the inquiry.
    */
   const handleDelete = async () => {
-    setClearGraphModal(true);
+    setResetGraphModal(true);
   };
 
   /**
@@ -62,45 +62,57 @@ export default function ModalUpsertInquiry({ open, onSave, onDelete, onClose }: 
           <div>
             <label className="block text-sm font-bold mb-2" htmlFor="title">
               Title
+              <br />
+              <span className="italic text-slate-500 text-sm font-normal">
+                The title of the inquiry that is displayed to the user.
+              </span>
             </label>
             <input
               type="text"
               id="title"
               value={form.title}
               onChange={handleInputChange('title')}
-              className="border-2 border-gray-200 p-2 rounded-lg w-full"
+              className="border-2 border-slate-200 p-2 rounded-lg w-full"
             />
           </div>
           <div>
             <label className="block text-sm font-bold mb-2" htmlFor="inputGoals">
               Description
+              <br />
+              <span className="italic text-slate-500 text-sm font-normal">
+                Describes the purpose of the inquiry and is presented to the user before they start the inquiry.
+              </span>
             </label>
             <textarea
               id="inputGoals"
               value={form.description}
               onChange={handleInputChange('description')}
               rows={2}
-              className="border-2 border-gray-200 p-2 rounded-lg w-full"
+              className="border-2 border-slate-200 p-2 rounded-lg w-full"
             />
           </div>
           <div>
             <label className="block text-sm font-bold mb-2" htmlFor="organizationName">
               Organization Name
+              <br />
+              <span className="italic text-slate-500 text-sm font-normal">
+                The organization name that the inquiry is associated with.
+              </span>
             </label>
             <input
               type="text"
               id="organizationName"
               value={form.organizationName}
               onChange={handleInputChange('organizationName')}
-              className="border-2 border-gray-200 p-2 rounded-lg w-full"
+              className="border-2 border-slate-200 p-2 rounded-lg w-full"
             />
           </div>
         </form>
-        <div className="flex justify-end bg-white p-4 rounded-2xl space-x-4">
+        <div className="flex justify-end p-4 rounded-2xl space-x-4">
           {id && (
             <button
               onClick={handleDelete}
-              className="bg-white hover:bg-red-600 border-red-600 border-2 hover:text-white text-red-600 text-sm font-bold py-2 px-4 rounded-full flex items-center transition-colors"
+              className="hover:bg-red-600 border-red-600 border-2 hover:text-white text-red-600 text-sm font-bold py-2 px-4 rounded-full flex items-center transition-colors"
             >
               Delete
             </button>
@@ -116,8 +128,8 @@ export default function ModalUpsertInquiry({ open, onSave, onDelete, onClose }: 
       </CustomModal>
 
       <DeleteConfirmationModal
-        isOpen={clearGraphModal}
-        onClose={() => setClearGraphModal(false)}
+        isOpen={resetGraphModal}
+        onClose={() => setResetGraphModal(false)}
         onConfirm={async () => {
           await deleteInquiry(
             () => {

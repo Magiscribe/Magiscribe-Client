@@ -74,7 +74,7 @@ export default function CustomTooltip({
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.1 }}
-                className="overflow-hidden rounded-lg shadow-lg bg-white p-2"
+                className="overflow-hidden rounded-lg shadow-xl bg-white p-2"
               >
                 {children}
               </motion.div>

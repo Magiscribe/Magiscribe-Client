@@ -47,7 +47,7 @@ interface ContextType {
   updateGraphNodes: React.Dispatch<React.SetStateAction<Node[]>>;
   updateGraphEdges: React.Dispatch<React.SetStateAction<Edge[]>>;
 
-  clearGraph: () => void;
+  resetGraph: () => void;
 
   onNodesChange: OnNodesChange;
   onEdgesChange: OnEdgesChange;
@@ -166,7 +166,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   /**
    * Clears the graph and initializes it with a start node.
    */
-  const clearGraph = () => {
+  const resetGraph = () => {
     updateGraph({ nodes: [{ id: '0', type: 'start', position: { x: 0, y: 0 }, data: {} }], edges: [] });
   };
 
@@ -231,7 +231,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     updateGraphNodes: setNodes,
     updateGraphEdges: setEdges,
 
-    clearGraph,
+    resetGraph,
 
     onNodesChange,
     onEdgesChange,

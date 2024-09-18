@@ -18,7 +18,7 @@ export default function DeleteConfirmationModal({
   cancelText = 'Cancel',
 }: DeleteConfirmationModalProps) {
   return (
-    <CustomModal title="Confirm Deletion" open={isOpen} onClose={onClose} size="md">
+    <CustomModal title="Confirm" open={isOpen} onClose={onClose} size="md">
       <p>{text}</p>
       <div className="mt-4 flex justify-center space-x-40">
         <button onClick={onClose} className="bg-gray-500 hover:bg-gray-700 text-white px-4 py-2 rounded-lg">
