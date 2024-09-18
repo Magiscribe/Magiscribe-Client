@@ -4,11 +4,11 @@ import ModalGenerateInquiryGraph from '@/components/modals/generate-inquiry-moda
 import ModalGraphHelp from '@/components/modals/graph-help-modal';
 import ModalUpsertInquiry from '@/components/modals/upsert-inquiry-modal';
 import { useAddAlert } from '@/providers/alert-provider';
-import { GraphData, useInquiryBuilder } from '@/providers/inquiry-builder-provider';
-import { createGraph, formatGraph } from '@/utils/graphs/graph-utils';
+import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
+import { formatGraph } from '@/utils/graphs/graph-utils';
 import { faBroom, faGear, faQuestionCircle, faSpinner, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const DEBOUNCE_DELAY_IN_MS = 1000;
 
@@ -20,7 +20,7 @@ const DEBOUNCE_DELAY_IN_MS = 1000;
 export default function InquiryBuilder() {
   // States
   const [upsertFormModal, setUpsertFormModal] = useState(false);
-  const [clearGraphModal, setClearGraphModal] = useState(false);
+  const [resetGraphModal, setResetGraphModal] = useState(false);
   const [generateModalOpen, setGenerateModalOpen] = useState(false);
   const [helpModal, setHelpModal] = useState(false);
 
@@ -35,6 +35,7 @@ export default function InquiryBuilder() {
     lastUpdated,
     updateGraph,
     saveGraph,
+    clearGraph,
     onEdgesChange,
     onNodesChange,
     updateGraphEdges,
@@ -64,30 +65,12 @@ export default function InquiryBuilder() {
   }, [graph]);
 
   /**
-   * Handle the creation of a graph from the input.
-   * @param input
-   * @param autoPosition
-   */
-  const handleGraphCreation = (input: GraphData, autoPosition: boolean = false) => {
-    const graph = createGraph(input);
-    updateGraph(formatGraph(graph, autoPosition));
-  };
-
-  /**
    * Handle formatting the graph.
    */
   const handleFormat = () => {
     updateGraph(formatGraph(graph, true));
     alert('Graph formatted successfully!', 'success');
   };
-
-  /**
-   * Clear the graph and initialize it with a start node.
-   */
-  const clearGraph = useCallback(() => {
-    handleGraphCreation({ nodes: [{ id: '0', type: 'start', position: { x: 0, y: 0 }, data: {} }], edges: [] }, true);
-    alert('Graph cleared successfully!', 'success');
-  }, [handleGraphCreation, alert]);
 
   return (
     <>
@@ -122,11 +105,11 @@ export default function InquiryBuilder() {
                 Format Graph
               </button>
               <button
-                onClick={() => setClearGraphModal(true)}
+                onClick={() => setResetGraphModal(true)}
                 className="bg-red-500 hover:bg-red-700 text-white text-sm font-bold py-2 px-4 rounded-full flex items-center"
               >
                 <FontAwesomeIcon icon={faTrash} className="mr-2" />
-                Clear Graph
+                Reset Graph
               </button>
               <button
                 onClick={() => setHelpModal(true)}
@@ -169,11 +152,12 @@ export default function InquiryBuilder() {
       />
 
       <DeleteConfirmationModal
-        isOpen={clearGraphModal}
-        onClose={() => setClearGraphModal(false)}
+        isOpen={resetGraphModal}
+        onClose={() => setResetGraphModal(false)}
         onConfirm={() => {
           clearGraph();
-          setClearGraphModal(false);
+          setResetGraphModal(false);
+          alert('Graph cleared successfully!', 'success');
         }}
         text="Are you sure you want to clear the graph?"
         confirmText="Clear Graph"

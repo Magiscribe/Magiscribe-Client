@@ -28,10 +28,7 @@ export interface FormData {
   inputGoals: string;
 }
 
-export interface GraphData {
-  nodes: Node[];
-  edges: Edge[];
-}
+const DEFAULT_GRAPH = { nodes: [{ id: '0', type: 'start', position: { x: 0, y: 0 }, data: {} }], edges: [] };
 
 interface ContextType {
   initialized: boolean;
@@ -49,6 +46,9 @@ interface ContextType {
   updateGraph: (graph: { nodes: Node[]; edges: Edge[] }) => void;
   updateGraphNodes: React.Dispatch<React.SetStateAction<Node[]>>;
   updateGraphEdges: React.Dispatch<React.SetStateAction<Edge[]>>;
+
+  clearGraph: () => void;
+
   onNodesChange: OnNodesChange;
   onEdgesChange: OnEdgesChange;
 
@@ -84,7 +84,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
       if (!getInquiry) return;
       setLastUpdated(new Date(getInquiry.updatedAt));
       updateForm(getInquiry.data.form);
-      updateGraph(getInquiry.data.graph);
+      updateGraph(getInquiry.data.graph ?? DEFAULT_GRAPH);
       setInitialized(true);
     },
   });
@@ -134,7 +134,20 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const saveForm = async (onSuccess?: (id: string) => void, onError?: () => void) => {
     try {
       const func = id ? updateFormMutation : createFormMutation;
-      const result = await func({ variables: { id, data: { form }, fields: ['form'] } });
+      const result = await func({
+        variables: {
+          id,
+          data: {
+            form: {
+              ...form,
+
+              // Default title if not provided.
+              title: form.title ?? 'Untitled Form',
+            },
+          },
+          fields: ['form'],
+        },
+      });
       if (onSuccess) onSuccess(result.data?.upsertInquiry.id as string);
     } catch {
       if (onError) onError();
@@ -145,9 +158,16 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
    * Updates the graph of the inquiry.
    * @param graph {Object} The graph object to update.
    */
-  const updateGraph = (graph: GraphData) => {
-    setNodes(graph.nodes);
-    setEdges(graph.edges);
+  const updateGraph = ({ nodes, edges }: { nodes: Node[]; edges: Edge[] }) => {
+    setNodes(nodes);
+    setEdges(edges);
+  };
+
+  /**
+   * Clears the graph and initializes it with a start node.
+   */
+  const clearGraph = () => {
+    updateGraph({ nodes: [{ id: '0', type: 'start', position: { x: 0, y: 0 }, data: {} }], edges: [] });
   };
 
   /**
@@ -210,6 +230,9 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     updateGraph,
     updateGraphNodes: setNodes,
     updateGraphEdges: setEdges,
+
+    clearGraph,
+
     onNodesChange,
     onEdgesChange,
     saveGraph,

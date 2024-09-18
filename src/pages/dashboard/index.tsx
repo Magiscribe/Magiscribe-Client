@@ -33,7 +33,7 @@ export default function DashboardPage() {
     <>
       <DashboardHero />
       <hr className="my-8" />
-      <div className={clsx('grid grid-cols-1 gap-4 md:grid-cols-2', visibleCards.length === 1 && 'md:grid-cols-1')}>
+      <div className={clsx('grid grid-cols-1 gap-4', visibleCards.length === 1 ? 'md:grid-cols-1' : 'md:grid-cols-2')}>
         {visibleCards.map((card) => (
           <LinkCard title={card.title} description={card.description} to={card.to} gradient={card.gradient} />
         ))}

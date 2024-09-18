@@ -48,7 +48,7 @@ export default function Inquiry() {
       </div>
       <h2 className="text-2xl font-semibold text-slate-100 mb-4">Your Inquiries</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-        {(data?.getInquiries ?? []).map((inquiry) => {
+        {(data?.getInquiries ?? []).map((inquiry, i) => {
           const form = inquiry.data.form;
           const updatedAt = new Date(inquiry.updatedAt);
           const formattedDate = updatedAt.toLocaleDateString('en-US', {
@@ -59,6 +59,10 @@ export default function Inquiry() {
           return (
             <motion.div
               key={inquiry.id}
+              initial={{ opacity: 0, y: 25 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -25 }}
+              transition={{ duration: 0.2, type: 'spring', stiffness: 100, delay: i * 0.1 }}
               className="bg-white p-4 text-black rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow"
               whileHover={{ scale: 1.05 }}
               onClick={() => navigate(inquiry.id)}
