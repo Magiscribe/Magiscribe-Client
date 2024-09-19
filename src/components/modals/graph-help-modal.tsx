@@ -59,26 +59,23 @@ export default function ModalGraphHelp({ open, onClose }: ModalGraphHelpProps) {
               <tr>
                 <td className="border border-gray-300 p-2 font-semibold">Conditional</td>
                 <td className="border border-gray-300 p-2">
-                  A node where users can write a message to direct users to a different node based on certain
-                  conditions.
+                  Instructions for an AI to handle routing users through the conversation.
                 </td>
-                <td className="border border-gray-300 p-2">
-                  Use when you need to branch the conversation based on user input or other factors.
-                </td>
+                <td className="border border-gray-300 p-2">Use when you need to branch the conversation.</td>
               </tr>
               <tr>
                 <td className="border border-gray-300 p-2 font-semibold">Conversation</td>
                 <td className="border border-gray-300 p-2">
-                  Where a user can create a question for the end-user to respond to.
+                  Where an admin can create a direct question for the end-user to respond to OR write a prompt for an AI
+                  to dynamically generate a question
                 </td>
-                <td className="border border-gray-300 p-2">
-                  Use to gather specific information from the user or prompt for a response.
-                </td>
+                <td className="border border-gray-300 p-2">Use to get responses from your end users.</td>
               </tr>
               <tr>
                 <td className="border border-gray-300 p-2 font-semibold">Information</td>
                 <td className="border border-gray-300 p-2">
-                  Where a user can provide explanations or additional context.
+                  Where an admin can provide explanations or additional context to a conversation that does NOT get a
+                  response from the end user.
                 </td>
                 <td className="border border-gray-300 p-2">
                   Use to give users important information or instructions without requiring a response.

@@ -15,6 +15,7 @@ import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo
 import { Edge, Node, OnEdgesChange, OnNodesChange } from '@xyflow/react';
 import React, { createContext, useContext, useMemo, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { useAddAlert } from '@/providers/alert-provider';
 
 interface InquiryProviderProps {
   id?: string;
@@ -73,6 +74,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
 
   // Memoized graph object
   const graph = useMemo(() => ({ nodes, edges }), [nodes, edges]);
+  const alert = useAddAlert();
 
   /**
    * Fetches the inquiry data from the server.
@@ -100,6 +102,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
         setGeneratingGraph(false);
         const graph = createGraph(JSON.parse(JSON.parse(prediction.result)));
         updateGraph(formatGraph(graph, true));
+        alert('Graph generated successfully!', 'success');
       }
     },
     onError: () => setGeneratingGraph(false),
@@ -206,7 +209,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
         variables: {
           ...form,
           userMessage: [
-            `You are generating a graph for ${form.title} at the organization ${form.organizationName}.`,
+            `You are generating a graph for ${form.title} at the organization ${form.organizationName} with the description: ${form.description}`,
             `The user is looking for the following goals to be completed: ${form.inputGoals}`,
           ].join('\n'),
         },

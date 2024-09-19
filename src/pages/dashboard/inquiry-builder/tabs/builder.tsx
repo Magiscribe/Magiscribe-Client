@@ -6,7 +6,7 @@ import ModalUpsertInquiry from '@/components/modals/upsert-inquiry-modal';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { formatGraph } from '@/utils/graphs/graph-utils';
-import { faBroom, faGear, faQuestionCircle, faSpinner, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faGear, faQuestionCircle, faSpinner, faTrash, faWandMagicSparkles } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useRef, useState } from 'react';
 
@@ -94,14 +94,18 @@ export default function InquiryBuilder() {
                 onClick={() => setGenerateModalOpen(true)}
                 disabled={generatingGraph}
               >
-                <FontAwesomeIcon icon={generatingGraph ? faSpinner : faGear} className="mr-2" spin={generatingGraph} />
+                <FontAwesomeIcon
+                  icon={generatingGraph ? faSpinner : faWandMagicSparkles}
+                  className="mr-2"
+                  spin={generatingGraph}
+                />
                 Generate Graph
               </button>
               <button
                 className="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded-full flex items-center"
                 onClick={handleFormat}
               >
-                <FontAwesomeIcon icon={faBroom} className="mr-2" />
+                <FontAwesomeIcon icon={faGear} className="mr-2" />
                 Format Graph
               </button>
               <button
