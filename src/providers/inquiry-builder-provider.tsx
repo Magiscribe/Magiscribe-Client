@@ -8,11 +8,10 @@ import {
   GetInquiryQuery,
   UpdateInquiryMutation,
 } from '@/graphql/graphql';
-import useReactFlowGraph from '@/hooks/graph';
 import { getAgentIdByName } from '@/utils/agents';
 import { createGraph, formatGraph } from '@/utils/graphs/graph-utils';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
-import { Edge, Node, OnEdgesChange, OnNodesChange } from '@xyflow/react';
+import { Edge, Node, OnEdgesChange, OnNodesChange, useEdgesState, useNodesState } from '@xyflow/react';
 import React, { createContext, useContext, useMemo, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { useAddAlert } from '@/providers/alert-provider';
@@ -70,7 +69,8 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const [generatingGraph, setGeneratingGraph] = useState(false);
 
   // Hooks
-  const { nodes, edges, setNodes, setEdges, onNodesChange, onEdgesChange } = useReactFlowGraph();
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
   // Memoized graph object
   const graph = useMemo(() => ({ nodes, edges }), [nodes, edges]);

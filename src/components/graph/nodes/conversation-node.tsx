@@ -27,6 +27,15 @@ export default function ConversationNode({ id, data }: ConversationNodeProps) {
 
   const handleUpdate = useCallback(
     (updates: Partial<ConversationNodeProps['data']>) => {
+      // If the user toggles dynamic generation, remove all ratings
+      // since they are not needed anymore.
+      if (updates.dynamicGeneration) {
+        updates = {
+          ...updates,
+          ratings: undefined, // Remove all ratings
+        };
+      }
+
       Object.entries(updates).forEach(([key, value]) => {
         handleInputChange({
           target: { name: key, value },
@@ -95,7 +104,7 @@ export default function ConversationNode({ id, data }: ConversationNodeProps) {
             className="w-full px-3 py-2 bg-inherit rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 resize-none overflow-hidden"
           />
         </div>
-        {(data.type === NodeType.RatingSingle || data.type === NodeType.RatingMulti) && (
+        {!data.dynamicGeneration && (data.type === NodeType.RatingSingle || data.type === NodeType.RatingMulti) && (
           <div className="flex flex-col gap-2">
             <label className="text-sm font-medium text-gray-700">Ratings</label>
             {data.ratings?.map((rating, index) => (
