@@ -13,9 +13,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import goHomeGif from '../assets/imgs/go-home.gif';
-import { SignedOut, SignUpButton } from '@clerk/clerk-react';
+import { SignedIn, SignedOut, SignUpButton } from '@clerk/clerk-react';
 
 /**
  * Represents a message in the chat.
@@ -329,22 +329,28 @@ function UserInquiryPage() {
           Your responses have been recorded.
           <br />
         </p>
-        <p className="text-lg text-slate-700">Thank you for your time... you can leave now!</p>
+
         <img src={goHomeGif} alt="Thank You" className="mx-auto rounded-3xl" />
         <div className="w-full max-w-3xl mx-auto flex flex-col items-center">
           {/* Form */}
-          <button onClick={() => handleReset()} className="text-indigo-600 hover:underline">
-            Restart Inquiry
-          </button>
-
-          <SignedOut>
-            <p className="text-lg text-center text-gray-600 mt-4">
-              Want to make your own inquiry?{' '}
+          <p className="text-lg text-center text-gray-600 mt-4">
+            Want to make your own inquiry?{' '}
+            <SignedOut>
               <SignUpButton signInForceRedirectUrl="/dashboard" forceRedirectUrl="/dashboard">
-                <button className="text-lg text-indigo-600 hover:underline">Sign Up Now</button>
+                <button className="px-3 ml-1 py-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-300 ease-in-out transform hover:scale-105 shadow-lg">
+                  Get Alpha Access
+                </button>
               </SignUpButton>
-            </p>
-          </SignedOut>
+            </SignedOut>
+            <SignedIn>
+              <Link
+                to="/dashboard/inquiry-builder"
+                className="px-3 ml-1 py-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-300 ease-in-out transform hover:scale-105 shadow-lg"
+              >
+                Go to Graph Builder
+              </Link>
+            </SignedIn>
+          </p>
         </div>
       </div>
     );

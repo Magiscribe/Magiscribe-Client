@@ -24,7 +24,7 @@ interface ModalUpsertInquiryProps {
 
 export default function ModalGenerateInquiryGraph({ open, onSave, onClose }: ModalUpsertInquiryProps) {
   // Hooks
-  const { form, updateForm, saveForm, generateGraph } = useInquiryBuilder();
+  const { form, updateForm, saveForm, generateGraph, resetGraph } = useInquiryBuilder();
   const alert = useAddAlert();
 
   /**
@@ -41,7 +41,8 @@ export default function ModalGenerateInquiryGraph({ open, onSave, onClose }: Mod
   /**
    * Handle saving the inquiry and shows a success or error alert.
    */
-  const handleSave = async () => {
+  const handleGenerate = async () => {
+    resetGraph();
     await saveForm(
       (id) => {
         alert('Started graph generation!', 'info');
@@ -70,9 +71,10 @@ export default function ModalGenerateInquiryGraph({ open, onSave, onClose }: Mod
           />
         </div>
       </form>
+      <span className="italic text-slate-500 text-sm font-normal">Note: This will override your existing graph</span>
       <div className="flex justify-end p-4 rounded-2xl space-x-4">
         <button
-          onClick={handleSave}
+          onClick={handleGenerate}
           className="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded-full flex items-center"
         >
           Start Graph Generation

@@ -32,7 +32,7 @@ export const ApolloProviderWrapper = ({ children }: { children: React.ReactNode 
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let activeSocket:any, timedOut: NodeJS.Timeout;
+    let activeSocket: any, timedOut: NodeJS.Timeout;
 
     const wsLink = new GraphQLWsLink(
       createClient({
@@ -49,10 +49,10 @@ export const ApolloProviderWrapper = ({ children }: { children: React.ReactNode 
         on: {
           connected: (socket) => (activeSocket = socket),
           ping: (received) => {
-            if (!received) // sent
+            if (!received)
+              // sent
               timedOut = setTimeout(() => {
-                if (activeSocket.readyState === WebSocket.OPEN)
-                  activeSocket.close(4408, 'Request Timeout');
+                if (activeSocket.readyState === WebSocket.OPEN) activeSocket.close(4408, 'Request Timeout');
               }, 5_000); // wait 5 seconds for the pong and then close the connection
           },
           pong: (received) => {

@@ -27,7 +27,7 @@ export const useTranscribe = () => {
       const result = event.results[event.results.length - 1];
       if (result.isFinal) {
         const newTranscript = result[0].transcript;
-        setTranscript((prevTranscript) => prevTranscript + newTranscript + ' ');
+        setTranscript(() => newTranscript);
       }
     };
 
