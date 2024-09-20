@@ -31,9 +31,34 @@ export const ApolloProviderWrapper = ({ children }: { children: React.ReactNode 
       uri: import.meta.env.VITE_APP_HTTP_SERVER_URL as string,
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let activeSocket:any, timedOut: NodeJS.Timeout;
+
     const wsLink = new GraphQLWsLink(
       createClient({
         url: import.meta.env.VITE_APP_WS_SERVER_URL as string,
+
+        // Ref: https://the-guild.dev/graphql/ws/docs/interfaces/client.ClientOptions#lazyclosetimeout
+        lazy: true,
+
+        // Ref: https://the-guild.dev/graphql/ws/docs/interfaces/client.ClientOptions#lazyclosetimeout
+        lazyCloseTimeout: 30 * 1000, // 30 seconds
+
+        // Ref: https://the-guild.dev/graphql/ws/docs/interfaces/client.ClientOptions#keepalive
+        keepAlive: 10 * 1000, // 30,
+        on: {
+          connected: (socket) => (activeSocket = socket),
+          ping: (received) => {
+            if (!received) // sent
+              timedOut = setTimeout(() => {
+                if (activeSocket.readyState === WebSocket.OPEN)
+                  activeSocket.close(4408, 'Request Timeout');
+              }, 5_000); // wait 5 seconds for the pong and then close the connection
+          },
+          pong: (received) => {
+            if (received) clearTimeout(timedOut); // pong is received, clear connection close timeout
+          },
+        },
         connectionParams: async () => {
           const token = await getToken();
           return {
