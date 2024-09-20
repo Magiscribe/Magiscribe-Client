@@ -13,8 +13,6 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Therefore it is highly recommended to use the babel or swc plugin for production.
  */
 const documents = {
-  '\n  mutation generateTranscriptionStreamingCredentials {\n    generateTranscriptionStreamingCredentials {\n      accessKeyId\n      secretAccessKey\n      sessionToken\n    }\n  }\n':
-    types.GenerateTranscriptionStreamingCredentialsDocument,
   '\n  mutation generateAudio($voice: String!, $text: String!) {\n    generateAudio(voice: $voice, text: $text)\n  }\n':
     types.GenerateAudioDocument,
   '\n  mutation addPrediction($subscriptionId: ID!, $agentId: ID!, $variables: JSONObject, $attachments: [JSONObject!]) {\n    addPrediction(subscriptionId: $subscriptionId, agentId: $agentId, variables: $variables, attachments: $attachments)\n  }\n':
@@ -82,12 +80,6 @@ const documents = {
  */
 export function gql(source: string): unknown;
 
-/**
- * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function gql(
-  source: '\n  mutation generateTranscriptionStreamingCredentials {\n    generateTranscriptionStreamingCredentials {\n      accessKeyId\n      secretAccessKey\n      sessionToken\n    }\n  }\n',
-): (typeof documents)['\n  mutation generateTranscriptionStreamingCredentials {\n    generateTranscriptionStreamingCredentials {\n      accessKeyId\n      secretAccessKey\n      sessionToken\n    }\n  }\n'];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

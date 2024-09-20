@@ -1,15 +1,5 @@
 import { gql } from '@apollo/client';
 
-export const GENERATE_TRANSCRIPTION_CREDENTIALS = gql`
-  mutation generateTranscriptionStreamingCredentials {
-    generateTranscriptionStreamingCredentials {
-      accessKeyId
-      secretAccessKey
-      sessionToken
-    }
-  }
-`;
-
 export const GENERATE_AUDIO = gql`
   mutation generateAudio($voice: String!, $text: String!) {
     generateAudio(voice: $voice, text: $text)

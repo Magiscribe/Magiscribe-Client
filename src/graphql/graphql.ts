@@ -119,7 +119,6 @@ export type Mutation = {
   deleteInquiry?: Maybe<Inquiry>;
   deletePrompt?: Maybe<Prompt>;
   generateAudio?: Maybe<Scalars['String']['output']>;
-  generateTranscriptionStreamingCredentials?: Maybe<TemporaryCredentials>;
   upsertAgent?: Maybe<Agent>;
   upsertCapability?: Maybe<Capability>;
   upsertInquiry: Inquiry;
@@ -270,25 +269,6 @@ export type Subscription = {
 
 export type SubscriptionPredictionAddedArgs = {
   subscriptionId: Scalars['ID']['input'];
-};
-
-export type TemporaryCredentials = {
-  __typename?: 'TemporaryCredentials';
-  accessKeyId: Scalars['String']['output'];
-  secretAccessKey: Scalars['String']['output'];
-  sessionToken: Scalars['String']['output'];
-};
-
-export type GenerateTranscriptionStreamingCredentialsMutationVariables = Exact<{ [key: string]: never }>;
-
-export type GenerateTranscriptionStreamingCredentialsMutation = {
-  __typename?: 'Mutation';
-  generateTranscriptionStreamingCredentials?: {
-    __typename?: 'TemporaryCredentials';
-    accessKeyId: string;
-    secretAccessKey: string;
-    sessionToken: string;
-  } | null;
 };
 
 export type GenerateAudioMutationVariables = Exact<{
@@ -615,36 +595,6 @@ export type PredictionAddedSubscription = {
   } | null;
 };
 
-export const GenerateTranscriptionStreamingCredentialsDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'mutation',
-      name: { kind: 'Name', value: 'generateTranscriptionStreamingCredentials' },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'generateTranscriptionStreamingCredentials' },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'accessKeyId' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'secretAccessKey' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'sessionToken' } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<
-  GenerateTranscriptionStreamingCredentialsMutation,
-  GenerateTranscriptionStreamingCredentialsMutationVariables
->;
 export const GenerateAudioDocument = {
   kind: 'Document',
   definitions: [
