@@ -18,6 +18,18 @@
 
 This repository contains a Node.js Vite application that serves as the dashboard for the project. The application is built using TypeScript and React.
 
+## Short Demos
+
+**Agent Lab:**
+The following video demonstrates the GraphQL API in action. The API is used to query the database for agents, capabilities, and their related prompts. It allows easy creation of new agents, capabilities, and prompts as well as additional features like per-organization authorization through Clerk.
+
+https://github.com/user-attachments/assets/1dac0771-db65-4cf1-ad5e-aa70c54a8c4e
+
+**Inquiry Builder:**
+The following video demonstrates the GraphQL API in action. The API is used to query the database for inquiry graphs. An inquiry graph is a dictated conversation flows that can be used to generate a conversation between an agent and a user. It allows for stakeholders to get a dynamic conversation flow between a user and an agent to probe for information or insights, while ensuring that the agent stays on tasks, asks the right questions in the right order, and does not miss any important information while still allowing the user and conversation to go off script at certain times depending on the graph.
+
+https://github.com/user-attachments/assets/908ae6d8-e7e9-4fb1-8964-90411095353e
+
 # Zero to Hero
 
 ### Pre-requisites
