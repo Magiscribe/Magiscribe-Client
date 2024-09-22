@@ -8,13 +8,13 @@ import {
   GetInquiryQuery,
   UpdateInquiryMutation,
 } from '@/graphql/graphql';
+import { useAddAlert } from '@/providers/alert-provider';
 import { getAgentIdByName } from '@/utils/agents';
 import { createGraph, formatGraph } from '@/utils/graphs/graph-utils';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
 import { Edge, Node, OnEdgesChange, OnNodesChange, useEdgesState, useNodesState } from '@xyflow/react';
 import React, { createContext, useContext, useMemo, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { useAddAlert } from '@/providers/alert-provider';
 
 interface InquiryProviderProps {
   id?: string;
@@ -179,6 +179,11 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
    * @param onError {Function} The function to call on error.
    */
   const saveGraph = async (onSuccess?: (id: string) => void, onError?: () => void) => {
+    if (!initialized) {
+      if (onError) onError();
+      return;
+    }
+
     try {
       const func = id ? updateFormMutation : createFormMutation;
       const result = await func({ variables: { id, data: { graph, fields: ['graph'] } } });

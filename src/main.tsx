@@ -13,13 +13,13 @@ import './assets/styles/index.css';
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ClerkProvider publishableKey={import.meta.env.VITE_APP_CLERK_PK as string}>
-        <ApolloProviderWrapper>
-          <TitleProvider>
-            <AlertProvider>
-              <Router />
-            </AlertProvider>
-          </TitleProvider>
-        </ApolloProviderWrapper>
-      </ClerkProvider>
+      <ApolloProviderWrapper>
+        <TitleProvider>
+          <AlertProvider>
+            <Router />
+          </AlertProvider>
+        </TitleProvider>
+      </ApolloProviderWrapper>
+    </ClerkProvider>
   </React.StrictMode>,
 );
