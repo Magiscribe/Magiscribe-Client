@@ -48,6 +48,10 @@ export default function InquiryBuilder() {
    * A debounced function to save the graph after a delay.
    */
   useEffect(() => {
+    if (graph.nodes.length === 0 && graph.edges.length === 0) {
+      return;
+    }
+
     if (saveDebounce.current) {
       clearTimeout(saveDebounce.current);
     }
