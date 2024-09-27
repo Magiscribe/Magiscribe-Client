@@ -40,6 +40,14 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
     [graph.nodes],
   );
 
+  const userIdToDetalsMap = useMemo(() => {
+    const map = new Map();
+    responses.forEach((response) => {
+      map.set(response.id, response.data.userDetails);
+    });
+    return map;
+  }, [responses]);
+
   const groupedResponses = useMemo(() => {
     const grouped: { [nodeId: string]: { [id: string]: NodeVisitAnalysisData[] } } = {};
     responses.forEach((response) => {
@@ -130,42 +138,46 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
 
   const renderAnswers = (nodeId: string) => {
     const nodeResponses = groupedResponses[nodeId] || {};
-    return Object.entries(nodeResponses).map(([userId, userResponses]) => (
-      <div key={`${userId}-${nodeId}`} className="ml-4 mb-4">
-        <p className="text-black font-semibold">{userId}:</p>
-        {userResponses.map((response, index) => {
-          const isDynamicGeneration = response.data?.text !== undefined;
-          const responseText = response.data?.response?.text;
-          const responseRatings = response.data?.response?.ratings;
+    return Object.entries(nodeResponses).map(([userId, userResponses]) => {
+      const userEmail = userIdToDetalsMap.get(userId)?.email;
+      const userName = userIdToDetalsMap.get(userId)?.name;
+      return (
+        <div key={`${userId}-${nodeId}`} className="ml-4 mb-4">
+          <p className="text-black font-semibold">{userEmail || userName ? userName + ' (' + userEmail + ')': userId}:</p>
+          {userResponses.map((response, index) => {
+            const isDynamicGeneration = response.data?.text !== undefined;
+            const responseText = response.data?.response?.text;
+            const responseRatings = response.data?.response?.ratings;
 
-          let answerContent = 'No response';
-          if (responseText && responseRatings) {
-            answerContent = `${responseText} (Ratings: ${responseRatings.join(', ')})`;
-          } else if (responseText) {
-            answerContent = responseText;
-          } else if (responseRatings) {
-            answerContent = `Ratings: ${responseRatings.join(', ')}`;
-          }
+            let answerContent = 'No response';
+            if (responseText && responseRatings) {
+              answerContent = `${responseText} (Ratings: ${responseRatings.join(', ')})`;
+            } else if (responseText) {
+              answerContent = responseText;
+            } else if (responseRatings) {
+              answerContent = `Ratings: ${responseRatings.join(', ')}`;
+            }
 
-          return (
-            <div key={`${userId}-${nodeId}-${index}`} className="ml-4 mt-2">
-              {isDynamicGeneration ? (
-                <>
-                  <p className="text-black font-medium">
-                    #{index + 1}: {response.data?.text}
+            return (
+              <div key={`${userId}-${nodeId}-${index}`} className="ml-4 mt-2">
+                {isDynamicGeneration ? (
+                  <>
+                    <p className="text-black font-medium">
+                      #{index + 1}: {response.data?.text}
+                    </p>
+                    <p className="text-black ml-4">{answerContent}</p>
+                  </>
+                ) : (
+                  <p className="text-black">
+                    <span className="font-medium">#{index + 1}:</span> {answerContent}
                   </p>
-                  <p className="text-black ml-4">{answerContent}</p>
-                </>
-              ) : (
-                <p className="text-black">
-                  <span className="font-medium">#{index + 1}:</span> {answerContent}
-                </p>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    ));
+                )}
+              </div>
+            );
+          })}
+        </div>
+      );
+    });
   };
 
   return (
