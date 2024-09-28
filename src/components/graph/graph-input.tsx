@@ -249,11 +249,12 @@ function Flow({ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange }
   };
 
   const renderNodeButtonsSide = () =>
-    Object.keys(nodeTypesInfo).map((type) => {
+    <div className="w-full flex flex-row space-x-4">
+      {Object.keys(nodeTypesInfo).map((type) => {
       const disabled = !validateNewNode(type);
 
       return (
-        <div key={type} className="w-full flex items-center">
+        <div key={type} className="w-44 flex items-center">
           <button
             draggable={!disabled}
             onDragStart={() => (disabled ? null : onDragStart(type))}
@@ -274,7 +275,8 @@ function Flow({ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange }
           </CustomTooltip>
         </div>
       );
-    });
+    })}
+    </div>
 
   const renderNodeButtonsMenu = (position?: { x: number; y: number }, source?: string, target?: string) =>
     Object.keys(nodeTypesInfo).map((type) => {
@@ -303,8 +305,8 @@ function Flow({ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange }
 
   return (
     <div className="relative w-full h-full text-black">
-      <div className="absolute h-full p-4 space-y-4 flex flex-col items-end z-10">
-        <h3 className="w-full text-xl font-semibold text-left text-white">
+      <div className="absolute w-full flex flex-row top-0 left-0 p-4 space-x-4 z-10">
+        <h3 className="text-xl font-semibold text-left text-white min-w-44">
           Nodes
           <br />
           <span className="-mt-2 text-xs">Drag and drop to add nodes</span>

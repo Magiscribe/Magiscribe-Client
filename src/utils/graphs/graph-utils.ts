@@ -37,7 +37,7 @@ export function formatGraph(graph: { nodes: Node[]; edges: Edge[] }, autoPositio
 
   if (autoPosition) {
     const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
-    g.setGraph({ rankdir: 'TB' });
+    g.setGraph({ rankdir: 'LR' });
 
     // TODO: Fix this so that it correctly sets the width and height of the nodes on the first render.
     //       Currently, it sets the width and height to 400 on the first render because it does not have

@@ -29,8 +29,8 @@ export default function ConditionNode({ id, data }: ConditionNodeProps) {
         />
       </div>
 
-      <Handle type="target" position={Position.Top} className="w-4 h-4 !bg-green-500" />
-      <Handle type="source" position={Position.Bottom} className="w-4 h-4 !bg-green-500" />
+      <Handle type="target" position={Position.Left} className="w-4 h-4 !bg-green-500" />
+      <Handle type="source" position={Position.Right} className="w-4 h-4 !bg-green-500" />
     </NodeContainer>
   );
 }

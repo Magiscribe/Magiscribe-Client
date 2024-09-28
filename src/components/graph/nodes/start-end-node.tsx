@@ -14,7 +14,7 @@ function StartEndNode({ id, type }: StartEndNodeProps) {
       <CustomHandle
         connectionCount={1}
         type={type === 'start' ? 'source' : 'target'}
-        position={type === 'start' ? Position.Bottom : Position.Top}
+        position={type === 'start' ? Position.Right : Position.Left}
         className="w-4 h-4 !bg-green-500"
       />
     </NodeContainer>
