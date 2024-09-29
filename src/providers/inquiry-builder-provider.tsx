@@ -8,12 +8,11 @@ import {
   GetInquiryQuery,
   UpdateInquiryMutation,
 } from '@/graphql/graphql';
-import { useAddAlert } from '@/providers/alert-provider';
 import { getAgentIdByName } from '@/utils/agents';
 import { createGraph, formatGraph } from '@/utils/graphs/graph-utils';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
 import { Edge, Node, OnEdgesChange, OnNodesChange, useEdgesState, useNodesState } from '@xyflow/react';
-import React, { createContext, useContext, useMemo, useState } from 'react';
+import React, { createContext, useContext, useMemo, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 interface InquiryProviderProps {
@@ -24,8 +23,7 @@ interface InquiryProviderProps {
 export interface FormData {
   title: string;
   description: string;
-  organizationName: string;
-  inputGoals: string;
+  goals: string;
 }
 
 const DEFAULT_GRAPH = { nodes: [{ id: '0', type: 'start', position: { x: 0, y: 0 }, data: {} }], edges: [] };
@@ -56,6 +54,7 @@ interface ContextType {
 
   generatingGraph: boolean;
   generateGraph: () => void;
+  onGraphGenerated?: (callback: () => void) => void;
 }
 
 const InquiryContext = createContext<ContextType | undefined>(undefined);
@@ -74,7 +73,9 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
 
   // Memoized graph object
   const graph = useMemo(() => ({ nodes, edges }), [nodes, edges]);
-  const alert = useAddAlert();
+
+  // Events
+  const onGraphGeneratedRef = useRef<() => void>();
 
   /**
    * Fetches the inquiry data from the server.
@@ -102,7 +103,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
         setGeneratingGraph(false);
         const graph = createGraph(JSON.parse(JSON.parse(prediction.result)));
         updateGraph(formatGraph(graph, true));
-        alert('Graph generated successfully!', 'success');
+        if (onGraphGeneratedRef.current) onGraphGeneratedRef.current();
       }
     },
     onError: () => setGeneratingGraph(false),
@@ -214,8 +215,8 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
         variables: {
           ...form,
           userMessage: [
-            `You are generating a graph for ${form.title} at the organization ${form.organizationName} with the description: ${form.description}`,
-            `The user is looking for the following goals to be completed: ${form.inputGoals}`,
+            `You are generating a graph for ${form.title}`,
+            `The user is looking for the following goals to be completed: ${form.goals}`,
           ].join('\n'),
         },
       },
@@ -247,6 +248,9 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
 
     generatingGraph,
     generateGraph,
+    onGraphGenerated: (callback: () => void) => {
+      onGraphGeneratedRef.current = callback;
+    },
   };
 
   return <InquiryContext.Provider value={contextValue}>{children}</InquiryContext.Provider>;

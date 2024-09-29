@@ -2,6 +2,7 @@ import { useAddAlert } from '@/providers/alert-provider';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import CustomModal from '../modal';
 import DeleteConfirmationModal from './delete-modal';
 
@@ -88,22 +89,6 @@ export default function ModalUpsertInquiry({ open, onSave, onDelete, onClose }: 
               value={form.description}
               onChange={handleInputChange('description')}
               rows={2}
-              className="border-2 border-slate-200 p-2 rounded-lg w-full"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-bold mb-2" htmlFor="organizationName">
-              Organization Name
-              <br />
-              <span className="italic text-slate-500 text-sm font-normal">
-                The organization name that the inquiry is associated with.
-              </span>
-            </label>
-            <input
-              type="text"
-              id="organizationName"
-              value={form.organizationName}
-              onChange={handleInputChange('organizationName')}
               className="border-2 border-slate-200 p-2 rounded-lg w-full"
             />
           </div>

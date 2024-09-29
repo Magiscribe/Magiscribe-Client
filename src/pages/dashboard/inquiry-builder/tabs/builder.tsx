@@ -6,9 +6,17 @@ import ModalUpsertInquiry from '@/components/modals/upsert-inquiry-modal';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { formatGraph } from '@/utils/graphs/graph-utils';
-import { faGear, faQuestionCircle, faSpinner, faTrash, faWandMagicSparkles } from '@fortawesome/free-solid-svg-icons';
+import {
+  faEye,
+  faGear,
+  faQuestionCircle,
+  faSpinner,
+  faTrash,
+  faWandMagicSparkles,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useRef, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
 
 const DEBOUNCE_DELAY_IN_MS = 1000;
 
@@ -41,8 +49,15 @@ export default function InquiryBuilder() {
     updateGraphEdges,
     updateGraphNodes,
     generatingGraph,
+    onGraphGenerated,
   } = useInquiryBuilder();
   const alert = useAddAlert();
+  const { id } = useParams<{ id: string }>();
+  const previewLink = `${window.location.origin}/inquiry/${id}?preview=true`;
+
+  onGraphGenerated?.(() => {
+    if (generateModalOpen) setGenerateModalOpen(false);
+  });
 
   /**
    * A debounced function to save the graph after a delay.
@@ -76,18 +91,16 @@ export default function InquiryBuilder() {
     <>
       <div className="h-[85vh] flex flex-col border-white border-2 rounded-2xl overflow-hidden">
         <div className="bg-white p-4 space-y-4 text-slate-700">
-          <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold flex flex-col items-start">
-              <span>
-                {form.title} Graph{' '}
-                <span className="text-sm font-normal text-slate-500">
-                  Last updated {lastUpdated ? new Date(lastUpdated).toLocaleString() : 'Never'}
-                </span>
-              </span>
-              <button onClick={() => setUpsertFormModal(true)} className="text-blue-500 text-sm font-semibold">
+          <div className="flex justify-between items-start">
+            <div>
+              <h2 className="text-2xl font-bold">{form.title} Graph</h2>
+              <p className="text-sm text-slate-500">
+                Last updated {lastUpdated ? new Date(lastUpdated).toLocaleString() : 'Never'}
+              </p>
+              <button onClick={() => setUpsertFormModal(true)} className="text-blue-500 text-sm font-semibold mt-1">
                 Edit Inquiry
               </button>
-            </h2>
+            </div>
             <div className="flex space-x-4">
               <button
                 className="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded-full flex items-center"
@@ -108,6 +121,15 @@ export default function InquiryBuilder() {
                 <FontAwesomeIcon icon={faGear} className="mr-2" />
                 Format Graph
               </button>
+              <Link
+                to={previewLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded-full flex items-center"
+              >
+                <FontAwesomeIcon icon={faEye} className="mr-2" />
+                Preview
+              </Link>
               <button
                 onClick={() => setResetGraphModal(true)}
                 className="bg-red-500 hover:bg-red-700 text-white text-sm font-bold py-2 px-4 rounded-full flex items-center"
@@ -147,13 +169,7 @@ export default function InquiryBuilder() {
         }}
       />
 
-      <ModalGenerateInquiryGraph
-        open={generateModalOpen}
-        onClose={() => setGenerateModalOpen(false)}
-        onSave={() => {
-          setGenerateModalOpen(false);
-        }}
-      />
+      <ModalGenerateInquiryGraph open={generateModalOpen} onClose={() => setGenerateModalOpen(false)} />
 
       <DeleteConfirmationModal
         isOpen={resetGraphModal}

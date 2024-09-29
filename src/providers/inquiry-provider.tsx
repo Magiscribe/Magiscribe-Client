@@ -9,8 +9,21 @@ import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo
 import React, { createContext, useContext, useRef, useState } from 'react';
 
 interface InquiryProviderProps {
+  /**
+   * The child components that will be wrapped by the InquiryProvider
+   */
   children: React.ReactNode;
+
+  /**
+   * A unique identifier for the inquiry
+   */
   id: string;
+
+  /**
+   * An optional preview string for the inquiry. This will prevent the inquiry from being saving
+   * data to the database.
+   */
+  preview?: boolean;
 }
 
 interface HandleNextNodeProps {
@@ -33,6 +46,9 @@ const INITIAL_STATE: State = {
 };
 
 interface InquiryContextType {
+  id: string;
+  preview?: boolean;
+
   handleNextNode: (props?: HandleNextNodeProps) => Promise<void>;
   onNodeUpdate: (callback: (node: OptimizedNode) => void) => void;
 
@@ -45,7 +61,7 @@ interface InquiryContextType {
 
 const InquiryContext = createContext<InquiryContextType | undefined>(undefined);
 
-function InquiryProvider({ children, id }: InquiryProviderProps) {
+function InquiryProvider({ children, id, preview }: InquiryProviderProps) {
   // Refs
   const formRef = useRef<{ [key: string]: string }>({});
   const graphRef = useRef<GraphManager | null>(null);
@@ -153,12 +169,16 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
    */
   const handleNextNode = async ({ nextNodeId, data }: HandleNextNodeProps = {}) => {
     if (!graphRef.current) return;
-
     setState((prev) => ({ ...prev, loading: true }));
 
     const carryOverData = graphRef.current.getCurrentNode()?.data;
     await graphRef.current.updateCurrentNodeData({ response: data, ...carryOverData });
     await graphRef.current.goToNextNode(nextNodeId);
+
+    if (preview) {
+      console.log('Preview mode, not saving response');
+      return;
+    }
 
     if (!inquiryResponseIdRef.current) {
       const result = await createResponse({
@@ -302,6 +322,9 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
   };
 
   const contextValue: InquiryContextType = {
+    id,
+    preview,
+
     onNodeUpdate: (callback: (node: OptimizedNode) => void) => {
       onNodeUpdateRef.current = callback;
     },

@@ -1,5 +1,8 @@
 import { useAddAlert } from '@/providers/alert-provider';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
+import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
 import CustomModal from '../modal';
 
 interface ModalUpsertInquiryProps {
@@ -24,7 +27,7 @@ interface ModalUpsertInquiryProps {
 
 export default function ModalGenerateInquiryGraph({ open, onSave, onClose }: ModalUpsertInquiryProps) {
   // Hooks
-  const { form, updateForm, saveForm, generateGraph, resetGraph } = useInquiryBuilder();
+  const { form, updateForm, saveForm, generateGraph, resetGraph, generatingGraph } = useInquiryBuilder();
   const alert = useAddAlert();
 
   /**
@@ -59,13 +62,13 @@ export default function ModalGenerateInquiryGraph({ open, onSave, onClose }: Mod
     <CustomModal size={'3xl'} open={open} onClose={onClose} title="Generate Inquiry Graph">
       <form className="space-y-4">
         <div>
-          <label className="block text-sm font-bold mb-2" htmlFor="inputGoals">
+          <label className="block text-sm font-bold mb-2" htmlFor="goals">
             Describe the goals of the inquiry you want to generate
           </label>
           <textarea
-            id="inputGoals"
-            value={form.inputGoals}
-            onChange={handleInputChange('inputGoals')}
+            id="goals"
+            value={form.goals}
+            onChange={handleInputChange('goals')}
             rows={3}
             className="border-2 border-gray-200 p-2 rounded-lg w-full"
           />
@@ -75,9 +78,17 @@ export default function ModalGenerateInquiryGraph({ open, onSave, onClose }: Mod
       <div className="flex justify-end p-4 rounded-2xl space-x-4">
         <button
           onClick={handleGenerate}
-          className="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded-full flex items-center"
+          disabled={generatingGraph}
+          className="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded-full flex items-center disabled:opacity-50"
         >
-          Start Graph Generation
+          {generatingGraph ? (
+            <>
+              Generating Graph...
+              <FontAwesomeIcon icon={faSpinner} className="ml-2" spin />
+            </>
+          ) : (
+            'Start Graph Generation '
+          )}
         </button>
       </div>
     </CustomModal>
