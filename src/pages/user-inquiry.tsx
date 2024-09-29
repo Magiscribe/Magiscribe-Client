@@ -27,6 +27,12 @@ interface Message {
   sender: 'user' | 'bot';
 }
 
+const emailRegex = /.+@.+\..+/;
+const validFieldCSS =
+  'w-full p-3 border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500';
+const invalidFieldCSS =
+  'w-full p-3 border border-red-700 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500';
+
 /**
  * Container component that provides a gradient background and rounded corners.
  */
@@ -50,6 +56,7 @@ function UserInquiryPage() {
   const [selectedRatings, setSelectedRatings] = useState<string[]>([]);
   const [currentNode, setCurrentNode] = useState<StrippedNode | null>(null);
   const { isTranscribing, transcript, handleTranscribe } = useTranscribe();
+  const [isValidEmail, setIsValidEmail] = useState<boolean>(true);
 
   // Navigation Hooks
   const navigate = useNavigate();
@@ -57,9 +64,25 @@ function UserInquiryPage() {
   // Inquiry hooks
   const { id, preview, handleNextNode, form, state, onNodeUpdate, userDetails, setUserDetails } = useInquiry();
 
+  const setUserEmail = React.useCallback(
+    (email: string) => {
+      setUserDetails({ ...userDetails, email: email });
+      if (emailRegex.test(email) || !email) {
+        setIsValidEmail(true);
+      } else {
+        setIsValidEmail(false);
+      }
+    },
+    [setUserDetails],
+  );
+
   if (!id || !form) return null;
 
   const handleStart = () => {
+    if (!isValidEmail) {
+      // Don't store emails with invalid syntax
+      setUserDetails({ ...userDetails, email: '' });
+    }
     setScreen('inquiry');
     handleNextNode();
   };
@@ -204,7 +227,7 @@ function UserInquiryPage() {
                   placeholder="Your Name"
                   onChange={(e) => setUserDetails({ ...userDetails, name: e.target.value })}
                   value={userDetails.name}
-                  className="w-full p-3 border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className={validFieldCSS}
                 />
               </div>
               <div className="flex flex-col gap-2">
@@ -213,10 +236,11 @@ function UserInquiryPage() {
                   type="email"
                   name="email"
                   placeholder="Your Email Address"
-                  onChange={(e) => setUserDetails({ ...userDetails, email: e.target.value })}
                   value={userDetails.email}
-                  className="w-full p-3 border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  onChange={(e) => setUserEmail(e.target.value)}
+                  className={isValidEmail ? validFieldCSS : invalidFieldCSS}
                 />
+                {!isValidEmail && <p className="text-sm text-red-700">Please enter a valid email address.</p>}
               </div>
             </form>
           </div>

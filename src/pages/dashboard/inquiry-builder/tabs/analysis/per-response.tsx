@@ -165,7 +165,7 @@ export default function PerResponseTab({ data }: TabProps) {
                 selectedUser === id ? 'bg-blue-500 text-white' : 'bg-slate-200 text-black'
               }`}
             >
-              {data.userDetails?.name || 'Unknown'} ({id})
+              {data.userDetails?.name || 'Unknown'} ({data.userDetails?.email || id})
             </button>
           ))}
         </div>
