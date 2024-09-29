@@ -248,35 +248,36 @@ function Flow({ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange }
     addNode();
   };
 
-  const renderNodeButtonsSide = () =>
+  const renderNodeButtonsSide = () => (
     <div className="w-full flex flex-row space-x-4">
       {Object.keys(nodeTypesInfo).map((type) => {
-      const disabled = !validateNewNode(type);
+        const disabled = !validateNewNode(type);
 
-      return (
-        <div key={type} className="w-44 flex items-center">
-          <button
-            draggable={!disabled}
-            onDragStart={() => (disabled ? null : onDragStart(type))}
-            disabled={disabled}
-            className="w-full max-w-xs px-4 py-2 bg-white border-2 border-slate-400 text-slate-800 font-semibold text-sm rounded-xl shadow-lg disabled:opacity-50 text-left"
-          >
-            <FontAwesomeIcon
-              icon={nodeTypesInfo[type as keyof typeof nodeTypesInfo].icon}
-              className="mr-2 text-blue-600"
-            />
-            {type.charAt(0).toUpperCase() + type.slice(1)}
-          </button>
-          <CustomTooltip
-            triggerOnHover
-            render={() => <FontAwesomeIcon icon={faQuestionCircle} className="ml-2 text-slate-400" />}
-          >
-            <p className="text-xs font-normal">{nodeTypesInfo[type as keyof typeof nodeTypesInfo].description}</p>
-          </CustomTooltip>
-        </div>
-      );
-    })}
+        return (
+          <div key={type} className="w-44 flex items-center">
+            <button
+              draggable={!disabled}
+              onDragStart={() => (disabled ? null : onDragStart(type))}
+              disabled={disabled}
+              className="w-full max-w-xs px-4 py-2 bg-white border-2 border-slate-400 text-slate-800 font-semibold text-sm rounded-xl shadow-lg disabled:opacity-50 text-left"
+            >
+              <FontAwesomeIcon
+                icon={nodeTypesInfo[type as keyof typeof nodeTypesInfo].icon}
+                className="mr-2 text-blue-600"
+              />
+              {type.charAt(0).toUpperCase() + type.slice(1)}
+            </button>
+            <CustomTooltip
+              triggerOnHover
+              render={() => <FontAwesomeIcon icon={faQuestionCircle} className="ml-2 text-slate-400" />}
+            >
+              <p className="text-xs font-normal">{nodeTypesInfo[type as keyof typeof nodeTypesInfo].description}</p>
+            </CustomTooltip>
+          </div>
+        );
+      })}
     </div>
+  );
 
   const renderNodeButtonsMenu = (position?: { x: number; y: number }, source?: string, target?: string) =>
     Object.keys(nodeTypesInfo).map((type) => {
