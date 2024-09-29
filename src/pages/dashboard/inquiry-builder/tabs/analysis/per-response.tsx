@@ -102,14 +102,14 @@ export default function PerResponseTab({ data }: TabProps) {
   });
 
   const renderNodeContent = (node: NodeVisitAnalysisData) => {
+    const nodeText = node?.data?.text;
     if (node?.data?.response) {
-      const question = node.data.text;
       const responseText = node.data.response.text;
       const ratings = node.data.response.ratings;
 
       return (
         <>
-          <p className="font-semibold text-black">{question}</p>
+          <p className="font-semibold text-black">{nodeText}</p>
           <hr className="my-2" />
           <p className="text-black">
             {responseText && <span>{responseText}</span>}
@@ -122,8 +122,9 @@ export default function PerResponseTab({ data }: TabProps) {
           </p>
         </>
       );
+    } else {
+      return <p className="font-semibold text-black">{nodeText}</p>;
     }
-    return null;
   };
 
   const totalPages = Math.ceil(responses.length / usersPerPage);
@@ -199,7 +200,7 @@ export default function PerResponseTab({ data }: TabProps) {
         {selectedUser &&
           userData.map((node, i) => {
             const graphNode = nodesMap[node.id];
-            if (graphNode?.type === 'conversation') {
+            if (graphNode?.type === 'conversation' || graphNode?.type === 'information') {
               return (
                 <div key={i} className="mb-4 p-4 bg-slate-200 rounded-2xl">
                   {renderNodeContent(node)}
