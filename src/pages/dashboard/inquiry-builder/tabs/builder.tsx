@@ -1,19 +1,11 @@
 import GraphInput from '@/components/graph/graph-input';
 import DeleteConfirmationModal from '@/components/modals/delete-modal';
 import ModalGenerateInquiryGraph from '@/components/modals/generate-inquiry-modal';
-import ModalGraphHelp from '@/components/modals/graph-help-modal';
 import ModalUpsertInquiry from '@/components/modals/upsert-inquiry-modal';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { formatGraph } from '@/utils/graphs/graph-utils';
-import {
-  faEye,
-  faGear,
-  faQuestionCircle,
-  faSpinner,
-  faTrash,
-  faWandMagicSparkles,
-} from '@fortawesome/free-solid-svg-icons';
+import { faEye, faGear, faSpinner, faTrash, faWandMagicSparkles } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -31,7 +23,6 @@ export default function InquiryBuilder() {
   const [resetGraphModal, setResetGraphModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [generateModalOpen, setGenerateModalOpen] = useState(false);
-  const [helpModal, setHelpModal] = useState(false);
 
   // Refs
   const saveDebounce = useRef<NodeJS.Timeout>();
@@ -168,12 +159,6 @@ export default function InquiryBuilder() {
                 Reset
               </button>
               <button
-                onClick={() => setHelpModal(true)}
-                className="text-gray-500 hover:text-gray-700 text-lg font-bold py-2 rounded-full flex items-center"
-              >
-                <FontAwesomeIcon icon={faQuestionCircle} className="mr-2" />
-              </button>
-              <button
                 onClick={() => setDeleteModal(true)}
                 className="text-gray-500 hover:text-gray-700 text-lg font-bold py-2 rounded-full flex items-center"
               >
@@ -235,8 +220,6 @@ export default function InquiryBuilder() {
         text="Are you sure you want to delete the inquiry?"
         confirmText="Delete Inquiry"
       />
-
-      <ModalGraphHelp open={helpModal} onClose={() => setHelpModal(false)} />
     </>
   );
 }
