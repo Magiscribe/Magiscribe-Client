@@ -241,6 +241,7 @@ function UserInquiryPage() {
                   onChange={(e) => setUserEmail(e.target.value)}
                   className={isValidEmail ? validFieldCSS : invalidFieldCSS}
                 />
+                {!isValidEmail && <p className="text-sm text-red-700">Please enter a valid email address.</p>}
               </div>
             </form>
           </div>

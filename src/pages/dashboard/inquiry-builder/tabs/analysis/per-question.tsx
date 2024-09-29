@@ -143,7 +143,9 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
       const userName = userIdToDetalsMap.get(userId)?.name;
       return (
         <div key={`${userId}-${nodeId}`} className="ml-4 mb-4">
-          <p className="text-black font-semibold">{userEmail || userName ? userName + ' (' + userEmail + ')': userId}:</p>
+          <p className="text-black font-semibold">
+            {userEmail || userName ? userName + ' (' + userEmail + ')' : userId}:
+          </p>
           {userResponses.map((response, index) => {
             const isDynamicGeneration = response.data?.text !== undefined;
             const responseText = response.data?.response?.text;
