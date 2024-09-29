@@ -26,6 +26,9 @@ interface Message {
   sender: 'user' | 'bot';
 }
 
+/**
+ * Container component that provides a gradient background and rounded corners.
+ */
 const Container = ({ children }: { children: React.ReactNode }) => (
   <div className="flex flex-col items-center py-4 px-4 md:py-12">
     <div className="w-full max-w-4xl mx-auto">
@@ -49,6 +52,8 @@ function UserInquiryPage() {
 
   // Hooks
   const { id } = useParams<{ id: string }>();
+  const { preview } = useParams<{ preview?: string }>();
+  const isPreview = preview === 'preview';
   const navigate = useNavigate();
   const { handleNextNode, form, state, onNodeUpdate, userDetails, setUserDetails } = useInquiry();
 
@@ -58,6 +63,22 @@ function UserInquiryPage() {
     setScreen('inquiry');
     handleNextNode();
   };
+
+  const handleFinishInquiry = () => {
+    if (preview) {
+      // Redirect to the inquiry builder page in preview mode
+      navigate(`/dashboard/inquiry-builder/${id}`);
+    } else {
+      // Regular mode: show the summary screen
+      setScreen('summary');
+    }
+  };
+
+  useEffect(() => {
+    if (isPreview && screen === 'start' && state.initialized) {
+      handleStart();
+    }
+  }, [isPreview, screen, handleNextNode]);
 
   const handleReset = () => {
     // Force a reload of the page to reset.
@@ -93,7 +114,7 @@ function UserInquiryPage() {
       setCurrentNode(node);
 
       if (node.type === 'information') {
-        setTimeout(() => handleNextNode(), 1000);
+        setTimeout(() => handleNextNode(), 100);
       }
     }
   };
@@ -306,7 +327,7 @@ function UserInquiryPage() {
               <div className="flex justify-end">
                 <button
                   type="button"
-                  onClick={() => setScreen('summary')}
+                  onClick={handleFinishInquiry}
                   className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-300 ease-in-out disabled:opacity-70 disabled:cursor-not-allowed"
                 >
                   Finish Inquiry
@@ -363,10 +384,10 @@ function UserInquiryPage() {
  * Wrapper component that provides the InquiryProvider context.
  */
 export default function InquiryWrapper() {
-  const { id } = useParams<{ id: string }>();
+  const { id, preview } = useParams<{ id: string; preview?: string }>();
   if (!id) return null;
   return (
-    <InquiryProvider id={id}>
+    <InquiryProvider id={id} preview={preview}>
       <Container>
         <UserInquiryPage />
       </Container>

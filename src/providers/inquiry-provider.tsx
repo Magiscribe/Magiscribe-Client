@@ -11,6 +11,7 @@ import React, { createContext, useContext, useRef, useState } from 'react';
 interface InquiryProviderProps {
   children: React.ReactNode;
   id: string;
+  preview?: string;
 }
 
 interface HandleNextNodeProps {
@@ -41,11 +42,12 @@ interface InquiryContextType {
 
   form: { [key: string]: string };
   state: State;
+  preview?: boolean;
 }
 
 const InquiryContext = createContext<InquiryContextType | undefined>(undefined);
 
-function InquiryProvider({ children, id }: InquiryProviderProps) {
+function InquiryProvider({ children, id, preview }: InquiryProviderProps) {
   // Refs
   const formRef = useRef<{ [key: string]: string }>({});
   const graphRef = useRef<GraphManager | null>(null);
@@ -153,35 +155,36 @@ function InquiryProvider({ children, id }: InquiryProviderProps) {
    */
   const handleNextNode = async ({ nextNodeId, data }: HandleNextNodeProps = {}) => {
     if (!graphRef.current) return;
-
     setState((prev) => ({ ...prev, loading: true }));
 
     const carryOverData = graphRef.current.getCurrentNode()?.data;
     await graphRef.current.updateCurrentNodeData({ response: data, ...carryOverData });
     await graphRef.current.goToNextNode(nextNodeId);
 
-    if (!inquiryResponseIdRef.current) {
-      const result = await createResponse({
-        variables: {
-          inquiryId: id,
-          data: {
-            userDetails,
-            history: graphRef.current.getNodeHistory(),
+    if (!preview) {
+      if (!inquiryResponseIdRef.current) {
+        const result = await createResponse({
+          variables: {
+            inquiryId: id,
+            data: {
+              userDetails,
+              history: graphRef.current.getNodeHistory(),
+            },
           },
-        },
-      });
-      inquiryResponseIdRef.current = result.data?.upsertInquiryResponse.id;
-    } else {
-      await updateResponse({
-        variables: {
-          id: inquiryResponseIdRef.current,
-          inquiryId: id,
-          data: {
-            history: graphRef.current.getNodeHistory(),
+        });
+        inquiryResponseIdRef.current = result.data?.upsertInquiryResponse.id;
+      } else {
+        await updateResponse({
+          variables: {
+            id: inquiryResponseIdRef.current,
+            inquiryId: id,
+            data: {
+              history: graphRef.current.getNodeHistory(),
+            },
+            fields: ['history'],
           },
-          fields: ['history'],
-        },
-      });
+        });
+      }
     }
   };
 
