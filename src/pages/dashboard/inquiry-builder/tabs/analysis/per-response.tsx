@@ -23,7 +23,7 @@ export default function PerResponseTab({ data }: TabProps) {
   const [summaries, setSummaries] = useWithLocalStorage<ResponseSummary>({}, `${data.id}-per-response-summary`);
 
   const { responses = [], graph } = data;
-  const usersPerPage = 42;
+  const usersPerPage = 40;
 
   const client = useApolloClient();
   const [addPrediction] = useMutation(ADD_PREDICTION);

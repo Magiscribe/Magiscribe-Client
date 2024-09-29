@@ -85,7 +85,7 @@ const router = createBrowserRouter([
       },
 
       {
-        path: 'inquiry/:id',
+        path: 'inquiry/:id/:preview?',
         element: <UserInquiryPage />,
       },
       {
