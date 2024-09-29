@@ -16,7 +16,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useRef, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
 const DEBOUNCE_DELAY_IN_MS = 1000;
 
@@ -29,6 +29,7 @@ export default function InquiryBuilder() {
   // States
   const [upsertFormModal, setUpsertFormModal] = useState(false);
   const [resetGraphModal, setResetGraphModal] = useState(false);
+  const [deleteModal, setDeleteModal] = useState(false);
   const [generateModalOpen, setGenerateModalOpen] = useState(false);
   const [helpModal, setHelpModal] = useState(false);
 
@@ -41,6 +42,7 @@ export default function InquiryBuilder() {
     form,
     graph,
     lastUpdated,
+    updateForm,
     updateGraph,
     saveGraph,
     resetGraph,
@@ -49,7 +51,9 @@ export default function InquiryBuilder() {
     updateGraphEdges,
     updateGraphNodes,
     generatingGraph,
+    saveForm,
     onGraphGenerated,
+    deleteInquiry,
   } = useInquiryBuilder();
   const alert = useAddAlert();
   const { id } = useParams<{ id: string }>();
@@ -58,6 +62,8 @@ export default function InquiryBuilder() {
   onGraphGenerated?.(() => {
     if (generateModalOpen) setGenerateModalOpen(false);
   });
+
+  const navigate = useNavigate();
 
   /**
    * A debounced function to save the graph after a delay.
@@ -80,6 +86,26 @@ export default function InquiryBuilder() {
   }, [graph]);
 
   /**
+   * A debounced function to save the graph after a delay.
+   */
+  useEffect(() => {
+    if (saveDebounce.current) {
+      clearTimeout(saveDebounce.current);
+    }
+
+    saveDebounce.current = setTimeout(() => {
+      saveForm(); // Function to save the graph
+    }, DEBOUNCE_DELAY_IN_MS);
+
+    // Cleanup function to clear the timeout if the component unmounts or the effect re-runs
+    return () => {
+      if (saveDebounce.current) {
+        clearTimeout(saveDebounce.current);
+      }
+    };
+  }, [form]);
+
+  /**
    * Handle formatting the graph.
    */
   const handleFormat = () => {
@@ -93,13 +119,17 @@ export default function InquiryBuilder() {
         <div className="bg-white p-4 space-y-4 text-slate-700">
           <div className="flex justify-between items-start">
             <div>
-              <h2 className="text-2xl font-bold">{form.title} Graph</h2>
+              <input
+                type="text"
+                value={form.title}
+                onChange={(e) => {
+                  updateForm({ ...form, title: e.target.value });
+                }}
+                className="text-2xl font-bold w-full border-2 border-slate-200 p-2 rounded-lg"
+              />
               <p className="text-sm text-slate-500">
                 Last updated {lastUpdated ? new Date(lastUpdated).toLocaleString() : 'Never'}
               </p>
-              <button onClick={() => setUpsertFormModal(true)} className="text-blue-500 text-sm font-semibold mt-1">
-                Edit Inquiry
-              </button>
             </div>
             <div className="flex space-x-4">
               <button
@@ -112,14 +142,14 @@ export default function InquiryBuilder() {
                   className="mr-2"
                   spin={generatingGraph}
                 />
-                Generate Graph
+                {graph.nodes.length <= 1 ? 'Generate' : 'Regenerate'}
               </button>
               <button
                 className="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded-full flex items-center"
                 onClick={handleFormat}
               >
                 <FontAwesomeIcon icon={faGear} className="mr-2" />
-                Format Graph
+                Format
               </button>
               <Link
                 to={previewLink}
@@ -135,14 +165,19 @@ export default function InquiryBuilder() {
                 className="bg-red-500 hover:bg-red-700 text-white text-sm font-bold py-2 px-4 rounded-full flex items-center"
               >
                 <FontAwesomeIcon icon={faTrash} className="mr-2" />
-                Reset Graph
+                Reset
               </button>
               <button
                 onClick={() => setHelpModal(true)}
-                className="bg-gray-500 hover:bg-gray-700 text-white text-sm font-bold py-2 px-4 rounded-full flex items-center"
+                className="text-gray-500 hover:text-gray-700 text-lg font-bold py-2 rounded-full flex items-center"
               >
                 <FontAwesomeIcon icon={faQuestionCircle} className="mr-2" />
-                Help
+              </button>
+              <button
+                onClick={() => setDeleteModal(true)}
+                className="text-gray-500 hover:text-gray-700 text-lg font-bold py-2 rounded-full flex items-center"
+              >
+                <FontAwesomeIcon icon={faTrash} />
               </button>
             </div>
           </div>
@@ -181,6 +216,24 @@ export default function InquiryBuilder() {
         }}
         text="Are you sure you want to reset the graph?"
         confirmText="Reset Graph"
+      />
+
+      <DeleteConfirmationModal
+        isOpen={deleteModal}
+        onClose={() => setDeleteModal(false)}
+        onConfirm={async () => {
+          await deleteInquiry(
+            () => {
+              alert('Inquiry deleted successfully!', 'success');
+              navigate('/dashboard/inquiry-builder');
+            },
+            () => {
+              alert('Something went wrong!', 'error');
+            },
+          );
+        }}
+        text="Are you sure you want to delete the inquiry?"
+        confirmText="Delete Inquiry"
       />
 
       <ModalGraphHelp open={helpModal} onClose={() => setHelpModal(false)} />

@@ -164,7 +164,6 @@ function UserInquiryPage() {
         <div className="text-center space-y-6">
           <h2 className="text-2xl md:text-3xl font-bold text-indigo-900 text-center">{form.title}</h2>
           <div className="h-1 mx-auto w-32 md:w-64 bg-gradient-to-r from-violet-600 to-pink-600 opacity-50 rounded-full"></div>
-          {form.description && <p className="mt-4 text-lg text-slate-700">{form.description}</p>}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
