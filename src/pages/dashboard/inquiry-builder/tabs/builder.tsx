@@ -45,6 +45,8 @@ export default function InquiryBuilder() {
     saveForm,
     onGraphGenerated,
     deleteInquiry,
+    graphFormattedAfterGeneration,
+    setGraphFormattedAfterGeneration,
   } = useInquiryBuilder();
   const alert = useAddAlert();
   const { id } = useParams<{ id: string }>();
@@ -75,6 +77,14 @@ export default function InquiryBuilder() {
       }
     };
   }, [graph]);
+
+  // The graph is not formatted correctly during the first render after it is generated.  This is a hack to auto-fix the formatting.
+  useEffect(() => {
+    if (!graphFormattedAfterGeneration) {
+      updateGraph(formatGraph(graph, true));
+      setGraphFormattedAfterGeneration(true);
+    }
+  }, [graphFormattedAfterGeneration])
 
   /**
    * A debounced function to save the graph after a delay.
