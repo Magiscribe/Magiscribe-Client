@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import useAutoResizeTextareaRef from '@/hooks/auto-resize-textarea';
 import { faUserFriends } from '@fortawesome/free-solid-svg-icons';
 import { Handle, NodeProps, Position } from '@xyflow/react';
@@ -24,6 +24,7 @@ type ConversationNodeProps = NodeProps & {
 export default function ConversationNode({ id, data }: ConversationNodeProps) {
   const textareaRef = useAutoResizeTextareaRef(data.text ?? '');
   const { handleInputChange } = useNodeData<ConversationNodeProps>(id);
+  const [isInputSelected, setIsInputSelected] = useState(false);
 
   const handleUpdate = useCallback(
     (updates: Partial<ConversationNodeProps['data']>) => {
@@ -62,7 +63,7 @@ export default function ConversationNode({ id, data }: ConversationNodeProps) {
   };
 
   return (
-    <NodeContainer title="Conversation" faIcon={faUserFriends} id={id}>
+    <NodeContainer title="Conversation" faIcon={faUserFriends} id={id} isInputSelected={isInputSelected}>
       <div className="space-y-4 mt-2">
         <div className="flex flex-col gap-2">
           <label className="text-sm font-medium text-gray-700">Dynamic Generation</label>
@@ -99,6 +100,8 @@ export default function ConversationNode({ id, data }: ConversationNodeProps) {
             defaultValue={data.text}
             name="text"
             onChange={(e) => handleUpdate({ text: e.target.value })}
+            onBlur={() => setIsInputSelected(false)}
+            onFocusCapture={() => setIsInputSelected(true)}
             rows={1}
             placeholder="Enter your text here..."
             className="w-full px-3 py-2 bg-inherit rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 resize-none overflow-hidden"
