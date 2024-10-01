@@ -260,7 +260,7 @@ function Flow({ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange }
               draggable={!disabled}
               onDragStart={() => (disabled ? null : onDragStart(type))}
               disabled={disabled}
-              className="w-full max-w-xs px-4 py-2 bg-white border-2 border-slate-400 text-slate-800 font-semibold text-sm rounded-xl shadow-lg disabled:opacity-50 text-left"
+              className="w-full max-w-xs px-4 py-2 bg-white border-2 border-slate-400 text-slate-800 font-semibold text-sm rounded-xl shadow-lg disabled:opacity-50 text-left z-10"
             >
               <FontAwesomeIcon
                 icon={nodeTypesInfo[type as keyof typeof nodeTypesInfo].icon}
@@ -307,7 +307,7 @@ function Flow({ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange }
 
   return (
     <div className="relative w-full h-full text-black">
-      <div className="absolute w-full flex flex-row top-0 left-0 p-4 space-x-4 z-10">
+      <div className="absolute w-full flex flex-row top-0 left-0 p-4 space-x-4">
         <h3 className="text-xl font-semibold text-left text-white min-w-44">
           Nodes
           <br />
