@@ -14,6 +14,7 @@ export function createGraph(input: { nodes: Node[]; edges: Edge[] }): { nodes: N
     type: node.type,
     position: { x: node.position?.x, y: node.position?.y },
     data: node.data,
+    dragHandle: ".custom-drag-handle"
   }));
 
   const newEdges: Edge[] = input.edges.map((edge: Edge) => ({

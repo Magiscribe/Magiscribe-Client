@@ -55,6 +55,8 @@ interface ContextType {
   generatingGraph: boolean;
   generateGraph: () => void;
   onGraphGenerated?: (callback: () => void) => void;
+  graphFormattedAfterGeneration: boolean;
+  setGraphFormattedAfterGeneration: (graphFormatted: boolean) => void;
 }
 
 const InquiryContext = createContext<ContextType | undefined>(undefined);
@@ -66,7 +68,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   const [form, updateForm] = useState<FormData>({} as FormData);
   const [generatingGraph, setGeneratingGraph] = useState(false);
-
+  const [graphFormattedAfterGeneration, setGraphFormattedAfterGeneration] = useState(true);
   // Hooks
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
@@ -103,6 +105,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
         setGeneratingGraph(false);
         const graph = createGraph(JSON.parse(JSON.parse(prediction.result)));
         updateGraph(formatGraph(graph, true));
+        setGraphFormattedAfterGeneration(false);
         if (onGraphGeneratedRef.current) onGraphGeneratedRef.current();
       }
     },
@@ -251,6 +254,8 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     onGraphGenerated: (callback: () => void) => {
       onGraphGeneratedRef.current = callback;
     },
+    graphFormattedAfterGeneration,
+    setGraphFormattedAfterGeneration
   };
 
   return <InquiryContext.Provider value={contextValue}>{children}</InquiryContext.Provider>;

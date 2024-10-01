@@ -4,14 +4,17 @@ import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { useReactFlow } from '@xyflow/react';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
+const nodeContainerBaseClass = 'px-4 py-2 shadow-md rounded-3xl bg-white w-96 shadow-xl';
+
 type NodeContainerProps = {
   title: string;
   faIcon: IconDefinition;
   id: string;
   children: React.ReactNode;
+  isInputSelected?: boolean;
 };
 
-const NodeContainer = ({ title, faIcon, id, children }: NodeContainerProps) => {
+const NodeContainer = ({ title, faIcon, id, children, isInputSelected }: NodeContainerProps) => {
   const { setNodes, setEdges } = useReactFlow();
 
   const onNodeClick = () => {
@@ -20,7 +23,7 @@ const NodeContainer = ({ title, faIcon, id, children }: NodeContainerProps) => {
   };
 
   return (
-    <div className="px-4 py-2 shadow-md rounded-3xl bg-white w-96 shadow-xl">
+    <div className={!isInputSelected ? nodeContainerBaseClass + ' custom-drag-handle' : nodeContainerBaseClass}>
       <div className="flex items-center">
         <FontAwesomeIcon icon={faIcon} className="mr-2 text-blue-600" />
         <button

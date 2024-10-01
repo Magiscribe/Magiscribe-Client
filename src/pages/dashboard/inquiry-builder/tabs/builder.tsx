@@ -5,7 +5,7 @@ import ModalUpsertInquiry from '@/components/modals/upsert-inquiry-modal';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { formatGraph } from '@/utils/graphs/graph-utils';
-import { faEye, faGear, faSpinner, faTrash, faWandMagicSparkles } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faGear, faRotateLeft, faSpinner, faTrash, faWandMagicSparkles } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -45,6 +45,8 @@ export default function InquiryBuilder() {
     saveForm,
     onGraphGenerated,
     deleteInquiry,
+    graphFormattedAfterGeneration,
+    setGraphFormattedAfterGeneration,
   } = useInquiryBuilder();
   const alert = useAddAlert();
   const { id } = useParams<{ id: string }>();
@@ -75,6 +77,14 @@ export default function InquiryBuilder() {
       }
     };
   }, [graph]);
+
+  // The graph is not formatted correctly during the first render after it is generated.  This is a hack to auto-fix the formatting.
+  useEffect(() => {
+    if (!graphFormattedAfterGeneration) {
+      updateGraph(formatGraph(graph, true));
+      setGraphFormattedAfterGeneration(true);
+    }
+  }, [graphFormattedAfterGeneration]);
 
   /**
    * A debounced function to save the graph after a delay.
@@ -153,16 +163,17 @@ export default function InquiryBuilder() {
               </Link>
               <button
                 onClick={() => setResetGraphModal(true)}
-                className="bg-red-500 hover:bg-red-700 text-white text-sm font-bold py-2 px-4 rounded-full flex items-center"
+                className="bg-gray-500 hover:bg-gray-700 text-white text-sm font-bold py-2 px-4 rounded-full flex items-center"
               >
-                <FontAwesomeIcon icon={faTrash} className="mr-2" />
+                <FontAwesomeIcon icon={faRotateLeft} className="mr-2" />
                 Reset
               </button>
               <button
                 onClick={() => setDeleteModal(true)}
-                className="text-gray-500 hover:text-gray-700 text-lg font-bold py-2 rounded-full flex items-center"
+                className="bg-red-500 hover:bg-red-700 text-white text-sm font-bold py-2 px-4 rounded-full flex items-center"
               >
-                <FontAwesomeIcon icon={faTrash} />
+                <FontAwesomeIcon icon={faTrash} className="mr-2" />
+                Delete
               </button>
             </div>
           </div>
