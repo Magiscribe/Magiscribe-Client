@@ -119,7 +119,7 @@ function UserInquiryPage() {
     setSelectedRatings([]);
   };
 
-  const onNodeVisit = (node: StrippedNode) => {
+  const onNodeVisit = async (node: StrippedNode) => {
     if (node.type === 'end') {
       setScreen('end');
       return;
@@ -130,7 +130,7 @@ function UserInquiryPage() {
       setCurrentNode(node);
 
       if (node.type === 'information') {
-        setTimeout(() => handleNextNode(), 100);
+        await handleNextNode();
       }
     }
   };
@@ -253,7 +253,7 @@ function UserInquiryPage() {
             onClick={handleStart}
             className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-lg font-semibold rounded-full hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-300 ease-in-out transform hover:scale-105 shadow-lg"
           >
-            Start Your Inquiry
+            Start Inquiry
           </button>
         </div>
       </div>
