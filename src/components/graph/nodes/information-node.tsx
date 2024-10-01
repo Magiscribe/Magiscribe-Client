@@ -4,6 +4,7 @@ import { Handle, NodeProps, Position } from '@xyflow/react';
 import NodeContainer from '../elements/node-container';
 import CustomHandle from '../handles/limit-handle';
 import { useNodeData } from '../utils';
+import { useState } from 'react';
 
 type InformationNodeProps = NodeProps & {
   data: {
@@ -15,9 +16,10 @@ type InformationNodeProps = NodeProps & {
 export default function InformationNode({ id, data }: InformationNodeProps) {
   const textareaRef = useAutoResizeTextareaRef(data.text);
   const { handleInputChange } = useNodeData<InformationNodeProps>(id);
+  const [isInputSelected, setIsInputSelected] = useState(false);
 
   return (
-    <NodeContainer title="Information" faIcon={faExclamationCircle} id={id}>
+    <NodeContainer title="Information" faIcon={faExclamationCircle} id={id} isInputSelected={isInputSelected}>
       <div className="space-y-4 mt-2">
         <div className="flex flex-col gap-2">
           <label className="text-sm font-medium text-gray-700">Dynamic Generation</label>
@@ -39,6 +41,8 @@ export default function InformationNode({ id, data }: InformationNodeProps) {
             defaultValue={data.text}
             name="text"
             onChange={handleInputChange}
+            onFocusCapture={() => setIsInputSelected(true)}
+            onBlur={() => setIsInputSelected(false)}
             rows={1}
             placeholder="Enter your text here..."
             className="w-full px-3 py-2 bg-inherit rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 resize-none overflow-hidden"

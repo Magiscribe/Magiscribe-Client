@@ -78,13 +78,13 @@ function UserInquiryPage() {
 
   if (!id || !form) return null;
 
-  const handleStart = () => {
+  const handleStart = async () => {
     if (!isValidEmail) {
       // Don't store emails with invalid syntax
       setUserDetails({ ...userDetails, email: '' });
     }
     setScreen('inquiry');
-    handleNextNode();
+    await handleNextNode();
   };
 
   const handleFinishInquiry = () => {
@@ -130,7 +130,9 @@ function UserInquiryPage() {
       setCurrentNode(node);
 
       if (node.type === 'information') {
-        setTimeout(() => handleNextNode(), 100);
+        // Delay so that at the very beginning we don't save two copies of the response. 100ms causes the problem, 200ms is fine.
+        // TODO: Come up with a better solution.
+        setTimeout(() => handleNextNode(), 200);
       }
     }
   };
@@ -253,7 +255,7 @@ function UserInquiryPage() {
             onClick={handleStart}
             className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-lg font-semibold rounded-full hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-300 ease-in-out transform hover:scale-105 shadow-lg"
           >
-            Start Your Inquiry
+            Start Inquiry
           </button>
         </div>
       </div>

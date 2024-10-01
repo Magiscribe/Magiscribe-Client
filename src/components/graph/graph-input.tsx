@@ -167,6 +167,7 @@ function Flow({ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange }
         type: node.type,
         position: node.position,
         data: { text: '' },
+        dragHandle: '.custom-drag-handle',
       },
     ]);
 
@@ -307,7 +308,7 @@ function Flow({ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange }
 
   return (
     <div className="relative w-full h-full text-black">
-      <div className="absolute w-full flex flex-row top-0 left-0 p-4 space-x-4 z-10">
+      <div className="absolute flex flex-row top-0 left-0 p-4 space-x-4 z-10">
         <h3 className="text-xl font-semibold text-left text-white min-w-44">
           Nodes
           <br />
