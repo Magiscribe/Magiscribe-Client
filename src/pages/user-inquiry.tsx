@@ -1,6 +1,7 @@
 import AnimatedDots from '@/components/animated/animated-dots';
 import { FeatureCard } from '@/components/cards/feature-card';
 import { ChartProps } from '@/components/chart';
+import Input from '@/components/controls/input';
 import RatingInput from '@/components/graph/rating-input';
 import MarkdownCustom from '@/components/markdown-custom';
 import { useTranscribe } from '@/hooks/audio-hook';
@@ -28,10 +29,6 @@ interface Message {
 }
 
 const emailRegex = /.+@.+\..+/;
-const validFieldCSS =
-  'w-full p-3 border border-slate-300 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500';
-const invalidFieldCSS =
-  'w-full p-3 border border-red-700 rounded-lg text-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500';
 
 /**
  * Container component that provides a gradient background and rounded corners.
@@ -56,35 +53,40 @@ function UserInquiryPage() {
   const [selectedRatings, setSelectedRatings] = useState<string[]>([]);
   const [currentNode, setCurrentNode] = useState<StrippedNode | null>(null);
   const { isTranscribing, transcript, handleTranscribe } = useTranscribe();
-  const [isValidEmail, setIsValidEmail] = useState<boolean>(true);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   // Navigation Hooks
   const navigate = useNavigate();
 
   // Inquiry hooks
-  const { id, preview, handleNextNode, form, state, onNodeUpdate, userDetails, setUserDetails } = useInquiry();
+  const { preview, handleNextNode, form, state, onNodeUpdate, userDetails, setUserDetails } = useInquiry();
 
-  const setUserEmail = React.useCallback(
-    (email: string) => {
-      setUserDetails({ ...userDetails, email: email });
-      if (emailRegex.test(email) || !email) {
-        setIsValidEmail(true);
-      } else {
-        setIsValidEmail(false);
-      }
-    },
-    [setUserDetails],
-  );
+  const validateInput = (input: { [key: string]: string }) => {
+    const newErrors: { [key: string]: string } = {};
 
-  if (!id || !form) return null;
+    if (input.email && !emailRegex.test(input.email)) {
+      newErrors.email = 'Please enter a valid email address.';
+    }
+
+    return newErrors;
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setUserDetails((prev) => ({ ...prev, [name]: value }));
+
+    // Clear the error for this field as the user types
+    setErrors((prev) => ({ ...prev, [name]: '' }));
+  };
 
   const handleStart = () => {
-    if (!isValidEmail) {
-      // Don't store emails with invalid syntax
-      setUserDetails({ ...userDetails, email: '' });
+    const newErrors = validateInput(userDetails);
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length === 0) {
+      setScreen('inquiry');
+      handleNextNode();
     }
-    setScreen('inquiry');
-    handleNextNode();
   };
 
   const handleFinishInquiry = () => {
@@ -220,27 +222,16 @@ function UserInquiryPage() {
             </p>
             <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-gray-700">Name</label>
-                <input
-                  type="text"
-                  name="name"
-                  placeholder="Your Name"
-                  onChange={(e) => setUserDetails({ ...userDetails, name: e.target.value })}
-                  value={userDetails.name}
-                  className={validFieldCSS}
-                />
+                <Input label="Name" name="name" error={errors.name} value={userDetails.name} onChange={handleChange} />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-gray-700">Email</label>
-                <input
-                  type="email"
+                <Input
+                  label="Email"
                   name="email"
-                  placeholder="Your Email Address"
+                  error={errors.email}
                   value={userDetails.email}
-                  onChange={(e) => setUserEmail(e.target.value)}
-                  className={isValidEmail ? validFieldCSS : invalidFieldCSS}
+                  onChange={handleChange}
                 />
-                {!isValidEmail && <p className="text-sm text-red-700">Please enter a valid email address.</p>}
               </div>
             </form>
           </div>
