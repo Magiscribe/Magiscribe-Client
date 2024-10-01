@@ -66,6 +66,7 @@ function InquiryProvider({ children, id, preview }: InquiryProviderProps) {
   const formRef = useRef<{ [key: string]: string }>({});
   const graphRef = useRef<GraphManager | null>(null);
   const inquiryResponseIdRef = useRef<string | undefined>(undefined);
+  const isCreatingResponseRef = useRef<boolean>(false);
   const inquiryHistoryRef = useRef<string[]>([]);
   const errorCountRef = useRef<number>(0);
 
@@ -171,37 +172,44 @@ function InquiryProvider({ children, id, preview }: InquiryProviderProps) {
     if (!graphRef.current) return;
     setState((prev) => ({ ...prev, loading: true }));
 
-    const carryOverData = graphRef.current.getCurrentNode()?.data;
-    await graphRef.current.updateCurrentNodeData({ response: data, ...carryOverData });
-    await graphRef.current.goToNextNode(nextNodeId);
+    try {
+      const carryOverData = graphRef.current.getCurrentNode()?.data;
+      await graphRef.current.updateCurrentNodeData({ response: data, ...carryOverData });
+      await graphRef.current.goToNextNode(nextNodeId);
 
-    if (preview) {
-      console.log('Preview mode, not saving response');
-      return;
-    }
+      if (preview) {
+        console.log('Preview mode, not saving response');
+        return;
+      }
 
-    if (!inquiryResponseIdRef.current) {
-      const result = await createResponse({
-        variables: {
-          inquiryId: id,
-          data: {
-            userDetails,
-            history: graphRef.current.getNodeHistory(),
+      if (!inquiryResponseIdRef.current && !isCreatingResponseRef.current) {
+        isCreatingResponseRef.current = true;
+        const result = await createResponse({
+          variables: {
+            inquiryId: id,
+            data: {
+              userDetails,
+              history: graphRef.current.getNodeHistory(),
+            },
           },
-        },
-      });
-      inquiryResponseIdRef.current = result.data?.upsertInquiryResponse.id;
-    } else {
-      await updateResponse({
-        variables: {
-          id: inquiryResponseIdRef.current,
-          inquiryId: id,
-          data: {
-            history: graphRef.current.getNodeHistory(),
+        });
+        inquiryResponseIdRef.current = result.data?.upsertInquiryResponse.id;
+        isCreatingResponseRef.current = false;
+      } else if (inquiryResponseIdRef.current) {
+        await updateResponse({
+          variables: {
+            id: inquiryResponseIdRef.current,
+            inquiryId: id,
+            data: {
+              history: graphRef.current.getNodeHistory(),
+            },
+            fields: ['history'],
           },
-          fields: ['history'],
-        },
-      });
+        });
+      }
+    } catch (error) {
+      console.error('Error in handleNextNode:', error);
+      setState((prev) => ({ ...prev, error: true }));
     }
   };
 

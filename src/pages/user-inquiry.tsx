@@ -78,13 +78,13 @@ function UserInquiryPage() {
 
   if (!id || !form) return null;
 
-  const handleStart = async () => {
+  const handleStart = () => {
     if (!isValidEmail) {
       // Don't store emails with invalid syntax
       setUserDetails({ ...userDetails, email: '' });
     }
     setScreen('inquiry');
-    await handleNextNode();
+    handleNextNode();
   };
 
   const handleFinishInquiry = () => {
@@ -119,7 +119,7 @@ function UserInquiryPage() {
     setSelectedRatings([]);
   };
 
-  const onNodeVisit = (node: StrippedNode) => {
+  const onNodeVisit = async (node: StrippedNode) => {
     if (node.type === 'end') {
       setScreen('end');
       return;
@@ -130,9 +130,7 @@ function UserInquiryPage() {
       setCurrentNode(node);
 
       if (node.type === 'information') {
-        // Delay so that at the very beginning we don't save two copies of the response. 100ms causes the problem, 200ms is fine.
-        // TODO: Come up with a better solution.
-        setTimeout(() => handleNextNode(), 200);
+        await handleNextNode();
       }
     }
   };
