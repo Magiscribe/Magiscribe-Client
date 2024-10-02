@@ -174,6 +174,20 @@ export default function CapabilityEdit() {
     e.preventDefault();
 
     try {
+      // First, save all prompts
+      await Promise.all(
+        form.prompts.map((prompt) =>
+          upsertPrompt({
+            variables: {
+              prompt: {
+                id: prompt.id,
+                name: prompt.name,
+                text: prompt.text,
+              },
+            },
+          }),
+        ),
+      );
       const result = await upsertCapability({
         variables: {
           capability: {
@@ -195,7 +209,7 @@ export default function CapabilityEdit() {
         return;
       }
 
-      addAlert('Capability saved successfully', 'success');
+      addAlert('Capability and prompts saved successfully', 'success');
       navigate('../capabilities');
     } catch (error) {
       console.error(error);

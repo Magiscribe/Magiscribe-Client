@@ -158,6 +158,7 @@ function Flow({ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange }
       return;
     }
 
+    // Guarantee unique ID
     const newNodeId = Math.random().toString(36).slice(2, 6);
 
     setNodes((prev) => [
