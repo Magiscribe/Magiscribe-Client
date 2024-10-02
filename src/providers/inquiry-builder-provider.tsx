@@ -1,3 +1,4 @@
+import templateDefault from '@/assets/templates/scratch';
 import { ADD_PREDICTION, CREATE_INQUIRY, DELETE_INQUIRY, UPDATE_INQUIRY } from '@/clients/mutations';
 import { GET_INQUIRY } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
@@ -26,8 +27,6 @@ export interface FormData {
   goals: string;
 }
 
-const DEFAULT_GRAPH = { nodes: [{ id: '0', type: 'start', position: { x: 0, y: 0 }, data: {} }], edges: [] };
-
 interface ContextType {
   initialized: boolean;
 
@@ -51,6 +50,15 @@ interface ContextType {
   onEdgesChange: OnEdgesChange;
 
   saveGraph: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
+  
+  save: (
+    data: { form?: FormData; graph?: { nodes: Node[]; edges: Edge[] } },
+    fields: string[],
+    onSuccess?: (id: string) => void,
+    onError?: () => void
+  ) => Promise<void>;
+
+  saveFormAndGraph: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
 
   generatingGraph: boolean;
   generateGraph: () => void;
@@ -87,7 +95,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
       if (!getInquiry) return;
       setLastUpdated(new Date(getInquiry.updatedAt));
       updateForm(getInquiry.data.form);
-      updateGraph(getInquiry.data.graph ?? DEFAULT_GRAPH);
+      updateGraph(getInquiry.data.graph ?? templateDefault);
       setInitialized(true);
     },
   });
@@ -131,31 +139,56 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   };
 
   /**
+   * Generic save function that can save both form and graph.
+   * @param data {Object} The data to save (either form or graph).
+   * @param fields {string[]} The fields to update.
+   * @param onSuccess {Function} The function to call on success.
+   * @param onError {Function} The function to call on error.
+   */
+  const save = async (
+    data: { form?: FormData; graph?: { nodes: Node[]; edges: Edge[] } },
+    fields: string[],
+    onSuccess?: (id: string) => void,
+    onError?: () => void
+  ) => {
+    if (!initialized && !data.form) {
+      if (onError) onError();
+      return;
+    }
+
+    try {
+      const func = id ? updateFormMutation : createFormMutation;
+      const result = await func({ variables: { id, data, fields } });
+
+      if (result.data) {
+        setLastUpdated(new Date(result.data.upsertInquiry.updatedAt));
+        if (onSuccess) onSuccess(result.data.upsertInquiry.id as string);
+      } else {
+        throw new Error('Failed to save the data.');
+      }
+    } catch {
+      if (onError) onError();
+    }
+  };
+
+  /**
    * Saves the form of the inquiry.
    * @param onSuccess {Function} The function to call on success.
    * @param onError {Function} The function to call on error.
    */
   const saveForm = async (onSuccess?: (id: string) => void, onError?: () => void) => {
-    try {
-      const func = id ? updateFormMutation : createFormMutation;
-      const result = await func({
-        variables: {
-          id,
-          data: {
-            form: {
-              ...form,
-
-              // Default title if not provided.
-              title: form.title ?? 'Untitled Inquiry',
-            },
-          },
-          fields: ['form'],
+    await save(
+      {
+        form: {
+          ...form,
+          // Default title if not provided.
+          title: form.title ?? 'Untitled Form',
         },
-      });
-      if (onSuccess) onSuccess(result.data?.upsertInquiry.id as string);
-    } catch {
-      if (onError) onError();
-    }
+      },
+      ['form'],
+      onSuccess,
+      onError
+    );
   };
 
   /**
@@ -180,24 +213,28 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
    * @param onError {Function} The function to call on error.
    */
   const saveGraph = async (onSuccess?: (id: string) => void, onError?: () => void) => {
-    if (!initialized) {
-      if (onError) onError();
-      return;
-    }
+    await save({ graph }, ['graph'], onSuccess, onError);
+  };
 
-    try {
-      const func = id ? updateFormMutation : createFormMutation;
-      const result = await func({ variables: { id, data: { graph, fields: ['graph'] } } });
-
-      if (result.data) {
-        setLastUpdated(new Date(result.data.upsertInquiry.updatedAt));
-        if (onSuccess) onSuccess(result.data.upsertInquiry.id as string);
-      } else {
-        throw new Error('Failed to save the graph.');
-      }
-    } catch {
-      if (onError) onError();
-    }
+  /**
+   * Saves both the form and graph of the inquiry.
+   * @param onSuccess {Function} The function to call on success.
+   * @param onError {Function} The function to call on error.
+   */
+  const saveFormAndGraph = async (onSuccess?: (id: string) => void, onError?: () => void) => {
+    await save(
+      {
+        form: {
+          ...form,
+          // Default title if not provided.
+          title: form.title ?? 'Untitled Form',
+        },
+        graph,
+      },
+      ['form', 'graph'],
+      onSuccess,
+      onError
+    );
   };
 
   /**
@@ -245,6 +282,9 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     onNodesChange,
     onEdgesChange,
     saveGraph,
+
+    save,
+    saveFormAndGraph,
 
     generatingGraph,
     generateGraph,
