@@ -1,6 +1,6 @@
-import CustomModal from '../modal'; // Adjust the import path as needed
+import CustomModal from './modal';
 
-interface DeleteConfirmationModalProps {
+interface ConfirmationModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
@@ -9,14 +9,14 @@ interface DeleteConfirmationModalProps {
   cancelText?: string;
 }
 
-export default function DeleteConfirmationModal({
+export default function ConfirmationModal({
   isOpen,
   onClose,
   onConfirm,
   text = 'item',
   confirmText = 'Delete',
   cancelText = 'Cancel',
-}: DeleteConfirmationModalProps) {
+}: ConfirmationModalProps) {
   return (
     <CustomModal title="Confirm" open={isOpen} onClose={onClose} size="md">
       <p>{text}</p>

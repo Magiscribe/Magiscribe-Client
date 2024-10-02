@@ -23,7 +23,7 @@ import React, { DragEvent, useRef, useState } from 'react';
 import colors from 'tailwindcss/colors';
 
 import CustomTooltip from '../controls/custom-tooltip';
-import CustomModal from '../modal';
+import CustomModal from '../modals/modal';
 import ContextMenu from './context-menu';
 import { edgeTypes, nodeTypes, nodeTypesInfo } from './utils';
 

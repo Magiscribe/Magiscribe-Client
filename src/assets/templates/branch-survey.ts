@@ -1,4 +1,6 @@
-const templateBranchSurvey = {
+import { Edge, Node } from '@xyflow/react';
+
+const templateBranchSurvey: { nodes: Node[]; edges: Edge[] } = {
   nodes: [
     {
       id: '0',

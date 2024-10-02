@@ -1,5 +1,5 @@
 import { useAddAlert } from '@/providers/alert-provider';
-import CustomModal from '../modal';
+import CustomModal from './modal';
 import { faLink } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 

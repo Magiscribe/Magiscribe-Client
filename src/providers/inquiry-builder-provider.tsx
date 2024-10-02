@@ -1,4 +1,3 @@
-import templateDefault from '@/assets/templates/scratch';
 import { ADD_PREDICTION, CREATE_INQUIRY, DELETE_INQUIRY, UPDATE_INQUIRY } from '@/clients/mutations';
 import { GET_INQUIRY } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
@@ -13,7 +12,7 @@ import { getAgentIdByName } from '@/utils/agents';
 import { createGraph, formatGraph } from '@/utils/graphs/graph-utils';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
 import { Edge, Node, OnEdgesChange, OnNodesChange, useEdgesState, useNodesState } from '@xyflow/react';
-import React, { createContext, useContext, useMemo, useRef, useState } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 interface InquiryProviderProps {
@@ -50,19 +49,19 @@ interface ContextType {
   onEdgesChange: OnEdgesChange;
 
   saveGraph: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
-  
+
   save: (
     data: { form?: FormData; graph?: { nodes: Node[]; edges: Edge[] } },
     fields: string[],
     onSuccess?: (id: string) => void,
-    onError?: () => void
+    onError?: () => void,
   ) => Promise<void>;
 
   saveFormAndGraph: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
 
   generatingGraph: boolean;
   generateGraph: () => void;
-  onGraphGenerated?: (callback: () => void) => void;
+  onGraphGenerated: (callback: () => void) => void;
 }
 
 const InquiryContext = createContext<ContextType | undefined>(undefined);
@@ -73,7 +72,10 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const [subscriptionId] = useState<string>(uuidv4());
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   const [form, updateForm] = useState<FormData>({} as FormData);
+
+  // Graph Generation States
   const [generatingGraph, setGeneratingGraph] = useState(false);
+  const [pendingGraph, setPendingGraph] = useState(false);
 
   // Hooks
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
@@ -95,7 +97,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
       if (!getInquiry) return;
       setLastUpdated(new Date(getInquiry.updatedAt));
       updateForm(getInquiry.data.form);
-      updateGraph(getInquiry.data.graph ?? templateDefault);
+      if (getInquiry.data.graph) updateGraph(getInquiry.data.graph);
       setInitialized(true);
     },
   });
@@ -111,11 +113,18 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
         setGeneratingGraph(false);
         const graph = createGraph(JSON.parse(JSON.parse(prediction.result)));
         updateGraph(formatGraph(graph, true));
-        if (onGraphGeneratedRef.current) onGraphGeneratedRef.current();
+        setPendingGraph(true);
       }
     },
     onError: () => setGeneratingGraph(false),
   });
+
+  useEffect(() => {
+    if (pendingGraph) {
+      onGraphGeneratedRef.current?.();
+      setPendingGraph(false);
+    }
+  }, [pendingGraph]);
 
   // Mutations
   const client = useApolloClient();
@@ -149,7 +158,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     data: { form?: FormData; graph?: { nodes: Node[]; edges: Edge[] } },
     fields: string[],
     onSuccess?: (id: string) => void,
-    onError?: () => void
+    onError?: () => void,
   ) => {
     if (!initialized && !data.form) {
       if (onError) onError();
@@ -187,7 +196,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
       },
       ['form'],
       onSuccess,
-      onError
+      onError,
     );
   };
 
@@ -233,7 +242,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
       },
       ['form', 'graph'],
       onSuccess,
-      onError
+      onError,
     );
   };
 

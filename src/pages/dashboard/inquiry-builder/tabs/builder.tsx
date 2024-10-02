@@ -1,5 +1,5 @@
 import GraphInput from '@/components/graph/graph-input';
-import DeleteConfirmationModal from '@/components/modals/delete-modal';
+import ConfirmationModal from '@/components/modals/confirm-modal';
 import ModalGenerateInquiryGraph from '@/components/modals/generate-inquiry-modal';
 import ModalUpsertInquiry from '@/components/modals/upsert-inquiry-modal';
 import { useAddAlert } from '@/providers/alert-provider';
@@ -199,7 +199,7 @@ export default function InquiryBuilder() {
 
       <ModalGenerateInquiryGraph open={generateModalOpen} onClose={() => setGenerateModalOpen(false)} />
 
-      <DeleteConfirmationModal
+      <ConfirmationModal
         isOpen={resetGraphModal}
         onClose={() => setResetGraphModal(false)}
         onConfirm={() => {
@@ -211,7 +211,7 @@ export default function InquiryBuilder() {
         confirmText="Reset Graph"
       />
 
-      <DeleteConfirmationModal
+      <ConfirmationModal
         isOpen={deleteModal}
         onClose={() => setDeleteModal(false)}
         onConfirm={async () => {

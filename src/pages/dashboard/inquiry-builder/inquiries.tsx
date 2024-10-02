@@ -50,12 +50,21 @@ export default function Inquiry() {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
         {(data?.getInquiries ?? []).map((inquiry, i) => {
           const form = inquiry.data.form;
+
+          const createdAt = new Date(inquiry.createdAt);
           const updatedAt = new Date(inquiry.updatedAt);
-          const formattedDate = updatedAt.toLocaleDateString('en-US', {
+
+          const formattedUpdateDate = updatedAt.toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'short',
             day: 'numeric',
           });
+          const formattedCreateDate = createdAt.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+          });
+
           return (
             <motion.div
               key={inquiry.id}
@@ -69,7 +78,7 @@ export default function Inquiry() {
             >
               <h3 className="text-lg font-semibold mb-2">{form.title === '' ? 'Untitled Inquiry' : form.title}</h3>
               <p className="text-sm text-gray-500 mb-2">
-                {form.organizationName ?? 'No Organization'} - {formattedDate}
+                Created: {formattedCreateDate} | Updated: {formattedUpdateDate}
               </p>
             </motion.div>
           );
