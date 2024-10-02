@@ -24,11 +24,11 @@ export interface Graph {
 
 export interface GraphNode {
   id: string;
-  type: 'start' | 'end' | 'conversation' | 'information' | 'condition';
-  data?: ConversationNodeData | ConditionNodeData | InformationNodeData;
+  type: 'start' | 'end' | 'question' | 'information' | 'condition';
+  data?: QuestionNodeData | ConditionNodeData | InformationNodeData;
 }
 
-export interface ConversationNodeData {
+export interface QuestionNodeData {
   text: string;
   response: string;
   type: 'rating-single' | 'rating-multi' | 'open-ended' | 'scalar-single' | 'scalar-multi';
@@ -98,12 +98,4 @@ export interface Summary {
 
 export interface RatingSummary {
   counts: Record<string, number>;
-}
-
-export interface ScalarSummary {
-  min: number;
-  max: number;
-  mean: number;
-  median: number;
-  standardDeviation: number;
 }

@@ -1,7 +1,7 @@
 import { ADD_PREDICTION } from '@/clients/mutations';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
-import { ConversationNodeData, GraphNode, NodeVisitAnalysisData, TabProps } from '@/types/conversation';
+import { QuestionNodeData, GraphNode, NodeVisitAnalysisData, TabProps } from '@/types/conversation';
 import { getAgentIdByName } from '@/utils/agents';
 import { useApolloClient, useMutation, useSubscription } from '@apollo/client';
 import { faChevronLeft, faChevronRight, faSpinner } from '@fortawesome/free-solid-svg-icons';
@@ -31,11 +31,10 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
   const client = useApolloClient();
   const [addPrediction] = useMutation(ADD_PREDICTION);
 
-  const conversationNodes = useMemo(
+  const questionNodes = useMemo(
     () =>
       graph.nodes.filter(
-        (node): node is GraphNode & { data: ConversationNodeData } =>
-          node.type === 'conversation' && node.data !== undefined,
+        (node): node is GraphNode & { data: QuestionNodeData } => node.type === 'question' && node.data !== undefined,
       ),
     [graph.nodes],
   );
@@ -77,7 +76,7 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
         if (result && result.summary) {
           setSummaries((prev) => ({
             ...prev,
-            [conversationNodes[currentQuestionIndex].id]: {
+            [questionNodes[currentQuestionIndex].id]: {
               text: result.summary,
               lastUpdated: new Date().toLocaleString(),
             },
@@ -96,7 +95,7 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
     const agentId = await getAgentIdByName('Stakeholder | Per Question Summary', client);
 
     if (agentId) {
-      const currentNode = conversationNodes[currentQuestionIndex];
+      const currentNode = questionNodes[currentQuestionIndex];
       const nodeResponses = groupedResponses[currentNode.id] || {};
       const formattedResponses = Object.values(nodeResponses)
         .flat()
@@ -126,13 +125,13 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
       console.error('Per Question Summary Agent not found');
       setIsGeneratingSummary(false);
     }
-  }, [conversationNodes, currentQuestionIndex, groupedResponses, client, addPrediction, subscriptionId]);
+  }, [questionNodes, currentQuestionIndex, groupedResponses, client, addPrediction, subscriptionId]);
 
-  if (!responses || !conversationNodes.length) {
+  if (!responses || !questionNodes.length) {
     return <div className="p-4">No data available</div>;
   }
 
-  const currentNode = conversationNodes[currentQuestionIndex];
+  const currentNode = questionNodes[currentQuestionIndex];
   const nodeData = currentNode.data;
   const currentSummary = summaries[currentNode.id];
 
@@ -207,7 +206,7 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
       <div className="my-4">
         <h2 className="font-bold mb-2">Select Question</h2>
         <div className="grid grid-cols-4 sm:grid-col-3 lg:grid-cols-6 gap-2">
-          {conversationNodes.map((node, index) => (
+          {questionNodes.map((node, index) => (
             <button
               key={node.id}
               onClick={() => setCurrentQuestionIndex(index)}
@@ -242,7 +241,7 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
               key={index}
               onClick={() =>
                 setCurrentQuestionIndex(
-                  (prev) => (prev + (index ? 1 : -1) + conversationNodes.length) % conversationNodes.length,
+                  (prev) => (prev + (index ? 1 : -1) + questionNodes.length) % questionNodes.length,
                 )
               }
               className="p-2 border-2 border-white rounded-full"

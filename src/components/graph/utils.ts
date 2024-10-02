@@ -1,14 +1,8 @@
-import {
-  faExclamationCircle,
-  faPlay,
-  faQuestionCircle,
-  faStop,
-  faUserFriends,
-} from '@fortawesome/free-solid-svg-icons';
+import { faCodeBranch, faExclamationCircle, faPlay, faQuestionCircle, faStop } from '@fortawesome/free-solid-svg-icons';
 import { EdgeTypes, NodeTypes, useReactFlow } from '@xyflow/react';
 import { useCallback } from 'react';
 import { EndNode, StartNode } from './nodes/start-end-node';
-import ConversationNode from './nodes/conversation-node';
+import QuestionNode from './nodes/question-node';
 import ConditionNode from './nodes/condition-node';
 import InformationNode from './nodes/information-node';
 import ButtonEdge from './edges/button-edge';
@@ -20,31 +14,31 @@ export const nodeTypesInfo = {
     description: 'The start node represents the beginning of the conversation flow. There can only be one start node.',
     element: StartNode,
   },
-  end: {
-    name: 'End',
-    icon: faStop,
-    description: 'The end node represents the end of the conversation flow. There can only be one end node.',
-    element: EndNode,
-  },
-  conversation: {
-    name: 'Conversation',
-    icon: faUserFriends,
-    description:
-      "The conversation node represents a point in the conversation flow where the user is prompted for a response. This reponse can be dynamically generated based on the user's previous responses.",
-    element: ConversationNode,
-  },
-  condition: {
-    name: 'Condition',
-    icon: faQuestionCircle,
-    description:
-      "The condition node allows for the conversation to take a different path based on the user's response.",
-    element: ConditionNode,
-  },
   information: {
     name: 'Information',
     icon: faExclamationCircle,
     description: 'The information node provides information to the user without requiring a response.',
     element: InformationNode,
+  },
+  question: {
+    name: 'Question',
+    icon: faQuestionCircle,
+    description:
+      "The question node represents a point where the user is asked a question. The question can be dynamically generated based on the user's previous responses.",
+    element: QuestionNode,
+  },
+  condition: {
+    name: 'Condition',
+    icon: faCodeBranch,
+    description:
+      "The condition node allows for the conversation to take a different path based on the user's response.",
+    element: ConditionNode,
+  },
+  end: {
+    name: 'End',
+    icon: faStop,
+    description: 'The end node represents the end of the conversation flow. There can only be one end node.',
+    element: EndNode,
   },
 };
 

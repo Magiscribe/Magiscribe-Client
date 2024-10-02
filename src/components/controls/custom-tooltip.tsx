@@ -63,7 +63,7 @@ export default function CustomTooltip({
           <Transition show={triggerOnHover ? isOpen : open} as={Fragment}>
             <PopoverPanel
               static
-              className="absolute z-10"
+              className="fixed z-100 max-w-sm"
               ref={setPopperElement}
               style={styles.popper}
               {...attributes.popper}

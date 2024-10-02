@@ -125,7 +125,7 @@ function UserInquiryPage() {
       return;
     }
 
-    if (node.type === 'information' || node.type === 'conversation') {
+    if (node.type === 'information' || node.type === 'question') {
       setMessages((prev) => [...prev, { type: 'text', content: node.data.text as string, sender: 'bot' }]);
       setCurrentNode(node);
 

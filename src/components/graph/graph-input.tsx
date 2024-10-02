@@ -249,31 +249,38 @@ function Flow({ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange }
     addNode();
   };
 
-  const renderNodeButtonsSide = () => (
+  const renderNodeButtons = () => (
     <div className="w-full flex flex-row space-x-4">
       {Object.keys(nodeTypesInfo).map((type) => {
         const disabled = !validateNewNode(type);
 
         return (
-          <div key={type} className="w-44 flex items-center">
+          <div key={type} className="w-44 flex items-center z-10">
             <button
               draggable={!disabled}
               onDragStart={() => (disabled ? null : onDragStart(type))}
               disabled={disabled}
-              className="w-full max-w-xs px-4 py-2 bg-white border-2 border-slate-400 text-slate-800 font-semibold text-sm rounded-xl shadow-lg disabled:opacity-50 text-left z-10"
+              className="relative w-full max-w-xs px-4 py-2 bg-white border-2 border-slate-400 text-slate-800 font-semibold text-sm rounded-xl shadow-lg disabled:opacity-50 text-left"
             >
               <FontAwesomeIcon
                 icon={nodeTypesInfo[type as keyof typeof nodeTypesInfo].icon}
                 className="mr-2 text-blue-600"
               />
-              {type.charAt(0).toUpperCase() + type.slice(1)}
+              {nodeTypesInfo[type as keyof typeof nodeTypesInfo].name}
+
+              <CustomTooltip
+                placement="bottom-start"
+                triggerOnHover
+                render={() => (
+                  <FontAwesomeIcon
+                    icon={faQuestionCircle}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-slate-400"
+                  />
+                )}
+              >
+                <p className="text-xs font-normal">{nodeTypesInfo[type as keyof typeof nodeTypesInfo].description}</p>
+              </CustomTooltip>
             </button>
-            <CustomTooltip
-              triggerOnHover
-              render={() => <FontAwesomeIcon icon={faQuestionCircle} className="ml-2 text-slate-400" />}
-            >
-              <p className="text-xs font-normal">{nodeTypesInfo[type as keyof typeof nodeTypesInfo].description}</p>
-            </CustomTooltip>
           </div>
         );
       })}
@@ -300,7 +307,7 @@ function Flow({ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange }
           }}
           className="w-full px-4 py-2 bg-blue-600 text-white rounded-xl disabled:opacity-50"
         >
-          {type.charAt(0).toUpperCase() + type.slice(1)} Node
+          {nodeTypesInfo[type as keyof typeof nodeTypesInfo].name}
         </button>
       );
     });
@@ -313,7 +320,7 @@ function Flow({ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange }
           <br />
           <span className="-mt-2 text-xs">Drag and drop to add nodes</span>
         </h3>
-        {renderNodeButtonsSide()}
+        {renderNodeButtons()}
       </div>
       <div className="w-full h-full text-black" ref={reactFlowWrapper}>
         <ReactFlow

@@ -146,7 +146,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
               ...form,
 
               // Default title if not provided.
-              title: form.title ?? 'Untitled Form',
+              title: form.title ?? 'Untitled Inquiry',
             },
           },
           fields: ['form'],

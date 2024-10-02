@@ -200,7 +200,7 @@ export default function PerResponseTab({ data }: TabProps) {
         {selectedUser &&
           userData.map((node, i) => {
             const graphNode = nodesMap[node.id];
-            if (graphNode?.type === 'conversation' || graphNode?.type === 'information') {
+            if (graphNode?.type === 'question' || graphNode?.type === 'information') {
               return (
                 <div key={i} className="mb-4 p-4 bg-slate-200 rounded-2xl">
                   {renderNodeContent(node)}
