@@ -244,7 +244,7 @@ function InquiryProvider({ children, id, preview }: InquiryProviderProps) {
     if (!currentNode) return;
 
     const agentId = await getAgentIdByName(
-      `Stakeholder | Dynamic ${currentNode.type === 'conversation' ? 'Question' : 'Information'} Generation`,
+      `Stakeholder | Dynamic ${currentNode.type === 'question' ? 'Question' : 'Information'} Generation`,
       client,
     );
     const mostRecentMessage = inquiryHistoryRef.current[inquiryHistoryRef.current.length - 1] || '';
@@ -313,7 +313,7 @@ function InquiryProvider({ children, id, preview }: InquiryProviderProps) {
       if (data.text) {
         conversation = `Bot: ${data.text}`;
       }
-    } else if (type === 'conversation') {
+    } else if (type === 'question') {
       const parts = [
         data.ratings && `Bot created ratings: ${JSON.stringify(data.ratings)} \n`,
         data.text && `Bot: ${data.text} \n`,

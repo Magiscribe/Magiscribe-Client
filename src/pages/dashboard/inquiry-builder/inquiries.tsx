@@ -67,7 +67,7 @@ export default function Inquiry() {
               whileHover={{ scale: 1.05 }}
               onClick={() => navigate(inquiry.id)}
             >
-              <h3 className="text-lg font-semibold mb-2">{form.title === '' ? 'Untitled Form' : form.title}</h3>
+              <h3 className="text-lg font-semibold mb-2">{form.title === '' ? 'Untitled Inquiry' : form.title}</h3>
               <p className="text-sm text-gray-500 mb-2">
                 {form.organizationName ?? 'No Organization'} - {formattedDate}
               </p>

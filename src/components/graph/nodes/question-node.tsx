@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import useAutoResizeTextareaRef from '@/hooks/auto-resize-textarea';
-import { faUserFriends } from '@fortawesome/free-solid-svg-icons';
+import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import { Handle, NodeProps, Position } from '@xyflow/react';
 import NodeContainer from '../elements/node-container';
 import CustomHandle from '../handles/limit-handle';
@@ -12,7 +12,7 @@ enum NodeType {
   RatingMulti = 'rating-multi',
 }
 
-type ConversationNodeProps = NodeProps & {
+type QuestionNodeProps = NodeProps & {
   data: {
     text?: string;
     type: NodeType;
@@ -21,12 +21,12 @@ type ConversationNodeProps = NodeProps & {
   };
 };
 
-export default function ConversationNode({ id, data }: ConversationNodeProps) {
+export default function QuestionNode({ id, data }: QuestionNodeProps) {
   const textareaRef = useAutoResizeTextareaRef(data.text ?? '');
-  const { handleInputChange } = useNodeData<ConversationNodeProps>(id);
+  const { handleInputChange } = useNodeData<QuestionNodeProps>(id);
 
   const handleUpdate = useCallback(
-    (updates: Partial<ConversationNodeProps['data']>) => {
+    (updates: Partial<QuestionNodeProps['data']>) => {
       // If the user toggles dynamic generation, remove all ratings
       // since they are not needed anymore.
       if (updates.dynamicGeneration) {
@@ -62,7 +62,7 @@ export default function ConversationNode({ id, data }: ConversationNodeProps) {
   };
 
   return (
-    <NodeContainer title="Conversation" faIcon={faUserFriends} id={id}>
+    <NodeContainer title="Question" faIcon={faQuestionCircle} id={id}>
       <div className="space-y-4 mt-2">
         <div className="flex flex-col gap-2">
           <label className="text-sm font-medium text-gray-700">Dynamic Generation</label>
@@ -78,7 +78,7 @@ export default function ConversationNode({ id, data }: ConversationNodeProps) {
           </div>
         </div>
         <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-gray-700">Conversation Type</label>
+          <label className="text-sm font-medium text-gray-700">Question Type</label>
           <select
             name="type"
             value={data.type}
