@@ -7,6 +7,7 @@ import { Description, Label, Radio, RadioGroup } from '@headlessui/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
 
+import Input from '../controls/input';
 import CustomModal from './modal';
 
 /**
@@ -186,18 +187,12 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
     <CustomModal size="3xl" open={open} onClose={onClose} title={id ? 'Update Inquiry' : 'Create Inquiry'}>
       <form className="space-y-4" onSubmit={handleSave}>
         <div>
-          <label className="block text-sm font-bold mb-2" htmlFor="title">
-            Title
-            <br />
-            <span className="italic text-slate-500 text-sm font-normal">
-              The title of the inquiry that is displayed to the user.
-            </span>
-          </label>
-          <input
-            type="text"
-            value={form.title}
+          <Input
+            name="title"
+            label="Title"
+            subLabel="The title of the inquiry that is displayed to the user."
+            value={form.description}
             onChange={handleInputChange('title')}
-            className="border-2 border-slate-200 p-2 rounded-lg w-full"
           />
         </div>
 
@@ -206,21 +201,19 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
         <AnimatePresence mode="sync">
           {selectedTemplate?.allowGeneration && (
             <motion.div
-              key="goals"
+              key="goals-check"
               initial={{ opacity: 0, y: -25 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2, type: 'spring', stiffness: 250 }}
             >
-              <input
+              <Input
+                name="generateGraph"
                 type="checkbox"
-                id="generateGraph"
-                checked={enableGraphGeneration}
+                label="Generate my inquiry"
+                subLabel="Using the selected template, we will generate a suggested inquiry for you!"
+                value={enableGraphGeneration.toString()}
                 onChange={handleCheckboxChange}
-                className="mr-2 h-5 w-5 text-blue-500 border-2 border-blue-500 rounded-md"
               />
-              <label htmlFor="generateGraph" className="text-sm font-bold">
-                Generate my graph
-              </label>
             </motion.div>
           )}
 
@@ -231,19 +224,13 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2, type: 'spring', stiffness: 250 }}
             >
-              <label className="block text-sm font-bold mb-2" htmlFor="goals">
-                Goals
-                <br />
-                <span className="italic text-slate-500 text-sm font-normal">
-                  Not sure where to start? Enter some goals you want to achieve and we'll modify the graph to match your
-                  goals.
-                </span>
-              </label>
-              <input
-                type="text"
+              <Input
+                name="goals"
+                label="Goals"
+                subLabel="Enter some goals you want to achieve! The more specific, the better."
                 value={form.goals}
                 onChange={handleInputChange('goals')}
-                className="border-2 border-slate-200 p-2 rounded-lg w-full"
+                as="textarea"
               />
             </motion.div>
           )}

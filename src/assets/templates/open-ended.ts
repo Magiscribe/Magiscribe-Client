@@ -36,7 +36,7 @@ const templateOpenEnded: { nodes: Node[]; edges: Edge[] } = {
     },
     {
       id: '6zb7',
-      type: 'conversation',
+      type: 'question',
       position: {
         x: 2670,
         y: 0,
@@ -86,7 +86,7 @@ const templateOpenEnded: { nodes: Node[]; edges: Edge[] } = {
     },
     {
       id: 'ggjq',
-      type: 'conversation',
+      type: 'question',
       position: {
         x: 1602,
         y: 1790.5,
@@ -157,7 +157,7 @@ const templateOpenEnded: { nodes: Node[]; edges: Edge[] } = {
     },
     {
       id: 'ylz7',
-      type: 'conversation',
+      type: 'question',
       position: {
         x: 2670,
         y: 2347,

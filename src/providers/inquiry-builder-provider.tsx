@@ -251,7 +251,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
    * the graph generator agent.
    */
   const generateGraph = async () => {
-    const agentId = await getAgentIdByName('Stakeholder | Graph Generator', client);
+    const agentId = await getAgentIdByName('Stakeholder | Graph Edit Agent (Sonnet)', client);
     setGeneratingGraph(true);
 
     addPrediction({
@@ -263,7 +263,9 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
           userMessage: [
             `You are generating a graph for ${form.title}`,
             `The user is looking for the following goals to be completed: ${form.goals}`,
+            `Do not add or remove any nodes or edges from the graph, only update the existing ones, unless the graph has no nodes or edges, in which case you should build the graph from scratch.`,
           ].join('\n'),
+          conversationGraph: JSON.stringify(graph),
         },
       },
     });

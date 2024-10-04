@@ -34,7 +34,7 @@ const templates: Template[] = [
   {
     name: 'From Scratch',
     description: 'Create a custom inquiry from the ground up, with no predefined structure.',
-    allowGeneration: false,
+    allowGeneration: true,
     graph: templateDefault,
   },
 ];

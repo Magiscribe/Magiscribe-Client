@@ -35,7 +35,7 @@ const templateBranchSurvey: { nodes: Node[]; edges: Edge[] } = {
     },
     {
       id: '2',
-      type: 'conversation',
+      type: 'question',
       position: {
         x: 1068,
         y: 57.5,
@@ -67,7 +67,7 @@ const templateBranchSurvey: { nodes: Node[]; edges: Edge[] } = {
     },
     {
       id: '4',
-      type: 'conversation',
+      type: 'question',
       position: {
         x: 2136,
         y: 0,
@@ -84,7 +84,7 @@ const templateBranchSurvey: { nodes: Node[]; edges: Edge[] } = {
     },
     {
       id: '5',
-      type: 'conversation',
+      type: 'question',
       position: {
         x: 2136,
         y: 447,
@@ -101,7 +101,7 @@ const templateBranchSurvey: { nodes: Node[]; edges: Edge[] } = {
     },
     {
       id: '6',
-      type: 'conversation',
+      type: 'question',
       position: {
         x: 2670,
         y: 57.5,
@@ -139,7 +139,7 @@ const templateBranchSurvey: { nodes: Node[]; edges: Edge[] } = {
     },
     {
       id: '8',
-      type: 'conversation',
+      type: 'question',
       position: {
         x: 3738,
         y: 340.25,
@@ -156,7 +156,7 @@ const templateBranchSurvey: { nodes: Node[]; edges: Edge[] } = {
     },
     {
       id: '9',
-      type: 'conversation',
+      type: 'question',
       position: {
         x: 4272,
         y: 223.5,

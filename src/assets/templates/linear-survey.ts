@@ -35,7 +35,7 @@ const templateLinearSurvey: { nodes: Node[]; edges: Edge[] } = {
     },
     {
       id: '2',
-      type: 'conversation',
+      type: 'question',
       position: {
         x: 1068,
         y: 0,
@@ -53,7 +53,7 @@ const templateLinearSurvey: { nodes: Node[]; edges: Edge[] } = {
     },
     {
       id: '3',
-      type: 'conversation',
+      type: 'question',
       position: {
         x: 1602,
         y: 166,
@@ -70,7 +70,7 @@ const templateLinearSurvey: { nodes: Node[]; edges: Edge[] } = {
     },
     {
       id: '4',
-      type: 'conversation',
+      type: 'question',
       position: {
         x: 2136,
         y: 166,
@@ -87,7 +87,7 @@ const templateLinearSurvey: { nodes: Node[]; edges: Edge[] } = {
     },
     {
       id: '5',
-      type: 'conversation',
+      type: 'question',
       position: {
         x: 2670,
         y: 0,
@@ -105,7 +105,7 @@ const templateLinearSurvey: { nodes: Node[]; edges: Edge[] } = {
     },
     {
       id: '6',
-      type: 'conversation',
+      type: 'question',
       position: {
         x: 3204,
         y: 0,
@@ -123,7 +123,7 @@ const templateLinearSurvey: { nodes: Node[]; edges: Edge[] } = {
     },
     {
       id: '7',
-      type: 'conversation',
+      type: 'question',
       position: {
         x: 3738,
         y: 166,
