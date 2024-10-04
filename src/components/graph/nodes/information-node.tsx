@@ -27,7 +27,7 @@ export default function InformationNode({ id, data }: InformationNodeProps) {
               name="dynamicGeneration"
               checked={data.dynamicGeneration}
               onChange={handleInputChange}
-              className="w-4 h-4 text-blue-600 bg-inherit rounded border-gray-300 focus:ring-blue-500 focus:ring-2"
+              className="w-4 h-4 bg-inherit text-blue-600 rounded border-gray-300 focus:ring-blue-500 focus:ring-2 nodrag"
             />
             <span className="ml-2 text-sm text-gray-700">Enable</span>
           </div>
@@ -41,7 +41,7 @@ export default function InformationNode({ id, data }: InformationNodeProps) {
             onChange={handleInputChange}
             rows={1}
             placeholder="Enter your text here..."
-            className="w-full px-3 py-2 bg-inherit rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 resize-none overflow-hidden"
+            className="w-full px-3 py-2 bg-inherit rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 resize-none overflow-hidden nodrag"
           />
         </div>
       </div>

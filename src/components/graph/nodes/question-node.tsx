@@ -72,7 +72,7 @@ export default function QuestionNode({ id, data }: QuestionNodeProps) {
               name="dynamicGeneration"
               checked={data.dynamicGeneration}
               onChange={(e) => handleUpdate({ dynamicGeneration: e.target.checked })}
-              className="w-4 h-4 bg-inherit text-blue-600 rounded border-gray-300 focus:ring-blue-500 focus:ring-2"
+              className="w-4 h-4 bg-inherit text-blue-600 rounded border-gray-300 focus:ring-blue-500 focus:ring-2 nodrag"
             />
             <span className="ml-2 text-sm text-gray-700">Enable</span>
           </div>
@@ -83,7 +83,7 @@ export default function QuestionNode({ id, data }: QuestionNodeProps) {
             name="type"
             value={data.type}
             onChange={(e) => handleUpdate({ type: e.target.value as NodeType })}
-            className="w-full px-3 py-2 bg-inherit rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 appearance-none"
+            className="w-full px-3 py-2 bg-inherit rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 appearance-none nodrag"
           >
             {Object.values(NodeType).map((value) => (
               <option key={value} value={value} className="py-1">
@@ -101,7 +101,7 @@ export default function QuestionNode({ id, data }: QuestionNodeProps) {
             onChange={(e) => handleUpdate({ text: e.target.value })}
             rows={1}
             placeholder="Enter your text here..."
-            className="w-full px-3 py-2 bg-inherit rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 resize-none overflow-hidden"
+            className="w-full px-3 py-2 bg-inherit rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 resize-none overflow-hidden nodrag"
           />
         </div>
         {!data.dynamicGeneration && (data.type === NodeType.RatingSingle || data.type === NodeType.RatingMulti) && (
@@ -113,11 +113,11 @@ export default function QuestionNode({ id, data }: QuestionNodeProps) {
                   type="text"
                   defaultValue={rating}
                   onChange={(e) => handleRatingChange(index, e.target.value)}
-                  className="flex-grow px-3 py-2 bg-inherit rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                  className="flex-grow px-3 py-2 bg-inherit rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 nodrag"
                 />
                 <button
                   onClick={() => removeRating(index)}
-                  className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition duration-200"
+                  className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition duration-200 nodrag"
                 >
                   Remove
                 </button>
@@ -125,7 +125,7 @@ export default function QuestionNode({ id, data }: QuestionNodeProps) {
             ))}
             <button
               onClick={addRating}
-              className="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-200"
+              className="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-200 nodrag"
             >
               Add Rating
             </button>
