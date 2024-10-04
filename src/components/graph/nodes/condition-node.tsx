@@ -25,7 +25,7 @@ export default function ConditionNode({ id, data }: ConditionNodeProps) {
           onChange={handleInputChange}
           rows={1}
           placeholder="Enter your text here..."
-          className={`w-full px-3 py-2 rounded-lg bg-inherit border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 resize-none overflow-hidden`}
+          className={`w-full px-3 py-2 rounded-lg bg-inherit border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 resize-none overflow-hidden nodrag`}
         />
       </div>
 
