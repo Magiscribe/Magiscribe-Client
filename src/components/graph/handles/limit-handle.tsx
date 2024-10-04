@@ -1,7 +1,7 @@
 import { Handle, HandleProps, useHandleConnections } from '@xyflow/react';
 
 interface CustomHandleProps extends HandleProps {
-  connectionCount: number;
+  limit?: number;
 }
 
 const CustomHandle = (props: CustomHandleProps) => {
@@ -10,13 +10,15 @@ const CustomHandle = (props: CustomHandleProps) => {
   });
 
   // Remove connectionCount prop from the Handle component
-  const { connectionCount, ...rest } = props;
+  const { limit, ...rest } = props;
+
+  const isConnectable = limit == undefined || connections.length < limit;
 
   return (
     <Handle
       {...rest}
-      isConnectable={connections.length < connectionCount}
-      className={connections.length < connectionCount ? 'w-4 h-4 !bg-green-500' : 'opacity-0'}
+      isConnectable={isConnectable}
+      className={isConnectable ? 'w-4 h-4 !bg-green-500' : 'opacity-0'}
     />
   );
 };

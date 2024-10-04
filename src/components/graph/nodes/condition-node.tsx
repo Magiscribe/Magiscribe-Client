@@ -2,6 +2,7 @@ import useAutoResizeTextareaRef from '@/hooks/auto-resize-textarea';
 import { QuestionNodeData } from '@/types/conversation';
 import { faCodeBranch } from '@fortawesome/free-solid-svg-icons';
 import { Handle, NodeProps, Position } from '@xyflow/react';
+
 import NodeContainer from '../elements/node-container';
 import { useNodeData } from '../utils';
 
@@ -16,7 +17,9 @@ export default function ConditionNode({ id, data }: ConditionNodeProps) {
   const { handleInputChange } = useNodeData<QuestionNodeData>(id);
 
   return (
-    <NodeContainer title="Condition" faIcon={faCodeBranch} id={id}>
+    <NodeContainer title="Condition" faIcon={faCodeBranch} id={id} handlers={{
+      sourceLimit: 1,
+    }}>
       <div className="flex flex-col gap-2 mt-2">
         <textarea
           ref={textareaRef}
@@ -28,9 +31,6 @@ export default function ConditionNode({ id, data }: ConditionNodeProps) {
           className={`w-full px-3 py-2 rounded-lg bg-inherit border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 resize-none overflow-hidden`}
         />
       </div>
-
-      <Handle type="target" position={Position.Left} className="w-4 h-4 !bg-green-500" />
-      <Handle type="source" position={Position.Right} className="w-4 h-4 !bg-green-500" />
     </NodeContainer>
   );
 }

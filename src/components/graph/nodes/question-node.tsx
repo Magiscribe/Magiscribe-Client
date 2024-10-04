@@ -1,7 +1,8 @@
-import React, { useCallback } from 'react';
 import useAutoResizeTextareaRef from '@/hooks/auto-resize-textarea';
 import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import { Handle, NodeProps, Position } from '@xyflow/react';
+import React, { useCallback } from 'react';
+
 import NodeContainer from '../elements/node-container';
 import CustomHandle from '../handles/limit-handle';
 import { useNodeData } from '../utils';
@@ -62,7 +63,11 @@ export default function QuestionNode({ id, data }: QuestionNodeProps) {
   };
 
   return (
-    <NodeContainer title="Question" faIcon={faQuestionCircle} id={id}>
+    <NodeContainer title="Question" faIcon={faQuestionCircle} id={id}
+    handlers={{
+      sourceLimit: 1,
+      targetLimit: 1,
+    }}>
       <div className="space-y-4 mt-2">
         <div className="flex flex-col gap-2">
           <label className="text-sm font-medium text-gray-700">Dynamic Generation</label>
@@ -132,8 +137,6 @@ export default function QuestionNode({ id, data }: QuestionNodeProps) {
           </div>
         )}
       </div>
-      <Handle type="target" position={Position.Left} className="w-4 h-4 !bg-green-500" />
-      <CustomHandle connectionCount={1} type="source" position={Position.Right} className="w-4 h-4 !bg-green-500" />
     </NodeContainer>
   );
 }
