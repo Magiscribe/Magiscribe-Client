@@ -27,7 +27,7 @@ const DEBOUNCE_DELAY_IN_MS = 1000;
 export default function InquiryBuilder() {
   // States
   const [upsertFormModal, setUpsertFormModal] = useState(false);
-  const [resetGraphModal, setResetGraphModal] = useState(false);
+  const [clearGraphModal, setClearGraphModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [generateModalOpen, setGenerateModalOpen] = useState(false);
 
@@ -107,7 +107,7 @@ export default function InquiryBuilder() {
    * Handle formatting the graph.
    */
   const handleFormat = () => {
-    updateGraph(formatGraph(graph, true));
+    updateGraph(formatGraph(graph));
     alert('Graph formatted successfully!', 'success');
   };
 
@@ -140,7 +140,7 @@ export default function InquiryBuilder() {
                   className="mr-2"
                   spin={generatingGraph}
                 />
-                {graph.nodes.length <= 1 ? 'Generate' : 'Regenerate'}
+                Generate
               </button>
               <button
                 className="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded-full flex items-center"
@@ -159,11 +159,11 @@ export default function InquiryBuilder() {
                 Preview
               </Link>
               <button
-                onClick={() => setResetGraphModal(true)}
+                onClick={() => setClearGraphModal(true)}
                 className="bg-gray-500 hover:bg-gray-700 text-white text-sm font-bold py-2 px-4 rounded-full flex items-center"
               >
                 <FontAwesomeIcon icon={faRotateLeft} className="mr-2" />
-                Reset
+                Clear
               </button>
               <button
                 onClick={() => setDeleteModal(true)}
@@ -179,8 +179,8 @@ export default function InquiryBuilder() {
           {initialized && (
             <GraphInput
               nodes={graph.nodes}
-              setNodes={updateGraphNodes}
               edges={graph.edges}
+              setNodes={updateGraphNodes}
               setEdges={updateGraphEdges}
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
@@ -200,15 +200,15 @@ export default function InquiryBuilder() {
       <ModalGenerateInquiryGraph open={generateModalOpen} onClose={() => setGenerateModalOpen(false)} />
 
       <ConfirmationModal
-        isOpen={resetGraphModal}
-        onClose={() => setResetGraphModal(false)}
+        isOpen={clearGraphModal}
+        onClose={() => setClearGraphModal(false)}
         onConfirm={() => {
           resetGraph();
-          setResetGraphModal(false);
-          alert('Graph reset successfully!', 'success');
+          setClearGraphModal(false);
+          alert('Graph cleared successfully!', 'success');
         }}
-        text="Are you sure you want to reset the graph?"
-        confirmText="Reset Graph"
+        text="Are you sure you want to clear the graph? This action cannot be undone."
+        confirmText="Clear Graph"
       />
 
       <ConfirmationModal

@@ -2,6 +2,7 @@ import { useAddAlert } from '@/providers/alert-provider';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useEffect } from 'react';
 
 import CustomModal from './modal';
 
@@ -27,8 +28,17 @@ interface ModalUpsertInquiryProps {
 
 export default function ModalGenerateInquiryGraph({ open, onSave, onClose }: ModalUpsertInquiryProps) {
   // Hooks
-  const { form, updateForm, saveForm, generateGraph, resetGraph, generatingGraph } = useInquiryBuilder();
+  const { form, updateForm, saveForm, generateGraph, generatingGraph, onGraphGenerated } = useInquiryBuilder();
   const alert = useAddAlert();
+
+  useEffect(() => {
+    if (open) {
+      onGraphGenerated?.(() => {
+        if (open) onClose();
+        alert('Graph generated successfully!', 'success');
+      });
+    }
+  }, [open, onGraphGenerated, onClose]);
 
   /**
    * Handle input change for the form.
@@ -45,10 +55,9 @@ export default function ModalGenerateInquiryGraph({ open, onSave, onClose }: Mod
    * Handle saving the inquiry and shows a success or error alert.
    */
   const handleGenerate = async () => {
-    resetGraph();
     await saveForm(
       (id) => {
-        alert('Started graph generation!', 'info');
+        alert('Started graph generation...', 'info');
         if (onSave) onSave(id as string);
       },
       () => {
@@ -74,7 +83,6 @@ export default function ModalGenerateInquiryGraph({ open, onSave, onClose }: Mod
           />
         </div>
       </form>
-      <span className="italic text-slate-500 text-sm font-normal">Note: This will override your existing graph</span>
       <div className="flex justify-end p-4 rounded-2xl space-x-4">
         <button
           onClick={handleGenerate}

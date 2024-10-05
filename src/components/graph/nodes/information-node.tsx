@@ -36,7 +36,7 @@ export default function InformationNode({ id, data }: InformationNodeProps) {
           <label className="text-sm font-medium text-gray-700">Message</label>
           <textarea
             ref={textareaRef}
-            defaultValue={data.text}
+            value={data.text}
             name="text"
             onChange={handleInputChange}
             rows={1}

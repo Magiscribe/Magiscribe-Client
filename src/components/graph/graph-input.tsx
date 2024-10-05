@@ -4,10 +4,8 @@ import {
   addEdge,
   Background,
   Controls,
-  DefaultEdgeOptions,
   Edge,
   MarkerType,
-  MiniMap,
   Node,
   OnConnect,
   OnConnectEnd,
@@ -27,20 +25,6 @@ import CustomModal from '../modals/modal';
 import ContextMenu from './context-menu';
 import { edgeTypes, nodeTypes, nodeTypesInfo } from './utils';
 
-const defaultEdgeOptions: DefaultEdgeOptions = {
-  type: 'button',
-  markerEnd: {
-    type: MarkerType.ArrowClosed,
-    color: colors.slate[200],
-  },
-  markerStart: {
-    type: MarkerType.ArrowClosed,
-    orient: 'auto-start-reverse',
-    color: colors.slate[200],
-  },
-};
-const proOptions = { hideAttribution: true };
-
 interface TreeInputProps {
   nodes: Node[];
   setNodes: React.Dispatch<React.SetStateAction<Node[]>>;
@@ -50,7 +34,7 @@ interface TreeInputProps {
   onEdgesChange: OnEdgesChange;
 }
 
-function Flow({ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange }: TreeInputProps) {
+function Flow({ nodes, edges, setNodes, onNodesChange, setEdges, onEdgesChange }: TreeInputProps) {
   // Refs
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const reactFlow = useRef<HTMLDivElement>(null);
@@ -343,19 +327,20 @@ function Flow({ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange }
           fitView
           minZoom={0.1}
           maxZoom={2}
-          defaultEdgeOptions={defaultEdgeOptions}
-          proOptions={proOptions}
+          defaultEdgeOptions={{
+            type: 'button',
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+              color: colors.slate[200],
+            },
+            markerStart: {
+              type: MarkerType.ArrowClosed,
+              orient: 'auto-start-reverse',
+              color: colors.slate[200],
+            },
+          }}
+          proOptions={{ hideAttribution: true }}
         >
-          <MiniMap
-            zoomable
-            pannable
-            style={{
-              border: '1px solid #ddd',
-              borderRadius: 8,
-              boxShadow: '0 0 10px rgba(0,0,0,0.2)',
-              background: 'rgba(255,255,255,0)',
-            }}
-          />
           <Background />
           <Controls
             position="top-right"

@@ -9,7 +9,7 @@ import {
   UpdateInquiryMutation,
 } from '@/graphql/graphql';
 import { getAgentIdByName } from '@/utils/agents';
-import { createGraph, formatGraph } from '@/utils/graphs/graph-utils';
+import { applyGraphChangeset, formatGraph } from '@/utils/graphs/graph-utils';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
 import { Edge, Node, OnEdgesChange, OnNodesChange, useEdgesState, useNodesState } from '@xyflow/react';
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
@@ -110,9 +110,12 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     onSubscriptionData: ({ subscriptionData }) => {
       const prediction = subscriptionData.data?.predictionAdded;
       if (prediction?.type === 'SUCCESS') {
+        const changeset = JSON.parse(JSON.parse(prediction.result));
+        const newGraph = applyGraphChangeset(graph, changeset);
+
+        updateGraph(formatGraph(newGraph));
+
         setGeneratingGraph(false);
-        const graph = createGraph(JSON.parse(JSON.parse(prediction.result)));
-        updateGraph(formatGraph(graph, true));
         setPendingGraph(true);
       }
     },

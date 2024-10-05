@@ -1,7 +1,8 @@
-import React, { useCallback } from 'react';
 import useAutoResizeTextareaRef from '@/hooks/auto-resize-textarea';
 import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import { Handle, NodeProps, Position } from '@xyflow/react';
+import React, { useCallback } from 'react';
+
 import NodeContainer from '../elements/node-container';
 import CustomHandle from '../handles/limit-handle';
 import { useNodeData } from '../utils';
@@ -96,7 +97,7 @@ export default function QuestionNode({ id, data }: QuestionNodeProps) {
           <label className="text-sm font-medium text-gray-700">Message</label>
           <textarea
             ref={textareaRef}
-            defaultValue={data.text}
+            value={data.text}
             name="text"
             onChange={(e) => handleUpdate({ text: e.target.value })}
             rows={1}

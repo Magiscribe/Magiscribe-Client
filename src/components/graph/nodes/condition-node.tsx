@@ -20,7 +20,7 @@ export default function ConditionNode({ id, data }: ConditionNodeProps) {
       <div className="flex flex-col gap-2 mt-2">
         <textarea
           ref={textareaRef}
-          defaultValue={data.text}
+          value={data.text}
           name="text"
           onChange={handleInputChange}
           rows={1}

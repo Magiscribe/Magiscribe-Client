@@ -142,19 +142,21 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
   };
 
   useEffect(() => {
-    onGraphGenerated(async () => {
-      alert('Graph generated successfully!', 'success');
-      await saveFormAndGraph(
-        (id) => {
-          alert('Inquiry saved successfully!', 'success');
-          if (onSave) onSave(id as string);
-        },
-        () => {
-          alert('Something went wrong!', 'error');
-        },
-      );
-    });
-  }, [onGraphGenerated, saveFormAndGraph, alert, onSave]);
+    if (open) {
+      onGraphGenerated(async () => {
+        alert('Graph generated successfully!', 'success');
+        await saveFormAndGraph(
+          (id) => {
+            alert('Inquiry saved successfully!', 'success');
+            if (onSave) onSave(id as string);
+          },
+          () => {
+            alert('Something went wrong!', 'error');
+          },
+        );
+      });
+    }
+  }, [open, onGraphGenerated, saveFormAndGraph, alert, onSave]);
 
   /**
    * Handle saving the inquiry
