@@ -64,7 +64,7 @@ export default function ModalGenerateInquiryGraph({ open, onSave, onClose }: Mod
         alert('Something went wrong!', 'error');
       },
     );
-    generateGraph();
+    generateGraph(false);
   };
 
   return (
@@ -72,7 +72,7 @@ export default function ModalGenerateInquiryGraph({ open, onSave, onClose }: Mod
       <form className="space-y-4">
         <div>
           <label className="block text-sm font-bold mb-2" htmlFor="goals">
-            Describe the goals of the inquiry you want to generate
+            Describe the goals of the modification you want to make to your inquiry.
           </label>
           <textarea
             id="goals"
@@ -95,7 +95,7 @@ export default function ModalGenerateInquiryGraph({ open, onSave, onClose }: Mod
               <FontAwesomeIcon icon={faSpinner} className="ml-2" spin />
             </>
           ) : (
-            'Start Graph Generation '
+            'Update Graph '
           )}
         </button>
       </div>

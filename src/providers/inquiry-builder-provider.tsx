@@ -60,7 +60,7 @@ interface ContextType {
   saveFormAndGraph: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
 
   generatingGraph: boolean;
-  generateGraph: () => void;
+  generateGraph: (templateOverride: boolean) => void;
   onGraphGenerated: (callback: () => void) => void;
 }
 
@@ -253,21 +253,31 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
    * Triggers the start of the graph generation process for the inquiry using
    * the graph generator agent.
    */
-  const generateGraph = async () => {
+  const generateGraph = async (templateOverride: boolean) => {
     const agentId = await getAgentIdByName('Stakeholder | Graph Edit Agent (Sonnet)', client);
     setGeneratingGraph(true);
+    let userMessage = '';
+
+    if (templateOverride) {
+      userMessage = [
+        `You are generating a graph for <title>${form.title}</title>`,
+        `The user is looking for the following goals to be completed: <goals>${form.goals}</goals>`,
+        `Taking the exact graph structure in <conversationGraph>, adapt the graph to be about the <goals> listed above. Simply upsert all of the existing nodes, do not add or remove any edges. No explanation is needed, simply return the "nodesToUpsert".`,
+      ].join('\n');
+    } else {
+      userMessage = [
+        `You are updating a graph for <title>${form.title}</title>`,
+        `The user is looking for the following goals to be completed in this update: <goals>${form.goals}</goals>`,
+        `Ensure the updates or new structure aligns with the user's goals, is relevant to the content in <conversationGraph>, and adheres to the <graphRules>.`,
+      ].join('\n');
+    }
 
     addPrediction({
       variables: {
         subscriptionId,
         agentId,
         variables: {
-          ...form,
-          userMessage: [
-            `You are generating a graph for ${form.title}`,
-            `The user is looking for the following goals to be completed: ${form.goals}`,
-            `Do not add or remove any nodes or edges from the graph, only update the existing ones, unless the graph has no nodes or edges, in which case you should build the graph from scratch.`,
-          ].join('\n'),
+          userMessage,
           conversationGraph: JSON.stringify(graph),
         },
       },
@@ -301,6 +311,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     saveFormAndGraph,
 
     generatingGraph,
+
     generateGraph,
     onGraphGenerated: (callback: () => void) => {
       onGraphGeneratedRef.current = callback;

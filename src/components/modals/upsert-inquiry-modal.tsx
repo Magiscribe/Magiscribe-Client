@@ -170,7 +170,7 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
     }
 
     if (selectedTemplate?.allowGeneration && enableGraphGeneration) {
-      generateGraph();
+      generateGraph(true);
       return;
     }
 
