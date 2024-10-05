@@ -110,7 +110,9 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     onSubscriptionData: ({ subscriptionData }) => {
       const prediction = subscriptionData.data?.predictionAdded;
       if (prediction?.type === 'SUCCESS') {
-        const changeset = JSON.parse(JSON.parse(prediction.result));
+        const result = JSON.parse(prediction.result)[0];
+        const jsonMatch = result.match(/```json\n([\s\S]*?)\n```/);
+        const changeset = JSON.parse(jsonMatch[1]);
         const newGraph = applyGraphChangeset(graph, changeset);
 
         updateGraph(formatGraph(newGraph));
@@ -254,15 +256,15 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
    * the graph generator agent.
    */
   const generateGraph = async (templateOverride: boolean) => {
-    const agentId = await getAgentIdByName('Stakeholder | Graph Edit Agent (Sonnet)', client);
     setGeneratingGraph(true);
-    let userMessage = '';
+    let userMessage;
+    const agentId = await getAgentIdByName('Stakeholder | Graph Edit Agent (Sonnet)', client);
 
     if (templateOverride) {
       userMessage = [
         `You are generating a graph for <title>${form.title}</title>`,
         `The user is looking for the following goals to be completed: <goals>${form.goals}</goals>`,
-        `Taking the exact graph structure in <conversationGraph>, adapt the graph to be about the <goals> listed above. Simply upsert all of the existing nodes, do not add or remove any edges. No explanation is needed, simply return the "nodesToUpsert".`,
+        `Taking the exact graph structure in <conversationGraph>, adapt the graph to be about the <goals> listed above. Simply upsert all of the existing nodes, do not remove any nodes, add any new nodes or add or remove any edges. Simply return the "nodesToUpsert". Absolutey do NOT include "nodesToDelete", "edgesToAdd" or "edgesToDelete". You will ONLY be using the existing nodes and overriding them.`,
       ].join('\n');
     } else {
       userMessage = [

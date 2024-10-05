@@ -91,7 +91,7 @@ export default function ModalGenerateInquiryGraph({ open, onSave, onClose }: Mod
         >
           {generatingGraph ? (
             <>
-              Generating Graph...
+              Updating Graph...
               <FontAwesomeIcon icon={faSpinner} className="ml-2" spin />
             </>
           ) : (

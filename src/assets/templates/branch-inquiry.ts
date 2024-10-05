@@ -1,6 +1,6 @@
 import { Edge, Node } from '@xyflow/react';
 
-const templateBranchSurvey: { nodes: Node[]; edges: Edge[] } = {
+const templateBranchInquiry: { nodes: Node[]; edges: Edge[] } = {
   nodes: [
     {
       id: '0',
@@ -18,14 +18,14 @@ const templateBranchSurvey: { nodes: Node[]; edges: Edge[] } = {
       },
     },
     {
-      id: '1',
+      id: 'v2mq',
       type: 'information',
       position: {
         x: 534,
         y: 266.5,
       },
       data: {
-        text: 'Welcome to our survey. We value your feedback to help us improve our services.',
+        text: 'Welcome to our inquiry. We value your feedback to help us improve our services.',
         dynamicGeneration: false,
       },
       measured: {
@@ -34,7 +34,7 @@ const templateBranchSurvey: { nodes: Node[]; edges: Edge[] } = {
       },
     },
     {
-      id: '2',
+      id: 'f7nh',
       type: 'question',
       position: {
         x: 1068,
@@ -51,14 +51,14 @@ const templateBranchSurvey: { nodes: Node[]; edges: Edge[] } = {
       },
     },
     {
-      id: '3',
+      id: 'c3pt',
       type: 'condition',
       position: {
         x: 1602,
         y: 300.5,
       },
       data: {
-        text: "If the user's rating in node 2 is 'Good' or 'Excellent', route to node 4. Otherwise, route to node 5.",
+        text: "If the user's rating in node f7nh is 'Good' or 'Excellent', route to node y8wj. Otherwise, route to node l5rb.",
       },
       measured: {
         width: 384,
@@ -66,7 +66,7 @@ const templateBranchSurvey: { nodes: Node[]; edges: Edge[] } = {
       },
     },
     {
-      id: '4',
+      id: 'y8wj',
       type: 'question',
       position: {
         x: 2136,
@@ -83,7 +83,7 @@ const templateBranchSurvey: { nodes: Node[]; edges: Edge[] } = {
       },
     },
     {
-      id: '5',
+      id: 'l5rb',
       type: 'question',
       position: {
         x: 2136,
@@ -100,7 +100,7 @@ const templateBranchSurvey: { nodes: Node[]; edges: Edge[] } = {
       },
     },
     {
-      id: '6',
+      id: 'h6td',
       type: 'question',
       position: {
         x: 2670,
@@ -123,14 +123,14 @@ const templateBranchSurvey: { nodes: Node[]; edges: Edge[] } = {
       },
     },
     {
-      id: '7',
+      id: 'b9gx',
       type: 'condition',
       position: {
         x: 3204,
         y: 300.5,
       },
       data: {
-        text: "If 'Customer Service' is selected in node 6, route to node 8. Otherwise, route to node 9.",
+        text: "If 'Customer Service' is selected in node h6td, route to node s4kf. Otherwise, route to node m1vz.",
       },
       measured: {
         width: 384,
@@ -138,7 +138,7 @@ const templateBranchSurvey: { nodes: Node[]; edges: Edge[] } = {
       },
     },
     {
-      id: '8',
+      id: 's4kf',
       type: 'question',
       position: {
         x: 3738,
@@ -155,7 +155,7 @@ const templateBranchSurvey: { nodes: Node[]; edges: Edge[] } = {
       },
     },
     {
-      id: '9',
+      id: 'm1vz',
       type: 'question',
       position: {
         x: 4272,
@@ -172,14 +172,14 @@ const templateBranchSurvey: { nodes: Node[]; edges: Edge[] } = {
       },
     },
     {
-      id: '10',
+      id: 'w3jq',
       type: 'information',
       position: {
         x: 4806,
         y: 254.5,
       },
       data: {
-        text: 'Thank you for taking the time to complete our survey. Your feedback is invaluable in helping us improve our services.',
+        text: 'Thank you for taking the time to complete our inquiry. Your feedback is invaluable in helping us improve our services.',
         dynamicGeneration: false,
       },
       measured: {
@@ -188,7 +188,7 @@ const templateBranchSurvey: { nodes: Node[]; edges: Edge[] } = {
       },
     },
     {
-      id: '11',
+      id: 'r7dx',
       type: 'end',
       position: {
         x: 5340,
@@ -207,69 +207,69 @@ const templateBranchSurvey: { nodes: Node[]; edges: Edge[] } = {
     {
       id: '788d83dd-ddea-41fe-b42c-7ccdeeb0e79d',
       source: '0',
-      target: '1',
+      target: 'v2mq',
     },
     {
       id: '56dac8a9-9eff-4d6d-923a-14a19f6f9193',
-      source: '1',
-      target: '2',
+      source: 'v2mq',
+      target: 'f7nh',
     },
     {
       id: 'd28e0b52-e463-4481-9aca-3ab4c16ac1b1',
-      source: '2',
-      target: '3',
+      source: 'f7nh',
+      target: 'c3pt',
     },
     {
       id: '81ee1159-bb52-49e2-8a4b-46d06d09cc2b',
-      source: '3',
-      target: '4',
+      source: 'c3pt',
+      target: 'y8wj',
     },
     {
       id: '1c5be03b-29c5-4485-b102-0d36c5ba22da',
-      source: '3',
-      target: '5',
+      source: 'c3pt',
+      target: 'l5rb',
     },
     {
       id: 'dc9ccdbe-c13a-44d7-aa95-cf22cc9a4a01',
-      source: '4',
-      target: '6',
+      source: 'y8wj',
+      target: 'h6td',
     },
     {
       id: '39a32a7c-3eb4-46f6-9496-a1c9189736e5',
-      source: '5',
-      target: '6',
+      source: 'l5rb',
+      target: 'h6td',
     },
     {
       id: 'a91bab91-53ec-45c4-ac58-d3d117c9d0db',
-      source: '6',
-      target: '7',
+      source: 'h6td',
+      target: 'b9gx',
     },
     {
       id: 'd98f3cd3-d080-42dd-a9a3-77af5024e301',
-      source: '7',
-      target: '8',
+      source: 'b9gx',
+      target: 's4kf',
     },
     {
       id: '4532cf87-74fe-4561-b1c9-2beeb282e6eb',
-      source: '7',
-      target: '9',
+      source: 'b9gx',
+      target: 'm1vz',
     },
     {
       id: '33fc5ae6-7ee9-4ae6-9ad5-b67f28faa8b4',
-      source: '8',
-      target: '9',
+      source: 's4kf',
+      target: 'm1vz',
     },
     {
       id: '50ba5a7f-e5f9-4f18-9d36-58fe9873c474',
-      source: '9',
-      target: '10',
+      source: 'm1vz',
+      target: 'w3jq',
     },
     {
       id: '5d7952f0-fb6c-4ffa-ba64-19d463b9b7f1',
-      source: '10',
-      target: '11',
+      source: 'w3jq',
+      target: 'r7dx',
     },
   ],
 };
 
-export default templateBranchSurvey;
+export default templateBranchInquiry;

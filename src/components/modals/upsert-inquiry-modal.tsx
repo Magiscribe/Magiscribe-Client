@@ -59,10 +59,10 @@ const TemplateSelection: React.FC<TemplateSelectionProps> = ({ value, onChange }
   <div className="w-full">
     <RadioGroup value={value} onChange={onChange}>
       <Label className="block text-sm font-bold mb-2">
-        Templates
+        Options
         <br />
         <span className="italic text-slate-500 text-sm font-normal">
-          Not sure where to start? Select a template to jumpstart your inquiry.
+          Select a template to jumpstart your inquiry or start from scratch
         </span>
       </Label>
       <div className="grid grid-cols-2 gap-4">
@@ -132,6 +132,7 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
   const handleChangeGraphTemplate = (template: Template) => {
     setSelectedTemplate(template);
     updateGraph(template.graph ?? { nodes: [], edges: [] });
+    console.log('template', template);
   };
 
   /**
@@ -192,7 +193,7 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
           <Input
             name="title"
             label="Title"
-            subLabel="The title of the inquiry that is displayed to the user."
+            subLabel="This will be displayed to the people you are sending the inquiry to"
             value={form.description}
             onChange={handleInputChange('title')}
           />
@@ -211,8 +212,8 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
               <Input
                 name="generateGraph"
                 type="checkbox"
-                label="Generate my inquiry"
-                subLabel="Using the selected template, we will generate a suggested inquiry for you!"
+                label="Customize my template"
+                subLabel="Using the selected template, we will generate a suggested inquiry for you"
                 value={enableGraphGeneration.toString()}
                 onChange={handleCheckboxChange}
               />
@@ -229,7 +230,7 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
               <Input
                 name="goals"
                 label="Goals"
-                subLabel="Enter some goals you want to achieve! The more specific, the better."
+                subLabel="Who are you trying to gain insights from and what type of information are you looking to capture?"
                 value={form.goals}
                 onChange={handleInputChange('goals')}
                 as="textarea"
