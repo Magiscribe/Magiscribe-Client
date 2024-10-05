@@ -1,5 +1,5 @@
-import React from 'react';
 import clsx from 'clsx';
+import React from 'react';
 
 /**
  * Props for the Input component.
@@ -12,7 +12,7 @@ import clsx from 'clsx';
  * @property {string} [className] - Additional CSS classes for the input element.
  */
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement | HTMLTextAreaElement> {
-  label: string;
+  label?: string;
   subLabel?: string;
   name: string;
   error?: string;
@@ -30,7 +30,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement | HTMLTe
 const Input: React.FC<InputProps> = ({ label, subLabel, name, error, as = 'input', className, ...props }) => {
   const isCheckbox = props.type === 'checkbox';
 
-  const baseClassName = 'w-full p-3 border rounded-lg text-slate-800 focus:outline-none focus:ring-2';
+  const baseClassName = 'w-full p-2 border rounded-xl text-slate-800 focus:outline-none focus:ring-2';
 
   const inputStyles = {
     default: clsx(
@@ -73,7 +73,7 @@ const Input: React.FC<InputProps> = ({ label, subLabel, name, error, as = 'input
     'ml-2': isCheckbox,
   });
 
-  const inputWrapperClassName = clsx('flex gap-2', {
+  const inputWrapperClassName = clsx('w-full flex gap-2', {
     'flex-col': !isCheckbox,
     'flex-row items-center': isCheckbox,
   });
@@ -81,15 +81,17 @@ const Input: React.FC<InputProps> = ({ label, subLabel, name, error, as = 'input
   return (
     <div className={inputWrapperClassName}>
       <InputComponent id={name} name={name} className={inputClassName} {...props} />
-      <label className={labelClassName} htmlFor={name}>
-        {label}
-        {subLabel && (
-          <>
-            <br />
-            <span className="italic text-slate-500 text-sm font-normal">{subLabel}</span>
-          </>
-        )}
-      </label>
+      {label && (
+        <label className={labelClassName} htmlFor={name}>
+          {label}
+          {subLabel && (
+            <>
+              <br />
+              <span className="italic text-slate-500 text-sm font-normal">{subLabel}</span>
+            </>
+          )}
+        </label>
+      )}
       {error && <p className="text-red-700 text-sm mt-1">{error}</p>}
     </div>
   );

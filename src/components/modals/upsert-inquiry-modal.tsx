@@ -7,6 +7,7 @@ import { Description, Label, Radio, RadioGroup } from '@headlessui/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
 
+import Button from '../controls/button';
 import Input from '../controls/input';
 import CustomModal from './modal';
 
@@ -162,7 +163,7 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
   /**
    * Handle saving the inquiry
    */
-  const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSave = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
 
     if (!selectedTemplate) {
@@ -255,12 +256,18 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
               )}
             </AnimatePresence>
           </div>
-          <button
-            disabled={form.title === '' || generatingGraph || !selectedTemplate}
-            className="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded-full flex items-center disabled:opacity-50"
+          <Button onClick={onClose} variant="transparentPrimary" size="medium" className="ml-2">
+            Cancel
+          </Button>
+          <Button
+            disabled={generatingGraph || !selectedTemplate}
+            onClick={handleSave}
+            variant="primary"
+            size="medium"
+            className="ml-2"
           >
             {id ? 'Save' : 'Create'} {generatingGraph && <FontAwesomeIcon icon={faSpinner} className="ml-2" spin />}
-          </button>
+          </Button>
         </div>
       </form>
     </CustomModal>

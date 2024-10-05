@@ -1,5 +1,7 @@
-import useAutoResizeTextareaRef from '@/hooks/auto-resize-textarea';
-import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
+import Button from '@/components/controls/button';
+import Input from '@/components/controls/input';
+import Select from '@/components/controls/select';
+import { faPlus, faQuestionCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import { Handle, NodeProps, Position } from '@xyflow/react';
 import React, { useCallback } from 'react';
 
@@ -23,17 +25,14 @@ type QuestionNodeProps = NodeProps & {
 };
 
 export default function QuestionNode({ id, data }: QuestionNodeProps) {
-  const textareaRef = useAutoResizeTextareaRef(data.text ?? '');
   const { handleInputChange } = useNodeData<QuestionNodeProps>(id);
 
   const handleUpdate = useCallback(
     (updates: Partial<QuestionNodeProps['data']>) => {
-      // If the user toggles dynamic generation, remove all ratings
-      // since they are not needed anymore.
       if (updates.dynamicGeneration) {
         updates = {
           ...updates,
-          ratings: undefined, // Remove all ratings
+          ratings: undefined,
         };
       }
 
@@ -65,71 +64,57 @@ export default function QuestionNode({ id, data }: QuestionNodeProps) {
   return (
     <NodeContainer title="Question" faIcon={faQuestionCircle} id={id}>
       <div className="space-y-4 mt-2">
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-gray-700">Dynamic Generation</label>
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              name="dynamicGeneration"
-              checked={data.dynamicGeneration}
-              onChange={(e) => handleUpdate({ dynamicGeneration: e.target.checked })}
-              className="w-4 h-4 bg-inherit text-blue-600 rounded border-gray-300 focus:ring-blue-500 focus:ring-2 nodrag"
-            />
-            <span className="ml-2 text-sm text-gray-700">Enable</span>
-          </div>
-        </div>
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-gray-700">Question Type</label>
-          <select
-            name="type"
-            value={data.type}
-            onChange={(e) => handleUpdate({ type: e.target.value as NodeType })}
-            className="w-full px-3 py-2 bg-inherit rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 appearance-none nodrag"
-          >
-            {Object.values(NodeType).map((value) => (
-              <option key={value} value={value} className="py-1">
-                {value}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-gray-700">Message</label>
-          <textarea
-            ref={textareaRef}
-            value={data.text}
-            name="text"
-            onChange={(e) => handleUpdate({ text: e.target.value })}
-            rows={1}
-            placeholder="Enter your text here..."
-            className="w-full px-3 py-2 bg-inherit rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 resize-none overflow-hidden nodrag"
-          />
-        </div>
+        <Input
+          label="Dynamic Generation"
+          name="dynamicGeneration"
+          type="checkbox"
+          checked={data.dynamicGeneration}
+          onChange={(e) => handleUpdate({ dynamicGeneration: (e.target as HTMLInputElement).checked })}
+          className="nodrag"
+        />
+
+        <Select
+          label="Question Type"
+          name="type"
+          value={data.type}
+          onChange={(e) => handleUpdate({ type: e.target.value as NodeType })}
+          options={Object.values(NodeType).map((value) => ({ value, label: value }))}
+          className="nodrag"
+        />
+
+        <Input
+          label="Message"
+          name="text"
+          value={data.text}
+          onChange={(e) => handleUpdate({ text: e.target.value })}
+          as="textarea"
+          placeholder="Enter your text here..."
+          className="resize-none overflow-hidden nodrag"
+        />
+
         {!data.dynamicGeneration && (data.type === NodeType.RatingSingle || data.type === NodeType.RatingMulti) && (
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-4">
             <label className="text-sm font-medium text-gray-700">Ratings</label>
             {data.ratings?.map((rating, index) => (
-              <div key={index} className="flex items-center gap-2">
-                <input
-                  type="text"
-                  defaultValue={rating}
+              <div key={index} className="flex items-center justify-between gap-2">
+                <Input
+                  name={`rating-${index}`}
+                  value={rating}
                   onChange={(e) => handleRatingChange(index, e.target.value)}
-                  className="flex-grow px-3 py-2 bg-inherit rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 nodrag"
+                  className="flex-grow nodrag"
                 />
-                <button
+                <Button
                   onClick={() => removeRating(index)}
-                  className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition duration-200 nodrag"
-                >
-                  Remove
-                </button>
+                  variant="transparentSecondary"
+                  size="small"
+                  iconLeft={faTimesCircle}
+                  className="nodrag flex-shrink-0 text-slate-400"
+                />
               </div>
             ))}
-            <button
-              onClick={addRating}
-              className="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-200 nodrag"
-            >
+            <Button onClick={addRating} variant="primary" size="medium" iconLeft={faPlus} className="nodrag mt-2">
               Add Rating
-            </button>
+            </Button>
           </div>
         )}
       </div>
