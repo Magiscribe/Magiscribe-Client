@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { ADD_UPDATE_CAPABILITY, DELETE_CAPABILITY } from '@/clients/mutations';
 import { GET_ALL_CAPABILITIES } from '@/clients/queries';
 import { useAddAlert } from '@/hooks/alert-hook';
-import DeleteConfirmationModal from '@/components/modals/delete-modal'; // Adjust the import path as needed
+import ConfirmationModal from '@/components/modals/confirm-modal'; // Adjust the import path as needed
 import { Capability, Prompt } from '@/graphql/graphql';
 
 function CapabilityCard({
@@ -76,7 +76,7 @@ function CapabilityCard({
           Delete
         </button>
       </div>
-      <DeleteConfirmationModal
+      <ConfirmationModal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={handleDelete}

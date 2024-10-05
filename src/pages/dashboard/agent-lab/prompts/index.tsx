@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { DELETE_PROMPT, ADD_UPDATE_PROMPT } from '@/clients/mutations';
 import { GET_ALL_PROMPTS } from '@/clients/queries';
-import DeleteConfirmationModal from '@/components/modals/delete-modal';
+import ConfirmationModal from '@/components/modals/confirm-modal';
 import { useAddAlert } from '@/hooks/alert-hook';
 import { Prompt } from '@/graphql/graphql';
 
@@ -68,7 +68,7 @@ function PromptCard({
           Delete
         </button>
       </div>
-      <DeleteConfirmationModal
+      <ConfirmationModal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={handleDelete}

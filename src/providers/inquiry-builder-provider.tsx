@@ -9,10 +9,10 @@ import {
   UpdateInquiryMutation,
 } from '@/graphql/graphql';
 import { getAgentIdByName } from '@/utils/agents';
-import { createGraph, formatGraph } from '@/utils/graphs/graph-utils';
+import { applyGraphChangeset, formatGraph } from '@/utils/graphs/graph-utils';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
 import { Edge, Node, OnEdgesChange, OnNodesChange, useEdgesState, useNodesState } from '@xyflow/react';
-import React, { createContext, useContext, useMemo, useRef, useState } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 interface InquiryProviderProps {
@@ -25,8 +25,6 @@ export interface FormData {
   description: string;
   goals: string;
 }
-
-const DEFAULT_GRAPH = { nodes: [{ id: '0', type: 'start', position: { x: 0, y: 0 }, data: {} }], edges: [] };
 
 interface ContextType {
   initialized: boolean;
@@ -52,9 +50,18 @@ interface ContextType {
 
   saveGraph: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
 
+  save: (
+    data: { form?: FormData; graph?: { nodes: Node[]; edges: Edge[] } },
+    fields: string[],
+    onSuccess?: (id: string) => void,
+    onError?: () => void,
+  ) => Promise<void>;
+
+  saveFormAndGraph: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
+
   generatingGraph: boolean;
-  generateGraph: () => void;
-  onGraphGenerated?: (callback: () => void) => void;
+  generateGraph: (templateOverride: boolean) => void;
+  onGraphGenerated: (callback: () => void) => void;
 }
 
 const InquiryContext = createContext<ContextType | undefined>(undefined);
@@ -65,7 +72,10 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const [subscriptionId] = useState<string>(uuidv4());
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   const [form, updateForm] = useState<FormData>({} as FormData);
+
+  // Graph Generation States
   const [generatingGraph, setGeneratingGraph] = useState(false);
+  const [pendingGraph, setPendingGraph] = useState(false);
 
   // Hooks
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
@@ -87,7 +97,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
       if (!getInquiry) return;
       setLastUpdated(new Date(getInquiry.updatedAt));
       updateForm(getInquiry.data.form);
-      updateGraph(getInquiry.data.graph ?? DEFAULT_GRAPH);
+      if (getInquiry.data.graph) updateGraph(getInquiry.data.graph);
       setInitialized(true);
     },
   });
@@ -100,14 +110,26 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     onSubscriptionData: ({ subscriptionData }) => {
       const prediction = subscriptionData.data?.predictionAdded;
       if (prediction?.type === 'SUCCESS') {
+        const result = JSON.parse(prediction.result)[0];
+        const jsonMatch = result.match(/```json\n([\s\S]*?)\n```/);
+        const changeset = JSON.parse(jsonMatch[1]);
+        const newGraph = applyGraphChangeset(graph, changeset);
+
+        updateGraph(formatGraph(newGraph));
+
         setGeneratingGraph(false);
-        const graph = createGraph(JSON.parse(JSON.parse(prediction.result)));
-        updateGraph(formatGraph(graph, true));
-        if (onGraphGeneratedRef.current) onGraphGeneratedRef.current();
+        setPendingGraph(true);
       }
     },
     onError: () => setGeneratingGraph(false),
   });
+
+  useEffect(() => {
+    if (pendingGraph) {
+      onGraphGeneratedRef.current?.();
+      setPendingGraph(false);
+    }
+  }, [pendingGraph]);
 
   // Mutations
   const client = useApolloClient();
@@ -131,31 +153,56 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   };
 
   /**
+   * Generic save function that can save both form and graph.
+   * @param data {Object} The data to save (either form or graph).
+   * @param fields {string[]} The fields to update.
+   * @param onSuccess {Function} The function to call on success.
+   * @param onError {Function} The function to call on error.
+   */
+  const save = async (
+    data: { form?: FormData; graph?: { nodes: Node[]; edges: Edge[] } },
+    fields: string[],
+    onSuccess?: (id: string) => void,
+    onError?: () => void,
+  ) => {
+    if (!initialized && !data.form) {
+      if (onError) onError();
+      return;
+    }
+
+    try {
+      const func = id ? updateFormMutation : createFormMutation;
+      const result = await func({ variables: { id, data, fields } });
+
+      if (result.data) {
+        setLastUpdated(new Date(result.data.upsertInquiry.updatedAt));
+        if (onSuccess) onSuccess(result.data.upsertInquiry.id as string);
+      } else {
+        throw new Error('Failed to save the data.');
+      }
+    } catch {
+      if (onError) onError();
+    }
+  };
+
+  /**
    * Saves the form of the inquiry.
    * @param onSuccess {Function} The function to call on success.
    * @param onError {Function} The function to call on error.
    */
   const saveForm = async (onSuccess?: (id: string) => void, onError?: () => void) => {
-    try {
-      const func = id ? updateFormMutation : createFormMutation;
-      const result = await func({
-        variables: {
-          id,
-          data: {
-            form: {
-              ...form,
-
-              // Default title if not provided.
-              title: form.title ?? 'Untitled Inquiry',
-            },
-          },
-          fields: ['form'],
+    await save(
+      {
+        form: {
+          ...form,
+          // Default title if not provided.
+          title: form.title ?? 'Untitled Form',
         },
-      });
-      if (onSuccess) onSuccess(result.data?.upsertInquiry.id as string);
-    } catch {
-      if (onError) onError();
-    }
+      },
+      ['form'],
+      onSuccess,
+      onError,
+    );
   };
 
   /**
@@ -180,44 +227,60 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
    * @param onError {Function} The function to call on error.
    */
   const saveGraph = async (onSuccess?: (id: string) => void, onError?: () => void) => {
-    if (!initialized) {
-      if (onError) onError();
-      return;
-    }
+    await save({ graph }, ['graph'], onSuccess, onError);
+  };
 
-    try {
-      const func = id ? updateFormMutation : createFormMutation;
-      const result = await func({ variables: { id, data: { graph, fields: ['graph'] } } });
-
-      if (result.data) {
-        setLastUpdated(new Date(result.data.upsertInquiry.updatedAt));
-        if (onSuccess) onSuccess(result.data.upsertInquiry.id as string);
-      } else {
-        throw new Error('Failed to save the graph.');
-      }
-    } catch {
-      if (onError) onError();
-    }
+  /**
+   * Saves both the form and graph of the inquiry.
+   * @param onSuccess {Function} The function to call on success.
+   * @param onError {Function} The function to call on error.
+   */
+  const saveFormAndGraph = async (onSuccess?: (id: string) => void, onError?: () => void) => {
+    await save(
+      {
+        form: {
+          ...form,
+          // Default title if not provided.
+          title: form.title ?? 'Untitled Form',
+        },
+        graph,
+      },
+      ['form', 'graph'],
+      onSuccess,
+      onError,
+    );
   };
 
   /**
    * Triggers the start of the graph generation process for the inquiry using
    * the graph generator agent.
    */
-  const generateGraph = async () => {
-    const agentId = await getAgentIdByName('Stakeholder | Graph Generator', client);
+  const generateGraph = async (templateOverride: boolean) => {
     setGeneratingGraph(true);
+    let userMessage;
+    const agentId = await getAgentIdByName('Stakeholder | Graph Edit Agent (Sonnet)', client);
+
+    if (templateOverride) {
+      userMessage = [
+        `You are generating a graph for <title>${form.title}</title>`,
+        `The user is looking for the following goals to be completed: <goals>${form.goals}</goals>`,
+        `Taking the exact graph structure in <conversationGraph>, adapt the graph to be about the <goals> listed above. Simply upsert all of the existing nodes, do not remove any nodes, add any new nodes or add or remove any edges. Simply return the "nodesToUpsert". Absolutey do NOT include "nodesToDelete", "edgesToAdd" or "edgesToDelete". You will ONLY be using the existing nodes and overriding them.`,
+      ].join('\n');
+    } else {
+      userMessage = [
+        `You are updating a graph for <title>${form.title}</title>`,
+        `The user is looking for the following goals to be completed in this update: <goals>${form.goals}</goals>`,
+        `Ensure the updates or new structure aligns with the user's goals, is relevant to the content in <conversationGraph>, and adheres to the <graphRules>.`,
+      ].join('\n');
+    }
 
     addPrediction({
       variables: {
         subscriptionId,
         agentId,
         variables: {
-          ...form,
-          userMessage: [
-            `You are generating a graph for ${form.title}`,
-            `The user is looking for the following goals to be completed: ${form.goals}`,
-          ].join('\n'),
+          userMessage,
+          conversationGraph: JSON.stringify(graph),
         },
       },
     });
@@ -246,7 +309,11 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     onEdgesChange,
     saveGraph,
 
+    save,
+    saveFormAndGraph,
+
     generatingGraph,
+
     generateGraph,
     onGraphGenerated: (callback: () => void) => {
       onGraphGeneratedRef.current = callback;

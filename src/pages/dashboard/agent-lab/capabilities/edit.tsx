@@ -2,7 +2,7 @@ import { ADD_UPDATE_CAPABILITY, ADD_UPDATE_PROMPT } from '@/clients/mutations';
 import { GET_ALL_MODELS, GET_ALL_PROMPTS, GET_CAPABILITY } from '@/clients/queries';
 import ListBox from '@/components/list/ListBox';
 import ReorderableList from '@/components/list/ReorderableList';
-import CustomModal from '@/components/modal';
+import CustomModal from '@/components/modals/modal';
 import { Prompt } from '@/graphql/graphql';
 import { useAddAlert } from '@/hooks/alert-hook';
 import { useMutation, useQuery } from '@apollo/client';
