@@ -133,7 +133,6 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
   const handleChangeGraphTemplate = (template: Template) => {
     setSelectedTemplate(template);
     updateGraph(template.graph ?? { nodes: [], edges: [] });
-    console.log('template', template);
   };
 
   /**
@@ -172,7 +171,7 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
     }
 
     if (selectedTemplate?.allowGeneration && enableGraphGeneration) {
-      generateGraph(true);
+      generateGraph(form.goals, true);
       return;
     }
 
@@ -256,9 +255,6 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
               )}
             </AnimatePresence>
           </div>
-          <Button onClick={onClose} variant="transparentPrimary" size="medium" className="ml-2">
-            Cancel
-          </Button>
           <Button
             disabled={generatingGraph || !selectedTemplate}
             onClick={handleSave}

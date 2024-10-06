@@ -30,7 +30,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement | HTMLTe
 const Input: React.FC<InputProps> = ({ label, subLabel, name, error, as = 'input', className, ...props }) => {
   const isCheckbox = props.type === 'checkbox';
 
-  const baseClassName = 'w-full p-2 border rounded-xl text-slate-800 focus:outline-none focus:ring-2';
+  const baseClassName = 'w-full p-2 border rounded-xl focus:outline-none focus:ring-2';
 
   const inputStyles = {
     default: clsx(
@@ -73,7 +73,7 @@ const Input: React.FC<InputProps> = ({ label, subLabel, name, error, as = 'input
     'ml-2': isCheckbox,
   });
 
-  const inputWrapperClassName = clsx('w-full flex gap-2', {
+  const inputWrapperClassName = clsx('text-slate-800 w-full flex gap-2', {
     'flex-col': !isCheckbox,
     'flex-row items-center': isCheckbox,
   });

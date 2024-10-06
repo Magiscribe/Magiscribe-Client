@@ -1,4 +1,10 @@
-import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
+import {
+  faComments,
+  faMagicWandSparkles,
+  faQuestionCircle,
+  faTimes,
+  faWandMagic,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   addEdge,
@@ -17,15 +23,18 @@ import {
   useReactFlow,
   XYPosition,
 } from '@xyflow/react';
+import { AnimatePresence, motion } from 'framer-motion';
 import React, { DragEvent, useRef, useState } from 'react';
 import colors from 'tailwindcss/colors';
 
+import Button from '../controls/button';
 import CustomTooltip from '../controls/custom-tooltip';
 import CustomModal from '../modals/modal';
 import ContextMenu from './context-menu';
 import { edgeTypes, nodeTypes, nodeTypesInfo } from './utils';
 
 interface TreeInputProps {
+  children?: React.ReactNode;
   nodes: Node[];
   setNodes: React.Dispatch<React.SetStateAction<Node[]>>;
   onNodesChange: OnNodesChange;
@@ -34,7 +43,7 @@ interface TreeInputProps {
   onEdgesChange: OnEdgesChange;
 }
 
-function Flow({ nodes, edges, setNodes, onNodesChange, setEdges, onEdgesChange }: TreeInputProps) {
+function Flow({ children, nodes, edges, setNodes, onNodesChange, setEdges, onEdgesChange }: TreeInputProps) {
   // Refs
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const reactFlow = useRef<HTMLDivElement>(null);
@@ -58,31 +67,16 @@ function Flow({ nodes, edges, setNodes, onNodesChange, setEdges, onEdgesChange }
   const connectingHandleType = useRef<'source' | 'target' | null>(null);
   const newNode = useRef<{ position: XYPosition; source?: string; target?: string; type: string } | null>(null);
 
-  /**
-   * Handles the start of connecting two nodes.
-   */
   const onConnect: OnConnect = (params) => {
     connectingNodeId.current = null;
     setEdges((eds) => addEdge(params, eds));
   };
 
-  /**
-   * Handles the start of connecting two nodes.
-   * @param event {MouseEvent} - The mouse event that triggered the start of the connection.
-   * @param nodeId {string} - The ID of the node that is being connected.
-   * @param handleType {'source' | 'target' | null} - The type of handle that is being connected.
-   * @returns {void} - Nothing
-   */
   const onConnectStart: OnConnectStart = (_event, { nodeId, handleType }) => {
     connectingNodeId.current = nodeId;
     connectingHandleType.current = handleType;
   };
 
-  /**
-   * Handles the end of connecting two nodes.
-   * @param event {MouseEvent | TouchEvent} - The mouse / touch  event that triggered the end of the connection.
-   * @returns {void} - Nothing
-   */
   const onConnectEnd: OnConnectEnd = (event: MouseEvent | TouchEvent): void => {
     if (!connectingNodeId.current) return;
 
@@ -94,13 +88,6 @@ function Flow({ nodes, edges, setNodes, onNodesChange, setEdges, onEdgesChange }
     );
   };
 
-  /**
-   * Opens the modal to add a new node and sets the position of the new node.
-   * @param x {number} - The x position of the new node.
-   * @param y {number} - The y position of the new node.
-   * @param connectedNodeId {string | undefined} - The ID of the node that is being connected.
-   * @param handleType {'source' | 'target' | null} - The type of handle that is being connected.
-   */
   const openNewNodeModal = (
     x: number,
     y: number,
@@ -116,24 +103,13 @@ function Flow({ nodes, edges, setNodes, onNodesChange, setEdges, onEdgesChange }
     setAddNodeModalOpen(true);
   };
 
-  /**
-   * Performs validation on the new node to ensure it can be added.
-   * @param type {string} - The type of the new node.
-   * @returns {boolean} - Whether the new node is valid and can be added.
-   */
   const validateNewNode = (type?: string) => {
-    // If there is more than one start node, don't allow adding another
     if (type === 'start' && nodes.some((node) => node.type === 'start')) {
       return false;
     }
-
     return true;
   };
 
-  /**
-   * Adds a new node to the graph.
-   * @returns {void} - Nothing
-   */
   const addNode = (): void => {
     const node = newNode.current;
     if (!node) return;
@@ -142,7 +118,6 @@ function Flow({ nodes, edges, setNodes, onNodesChange, setEdges, onEdgesChange }
       return;
     }
 
-    // Guarantee unique ID
     const newNodeId = Math.random().toString(36).slice(2, 6);
 
     setNodes((prev) => [
@@ -170,19 +145,11 @@ function Flow({ nodes, edges, setNodes, onNodesChange, setEdges, onEdgesChange }
     setAddNodeModalOpen(false);
   };
 
-  /**
-   * Handles the opening of the context menu for the graph.
-   * @param event {MouseEvent | React.MouseEvent<Element, MouseEvent>} - The mouse event that triggered the context menu.
-   * @returns {void} - Nothing
-   */
   const onPaneContextMenu = (event: MouseEvent | React.MouseEvent<Element, MouseEvent>): void => {
     if (!reactFlow.current) return;
 
-    // Prevent native context menu from showing
     event.preventDefault();
 
-    // Calculate position of the context menu. We want to make sure it
-    // doesn't get positioned off-screen.
     const pane = reactFlow.current.getBoundingClientRect();
     setMenu({
       top: event.clientY < pane.height ? event.clientY : undefined,
@@ -196,31 +163,17 @@ function Flow({ nodes, edges, setNodes, onNodesChange, setEdges, onEdgesChange }
     });
   };
 
-  /**
-   * Handles the closing of the context menu when the area outside of the context menu is clicked.
-   * @returns
-   */
   const onPaneClick = () => setMenu(null);
 
-  /**
-   * Handles the start of dragging a node from the sidebar.
-   * @param nodeType
-   */
   const onDragStart = (nodeType: string) => {
     newNode.current = { position: { x: 0, y: 0 }, type: nodeType };
   };
 
-  /**
-   * Handles dragging over the flow to allow dropping nodes.
-   */
   const onDragOver = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = 'move';
   };
 
-  /**
-   * Handles dropping a node onto the flow.
-   */
   const onDrop = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     const node = newNode.current;
@@ -342,11 +295,7 @@ function Flow({ nodes, edges, setNodes, onNodesChange, setEdges, onEdgesChange }
           proOptions={{ hideAttribution: true }}
         >
           <Background />
-          <Controls
-            position="top-right"
-            // TODO: Handle locking the graph.
-            showInteractive={false}
-          />
+          <Controls position="bottom-left" showInteractive={false} />
           {menu && <ContextMenu buttons={renderNodeButtonsMenu()} {...menu} />}
         </ReactFlow>
 
@@ -367,6 +316,8 @@ function Flow({ nodes, edges, setNodes, onNodesChange, setEdges, onEdgesChange }
           </CustomModal>
         </div>
       </div>
+
+      {children}
     </div>
   );
 }
