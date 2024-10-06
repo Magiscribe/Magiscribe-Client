@@ -1,3 +1,5 @@
+import ChatPopover from '@/components/controls/popovers/chat-popover';
+import ChatWindowContainer from '@/components/controls/popovers/fixed-popover';
 import GraphInput from '@/components/graph/graph-input';
 import ConfirmationModal from '@/components/modals/confirm-modal';
 import ModalGenerateInquiryGraph from '@/components/modals/generate-inquiry-modal';
@@ -5,14 +7,7 @@ import ModalUpsertInquiry from '@/components/modals/upsert-inquiry-modal';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { formatGraph } from '@/utils/graphs/graph-utils';
-import {
-  faEye,
-  faGear,
-  faRotateLeft,
-  faSpinner,
-  faTrash,
-  faWandMagicSparkles,
-} from '@fortawesome/free-solid-svg-icons';
+import { faEye, faGear, faRotateLeft, faSpinner, faTrash, faWandMagicSparkles } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -228,6 +223,8 @@ export default function InquiryBuilder() {
         text="Are you sure you want to delete the inquiry?"
         confirmText="Delete Inquiry"
       />
+
+      <ChatPopover label="Chat with Assistant" onGenerateGraph={saveForm} />
     </>
   );
 }
