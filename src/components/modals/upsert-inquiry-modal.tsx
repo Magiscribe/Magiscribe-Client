@@ -255,6 +255,9 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
               )}
             </AnimatePresence>
           </div>
+          <Button type="button" onClick={onClose} variant="transparentPrimary" size="medium" className="ml-2">
+            Cancel
+          </Button>
           <Button
             disabled={generatingGraph || !selectedTemplate}
             onClick={handleSave}
