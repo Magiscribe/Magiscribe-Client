@@ -37,7 +37,7 @@ export const nodeTypesInfo = {
   end: {
     name: 'End',
     icon: faStop,
-    description: 'The end node represents the end of the conversation flow. There can only be one end node.',
+    description: 'The end node represents the end of the conversation flow. There can be multiple end nodes.',
     element: EndNode,
   },
 };

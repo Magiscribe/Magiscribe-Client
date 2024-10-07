@@ -56,7 +56,6 @@ function applyNodeChanges(nodes: Node[], changeset: ChangeSet): Node[] {
 
 function applyEdgeChanges(edges: Edge[], changeset: ChangeSet, updatedNodes: Node[]): Edge[] {
   const validNodeIds = new Set(updatedNodes.map((node) => node.id));
-  const edgeSet = new Set(edges.map((edge) => `${edge.source}-${edge.target}`));
 
   const updatedEdges = edges.filter(
     (edge) =>
@@ -66,6 +65,8 @@ function applyEdgeChanges(edges: Edge[], changeset: ChangeSet, updatedNodes: Nod
         (deleteEdge) => deleteEdge.source === edge.source && deleteEdge.target === edge.target,
       ),
   );
+
+  const edgeSet = new Set(updatedEdges.map((edge) => `${edge.source}-${edge.target}`));
 
   changeset.edgesToAdd?.forEach((edge) => {
     if (validNodeIds.has(edge.source) && validNodeIds.has(edge.target)) {
