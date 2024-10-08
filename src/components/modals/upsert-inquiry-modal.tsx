@@ -9,6 +9,7 @@ import React, { useEffect, useState } from 'react';
 
 import Button from '../controls/button';
 import Input from '../controls/input';
+import Textarea from '../controls/textarea';
 import CustomModal from './modal';
 
 /**
@@ -227,13 +228,12 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2, type: 'spring', stiffness: 250 }}
             >
-              <Input
+              <Textarea
                 name="goals"
                 label="Goals"
                 subLabel="Who are you trying to gain insights from and what type of information are you looking to capture?"
                 value={form.goals}
                 onChange={handleInputChange('goals')}
-                as="textarea"
               />
             </motion.div>
           )}

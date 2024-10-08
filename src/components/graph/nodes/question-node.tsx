@@ -1,6 +1,7 @@
 import Button from '@/components/controls/button';
 import Input from '@/components/controls/input';
 import Select from '@/components/controls/select';
+import Textarea from '@/components/controls/textarea';
 import { faPlus, faQuestionCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import { Handle, NodeProps, Position } from '@xyflow/react';
 import React, { useCallback } from 'react';
@@ -82,12 +83,11 @@ export default function QuestionNode({ id, data }: QuestionNodeProps) {
           className="nodrag"
         />
 
-        <Input
+        <Textarea
           label="Message"
           name="text"
           value={data.text}
           onChange={(e) => handleUpdate({ text: e.target.value })}
-          as="textarea"
           placeholder="Enter your text here..."
           className="resize-none overflow-hidden nodrag"
         />
