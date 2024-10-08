@@ -26,6 +26,7 @@ import ContextMenu from './context-menu';
 import { edgeTypes, nodeTypes, nodeTypesInfo } from './utils';
 
 interface TreeInputProps {
+  children?: React.ReactNode;
   nodes: Node[];
   setNodes: React.Dispatch<React.SetStateAction<Node[]>>;
   onNodesChange: OnNodesChange;
@@ -34,7 +35,7 @@ interface TreeInputProps {
   onEdgesChange: OnEdgesChange;
 }
 
-function Flow({ nodes, edges, setNodes, onNodesChange, setEdges, onEdgesChange }: TreeInputProps) {
+function Flow({ children, nodes, edges, setNodes, onNodesChange, setEdges, onEdgesChange }: TreeInputProps) {
   // Refs
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const reactFlow = useRef<HTMLDivElement>(null);
@@ -342,11 +343,7 @@ function Flow({ nodes, edges, setNodes, onNodesChange, setEdges, onEdgesChange }
           proOptions={{ hideAttribution: true }}
         >
           <Background />
-          <Controls
-            position="top-right"
-            // TODO: Handle locking the graph.
-            showInteractive={false}
-          />
+          <Controls position="bottom-left" showInteractive={false} />
           {menu && <ContextMenu buttons={renderNodeButtonsMenu()} {...menu} />}
         </ReactFlow>
 
@@ -367,6 +364,8 @@ function Flow({ nodes, edges, setNodes, onNodesChange, setEdges, onEdgesChange }
           </CustomModal>
         </div>
       </div>
+
+      {children}
     </div>
   );
 }

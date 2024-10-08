@@ -221,13 +221,21 @@ function UserInquiryPage() {
               appreciate it if you could fill them out.
             </p>
             <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="flex flex-col gap-2">
-                <Input label="Name" name="name" error={errors.name} value={userDetails.name} onChange={handleChange} />
+              <div className="flex flex-col gap-2 text-slate-800">
+                <Input
+                  label="Name"
+                  name="name"
+                  placeholder="Your name"
+                  error={errors.name}
+                  value={userDetails.name}
+                  onChange={handleChange}
+                />
               </div>
               <div className="flex flex-col gap-2">
                 <Input
                   label="Email"
                   name="email"
+                  placeholder="Your email address"
                   error={errors.email}
                   value={userDetails.email}
                   onChange={handleChange}

@@ -15,7 +15,16 @@ import React from 'react';
  */
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children?: React.ReactNode;
-  variant?: 'primary' | 'secondary' | 'danger' | 'transparentPrimary' | 'transparentSecondary' | 'transparentDanger';
+  variant?:
+    | 'primary'
+    | 'secondary'
+    | 'danger'
+    | 'transparentPrimary'
+    | 'transparentSecondary'
+    | 'transparentDanger'
+    | 'inversePrimary'
+    | 'inverseSecondary'
+    | 'inverseDanger';
   size?: 'small' | 'medium' | 'large';
   iconLeft?: IconDefinition;
   iconRight?: IconDefinition;
@@ -48,6 +57,10 @@ const Button: React.FC<ButtonProps> = ({
     transparentPrimary: 'text-blue-600 hover:text-blue-700 focus:ring-blue-500',
     transparentSecondary: 'text-slate-400 hover:text-slate-500 focus:ring-slate-300',
     transparentDanger: 'text-red-600 hover:text-red-700 focus:ring-red-500',
+
+    inversePrimary: 'bg-white text-blue-600 hover:bg-blue-50 focus:ring-blue-500',
+    inverseSecondary: 'bg-white text-slate-400 hover:bg-slate-50 focus:ring-slate-300',
+    inverseDanger: 'bg-white text-red-600 hover:bg-red-50 focus:ring-red-500',
   };
 
   const sizeClassNames = {

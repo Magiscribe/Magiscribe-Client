@@ -8,15 +8,13 @@ import React from 'react';
  * @property {string} [subLabel] - An optional sub-label for additional information.
  * @property {string} name - The name attribute for the input field.
  * @property {string} [error] - An optional error message to display.
- * @property {'input' | 'textarea'} [as='input'] - Determines whether to render an input or textarea.
  * @property {string} [className] - Additional CSS classes for the input element.
  */
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement | HTMLTextAreaElement> {
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   subLabel?: string;
   name: string;
   error?: string;
-  as?: 'input' | 'textarea';
   className?: string;
 }
 
@@ -27,10 +25,10 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement | HTMLTe
  * @param {InputProps} props - The props for the Input component.
  * @returns {JSX.Element} The rendered Input component.
  */
-const Input: React.FC<InputProps> = ({ label, subLabel, name, error, as = 'input', className, ...props }) => {
+export default function Input({ label, subLabel, name, error, className, ...props }: InputProps): JSX.Element {
   const isCheckbox = props.type === 'checkbox';
 
-  const baseClassName = 'w-full p-2 border rounded-xl text-slate-800 focus:outline-none focus:ring-2';
+  const baseClassName = 'w-full p-2 border rounded-xl focus:outline-none focus:ring-2';
 
   const inputStyles = {
     default: clsx(
@@ -49,38 +47,23 @@ const Input: React.FC<InputProps> = ({ label, subLabel, name, error, as = 'input
       },
       className,
     ),
-    textarea: clsx(
-      baseClassName,
-      'focus:ring-indigo-500 resize-vertical min-h-[100px]',
-      {
-        'border-slate-300': !error,
-        'border-red-700 focus:ring-red-500': error,
-      },
-      className,
-    ),
   };
 
-  const inputClassName = isCheckbox
-    ? inputStyles.checkbox
-    : as === 'textarea'
-      ? inputStyles.textarea
-      : inputStyles.default;
-
-  const InputComponent = as === 'textarea' ? 'textarea' : 'input';
+  const inputClassName = isCheckbox ? inputStyles.checkbox : inputStyles.default;
 
   const labelClassName = clsx('text-sm font-bold', {
     'order-first mb-2': !isCheckbox,
     'ml-2': isCheckbox,
   });
 
-  const inputWrapperClassName = clsx('w-full flex gap-2', {
+  const inputWrapperClassName = clsx('text-slate-800 w-full flex gap-2', {
     'flex-col': !isCheckbox,
     'flex-row items-center': isCheckbox,
   });
 
   return (
     <div className={inputWrapperClassName}>
-      <InputComponent id={name} name={name} className={inputClassName} {...props} />
+      <input id={name} name={name} className={inputClassName} {...props} />
       {label && (
         <label className={labelClassName} htmlFor={name}>
           {label}
@@ -95,6 +78,4 @@ const Input: React.FC<InputProps> = ({ label, subLabel, name, error, as = 'input
       {error && <p className="text-red-700 text-sm mt-1">{error}</p>}
     </div>
   );
-};
-
-export default Input;
+}

@@ -1,23 +1,20 @@
 import { Handle, HandleProps, useHandleConnections } from '@xyflow/react';
 
 interface CustomHandleProps extends HandleProps {
-  connectionCount: number;
+  connectionCount?: number;
 }
 
 const CustomHandle = (props: CustomHandleProps) => {
+  const { connectionCount, ...rest } = props;
+
   const connections = useHandleConnections({
     type: props.type,
   });
 
-  // Remove connectionCount prop from the Handle component
-  const { connectionCount, ...rest } = props;
+  const isConnectable = connectionCount == null || connections.length < connectionCount;
 
   return (
-    <Handle
-      {...rest}
-      isConnectable={connections.length < connectionCount}
-      className={connections.length < connectionCount ? 'w-4 h-4 !bg-green-500' : 'opacity-0'}
-    />
+    <Handle {...rest} isConnectable={isConnectable} className={isConnectable ? 'w-4 h-4 !bg-green-500' : 'opacity-0'} />
   );
 };
 
