@@ -7,6 +7,7 @@ import { NodeData, OptimizedNode } from '@/utils/graphs/graph';
 import { GraphManager } from '@/utils/graphs/graph-manager';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
 import React, { createContext, useContext, useRef, useState } from 'react';
+import { validateGraph } from '@/utils/graphs/graph-utils';
 
 interface InquiryProviderProps {
   /**
@@ -48,6 +49,7 @@ const INITIAL_STATE: State = {
 interface InquiryContextType {
   id: string;
   preview?: boolean;
+  validGraph?: boolean;
 
   handleNextNode: (props?: HandleNextNodeProps) => Promise<void>;
   onNodeUpdate: (callback: (node: OptimizedNode) => void) => void;
@@ -69,7 +71,7 @@ function InquiryProvider({ children, id, preview }: InquiryProviderProps) {
   const isCreatingResponseRef = useRef<boolean>(false);
   const inquiryHistoryRef = useRef<string[]>([]);
   const errorCountRef = useRef<number>(0);
-
+  const validGraph = useRef<boolean>(true);
   // States
   const [userDetails, setUserDetails] = useState<{ [key: string]: string }>({});
   const [state, setState] = useState<State>({
@@ -99,12 +101,32 @@ function InquiryProvider({ children, id, preview }: InquiryProviderProps) {
     skip: !id,
     errorPolicy: 'all',
     onCompleted: ({ getInquiry }) => {
-      if (getInquiry.data.graph) {
+      if (getInquiry.data) {
         formRef.current = getInquiry.data.form;
-        graphRef.current = new GraphManager(getInquiry.data.graph);
-        graphRef.current.onNodeVisit = handleOnNodeVisit;
-        graphRef.current.onNodeAddedToHistory = addNodeToHistory;
-        setState({ ...INITIAL_STATE, initialized: true });
+
+        if (preview) {
+          // In preview mode, always use draftGraph
+          if (getInquiry.data.draftGraph) {
+            graphRef.current = new GraphManager(getInquiry.data.draftGraph);
+            validGraph.current = validateGraph(graphRef.current.getGraph()) === true;
+            graphRef.current.onNodeVisit = handleOnNodeVisit;
+            graphRef.current.onNodeAddedToHistory = addNodeToHistory;
+            setState({ ...INITIAL_STATE, initialized: true });
+          } else {
+            // If there's no draftGraph in preview mode, we might want to show an appropriate message
+            setState({ ...INITIAL_STATE, notFound: true });
+          }
+        } else {
+          // In non-preview mode, use the published graph
+          if (getInquiry.data.graph) {
+            graphRef.current = new GraphManager(getInquiry.data.graph);
+            graphRef.current.onNodeVisit = handleOnNodeVisit;
+            graphRef.current.onNodeAddedToHistory = addNodeToHistory;
+            setState({ ...INITIAL_STATE, initialized: true });
+          } else {
+            setState({ ...INITIAL_STATE, notFound: true });
+          }
+        }
       } else {
         setState({ ...INITIAL_STATE, notFound: true });
       }
@@ -332,6 +354,7 @@ function InquiryProvider({ children, id, preview }: InquiryProviderProps) {
   const contextValue: InquiryContextType = {
     id,
     preview,
+    validGraph: validGraph.current,
 
     onNodeUpdate: (callback: (node: OptimizedNode) => void) => {
       onNodeUpdateRef.current = callback;

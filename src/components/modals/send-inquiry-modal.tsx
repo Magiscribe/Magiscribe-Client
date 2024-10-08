@@ -44,12 +44,13 @@ export default function ModalSendInquiry({ id, open, onClose, validationErrors, 
     if (validationErrors) {
       onAutoFix(validationErrors);
     }
-    onClose();
   };
 
   const renderErrorList = () => (
     <div className="mt-4">
-      <h3 className="text-lg font-semibold text-red-600 mb-2">Validation Errors:</h3>
+      <h3 className="text-lg font-semibold text-red-600 mb-2">
+        Please address the following errors before publishing:
+      </h3>
       <ul className="list-disc list-inside">
         {validationErrors?.map((error, index) => (
           <li key={index} className="text-red-600">
@@ -66,12 +67,17 @@ export default function ModalSendInquiry({ id, open, onClose, validationErrors, 
   );
 
   return (
-    <CustomModal open={open} onClose={onClose} title={validationErrors ? 'Validation Failed' : 'Send'} size="4xl">
+    <CustomModal
+      open={open}
+      onClose={onClose}
+      title={validationErrors ? 'Invalid Inquiry Graph' : 'Send Inquiry'}
+      size="4xl"
+    >
       {validationErrors ? (
         renderErrorList()
       ) : (
         <>
-          <p className="text-slate-600 mb-6">Send the link to anyone you want to get input from</p>
+          <p className="text-slate-600 mb-6">Share the link to this inquiry with anyone you want to get input from</p>
           <div className="flex items-stretch">
             <p className="flex-grow p-2 rounded-l-md border border-r-0 border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500">
               {link}

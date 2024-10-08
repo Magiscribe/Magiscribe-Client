@@ -21,7 +21,8 @@ export default function GraphContextBar({ onOpenGraphGenerator, onAutoFix }: Gra
   const [validationErrors, setValidationErrors] = useState<string[] | null>(null);
 
   // Hooks
-  const { id, form, graph, lastUpdated, updateForm, updateGraph, resetGraph, deleteInquiry } = useInquiryBuilder();
+  const { id, form, draftGraph, lastUpdated, updateForm, updateGraph, resetGraph, deleteInquiry, saveGraph } =
+    useInquiryBuilder();
   const alert = useAddAlert();
   const navigate = useNavigate();
 
@@ -32,7 +33,7 @@ export default function GraphContextBar({ onOpenGraphGenerator, onAutoFix }: Gra
    * Handle formatting the graph.
    */
   const handleFormat = () => {
-    updateGraph(formatGraph(graph));
+    updateGraph(formatGraph(draftGraph));
     alert('Graph formatted successfully!', 'success');
   };
 
@@ -40,14 +41,22 @@ export default function GraphContextBar({ onOpenGraphGenerator, onAutoFix }: Gra
    * Handle validating the graph.
    */
   const handlePublish = () => {
-    const validationResult = validateGraph(graph);
+    const validationResult = validateGraph(draftGraph);
     setValidationErrors(validationResult === true ? null : validationResult);
     setSendModalOpen(true);
+    if (validationResult === true) {
+      // Setting the input parameter to false saves the real graph
+      saveGraph(false);
+      alert('Inquiry published successfully!', 'success');
+    } else {
+      alert('Unable to publish inquiry due to validation errors!', 'error');
+    }
   };
 
   const handleAutoFix = (errors: string[]) => {
     onOpenGraphGenerator();
     onAutoFix(errors);
+    setSendModalOpen(false); // Close the modal
   };
 
   return (

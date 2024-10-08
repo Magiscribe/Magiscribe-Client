@@ -32,14 +32,15 @@ interface ContextType {
   id?: string;
   lastUpdated: Date;
   form: FormData;
-  graph: { edges: Edge[]; nodes: Node[] };
+
+  draftGraph: { edges: Edge[]; nodes: Node[] };
 
   deleteInquiry: (onSuccess?: () => void, onError?: () => void) => Promise<void>;
 
   updateForm: (form: FormData) => void;
   saveForm: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
 
-  updateGraph: (graph: { nodes: Node[]; edges: Edge[] }) => void;
+  updateGraph: (draftGraph: { nodes: Node[]; edges: Edge[] }) => void;
   updateGraphNodes: React.Dispatch<React.SetStateAction<Node[]>>;
   updateGraphEdges: React.Dispatch<React.SetStateAction<Edge[]>>;
 
@@ -48,7 +49,7 @@ interface ContextType {
   onNodesChange: OnNodesChange;
   onEdgesChange: OnEdgesChange;
 
-  saveGraph: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
+  saveGraph: (saveDraft?: boolean, onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
 
   save: (
     data: { form?: FormData; graph?: { nodes: Node[]; edges: Edge[] } },
@@ -60,7 +61,7 @@ interface ContextType {
   saveFormAndGraph: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
 
   generatingGraph: boolean;
-  generateGraph: (message: string, templateOverride: boolean) => void;
+  generateGraph: (templateOverride: boolean, message?: string) => void;
   onGraphGenerated: (callback: (message: string) => void) => void;
 }
 
@@ -83,7 +84,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
   // Memoized graph object
-  const graph = useMemo(() => ({ nodes, edges }), [nodes, edges]);
+  const draftGraph = useMemo(() => ({ nodes, edges }), [nodes, edges]);
 
   // Events
   const onGraphGeneratedRef = useRef<(message: string) => void>();
@@ -98,7 +99,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
       if (!getInquiry) return;
       setLastUpdated(new Date(getInquiry.updatedAt));
       updateForm(getInquiry.data.form);
-      if (getInquiry.data.graph) updateGraph(getInquiry.data.graph);
+      if (getInquiry.data.draftGraph) updateGraph(getInquiry.data.draftGraph);
       setInitialized(true);
     },
   });
@@ -115,10 +116,10 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
         const jsonMatch = result.match(/```json\n([\s\S]*?)\n```/);
         const markdownMatch = result.match(/```markdown\n([\s\S]*?)\n```/);
         const changeset = JSON.parse(jsonMatch[1]);
-        const newGraph = applyGraphChangeset(graph, changeset);
+        const newGraph = applyGraphChangeset(draftGraph, changeset);
 
-        updateGraph(formatGraph(newGraph));
         setExplanation(markdownMatch[1]);
+        updateGraph(formatGraph(newGraph));
 
         setGeneratingGraph(false);
         setPendingGraph(true);
@@ -163,7 +164,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
    * @param onError {Function} The function to call on error.
    */
   const save = async (
-    data: { form?: FormData; graph?: { nodes: Node[]; edges: Edge[] } },
+    data: { form?: FormData; graph?: { nodes: Node[]; edges: Edge[] }; draftGraph?: { nodes: Node[]; edges: Edge[] } },
     fields: string[],
     onSuccess?: (id: string) => void,
     onError?: () => void,
@@ -210,7 +211,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
 
   /**
    * Updates the graph of the inquiry.
-   * @param graph {Object} The graph object to update.
+   * @param draftGraph {Object} The graph object to update.
    */
   const updateGraph = ({ nodes, edges }: { nodes: Node[]; edges: Edge[] }) => {
     setNodes(nodes);
@@ -229,8 +230,12 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
    * @param onSuccess {Function} The function to call on success.
    * @param onError {Function} The function to call on error.
    */
-  const saveGraph = async (onSuccess?: (id: string) => void, onError?: () => void) => {
-    await save({ graph }, ['graph'], onSuccess, onError);
+  const saveGraph = async (saveDraft?: boolean, onSuccess?: (id: string) => void, onError?: () => void) => {
+    if (saveDraft) {
+      await save({ draftGraph }, ['draftGraph'], onSuccess, onError);
+    } else {
+      await save({ graph: draftGraph }, ['graph'], onSuccess, onError);
+    }
   };
 
   /**
@@ -246,9 +251,9 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
           // Default title if not provided.
           title: form.title ?? 'Untitled Form',
         },
-        graph,
+        draftGraph,
       },
-      ['form', 'graph'],
+      ['form', 'draftGraph'],
       onSuccess,
       onError,
     );
@@ -258,7 +263,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
    * Triggers the start of the graph generation process for the inquiry using
    * the graph generator agent.
    */
-  const generateGraph = async (message: string, templateOverride: boolean) => {
+  const generateGraph = async (templateOverride: boolean, message?: string) => {
     setGeneratingGraph(true);
     let userMessage;
     const agentId = await getAgentIdByName('Stakeholder | Graph Edit Agent (Sonnet)', client);
@@ -266,7 +271,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     if (templateOverride) {
       userMessage = [
         `You are generating a graph for <title>${form.title}</title>`,
-        `The user is looking for the following goals to be completed: <goals>${message}</goals>`,
+        `The user is looking for the following goals to be completed: <goals>${form.goals}</goals>`,
         `Taking the exact graph structure in <conversationGraph>, adapt the graph to be about the <goals> listed above. Simply upsert all of the existing nodes, do not remove any nodes, add any new nodes or add or remove any edges. Simply return the "nodesToUpsert". Absolutey do NOT include "nodesToDelete", "edgesToAdd" or "edgesToDelete". You will ONLY be using the existing nodes and overriding them.`,
       ].join('\n');
     } else {
@@ -283,7 +288,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
         agentId,
         variables: {
           userMessage,
-          conversationGraph: JSON.stringify(graph),
+          conversationGraph: JSON.stringify(draftGraph),
         },
       },
     });
@@ -295,7 +300,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     id,
     lastUpdated,
     form,
-    graph,
+    draftGraph,
 
     deleteInquiry,
 

@@ -26,7 +26,7 @@ export default function InquiryBuilder() {
   const {
     initialized,
     form,
-    graph,
+    draftGraph,
     saveGraph,
     onEdgesChange,
     onNodesChange,
@@ -44,7 +44,7 @@ export default function InquiryBuilder() {
     }
 
     saveDebounce.current = setTimeout(() => {
-      saveGraph(); // Function to save the graph
+      saveGraph(true); // Function to save the graph
     }, DEBOUNCE_DELAY_IN_MS);
 
     // Cleanup function to clear the timeout if the component unmounts or the effect re-runs
@@ -53,7 +53,7 @@ export default function InquiryBuilder() {
         clearTimeout(saveDebounce.current);
       }
     };
-  }, [graph]);
+  }, [draftGraph]);
 
   /**
    * A debounced function to save the graph after a delay.
@@ -94,8 +94,8 @@ export default function InquiryBuilder() {
           {initialized && (
             <>
               <GraphInput
-                nodes={graph.nodes}
-                edges={graph.edges}
+                nodes={draftGraph.nodes}
+                edges={draftGraph.edges}
                 setNodes={updateGraphNodes}
                 setEdges={updateGraphEdges}
                 onNodesChange={onNodesChange}

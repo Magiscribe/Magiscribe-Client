@@ -59,7 +59,7 @@ function UserInquiryPage() {
   const navigate = useNavigate();
 
   // Inquiry hooks
-  const { preview, handleNextNode, form, state, onNodeUpdate, userDetails, setUserDetails } = useInquiry();
+  const { preview, validGraph, handleNextNode, form, state, onNodeUpdate, userDetails, setUserDetails } = useInquiry();
 
   const validateInput = (input: { [key: string]: string }) => {
     const newErrors: { [key: string]: string } = {};
@@ -242,6 +242,13 @@ function UserInquiryPage() {
                 />
               </div>
             </form>
+          </div>
+        )}
+
+        {preview && !validGraph && (
+          <div className="my-6 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700">
+            <h3 className="text-lg font-semibold mb-2">Warning: Invalid Graph</h3>
+            <p>This may lead to unexpected behavior or errors during the inquiry process</p>
           </div>
         )}
 

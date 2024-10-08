@@ -92,6 +92,7 @@ export default function GraphGeneratorMenu({ onClose, autoFixErrors }: GraphGene
     if (autoFixErrors && autoFixErrors.length > 0) {
       const errorMessage = `Validation Errors:\n${autoFixErrors.join('\n')}`;
       sendMessage(errorMessage, true);
+      autoFixErrors = [];
     }
   }, [autoFixErrors]);
 
@@ -122,7 +123,7 @@ export default function GraphGeneratorMenu({ onClose, autoFixErrors }: GraphGene
         sender: isUserMessage ? 'user' : 'assistant',
       };
       setMessages((prev) => [...prev, newMessage]);
-      generateGraph(message, false);
+      generateGraph(false, newMessage.text);
       setInputMessage('');
     }
   };
@@ -147,15 +148,17 @@ export default function GraphGeneratorMenu({ onClose, autoFixErrors }: GraphGene
 
   /*================================ SIDE EFFECTS ==============================*/
 
-  onGraphGenerated?.((message) => {
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: Date.now().toString(),
-        text: message,
-        sender: 'assistant',
-      },
-    ]);
+  onGraphGenerated?.((message?: string) => {
+    if (message) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now().toString(),
+          text: message,
+          sender: 'assistant',
+        },
+      ]);
+    }
   });
 
   return (
