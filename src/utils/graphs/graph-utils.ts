@@ -193,3 +193,86 @@ export function convertToOptimizedGraph(graph: StrippedGraph): OptimizedGraph {
 
   return { nodes, edges };
 }
+
+/*================================ Validation ==============================*/
+/**
+ * Validates a graph structure.
+ * @param graph {StrippedGraph} An optimized graph structure
+ * @returns {true | string[]} Returns true if the graph is valid, or an array of error messages if not
+ */
+export function validateGraph(graph: StrippedGraph): true | string[] {
+  const optimizedGraph = convertToOptimizedGraph(graph);
+  const errors: string[] = [];
+  const nodeIds = new Set(Object.keys(optimizedGraph.nodes));
+
+  // Check for start and end nodes
+  const startNodes = Object.values(optimizedGraph.nodes).filter((node) => node.type === 'start');
+  const endNodes = Object.values(optimizedGraph.nodes).filter((node) => node.type === 'end');
+  const questionNodes = Object.values(optimizedGraph.nodes).filter((node) => node.type === 'question');
+
+  if (startNodes.length !== 1) errors.push(`Graph must have exactly one start node, found ${startNodes.length}`);
+  if (endNodes.length === 0) errors.push(`Graph must have at least one end node, found 0`);
+  if (questionNodes.length === 0) errors.push(`Graph must have at least one question node, found 0`);
+
+  // Check for disconnected nodes and validate node-specific rules
+  Object.entries(optimizedGraph.nodes).forEach(([id, node]) => {
+    // Check outgoing edges for validity
+    node.outgoingEdges.forEach((edgeId) => {
+      const edge = optimizedGraph.edges[edgeId];
+      if (!nodeIds.has(edge.target)) {
+        errors.push(`Edge ${edgeId} targets non-existent node ${edge.target}. Consider removing this edge`);
+      }
+    });
+
+    switch (node.type) {
+      case 'start':
+        if (Object.values(optimizedGraph.edges).some((edge) => edge.target === id)) {
+          errors.push(`Start node ${id} cannot be a target for any edge`);
+        }
+        break;
+      case 'end':
+        if (node.outgoingEdges.length > 0) {
+          errors.push(`End node ${id} cannot be a source for any edge. `);
+        }
+        break;
+      case 'information':
+      case 'question':
+        if (node.data.text === '') {
+          errors.push(`Node ${id} has no text. Consider adding text.`);
+        }
+        if (node.outgoingEdges.length > 1) {
+          errors.push(
+            `${node.type} node ${id} must have exactly one outgoing edge. It has ${node.outgoingEdges.length} edges. Consider removing the extra edge(s) or deleting this node.`,
+          );
+        } else if (node.outgoingEdges.length === 0) {
+          errors.push(
+            `Node ${id} has no outgoing edges. Consider deleting this node or connecting it to another node.`,
+          );
+        }
+        if (node.type === 'question' && (node.data.type === 'rating-single' || node.data.type === 'rating-multi')) {
+          if (!Array.isArray(node.data.ratings) || node.data.ratings.length === 0) {
+            errors.push(`Rating node ${id} must have at least one option. Consider adding options.`);
+          }
+        }
+        break;
+      case 'condition':
+        if (node.outgoingEdges.length < 2) {
+          errors.push(
+            `Condition node ${id} should have at least two outgoing edges. Ensure that the nodes mentioned in the text of this condition node actually exist. Consider adding another edge, adding another node, or deleting this node.`,
+          );
+        }
+        // Check if condition node has a condition
+        if (!node.data.text) {
+          errors.push(`Condition node ${id} has no condition. Consider adding a condition.`);
+        }
+        break;
+    }
+
+    // Check for incoming edges (except for start node)
+    if (node.type !== 'start' && !Object.values(optimizedGraph.edges).some((edge) => edge.target === id)) {
+      errors.push(`Node ${id} has no incoming edges. Consider deleting this node or connecting it to another node.`);
+    }
+  });
+
+  return errors.length === 0 ? true : errors;
+}
