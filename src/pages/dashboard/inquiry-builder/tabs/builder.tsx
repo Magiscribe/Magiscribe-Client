@@ -17,6 +17,7 @@ const DEBOUNCE_DELAY_IN_MS = 1000;
 export default function InquiryBuilder() {
   // States
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [autoFixErrors, setAutoFixErrors] = useState<string[] | undefined>(undefined);
 
   // Refs
   const saveDebounce = useRef<NodeJS.Timeout>();
@@ -78,11 +79,16 @@ export default function InquiryBuilder() {
     setIsChatOpen(!isChatOpen);
   };
 
+  const handleAutoFix = (errors: string[]) => {
+    setAutoFixErrors(errors);
+    setIsChatOpen(true);
+  };
+
   return (
     <>
       <div className="h-[85vh] flex flex-col border-white border-2 rounded-2xl overflow-hidden">
         <div className="bg-white p-4 space-y-4 text-slate-700">
-          <GraphContextBar />
+          <GraphContextBar onOpenGraphGenerator={toggleChat} onAutoFix={handleAutoFix} />
         </div>
         <div className="flex-grow">
           {initialized && (
@@ -105,7 +111,9 @@ export default function InquiryBuilder() {
                 </Button>
 
                 <AnimatePresence>
-                  {isChatOpen && <GraphGeneratorMenu onClose={() => setIsChatOpen(false)} />}
+                  {isChatOpen && (
+                    <GraphGeneratorMenu onClose={() => setIsChatOpen(false)} autoFixErrors={autoFixErrors} />
+                  )}
                 </AnimatePresence>
               </GraphInput>
             </>

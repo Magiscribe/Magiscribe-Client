@@ -4,7 +4,6 @@ import { faMagicWandSparkles, faSpinner, faTimes } from '@fortawesome/free-solid
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
-
 import Button from '../controls/button';
 import MarkdownCustom from '../markdown-custom';
 
@@ -22,6 +21,7 @@ interface Message {
  */
 interface GraphGeneratorMenuProps {
   onClose: () => void;
+  autoFixErrors?: string[];
 }
 
 // Constants
@@ -55,11 +55,7 @@ function ChatBubble({ message, sender }: { message: Message; sender: 'user' | 'a
   );
 }
 
-/**
- * GraphGeneratorMenu component for managing and displaying the graph generation interface.
- */
-export default function GraphGeneratorMenu({ onClose }: GraphGeneratorMenuProps) {
-  // State
+export default function GraphGeneratorMenu({ onClose, autoFixErrors }: GraphGeneratorMenuProps) {
   const [messages, setMessages] = useState<Message[]>([INITIAL_MESSAGE]);
   const [inputMessage, setInputMessage] = useState('');
   const [isDragging, setIsDragging] = useState(false);
@@ -90,19 +86,6 @@ export default function GraphGeneratorMenu({ onClose }: GraphGeneratorMenuProps)
   }, [isDragging]);
 
   /*================================ HANDLERS ==============================*/
-
-  const handleSendMessage = () => {
-    if (inputMessage.trim()) {
-      const newMessage: Message = {
-        id: Date.now().toString(),
-        text: inputMessage,
-        sender: 'user',
-      };
-      setMessages((prev) => [...prev, newMessage]);
-      setInputMessage('');
-      generateGraph(inputMessage, false);
-    }
-  };
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -141,6 +124,34 @@ export default function GraphGeneratorMenu({ onClose }: GraphGeneratorMenuProps)
       },
     ]);
   });
+
+  useEffect(() => {
+    if (autoFixErrors && autoFixErrors.length > 0) {
+      const errorMessage = `Validation Errors:\n${autoFixErrors.join('\n')}`;
+      handleSendMessage(errorMessage);
+    }
+  }, [autoFixErrors]);
+
+  const handleSendMessage = (magicMessage?: string) => {
+    if (magicMessage) {
+      const newMessage: Message = {
+        id: Date.now().toString(),
+        text: magicMessage,
+        sender: 'user',
+      };
+      setMessages((prev) => [...prev, newMessage]);
+      generateGraph(magicMessage, false);
+    } else if (inputMessage.trim()) {
+      const newMessage: Message = {
+        id: Date.now().toString(),
+        text: inputMessage,
+        sender: 'user',
+      };
+      setMessages((prev) => [...prev, newMessage]);
+      setInputMessage('');
+      generateGraph(inputMessage, false);
+    }
+  };
 
   return (
     <motion.div
@@ -183,7 +194,7 @@ export default function GraphGeneratorMenu({ onClose }: GraphGeneratorMenuProps)
             placeholder="Request a modification..."
           />
           <Button
-            onClick={handleSendMessage}
+            onClick={() => handleSendMessage()}
             className="mt-2 w-full"
             disabled={generatingGraph || !inputMessage.trim()}
           >
