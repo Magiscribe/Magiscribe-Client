@@ -5,10 +5,28 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Button from '@/components/controls/button';
 
 interface ModalSendInquiryProps {
+  /**
+   * The inquiry ID to Send.
+   */
   id: string;
+  /**
+   * Whether the modal is open or not.
+   */
   open: boolean;
+
+  /**
+   * A callback triggered when the modal requests to be closed.
+   * @returns {void} Does not return anything.
+   */
   onClose: () => void;
+  /**
+   * The validation errors to display.
+   */
   validationErrors: string[] | null;
+  /**
+   * A callback triggered when the modal requests to be closed.
+   * @returns {void} Does not return anything.
+   */
   onAutoFix: (errors: string[]) => void;
 }
 

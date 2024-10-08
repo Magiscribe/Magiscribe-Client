@@ -41,11 +41,7 @@ export default function GraphContextBar({ onOpenGraphGenerator, onAutoFix }: Gra
    */
   const handlePublish = () => {
     const validationResult = validateGraph(graph);
-    if (validationResult === true) {
-      setValidationErrors(null);
-    } else {
-      setValidationErrors(validationResult);
-    }
+    setValidationErrors(validationResult === true ? null : validationResult);
     setSendModalOpen(true);
   };
 

@@ -42,7 +42,7 @@ const INITIAL_MESSAGE: Message = {
  */
 function ChatBubble({ message, sender }: { message: Message; sender: 'user' | 'assistant' }) {
   return (
-    <div className={`mb-4 flex ${sender === 'user' ? 'justify-start' : 'justify-end'}`}>
+    <div className={`mb-4 flex ${sender === 'user' ? 'justify-end' : 'justify-start'}`}>
       <div
         className={`max-w-[90%] p-3 rounded-lg ${
           sender === 'user' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
@@ -55,6 +55,9 @@ function ChatBubble({ message, sender }: { message: Message; sender: 'user' | 'a
   );
 }
 
+/**
+ * GraphGeneratorMenu component for managing and displaying the graph generation interface.
+ */
 export default function GraphGeneratorMenu({ onClose, autoFixErrors }: GraphGeneratorMenuProps) {
   const [messages, setMessages] = useState<Message[]>([INITIAL_MESSAGE]);
   const [inputMessage, setInputMessage] = useState('');
@@ -85,6 +88,13 @@ export default function GraphGeneratorMenu({ onClose, autoFixErrors }: GraphGene
     };
   }, [isDragging]);
 
+  useEffect(() => {
+    if (autoFixErrors && autoFixErrors.length > 0) {
+      const errorMessage = `Validation Errors:\n${autoFixErrors.join('\n')}`;
+      sendMessage(errorMessage, true);
+    }
+  }, [autoFixErrors]);
+
   /*================================ HANDLERS ==============================*/
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -102,6 +112,29 @@ export default function GraphGeneratorMenu({ onClose, autoFixErrors }: GraphGene
 
   const handleMouseUp = () => {
     setIsDragging(false);
+  };
+
+  const sendMessage = (message: string, isUserMessage: boolean = true) => {
+    if (message.trim()) {
+      const newMessage: Message = {
+        id: Date.now().toString(),
+        text: message.trim(),
+        sender: isUserMessage ? 'user' : 'assistant',
+      };
+      setMessages((prev) => [...prev, newMessage]);
+      generateGraph(message, false);
+      setInputMessage('');
+    }
+  };
+
+  const handleSendButtonClick = () => {
+    sendMessage(inputMessage);
+  };
+
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSendButtonClick();
+    }
   };
 
   /*================================ HELPERS ==============================*/
@@ -124,34 +157,6 @@ export default function GraphGeneratorMenu({ onClose, autoFixErrors }: GraphGene
       },
     ]);
   });
-
-  useEffect(() => {
-    if (autoFixErrors && autoFixErrors.length > 0) {
-      const errorMessage = `Validation Errors:\n${autoFixErrors.join('\n')}`;
-      handleSendMessage(errorMessage);
-    }
-  }, [autoFixErrors]);
-
-  const handleSendMessage = (magicMessage?: string) => {
-    if (magicMessage) {
-      const newMessage: Message = {
-        id: Date.now().toString(),
-        text: magicMessage,
-        sender: 'user',
-      };
-      setMessages((prev) => [...prev, newMessage]);
-      generateGraph(magicMessage, false);
-    } else if (inputMessage.trim()) {
-      const newMessage: Message = {
-        id: Date.now().toString(),
-        text: inputMessage,
-        sender: 'user',
-      };
-      setMessages((prev) => [...prev, newMessage]);
-      setInputMessage('');
-      generateGraph(inputMessage, false);
-    }
-  };
 
   return (
     <motion.div
@@ -189,12 +194,12 @@ export default function GraphGeneratorMenu({ onClose, autoFixErrors }: GraphGene
             type="text"
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+            onKeyDown={handleInputKeyDown}
             className="w-full px-3 py-2 border rounded-lg"
             placeholder="Request a modification..."
           />
           <Button
-            onClick={() => handleSendMessage()}
+            onClick={handleSendButtonClick}
             className="mt-2 w-full"
             disabled={generatingGraph || !inputMessage.trim()}
           >
