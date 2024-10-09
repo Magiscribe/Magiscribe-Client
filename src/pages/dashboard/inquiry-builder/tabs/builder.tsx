@@ -43,7 +43,7 @@ export default function InquiryBuilder() {
     }
 
     saveDebounce.current = setTimeout(() => {
-      saveGraph(); // Function to save the graph
+      saveGraph();
     }, DEBOUNCE_DELAY_IN_MS);
 
     // Cleanup function to clear the timeout if the component unmounts or the effect re-runs
@@ -63,7 +63,7 @@ export default function InquiryBuilder() {
     }
 
     saveDebounce.current = setTimeout(() => {
-      saveForm(); // Function to save the graph
+      saveForm();
     }, DEBOUNCE_DELAY_IN_MS);
 
     // Cleanup function to clear the timeout if the component unmounts or the effect re-runs
@@ -105,7 +105,11 @@ export default function InquiryBuilder() {
                 </Button>
 
                 <AnimatePresence>
-                  {isChatOpen && <GraphGeneratorMenu onClose={() => setIsChatOpen(false)} />}
+                  <GraphGeneratorMenu
+                    open={isChatOpen}
+                    onUpdate={() => setIsChatOpen(true)}
+                    onClose={() => setIsChatOpen(false)}
+                  />
                 </AnimatePresence>
               </GraphInput>
             </>

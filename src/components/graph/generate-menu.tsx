@@ -21,6 +21,8 @@ interface Message {
  * Props for the Graph Generator Menu component.
  */
 interface GraphGeneratorMenuProps {
+  open: boolean;
+  onUpdate: () => void;
   onClose: () => void;
 }
 
@@ -28,11 +30,13 @@ interface GraphGeneratorMenuProps {
 const INITIAL_MENU_WIDTH = 400;
 const MIN_MENU_WIDTH = 250;
 const MAX_MENU_WIDTH = 1200;
-const INITIAL_MESSAGE: Message = {
-  id: '1',
-  text: 'Hello! How can I help you modify your inquiry graph today?',
-  sender: 'assistant',
-};
+const INITIAL_MESSAGES: Message[] = [
+  {
+    id: '1',
+    text: 'Hello! How can I help you modify your inquiry graph today?',
+    sender: 'assistant',
+  },
+];
 
 /**
  * ChatBubble component to render individual chat messages.
@@ -42,7 +46,7 @@ const INITIAL_MESSAGE: Message = {
  */
 function ChatBubble({ message, sender }: { message: Message; sender: 'user' | 'assistant' }) {
   return (
-    <div className={`mb-4 flex ${sender === 'user' ? 'justify-start' : 'justify-end'}`}>
+    <div className={`mb-4 flex ${sender === 'user' ? 'justify-end' : 'justify-start'}`}>
       <div
         className={`max-w-[90%] p-3 rounded-lg ${
           sender === 'user' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
@@ -58,9 +62,8 @@ function ChatBubble({ message, sender }: { message: Message; sender: 'user' | 'a
 /**
  * GraphGeneratorMenu component for managing and displaying the graph generation interface.
  */
-export default function GraphGeneratorMenu({ onClose }: GraphGeneratorMenuProps) {
-  // State
-  const [messages, setMessages] = useState<Message[]>([INITIAL_MESSAGE]);
+export default function GraphGeneratorMenu({ open, onUpdate, onClose }: GraphGeneratorMenuProps) {
+  const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
   const [inputMessage, setInputMessage] = useState('');
   const [isDragging, setIsDragging] = useState(false);
   const [menuWidth, setMenuWidth] = useWithLocalStorage(INITIAL_MENU_WIDTH, 'playground-form');
@@ -70,11 +73,17 @@ export default function GraphGeneratorMenu({ onClose }: GraphGeneratorMenuProps)
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Hooks
-  const { generatingGraph, generateGraph, onGraphGenerated } = useInquiryBuilder();
+  const { generatingGraph, generateGraph, onGraphGenerationCompleted, onGraphGenerationStarted } = useInquiryBuilder();
 
   /*================================ EFFECTS ==============================*/
 
   useEffect(() => {
+    // Provide a update callback to notify when new messages are added to the chat
+    // beyond the initial messages.
+    if (messages.length > INITIAL_MESSAGES.length) {
+      onUpdate();
+    }
+
     scrollToBottom();
   }, [messages]);
 
@@ -90,19 +99,6 @@ export default function GraphGeneratorMenu({ onClose }: GraphGeneratorMenuProps)
   }, [isDragging]);
 
   /*================================ HANDLERS ==============================*/
-
-  const handleSendMessage = () => {
-    if (inputMessage.trim()) {
-      const newMessage: Message = {
-        id: Date.now().toString(),
-        text: inputMessage,
-        sender: 'user',
-      };
-      setMessages((prev) => [...prev, newMessage]);
-      setInputMessage('');
-      generateGraph(inputMessage, false);
-    }
-  };
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -121,6 +117,28 @@ export default function GraphGeneratorMenu({ onClose }: GraphGeneratorMenuProps)
     setIsDragging(false);
   };
 
+  const sendMessage = (message: string, isUserMessage: boolean = true) => {
+    if (message.trim()) {
+      const newMessage: Message = {
+        id: Date.now().toString(),
+        text: message.trim(),
+        sender: isUserMessage ? 'user' : 'assistant',
+      };
+      generateGraph(false, newMessage.text);
+      setInputMessage('');
+    }
+  };
+
+  const handleSendButtonClick = () => {
+    sendMessage(inputMessage);
+  };
+
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSendButtonClick();
+    }
+  };
+
   /*================================ HELPERS ==============================*/
 
   const scrollToBottom = () => {
@@ -131,16 +149,33 @@ export default function GraphGeneratorMenu({ onClose }: GraphGeneratorMenuProps)
 
   /*================================ SIDE EFFECTS ==============================*/
 
-  onGraphGenerated?.((message) => {
+  onGraphGenerationStarted?.((message) => {
     setMessages((prev) => [
       ...prev,
       {
         id: Date.now().toString(),
         text: message,
-        sender: 'assistant',
+        sender: 'user',
       },
     ]);
   });
+
+  onGraphGenerationCompleted?.((message?: string) => {
+    if (message) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now().toString(),
+          text: message,
+          sender: 'assistant',
+        },
+      ]);
+    }
+  });
+
+  if (!open) {
+    return null;
+  }
 
   return (
     <motion.div
@@ -178,12 +213,12 @@ export default function GraphGeneratorMenu({ onClose }: GraphGeneratorMenuProps)
             type="text"
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+            onKeyDown={handleInputKeyDown}
             className="w-full px-3 py-2 border rounded-lg"
             placeholder="Request a modification..."
           />
           <Button
-            onClick={handleSendMessage}
+            onClick={handleSendButtonClick}
             className="mt-2 w-full"
             disabled={generatingGraph || !inputMessage.trim()}
           >

@@ -1,14 +1,11 @@
 import { useAddAlert } from '@/providers/alert-provider';
-import CustomModal from './modal';
+import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { faLink } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-interface ModalSendInquiryProps {
-  /**
-   * The inquiry ID to Send.
-   */
-  id: string;
+import CustomModal from './modal';
 
+interface SendInquiryProps {
   /**
    * Whether the modal is open or not.
    */
@@ -21,14 +18,17 @@ interface ModalSendInquiryProps {
   onClose: () => void;
 }
 
-export default function ModalSendInquiry({ id, open, onClose }: ModalSendInquiryProps) {
-  const link = `${window.location.origin}/inquiry/${id}`;
+/**
+ * A component to display and share the inquiry link.
+ */
+export default function SendInquiry({ open, onClose }: SendInquiryProps) {
+  const { id } = useInquiryBuilder();
 
-  // Hooks
+  const link = `${window.location.origin}/inquiry/${id}`;
   const alert = useAddAlert();
 
   /**
-   * Handle copying the link to the clipboard, show a info alert, and close the modal.
+   * Handle copying the link to the clipboard, show an info alert, and close the modal.
    */
   const handleCopyLink = () => {
     navigator.clipboard.writeText(link);
@@ -37,8 +37,8 @@ export default function ModalSendInquiry({ id, open, onClose }: ModalSendInquiry
   };
 
   return (
-    <CustomModal open={open} onClose={onClose} title="Send" size="4xl">
-      <p className="text-slate-600 mb-6">Send the link to anyone you want to get input from</p>
+    <CustomModal open={open} onClose={onClose} title="Send Inquiry" size="4xl">
+      <p className="text-slate-600 mb-6">Share the link to this inquiry with anyone you want to get input from</p>
       <div className="flex items-stretch">
         <p className="flex-grow p-2 rounded-l-md border border-r-0 border-gray-300 shadow-sm focus:border-slate-500 focus:ring-slate-500">
           {link}

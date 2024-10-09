@@ -1,22 +1,6 @@
 import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  addEdge,
-  Background,
-  Controls,
-  Edge,
-  MarkerType,
-  Node,
-  OnConnect,
-  OnConnectEnd,
-  OnConnectStart,
-  OnEdgesChange,
-  OnNodesChange,
-  ReactFlow,
-  ReactFlowProvider,
-  useReactFlow,
-  XYPosition,
-} from '@xyflow/react';
+import { addEdge, Background, Controls, Edge, MarkerType, Node, OnConnect, OnConnectEnd, OnConnectStart, OnEdgesChange, OnNodesChange, ReactFlow, ReactFlowProvider, useReactFlow, XYPosition } from '@xyflow/react';
 import React, { DragEvent, useRef, useState } from 'react';
 import colors from 'tailwindcss/colors';
 
@@ -299,74 +283,74 @@ function Flow({ children, nodes, edges, setNodes, onNodesChange, setEdges, onEdg
     });
 
   return (
-    <div className="relative w-full h-full text-black">
-      <div className="absolute w-full flex flex-row top-0 left-0 p-4 space-x-4">
-        <h3 className="text-xl font-semibold text-left text-white min-w-44">
-          Nodes
-          <br />
-          <span className="-mt-2 text-xs">Drag and drop to add nodes</span>
-        </h3>
-        {renderNodeButtons()}
-      </div>
-      <div className="w-full h-full text-black" ref={reactFlowWrapper}>
-        <ReactFlow
-          ref={reactFlow}
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          nodeTypes={nodeTypes}
-          edgeTypes={edgeTypes}
-          onConnect={onConnect}
-          onConnectStart={onConnectStart}
-          onConnectEnd={onConnectEnd}
-          onPaneContextMenu={onPaneContextMenu}
-          onPaneClick={onPaneClick}
-          onPaneScroll={onPaneClick}
-          onDrop={onDrop}
-          onDragOver={onDragOver}
-          fitView
-          minZoom={0.1}
-          maxZoom={2}
-          defaultEdgeOptions={{
-            type: 'button',
-            markerEnd: {
-              type: MarkerType.ArrowClosed,
-              color: colors.slate[200],
-            },
-            markerStart: {
-              type: MarkerType.ArrowClosed,
-              orient: 'auto-start-reverse',
-              color: colors.slate[200],
-            },
-          }}
-          proOptions={{ hideAttribution: true }}
-        >
-          <Background />
-          <Controls position="bottom-left" showInteractive={false} />
-          {menu && <ContextMenu buttons={renderNodeButtonsMenu()} {...menu} />}
-        </ReactFlow>
-
-        <div className="absolute bottom-0 left-0 p-4">
-          <CustomModal open={addNodeModalOpen} onClose={() => setAddNodeModalOpen(false)} title="Add Node">
-            <div className="grid grid-cols-1 gap-4">
-              {renderNodeButtonsMenu(
-                newNode.current
-                  ? {
-                      x: newNode.current?.position.x,
-                      y: newNode.current?.position.y,
-                    }
-                  : undefined,
-                newNode.current?.source,
-                newNode.current?.target,
-              )}
-            </div>
-          </CustomModal>
+    <>
+      <div className="relative w-full h-full text-black">
+        <div className="absolute w-full flex flex-row top-0 left-0 p-4 space-x-4">
+          <h3 className="text-xl font-semibold text-left text-white min-w-44">
+            Nodes
+            <br />
+            <span className="-mt-2 text-xs">Drag and drop to add nodes</span>
+          </h3>
+          {renderNodeButtons()}
         </div>
+        <div className="w-full h-full text-black" ref={reactFlowWrapper}>
+          <ReactFlow
+            ref={reactFlow}
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            nodeTypes={nodeTypes}
+            edgeTypes={edgeTypes}
+            onConnect={onConnect}
+            onConnectStart={onConnectStart}
+            onConnectEnd={onConnectEnd}
+            onPaneContextMenu={onPaneContextMenu}
+            onPaneClick={onPaneClick}
+            onPaneScroll={onPaneClick}
+            onDrop={onDrop}
+            onDragOver={onDragOver}
+            fitView
+            minZoom={0.1}
+            maxZoom={2}
+            defaultEdgeOptions={{
+              type: 'button',
+              markerEnd: {
+                type: MarkerType.ArrowClosed,
+                color: colors.slate[200],
+              },
+              markerStart: {
+                type: MarkerType.ArrowClosed,
+                orient: 'auto-start-reverse',
+                color: colors.slate[200],
+              },
+            }}
+            proOptions={{ hideAttribution: true }}
+          >
+            <Background />
+            <Controls position="bottom-left" showInteractive={false} />
+            {menu && <ContextMenu buttons={renderNodeButtonsMenu()} {...menu} />}
+          </ReactFlow>
+        </div>
+
+        {children}
       </div>
 
-      {children}
-    </div>
+      <CustomModal open={addNodeModalOpen} onClose={() => setAddNodeModalOpen(false)} title="Add Node">
+        <div className="grid grid-cols-1 gap-4">
+          {renderNodeButtonsMenu(
+            newNode.current
+              ? {
+                  x: newNode.current?.position.x,
+                  y: newNode.current?.position.y,
+                }
+              : undefined,
+            newNode.current?.source,
+            newNode.current?.target,
+          )}
+        </div>
+      </CustomModal>
+    </>
   );
 }
 

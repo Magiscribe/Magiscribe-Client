@@ -1,7 +1,7 @@
 import { ADD_PREDICTION, CREATE_INQUIRY_RESPONSE, UPDATE_INQUIRY_RESPONSE } from '@/clients/mutations';
 import { GET_INQUIRY } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
-import { CreateInquiryResponseMutation, UpdateInquiryResponseMutation } from '@/graphql/graphql';
+import { CreateInquiryResponseMutation, GetInquiryQuery, UpdateInquiryResponseMutation } from '@/graphql/graphql';
 import { getAgentIdByName } from '@/utils/agents';
 import { NodeData, OptimizedNode } from '@/utils/graphs/graph';
 import { GraphManager } from '@/utils/graphs/graph-manager';
@@ -48,6 +48,7 @@ const INITIAL_STATE: State = {
 interface InquiryContextType {
   id: string;
   preview?: boolean;
+  validGraph?: boolean;
 
   handleNextNode: (props?: HandleNextNodeProps) => Promise<void>;
   onNodeUpdate: (callback: (node: OptimizedNode) => void) => void;
@@ -68,7 +69,8 @@ function InquiryProvider({ children, id, preview }: InquiryProviderProps) {
   const inquiryResponseIdRef = useRef<string | undefined>(undefined);
   const isCreatingResponseRef = useRef<boolean>(false);
   const inquiryHistoryRef = useRef<string[]>([]);
-  const errorCountRef = useRef<number>(0);
+  const errorRetryCountRef = useRef<number>(0);
+  const validGraph = useRef<boolean>(true);
 
   // States
   const [userDetails, setUserDetails] = useState<{ [key: string]: string }>({});
@@ -94,14 +96,22 @@ function InquiryProvider({ children, id, preview }: InquiryProviderProps) {
    * Fetches the data object on mount when an ID is provided.
    * Will automatically start the inquiry process.
    */
-  useQuery(GET_INQUIRY, {
+  useQuery<GetInquiryQuery>(GET_INQUIRY, {
     variables: { id },
     skip: !id,
     errorPolicy: 'all',
     onCompleted: ({ getInquiry }) => {
-      if (getInquiry.data.graph) {
-        formRef.current = getInquiry.data.form;
-        graphRef.current = new GraphManager(getInquiry.data.graph);
+      if (!getInquiry) {
+        setState({ ...INITIAL_STATE, notFound: true });
+        return;
+      }
+
+      const { graph, draftGraph, form } = getInquiry.data;
+      const usedGraph = preview ? draftGraph : graph;
+
+      if (usedGraph) {
+        formRef.current = form;
+        graphRef.current = new GraphManager(usedGraph);
         graphRef.current.onNodeVisit = handleOnNodeVisit;
         graphRef.current.onNodeAddedToHistory = addNodeToHistory;
         setState({ ...INITIAL_STATE, initialized: true });
@@ -145,12 +155,12 @@ function InquiryProvider({ children, id, preview }: InquiryProviderProps) {
           }
 
           // Reset the error count if the prediction was successful
-          errorCountRef.current = 0;
+          errorRetryCountRef.current = 0;
         }
       } catch {
-        errorCountRef.current += 1;
+        errorRetryCountRef.current += 1;
 
-        if (errorCountRef.current >= 3) {
+        if (errorRetryCountRef.current >= 3) {
           setState({ ...INITIAL_STATE, error: true });
         } else {
           setState({ ...INITIAL_STATE, loading: true });
@@ -332,6 +342,7 @@ function InquiryProvider({ children, id, preview }: InquiryProviderProps) {
   const contextValue: InquiryContextType = {
     id,
     preview,
+    validGraph: validGraph.current,
 
     onNodeUpdate: (callback: (node: OptimizedNode) => void) => {
       onNodeUpdateRef.current = callback;
