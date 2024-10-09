@@ -32,15 +32,14 @@ interface ContextType {
   id?: string;
   lastUpdated: Date;
   form: FormData;
-
-  draftGraph: { edges: Edge[]; nodes: Node[] };
+  graph: { edges: Edge[]; nodes: Node[] };
 
   deleteInquiry: (onSuccess?: () => void, onError?: () => void) => Promise<void>;
 
   updateForm: (form: FormData) => void;
   saveForm: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
 
-  updateGraph: (draftGraph: { nodes: Node[]; edges: Edge[] }) => void;
+  updateGraph: (graph: { nodes: Node[]; edges: Edge[] }) => void;
   updateGraphNodes: React.Dispatch<React.SetStateAction<Node[]>>;
   updateGraphEdges: React.Dispatch<React.SetStateAction<Edge[]>>;
 
@@ -49,7 +48,8 @@ interface ContextType {
   onNodesChange: OnNodesChange;
   onEdgesChange: OnEdgesChange;
 
-  saveGraph: (saveDraft?: boolean, onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
+  saveGraph: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
+  publishGraph: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
 
   save: (
     data: { form?: FormData; graph?: { nodes: Node[]; edges: Edge[] } },
@@ -61,8 +61,10 @@ interface ContextType {
   saveFormAndGraph: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
 
   generatingGraph: boolean;
-  generateGraph: (templateOverride: boolean, message?: string) => void;
-  onGraphGenerated: (callback: (message: string) => void) => void;
+  generateGraph: (templateOverride: boolean, message: string) => void;
+
+  onGraphGenerationStarted: (callback: (message: string) => void) => void;
+  onGraphGenerationCompleted: (callback: (message: string) => void) => void;
 }
 
 const InquiryContext = createContext<ContextType | undefined>(undefined);
@@ -84,10 +86,11 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
   // Memoized graph object
-  const draftGraph = useMemo(() => ({ nodes, edges }), [nodes, edges]);
+  const graph = useMemo(() => ({ nodes, edges }), [nodes, edges]);
 
   // Events
-  const onGraphGeneratedRef = useRef<(message: string) => void>();
+  const onGraphGenerationStartedRef = useRef<(message: string) => void>();
+  const onGraphGenerationCompletedRef = useRef<(message: string) => void>();
 
   /**
    * Fetches the inquiry data from the server.
@@ -116,7 +119,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
         const jsonMatch = result.match(/```json\n([\s\S]*?)\n```/);
         const markdownMatch = result.match(/```markdown\n([\s\S]*?)\n```/);
         const changeset = JSON.parse(jsonMatch[1]);
-        const newGraph = applyGraphChangeset(draftGraph, changeset);
+        const newGraph = applyGraphChangeset(graph, changeset);
 
         setExplanation(markdownMatch[1]);
         updateGraph(formatGraph(newGraph));
@@ -130,7 +133,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
 
   useEffect(() => {
     if (pendingGraph) {
-      onGraphGeneratedRef.current?.(explanation);
+      onGraphGenerationCompletedRef.current?.(explanation);
       setPendingGraph(false);
     }
   }, [pendingGraph]);
@@ -200,7 +203,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
         form: {
           ...form,
           // Default title if not provided.
-          title: form.title ?? 'Untitled Form',
+          title: form.title ?? 'Untitled Inquiry',
         },
       },
       ['form'],
@@ -211,7 +214,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
 
   /**
    * Updates the graph of the inquiry.
-   * @param draftGraph {Object} The graph object to update.
+   * @param graph {Object} The graph object to update.
    */
   const updateGraph = ({ nodes, edges }: { nodes: Node[]; edges: Edge[] }) => {
     setNodes(nodes);
@@ -230,12 +233,17 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
    * @param onSuccess {Function} The function to call on success.
    * @param onError {Function} The function to call on error.
    */
-  const saveGraph = async (saveDraft?: boolean, onSuccess?: (id: string) => void, onError?: () => void) => {
-    if (saveDraft) {
-      await save({ draftGraph }, ['draftGraph'], onSuccess, onError);
-    } else {
-      await save({ graph: draftGraph }, ['graph'], onSuccess, onError);
-    }
+  const saveGraph = async (onSuccess?: (id: string) => void, onError?: () => void) => {
+    await save({ draftGraph: graph }, ['draftGraph'], onSuccess, onError);
+  };
+
+  /**
+   * Publishes a graph for public consumption.
+   * @param onSuccess {Function} The function to call on success.
+   * @param onError {Function} The function to call on error.
+   */
+  const publishGraph = async (onSuccess?: (id: string) => void, onError?: () => void) => {
+    await save({ graph }, ['graph'], onSuccess, onError);
   };
 
   /**
@@ -249,9 +257,9 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
         form: {
           ...form,
           // Default title if not provided.
-          title: form.title ?? 'Untitled Form',
+          title: form.title ?? 'Untitled Inquiry',
         },
-        draftGraph,
+        draftGraph: graph,
       },
       ['form', 'draftGraph'],
       onSuccess,
@@ -263,7 +271,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
    * Triggers the start of the graph generation process for the inquiry using
    * the graph generator agent.
    */
-  const generateGraph = async (templateOverride: boolean, message?: string) => {
+  const generateGraph = async (templateOverride: boolean, message: string) => {
     setGeneratingGraph(true);
     let userMessage;
     const agentId = await getAgentIdByName('Stakeholder | Graph Edit Agent (Sonnet)', client);
@@ -271,7 +279,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     if (templateOverride) {
       userMessage = [
         `You are generating a graph for <title>${form.title}</title>`,
-        `The user is looking for the following goals to be completed: <goals>${form.goals}</goals>`,
+        `The user is looking for the following goals to be completed: <goals>${message}</goals>`,
         `Taking the exact graph structure in <conversationGraph>, adapt the graph to be about the <goals> listed above. Simply upsert all of the existing nodes, do not remove any nodes, add any new nodes or add or remove any edges. Simply return the "nodesToUpsert". Absolutey do NOT include "nodesToDelete", "edgesToAdd" or "edgesToDelete". You will ONLY be using the existing nodes and overriding them.`,
       ].join('\n');
     } else {
@@ -282,13 +290,15 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
       ].join('\n');
     }
 
+    onGraphGenerationStartedRef.current?.(message);
+
     addPrediction({
       variables: {
         subscriptionId,
         agentId,
         variables: {
           userMessage,
-          conversationGraph: JSON.stringify(draftGraph),
+          conversationGraph: JSON.stringify(graph),
         },
       },
     });
@@ -300,7 +310,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     id,
     lastUpdated,
     form,
-    draftGraph,
+    graph,
 
     deleteInquiry,
 
@@ -316,6 +326,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     onNodesChange,
     onEdgesChange,
     saveGraph,
+    publishGraph,
 
     save,
     saveFormAndGraph,
@@ -323,8 +334,11 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     generatingGraph,
 
     generateGraph,
-    onGraphGenerated: (callback: (message: string) => void) => {
-      onGraphGeneratedRef.current = callback;
+    onGraphGenerationCompleted: (callback: (message: string) => void) => {
+      onGraphGenerationCompletedRef.current = callback;
+    },
+    onGraphGenerationStarted: (callback: (message: string) => void) => {
+      onGraphGenerationStartedRef.current = callback;
     },
   };
 

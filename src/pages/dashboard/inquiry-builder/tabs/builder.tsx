@@ -17,7 +17,6 @@ const DEBOUNCE_DELAY_IN_MS = 1000;
 export default function InquiryBuilder() {
   // States
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [autoFixErrors, setAutoFixErrors] = useState<string[] | undefined>(undefined);
 
   // Refs
   const saveDebounce = useRef<NodeJS.Timeout>();
@@ -26,7 +25,7 @@ export default function InquiryBuilder() {
   const {
     initialized,
     form,
-    draftGraph,
+    graph,
     saveGraph,
     onEdgesChange,
     onNodesChange,
@@ -44,7 +43,7 @@ export default function InquiryBuilder() {
     }
 
     saveDebounce.current = setTimeout(() => {
-      saveGraph(true); // Function to save the graph
+      saveGraph();
     }, DEBOUNCE_DELAY_IN_MS);
 
     // Cleanup function to clear the timeout if the component unmounts or the effect re-runs
@@ -53,7 +52,7 @@ export default function InquiryBuilder() {
         clearTimeout(saveDebounce.current);
       }
     };
-  }, [draftGraph]);
+  }, [graph]);
 
   /**
    * A debounced function to save the graph after a delay.
@@ -64,7 +63,7 @@ export default function InquiryBuilder() {
     }
 
     saveDebounce.current = setTimeout(() => {
-      saveForm(); // Function to save the graph
+      saveForm();
     }, DEBOUNCE_DELAY_IN_MS);
 
     // Cleanup function to clear the timeout if the component unmounts or the effect re-runs
@@ -79,23 +78,18 @@ export default function InquiryBuilder() {
     setIsChatOpen(!isChatOpen);
   };
 
-  const handleAutoFix = (errors: string[]) => {
-    setAutoFixErrors(errors);
-    setIsChatOpen(true);
-  };
-
   return (
     <>
       <div className="h-[85vh] flex flex-col border-white border-2 rounded-2xl overflow-hidden">
         <div className="bg-white p-4 space-y-4 text-slate-700">
-          <GraphContextBar onOpenGraphGenerator={toggleChat} onAutoFix={handleAutoFix} />
+          <GraphContextBar />
         </div>
         <div className="flex-grow">
           {initialized && (
             <>
               <GraphInput
-                nodes={draftGraph.nodes}
-                edges={draftGraph.edges}
+                nodes={graph.nodes}
+                edges={graph.edges}
                 setNodes={updateGraphNodes}
                 setEdges={updateGraphEdges}
                 onNodesChange={onNodesChange}
@@ -111,9 +105,11 @@ export default function InquiryBuilder() {
                 </Button>
 
                 <AnimatePresence>
-                  {isChatOpen && (
-                    <GraphGeneratorMenu onClose={() => setIsChatOpen(false)} autoFixErrors={autoFixErrors} />
-                  )}
+                  <GraphGeneratorMenu
+                    open={isChatOpen}
+                    onUpdate={() => setIsChatOpen(true)}
+                    onClose={() => setIsChatOpen(false)}
+                  />
                 </AnimatePresence>
               </GraphInput>
             </>

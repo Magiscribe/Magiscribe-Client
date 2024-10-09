@@ -9,7 +9,7 @@ export interface Template {
   name: string;
   description: string;
   allowGeneration: boolean;
-  draftGraph?: { nodes: Node[]; edges: Edge[] };
+  graph?: { nodes: Node[]; edges: Edge[] };
 }
 
 const templates: Template[] = [
@@ -17,25 +17,25 @@ const templates: Template[] = [
     name: 'Linear Inquiry',
     description: 'Similar to a traditional survey where questions are asked in a fixed, linear order',
     allowGeneration: true,
-    draftGraph: templateLinearInquiry,
+    graph: templateLinearInquiry,
   },
   {
     name: 'Branching Inquiry',
     description: 'Questions that adapt based on user responses, leading to different questions or paths',
     allowGeneration: true,
-    draftGraph: templateBranchInquiry,
+    graph: templateBranchInquiry,
   },
   {
     name: 'Open Ended Inquiry',
     description: 'A flexible conversation format where users can freely navigate through various topics',
     allowGeneration: true,
-    draftGraph: templateOpenEnded,
+    graph: templateOpenEnded,
   },
   {
     name: 'Start From Scratch',
     description: 'Create a custom inquiry from the ground up, with no predefined structure',
     allowGeneration: false,
-    draftGraph: templateDefault,
+    graph: templateDefault,
   },
 ];
 

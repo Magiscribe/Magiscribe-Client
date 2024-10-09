@@ -66,6 +66,8 @@ function applyEdgeChanges(edges: Edge[], changeset: ChangeSet, updatedNodes: Nod
       ),
   );
 
+  // We want to calculate the set of edges after the edges are updated, in case the agent
+  // decides to remove and re-add the same edge in the same changeset.
   const edgeSet = new Set(updatedEdges.map((edge) => `${edge.source}-${edge.target}`));
 
   changeset.edgesToAdd?.forEach((edge) => {
@@ -199,9 +201,9 @@ export function convertToOptimizedGraph(graph: StrippedGraph): OptimizedGraph {
 /**
  * Validates a graph structure.
  * @param graph {StrippedGraph} An optimized graph structure
- * @returns {true | string[]} Returns true if the graph is valid, or an array of error messages if not
+ * @returns { { valid: boolean; errors: string[] } } An object with a boolean indicating validity and an array of errors
  */
-export function validateGraph(graph: StrippedGraph): true | string[] {
+export function validateGraph(graph: StrippedGraph): { valid: boolean; errors: string[] } {
   const optimizedGraph = convertToOptimizedGraph(graph);
   const errors: string[] = [];
   const nodeIds = new Set(Object.keys(optimizedGraph.nodes));
@@ -284,5 +286,8 @@ export function validateGraph(graph: StrippedGraph): true | string[] {
     }
   });
 
-  return errors.length === 0 ? true : errors;
+  return {
+    valid: errors.length === 0,
+    errors,
+  };
 }

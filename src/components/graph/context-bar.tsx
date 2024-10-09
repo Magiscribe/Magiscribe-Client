@@ -1,3 +1,5 @@
+import ConfirmationModal from '@/components/modals/confirm-modal';
+import ModalSendInquiry from '@/components/modals/send-inquiry-modal';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { formatGraph, validateGraph } from '@/utils/graphs/graph-utils';
@@ -5,23 +7,18 @@ import { faCheckCircle, faEye, faGear, faRotateLeft, faTrash } from '@fortawesom
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import ConfirmationModal from '@/components/modals/confirm-modal';
-import ModalSendInquiry from '@/components/modals/send-inquiry-modal';
 
-interface GraphContextBarProps {
-  onOpenGraphGenerator: () => void;
-  onAutoFix: (errors: string[]) => void;
-}
+import ModalValidationErrors from '../modals/inquiry-validation-errors-modal';
 
-export default function GraphContextBar({ onOpenGraphGenerator, onAutoFix }: GraphContextBarProps) {
+export default function GraphContextBar() {
   // States
   const [clearGraphModal, setClearGraphModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [sendModalOpen, setSendModalOpen] = useState(false);
-  const [validationErrors, setValidationErrors] = useState<string[] | null>(null);
+  const [validationErrorsModalOpen, setValidationErrorsModalOpen] = useState(false);
 
   // Hooks
-  const { id, form, draftGraph, lastUpdated, updateForm, updateGraph, resetGraph, deleteInquiry, saveGraph } =
+  const { id, form, graph, lastUpdated, updateForm, updateGraph, resetGraph, deleteInquiry, publishGraph } =
     useInquiryBuilder();
   const alert = useAddAlert();
   const navigate = useNavigate();
@@ -33,30 +30,25 @@ export default function GraphContextBar({ onOpenGraphGenerator, onAutoFix }: Gra
    * Handle formatting the graph.
    */
   const handleFormat = () => {
-    updateGraph(formatGraph(draftGraph));
+    updateGraph(formatGraph(graph));
     alert('Graph formatted successfully!', 'success');
   };
 
   /**
-   * Handle validating the graph.
+   * Handles opening the appropriate modal to publish the inquiry or show validation errors
+   * so that the user can fix them before publishing.
    */
   const handlePublish = () => {
-    const validationResult = validateGraph(draftGraph);
-    setValidationErrors(validationResult === true ? null : validationResult);
-    setSendModalOpen(true);
-    if (validationResult === true) {
-      // Setting the input parameter to false saves the real graph
-      saveGraph(false);
+    const validationResult = validateGraph(graph);
+
+    if (validationResult.valid) {
+      setSendModalOpen(true);
+      publishGraph();
       alert('Inquiry published successfully!', 'success');
     } else {
+      setValidationErrorsModalOpen(true);
       alert('Unable to publish inquiry due to validation errors!', 'error');
     }
-  };
-
-  const handleAutoFix = (errors: string[]) => {
-    onOpenGraphGenerator();
-    onAutoFix(errors);
-    setSendModalOpen(false); // Close the modal
   };
 
   return (
@@ -146,13 +138,9 @@ export default function GraphContextBar({ onOpenGraphGenerator, onAutoFix }: Gra
         confirmText="Delete Inquiry"
       />
 
-      <ModalSendInquiry
-        id={id ?? ''}
-        open={sendModalOpen}
-        onClose={() => setSendModalOpen(false)}
-        validationErrors={validationErrors}
-        onAutoFix={handleAutoFix}
-      />
+      <ModalSendInquiry open={sendModalOpen} onClose={() => setSendModalOpen(false)} />
+
+      <ModalValidationErrors open={validationErrorsModalOpen} onClose={() => setValidationErrorsModalOpen(false)} />
     </>
   );
 }

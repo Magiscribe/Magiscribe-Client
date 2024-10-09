@@ -4,6 +4,7 @@ import { faMagicWandSparkles, faSpinner, faTimes } from '@fortawesome/free-solid
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
+
 import Button from '../controls/button';
 import MarkdownCustom from '../markdown-custom';
 
@@ -20,8 +21,9 @@ interface Message {
  * Props for the Graph Generator Menu component.
  */
 interface GraphGeneratorMenuProps {
+  open: boolean;
+  onUpdate: () => void;
   onClose: () => void;
-  autoFixErrors?: string[];
 }
 
 // Constants
@@ -58,7 +60,7 @@ function ChatBubble({ message, sender }: { message: Message; sender: 'user' | 'a
 /**
  * GraphGeneratorMenu component for managing and displaying the graph generation interface.
  */
-export default function GraphGeneratorMenu({ onClose, autoFixErrors }: GraphGeneratorMenuProps) {
+export default function GraphGeneratorMenu({ open, onUpdate, onClose }: GraphGeneratorMenuProps) {
   const [messages, setMessages] = useState<Message[]>([INITIAL_MESSAGE]);
   const [inputMessage, setInputMessage] = useState('');
   const [isDragging, setIsDragging] = useState(false);
@@ -69,11 +71,12 @@ export default function GraphGeneratorMenu({ onClose, autoFixErrors }: GraphGene
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Hooks
-  const { generatingGraph, generateGraph, onGraphGenerated } = useInquiryBuilder();
+  const { generatingGraph, generateGraph, onGraphGenerationCompleted, onGraphGenerationStarted } = useInquiryBuilder();
 
   /*================================ EFFECTS ==============================*/
 
   useEffect(() => {
+    onUpdate();
     scrollToBottom();
   }, [messages]);
 
@@ -87,14 +90,6 @@ export default function GraphGeneratorMenu({ onClose, autoFixErrors }: GraphGene
       window.removeEventListener('mouseup', handleMouseUp);
     };
   }, [isDragging]);
-
-  useEffect(() => {
-    if (autoFixErrors && autoFixErrors.length > 0) {
-      const errorMessage = `Validation Errors:\n${autoFixErrors.join('\n')}`;
-      sendMessage(errorMessage, true);
-      autoFixErrors = [];
-    }
-  }, [autoFixErrors]);
 
   /*================================ HANDLERS ==============================*/
 
@@ -148,7 +143,18 @@ export default function GraphGeneratorMenu({ onClose, autoFixErrors }: GraphGene
 
   /*================================ SIDE EFFECTS ==============================*/
 
-  onGraphGenerated?.((message?: string) => {
+  onGraphGenerationStarted?.((message) => {
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: Date.now().toString(),
+        text: message,
+        sender: 'user',
+      },
+    ]);
+  });
+
+  onGraphGenerationCompleted?.((message?: string) => {
     if (message) {
       setMessages((prev) => [
         ...prev,
@@ -160,6 +166,10 @@ export default function GraphGeneratorMenu({ onClose, autoFixErrors }: GraphGene
       ]);
     }
   });
+
+  if (!open) {
+    return null;
+  }
 
   return (
     <motion.div

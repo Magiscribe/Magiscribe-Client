@@ -39,7 +39,6 @@ const AnalysisTab: React.FC<AnalysisTabProps> = ({ id }) => {
     id,
     form: inquiryData?.getInquiry?.data?.form,
     graph: inquiryData?.getInquiry?.data?.graph,
-    draftGraph: inquiryData?.getInquiry?.data?.draftGraph,
     responses: inquiryResponseData?.getInquiryResponses ?? [],
   };
 

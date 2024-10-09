@@ -102,8 +102,16 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
   const [enableGraphGeneration, setEnableGraphGeneration] = useState(false);
   const [loadingQuote, setLoadingQuote] = useState(conversationGraphLoadingQuotes[0]);
 
-  const { id, form, updateForm, generateGraph, updateGraph, onGraphGenerated, saveFormAndGraph, generatingGraph } =
-    useInquiryBuilder();
+  const {
+    id,
+    form,
+    updateForm,
+    generateGraph,
+    updateGraph,
+    onGraphGenerationCompleted,
+    saveFormAndGraph,
+    generatingGraph,
+  } = useInquiryBuilder();
   const alert = useAddAlert();
 
   useEffect(() => {
@@ -133,7 +141,7 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
    */
   const handleChangeGraphTemplate = (template: Template) => {
     setSelectedTemplate(template);
-    updateGraph(template.draftGraph ?? { nodes: [], edges: [] });
+    updateGraph(template.graph ?? { nodes: [], edges: [] });
   };
 
   /**
@@ -145,7 +153,7 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
 
   useEffect(() => {
     if (open) {
-      onGraphGenerated?.(async () => {
+      onGraphGenerationCompleted?.(async () => {
         alert('Graph generated successfully!', 'success');
         await saveFormAndGraph(
           (id) => {
@@ -158,7 +166,7 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
         );
       });
     }
-  }, [open, onGraphGenerated, saveFormAndGraph, alert, onSave]);
+  }, [open, onGraphGenerationCompleted, saveFormAndGraph, alert, onSave]);
 
   /**
    * Handle saving the inquiry
@@ -172,7 +180,7 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
     }
 
     if (selectedTemplate?.allowGeneration && enableGraphGeneration) {
-      generateGraph(true);
+      generateGraph(true, form.goals);
       return;
     }
 
