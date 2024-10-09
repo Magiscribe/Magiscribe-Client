@@ -6,7 +6,7 @@ import RatingInput from '@/components/graph/rating-input';
 import MarkdownCustom from '@/components/markdown-custom';
 import { useTranscribe } from '@/hooks/audio-hook';
 import { useSetTitle } from '@/hooks/title-hook';
-import { InquiryProvider, useInquiry } from '@/providers/inquiry-provider';
+import { InquiryTraversalProvider, useInquiry } from '@/providers/inquiry-traversal-provider';
 import { StrippedNode } from '@/utils/graphs/graph';
 import { SignedIn, SignedOut, SignUpButton } from '@clerk/clerk-react';
 import { faChevronRight, faComments, faLightbulb, faPaperPlane, faRocket } from '@fortawesome/free-solid-svg-icons';
@@ -417,10 +417,10 @@ export default function InquiryWrapper() {
 
   if (!id) return null;
   return (
-    <InquiryProvider id={id} preview={preview}>
+    <InquiryTraversalProvider id={id} preview={preview}>
       <Container>
         <UserInquiryPage />
       </Container>
-    </InquiryProvider>
+    </InquiryTraversalProvider>
   );
 }
