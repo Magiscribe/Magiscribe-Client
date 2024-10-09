@@ -224,22 +224,22 @@ export function validateGraph(graph: StrippedGraph): { valid: boolean; errors: s
     node.outgoingEdges.forEach((edgeId) => {
       const edge = optimizedGraph.edges[edgeId];
       if (!nodeIds.has(edge.target)) {
-        errors.push(`Edge ${edgeId} targets non-existent node ${edge.target}. Consider removing this edge`);
+        errors.push(`Edge "${edgeId}" targets non-existent node "${edge.target}". Consider removing this edge.`);
       }
     });
 
     switch (node.type) {
       case 'start':
         if (Object.values(optimizedGraph.edges).some((edge) => edge.target === id)) {
-          errors.push(`Start node ${id} cannot be a target for any edge`);
+          errors.push(`Start node "${id}" cannot be a target for any edge. Consider removing the extra edge(s).`);
         }
         if (node.outgoingEdges.length === 0) {
-          errors.push(`Start node ${id} has no outgoing edges. Consider adding another edge.`);
+          errors.push(`Start node "${id}" has no outgoing edges. Consider adding another edge.`);
         }
         break;
       case 'end':
         if (node.outgoingEdges.length > 0) {
-          errors.push(`End node ${id} cannot be a source for any edge. `);
+          errors.push(`End node "${id}" cannot be a source for any edge. Consider removing the extra edge(s).`);
         }
 
         break;
@@ -257,7 +257,11 @@ export function validateGraph(graph: StrippedGraph): { valid: boolean; errors: s
             `Your ${node.type} node "${id}" has no outgoing edges. Consider deleting this node or connecting it to another node.`,
           );
         }
-        if (node.type === 'question' && (node.data.type === 'rating-single' || node.data.type === 'rating-multi')) {
+        if (
+          node.type === 'question' &&
+          (node.data.type === 'rating-single' || node.data.type === 'rating-multi') &&
+          !node.data.dynamicGeneration
+        ) {
           if (!Array.isArray(node.data.ratings) || node.data.ratings.length === 0) {
             errors.push(`Your ${node.type} node "${id}" must have at least one option. Consider adding options.`);
           }
@@ -266,13 +270,13 @@ export function validateGraph(graph: StrippedGraph): { valid: boolean; errors: s
       case 'condition':
         if (node.outgoingEdges.length < 2) {
           errors.push(
-            `Condition node ${id} needs at least two paths to choose from. Make sure all nodes mentioned in this condition's text exist. You can fix this by adding another connection, creating a new node to connect to, or removing this condition if it's not needed.`,
+            `Condition node "${id}" needs at least two paths to choose from. Make sure all nodes mentioned in this condition's text exist. You can fix this by adding another connection, creating a new node to connect to, or removing this condition if it's not needed.`,
           );
         }
         // Check if condition node has a condition
         if (!node.data.text) {
           errors.push(
-            `Condition node ${id} is missing its decision criteria. Please add a condition to specify how the flow should branch.`,
+            `Condition node "${id}" is missing its decision criteria. Please add a condition to specify how the flow should branch.`,
           );
         }
         break;

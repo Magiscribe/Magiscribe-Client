@@ -62,7 +62,7 @@ interface InquiryContextType {
 
 const InquiryContext = createContext<InquiryContextType | undefined>(undefined);
 
-function InquiryProvider({ children, id, preview }: InquiryProviderProps) {
+function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProps) {
   // Refs
   const formRef = useRef<{ [key: string]: string }>({});
   const graphRef = useRef<GraphManager | null>(null);
@@ -367,4 +367,4 @@ function useInquiry() {
   return context;
 }
 
-export { InquiryProvider, useInquiry };
+export { InquiryTraversalProvider, useInquiry };
