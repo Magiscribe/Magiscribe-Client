@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import { useReactFlow } from '@xyflow/react';
+import { ImageUploader } from '@/components/imageUpload/image-uploader';
 
 type NodeContainerProps = {
   title: string;
@@ -34,6 +35,7 @@ const NodeContainer = ({ title, faIcon, id, children }: NodeContainerProps) => {
         <h3 className="text-lg font-bold text-slate-800 dark:text-white">{title}</h3>
         <p className="ml-2 text-sm text-slate-400">#{id}</p>
       </div>
+      <ImageUploader nodeId={id}/>
       {children}
     </div>
   );
