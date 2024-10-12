@@ -6,6 +6,13 @@ export const GENERATE_AUDIO = gql`
   }
 `;
 
+export const ADD_MEDIA_ASSET = gql`
+  mutation addMediaAsset($fileName: String!, $fileType: String!) {
+    addMediaAsset(fileName: $fileName, fileType: $fileType)
+  }
+`;
+
+
 export const ADD_PREDICTION = gql`
   mutation addPrediction($subscriptionId: ID!, $agentId: ID!, $variables: JSONObject, $attachments: [JSONObject!]) {
     addPrediction(subscriptionId: $subscriptionId, agentId: $agentId, variables: $variables, attachments: $attachments)

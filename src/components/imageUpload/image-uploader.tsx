@@ -1,20 +1,46 @@
-import { useState } from "react";
+import { ADD_MEDIA_ASSET } from "@/clients/mutations";
+import { useMutation } from "@apollo/client";
+import { useCallback, useState } from "react";
 
 type ImageUploaderProps = {
   nodeId: string;
 };
 
+function useImageUpload() {
+  const [addMediaAsset] = useMutation(ADD_MEDIA_ASSET);
+
+  const uploadImage = useCallback(async (image: File, nodeId: string) => {
+    const fileName = image.name + "_" + nodeId;
+    const fileType = image.type;
+    const signedUrl = await addMediaAsset({
+        variables: {
+            fileName,
+            fileType
+        }
+    })
+    
+    const s3Url = signedUrl.data["addMediaAsset"]
+    console.log("Image url: " + s3Url)
+    // TODO: upload image to s3, update graph node with image url
+  },[])
+
+  return uploadImage
+
+}
+
 export function ImageUploader(props: ImageUploaderProps): React.ReactElement {
    const [base64Images, setBase64Images] = useState<string[]>([]);
+   const uploadImage = useImageUpload();
   /**
    * Handles the image upload and conversion to base64.
    * @param event {React.ChangeEvent<HTMLInputElement>} The change event.
    */
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async function (event: React.ChangeEvent<HTMLInputElement>) {
     const files = event.target.files;
     if (files) {
-      Array.from(files).forEach((file) => {
+      Array.from(files).forEach(async (file) => {
         const reader = new FileReader();
+        await uploadImage(file, props.nodeId)
         reader.onloadend = () => {
           setBase64Images((prevImages) => [...prevImages, reader.result as string]);
         };
