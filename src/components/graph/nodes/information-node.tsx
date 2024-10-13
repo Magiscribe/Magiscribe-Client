@@ -6,16 +6,19 @@ import Textarea from '@/components/controls/textarea';
 import NodeContainer from '../elements/node-container';
 import CustomHandle from '../handles/limit-handle';
 import { useNodeData } from '../utils';
+import { ImageUploader } from '@/components/imageUpload/image-uploader';
+import { ImageMetadata } from '@/types/conversation';
 
 type InformationNodeProps = NodeProps & {
   data: {
     text: string;
     dynamicGeneration: boolean;
+    images: ImageMetadata[];
   };
 };
 
 export default function InformationNode({ id, data }: InformationNodeProps) {
-  const { handleInputChange } = useNodeData<InformationNodeProps>(id);
+  const { handleInputChange, updateNodeImages } = useNodeData<InformationNodeProps>(id);
 
   const handleUpdate = useCallback(
     (updates: Partial<InformationNodeProps['data']>) => {
@@ -30,6 +33,7 @@ export default function InformationNode({ id, data }: InformationNodeProps) {
 
   return (
     <NodeContainer title="Information" faIcon={faExclamationCircle} id={id}>
+      <ImageUploader nodeId={id} handleUpdateNodeImages={updateNodeImages} images={data.images}/>
       <div className="space-y-4 mt-2">
         <Input
           label="Dynamic Generation"

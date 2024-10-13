@@ -1,22 +1,25 @@
 import Textarea from '@/components/controls/textarea';
-import { QuestionNodeData } from '@/types/conversation';
+import { ImageMetadata, QuestionNodeData } from '@/types/conversation';
 import { faCodeBranch } from '@fortawesome/free-solid-svg-icons';
 import { Handle, NodeProps, Position } from '@xyflow/react';
 
 import NodeContainer from '../elements/node-container';
 import { useNodeData } from '../utils';
+import { ImageUploader } from '@/components/imageUpload/image-uploader';
 
 type ConditionNodeProps = NodeProps & {
   data: {
     text: string;
+    images: ImageMetadata[];
   };
 };
 
 export default function ConditionNode({ id, data }: ConditionNodeProps) {
-  const { handleInputChange } = useNodeData<QuestionNodeData>(id);
+  const { handleInputChange, updateNodeImages } = useNodeData<QuestionNodeData>(id);
 
   return (
     <NodeContainer title="Condition" faIcon={faCodeBranch} id={id}>
+      <ImageUploader nodeId={id} handleUpdateNodeImages={updateNodeImages} images={data.images}/>
       <div className="flex flex-col gap-2 mt-2">
         <Textarea
           label="Message"

@@ -9,6 +9,8 @@ import React, { useCallback } from 'react';
 import NodeContainer from '../elements/node-container';
 import CustomHandle from '../handles/limit-handle';
 import { useNodeData } from '../utils';
+import { ImageMetadata } from '@/types/conversation';
+import { ImageUploader } from '@/components/imageUpload/image-uploader';
 
 enum NodeType {
   OpenEnded = 'open-ended',
@@ -22,11 +24,12 @@ type QuestionNodeProps = NodeProps & {
     type: NodeType;
     ratings?: string[];
     dynamicGeneration?: boolean;
+    images: ImageMetadata[];
   };
 };
 
 export default function QuestionNode({ id, data }: QuestionNodeProps) {
-  const { handleInputChange } = useNodeData<QuestionNodeProps>(id);
+  const { handleInputChange, updateNodeImages } = useNodeData<QuestionNodeProps>(id);
 
   const handleUpdate = useCallback(
     (updates: Partial<QuestionNodeProps['data']>) => {
@@ -64,6 +67,7 @@ export default function QuestionNode({ id, data }: QuestionNodeProps) {
 
   return (
     <NodeContainer title="Question" faIcon={faQuestionCircle} id={id}>
+      <ImageUploader nodeId={id} handleUpdateNodeImages={updateNodeImages} images={data.images}/>
       <div className="space-y-4 mt-2">
         <Input
           label="Dynamic Generation"

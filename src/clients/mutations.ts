@@ -7,11 +7,16 @@ export const GENERATE_AUDIO = gql`
 `;
 
 export const ADD_MEDIA_ASSET = gql`
-  mutation addMediaAsset($fileName: String!, $fileType: String!) {
-    addMediaAsset(fileName: $fileName, fileType: $fileType)
+  mutation addMediaAsset($s3Key: String!) {
+    addMediaAsset(s3Key: $s3Key)
   }
 `;
 
+export const GET_MEDIA_ASSET = gql`
+  mutation getMediaAsset($s3Key: String!) {
+    getMediaAsset(s3Key: $s3Key)
+  }
+`;
 
 export const ADD_PREDICTION = gql`
   mutation addPrediction($subscriptionId: ID!, $agentId: ID!, $variables: JSONObject, $attachments: [JSONObject!]) {

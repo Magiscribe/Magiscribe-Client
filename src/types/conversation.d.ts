@@ -22,6 +22,10 @@ export interface Graph {
   edges: GraphEdge[];
 }
 
+export type ImageMetadata = {
+  s3Key: string
+}
+
 export interface GraphNode {
   id: string;
   type: 'start' | 'end' | 'question' | 'information' | 'condition';
@@ -29,6 +33,7 @@ export interface GraphNode {
 }
 
 export interface QuestionNodeData {
+  images: ImageMetadata[];
   text: string;
   response: string;
   type: 'rating-single' | 'rating-multi' | 'open-ended' | 'scalar-single' | 'scalar-multi';
@@ -37,10 +42,12 @@ export interface QuestionNodeData {
 }
 
 export interface ConditionNodeData {
+  images: ImageMetadata[];
   text: string;
 }
 
 export interface InformationNodeData {
+  images: ImageMetadata[];
   text: string;
 }
 

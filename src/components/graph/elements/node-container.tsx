@@ -35,7 +35,6 @@ const NodeContainer = ({ title, faIcon, id, children }: NodeContainerProps) => {
         <h3 className="text-lg font-bold text-slate-800 dark:text-white">{title}</h3>
         <p className="ml-2 text-sm text-slate-400">#{id}</p>
       </div>
-      <ImageUploader nodeId={id}/>
       {children}
     </div>
   );
