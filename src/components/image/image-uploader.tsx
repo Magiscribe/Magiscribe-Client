@@ -1,4 +1,4 @@
-import { ADD_MEDIA_ASSET, GET_MEDIA_ASSET } from '@/clients/mutations';
+import { ADD_MEDIA_ASSET, DELETE_MEDIA_ASSET, GET_MEDIA_ASSET } from '@/clients/mutations';
 import { ImageMetadata } from '@/types/conversation';
 import { useMutation } from '@apollo/client';
 import { useCallback, useEffect, useState } from 'react';
@@ -38,7 +38,7 @@ function useImageUpload() {
   return uploadImage;
 }
 
-function useImageDownload() {
+export function useImageDownload() {
   const [getMediaAsset] = useMutation(GET_MEDIA_ASSET);
 
   const downloadImage = useCallback(
@@ -106,7 +106,7 @@ async function downloadImageFromS3(presignedUrl: string) {
 
 export function ImageUploader(props: ImageUploaderProps): React.ReactElement {
   const [base64Images, setBase64Images] = useState<string[]>([]);
-  //const [ImageMetadata, setImageMetadata] = useState<ImageMetadata[]>(props.images);
+  const [deleteMediaAsset] = useMutation(DELETE_MEDIA_ASSET);
   const uploadImage = useImageUpload();
   const downloadImage = useImageDownload();
 
@@ -114,12 +114,29 @@ export function ImageUploader(props: ImageUploaderProps): React.ReactElement {
     // Download the node images from s3
     (async () => {
       if (props.images) {
-        const images = await Promise.all(props.images?.map(async (image) => await downloadImage(image)));
-        console.log('images: ' + JSON.stringify(images));
-        setBase64Images((prevImages) => [...prevImages, ...images]);
+        try {
+          const images = await Promise.all(props.images?.map(async (image) => await downloadImage(image)));
+          setBase64Images(images);
+        } catch (exception) {
+          console.log('Image load failed: ' + exception);
+        }
+      } else if (base64Images.length > 0) {
+        // If the only image on a node was deleted, then set the images state to empty
+        setBase64Images([]);
       }
     })();
   }, [props.images]);
+
+  const handleImageDelete = async function (imageIndex: number) {
+    const s3KeyToDelete = props.images[imageIndex].s3Key;
+    await deleteMediaAsset({
+      variables: {
+        s3Key: s3KeyToDelete,
+      },
+    });
+    // TODO: Verify that image deletion was successful before removing the image from the graph
+    props.handleUpdateNodeImages(props.images.filter((_, i) => i !== imageIndex));
+  };
 
   /**
    * Handles the image upload and conversion to base64.
@@ -137,14 +154,14 @@ export function ImageUploader(props: ImageUploaderProps): React.ReactElement {
         return fileWithS3Key;
       });
       // Upload each file to s3
-      Array.from(filesWithS3Key).forEach(async (fileWithS3Key) => {
+      await Promise.all(Array.from(filesWithS3Key).map(async (fileWithS3Key) => {
         const reader = new FileReader();
-        await uploadImage(fileWithS3Key.file, fileWithS3Key.s3Key);
         reader.onloadend = () => {
           setBase64Images((prevImages) => [...prevImages, reader.result as string]);
         };
         reader.readAsDataURL(fileWithS3Key.file);
-      });
+        return await uploadImage(fileWithS3Key.file, fileWithS3Key.s3Key);
+      }));
 
       // Save image metadata to the graph node
       const newImageMetadata = Array.from(filesWithS3Key).map((file) => {
@@ -182,7 +199,7 @@ export function ImageUploader(props: ImageUploaderProps): React.ReactElement {
               <img src={image} alt={`Uploaded ${index + 1}`} className="w-24 h-24 object-cover rounded" />
               <button
                 type="button"
-                onClick={() => setBase64Images(base64Images.filter((_, i) => i !== index))}
+                onClick={() => handleImageDelete(index)}
                 className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
               >
                 ×

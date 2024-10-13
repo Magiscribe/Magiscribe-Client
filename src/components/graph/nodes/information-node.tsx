@@ -6,7 +6,7 @@ import Textarea from '@/components/controls/textarea';
 import NodeContainer from '../elements/node-container';
 import CustomHandle from '../handles/limit-handle';
 import { useNodeData } from '../utils';
-import { ImageUploader } from '@/components/imageUpload/image-uploader';
+import { ImageUploader } from '@/components/image/image-uploader';
 import { ImageMetadata } from '@/types/conversation';
 
 type InformationNodeProps = NodeProps & {

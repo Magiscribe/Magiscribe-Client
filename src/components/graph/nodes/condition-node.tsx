@@ -5,7 +5,7 @@ import { Handle, NodeProps, Position } from '@xyflow/react';
 
 import NodeContainer from '../elements/node-container';
 import { useNodeData } from '../utils';
-import { ImageUploader } from '@/components/imageUpload/image-uploader';
+import { ImageUploader } from '@/components/image/image-uploader';
 
 type ConditionNodeProps = NodeProps & {
   data: {

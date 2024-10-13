@@ -18,6 +18,12 @@ export const GET_MEDIA_ASSET = gql`
   }
 `;
 
+export const DELETE_MEDIA_ASSET = gql`
+  mutation deleteMediaAsset($s3Key: String!) {
+    deleteMediaAsset(s3Key: $s3Key)
+  }
+`;
+
 export const ADD_PREDICTION = gql`
   mutation addPrediction($subscriptionId: ID!, $agentId: ID!, $variables: JSONObject, $attachments: [JSONObject!]) {
     addPrediction(subscriptionId: $subscriptionId, agentId: $agentId, variables: $variables, attachments: $attachments)

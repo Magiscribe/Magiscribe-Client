@@ -10,7 +10,7 @@ import NodeContainer from '../elements/node-container';
 import CustomHandle from '../handles/limit-handle';
 import { useNodeData } from '../utils';
 import { ImageMetadata } from '@/types/conversation';
-import { ImageUploader } from '@/components/imageUpload/image-uploader';
+import { ImageUploader } from '@/components/image/image-uploader';
 
 enum NodeType {
   OpenEnded = 'open-ended',
