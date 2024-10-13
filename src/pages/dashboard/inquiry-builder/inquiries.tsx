@@ -1,4 +1,5 @@
 import { GET_INQUIRIES } from '@/clients/queries';
+import GenericHero from '@/components/heroes/generic-hero';
 import ModalUpsertInquiry from '@/components/modals/upsert-inquiry-modal';
 import { GetInquiriesQuery } from '@/graphql/graphql';
 import { InquiryBuilderProvider } from '@/providers/inquiry-builder-provider';
@@ -29,23 +30,11 @@ export default function Inquiry() {
     <InquiryBuilderProvider>
       <ModalUpsertInquiry open={createFormModal} onClose={() => setCreateFormModal(false)} onSave={onCreateForm} />
 
-      <div className="mb-8 text-slate-100">
-        <h2 className="text-2xl font-semibold mb-4">Are you responsible for a large group of stakeholders?</h2>
-        <ul className="list-disc pl-6 mb-4">
-          <li>User base of your product/service</li>
-          <li>Workforce/Shareholders of your company</li>
-          <li>Audience of your content</li>
-          <li>Constituents you represent</li>
-          <li>Members of your social organization</li>
-          <li>Any other group you want to gain insights from</li>
-        </ul>
-        <h2 className="text-2xl font-semibold mb-4">Do you want to make decisions in their best interest?</h2>
-        <ul className="list-disc pl-6 mb-4">
-          <li>Gather detailed responses across multiple modalities</li>
-          <li>Build consensus from more voices than you could ever engage individually</li>
-          <li>Make informed decisions backed by comprehensive data and our advanced analysis</li>
-        </ul>
-      </div>
+      <GenericHero
+        title="Your Inquiries"
+        subtitle="Build and manage inquiries here to start capturing meaningful feedback."
+      />
+      <hr className="my-8" />
       <h2 className="text-2xl font-semibold text-slate-100 mb-4">Your Inquiries</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
         {(data?.getInquiries ?? []).map((inquiry, i) => {

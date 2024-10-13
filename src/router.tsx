@@ -8,6 +8,8 @@ import CapabilityEdit from './pages/dashboard/agent-lab/capabilities/edit';
 import PlaygroundDashboard from './pages/dashboard/agent-lab/playground';
 import PromptDashboard from './pages/dashboard/agent-lab/prompts';
 import PromptEdit from './pages/dashboard/agent-lab/prompts/edit';
+import Contact from './pages/dashboard/contact';
+import FAQPage from './pages/dashboard/faq';
 import InquiriesBuilderPage from './pages/dashboard/inquiry-builder/inquiries';
 import InquiryBuilderPage from './pages/dashboard/inquiry-builder/inquiry';
 import HomeHero from './pages/home';
@@ -33,6 +35,14 @@ const router = createBrowserRouter([
           {
             path: '/dashboard',
             element: <DashboardPage />,
+          },
+          {
+            path: '/dashboard/contact',
+            element: <Contact />,
+          },
+          {
+            path: '/dashboard/faq',
+            element: <FAQPage />,
           },
           {
             path: '/dashboard/agent-lab',
