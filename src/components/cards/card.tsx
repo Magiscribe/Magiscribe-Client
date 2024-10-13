@@ -27,6 +27,7 @@ export default function LinkCard({
     sky: 'from-sky-700/80 to-sky-500/80',
     orange: 'from-orange-700/80 to-orange-500/80',
     teal: 'from-teal-700/80 to-teal-500/80',
+    green: 'from-green-700/80 to-green-500/80',
   };
 
   const bg = gradients[gradient as keyof typeof gradients] || gradients['purple'];
