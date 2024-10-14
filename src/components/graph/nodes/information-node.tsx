@@ -1,6 +1,8 @@
-import useAutoResizeTextareaRef from '@/hooks/auto-resize-textarea';
-import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
+import React, { useCallback } from 'react';
 import { Handle, NodeProps, Position } from '@xyflow/react';
+import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
+import Input from '@/components/controls/input';
+import Textarea from '@/components/controls/textarea';
 import NodeContainer from '../elements/node-container';
 import CustomHandle from '../handles/limit-handle';
 import { useNodeData } from '../utils';
@@ -13,37 +15,39 @@ type InformationNodeProps = NodeProps & {
 };
 
 export default function InformationNode({ id, data }: InformationNodeProps) {
-  const textareaRef = useAutoResizeTextareaRef(data.text);
   const { handleInputChange } = useNodeData<InformationNodeProps>(id);
+
+  const handleUpdate = useCallback(
+    (updates: Partial<InformationNodeProps['data']>) => {
+      Object.entries(updates).forEach(([key, value]) => {
+        handleInputChange({
+          target: { name: key, value },
+        } as React.ChangeEvent<HTMLInputElement>);
+      });
+    },
+    [handleInputChange],
+  );
 
   return (
     <NodeContainer title="Information" faIcon={faExclamationCircle} id={id}>
       <div className="space-y-4 mt-2">
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-gray-700">Dynamic Generation</label>
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              name="dynamicGeneration"
-              checked={data.dynamicGeneration}
-              onChange={handleInputChange}
-              className="w-4 h-4 bg-inherit text-blue-600 rounded border-gray-300 focus:ring-blue-500 focus:ring-2 nodrag"
-            />
-            <span className="ml-2 text-sm text-gray-700">Enable</span>
-          </div>
-        </div>
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-gray-700">Message</label>
-          <textarea
-            ref={textareaRef}
-            value={data.text}
-            name="text"
-            onChange={handleInputChange}
-            rows={1}
-            placeholder="Enter your text here..."
-            className="w-full px-3 py-2 bg-inherit rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 resize-none overflow-hidden nodrag"
-          />
-        </div>
+        <Input
+          label="Dynamic Generation"
+          name="dynamicGeneration"
+          type="checkbox"
+          checked={data.dynamicGeneration}
+          onChange={(e) => handleUpdate({ dynamicGeneration: (e.target as HTMLInputElement).checked })}
+          className="nodrag"
+        />
+
+        <Textarea
+          label="Message"
+          name="text"
+          value={data.text}
+          onChange={(e) => handleUpdate({ text: e.target.value })}
+          placeholder="Enter your text here..."
+          className="resize-none overflow-hidden nodrag"
+        />
       </div>
       <Handle type="target" position={Position.Left} className="w-4 h-4 !bg-green-500" />
       <CustomHandle connectionCount={1} type="source" position={Position.Right} className="w-4 h-4 !bg-green-500" />
