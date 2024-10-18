@@ -93,16 +93,15 @@ const router = createBrowserRouter([
           },
         ],
       },
-
-      {
-        path: 'inquiry/:id/:preview?',
-        element: <UserInquiryPage />,
-      },
       {
         path: '*',
         element: <div>404</div>,
       },
     ],
+  },
+  {
+    path: 'inquiry/:id',
+    element: <UserInquiryPage />,
   },
   {
     path: '/dashboard/inquiry-builder/:id',
