@@ -21,7 +21,7 @@ export const TitleProvider = ({ children }: { children: React.ReactNode }) => {
   const [title, setTitle] = useState('');
 
   useEffect(() => {
-    document.title = title ? `Magiscribe | ${title}` : 'Magiscribe';
+    document.title = title ? `${title} | Magiscribe` : 'Magiscribe';
   }, [title]);
 
   return <TitleContext.Provider value={{ title, setTitle }}>{children}</TitleContext.Provider>;
