@@ -1,27 +1,25 @@
 import ConfirmationModal from '@/components/modals/confirm-modal';
-import ModalSendInquiry from '@/components/modals/send-inquiry-modal';
+import ModalSendInquiry from '@/components/modals/inquiry/send-inquiry-modal';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { formatGraph, validateGraph } from '@/utils/graphs/graph-utils';
-import { faCheckCircle, faEye, faGear, faRotateLeft, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheckCircle, faCog, faEllipsisV, faEye, faRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 
-import ModalValidationErrors from '../modals/inquiry-validation-errors-modal';
+import Button from '../controls/button';
+import ModalValidationErrors from '../modals/inquiry/inquiry-validation-errors-modal';
+import ModalSettingsInquiry from '../modals/inquiry/settings-inquiry-modal';
 
 export default function GraphContextBar() {
   // States
   const [clearGraphModal, setClearGraphModal] = useState(false);
-  const [deleteModal, setDeleteModal] = useState(false);
   const [sendModalOpen, setSendModalOpen] = useState(false);
+  const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const [validationErrorsModalOpen, setValidationErrorsModalOpen] = useState(false);
 
   // Hooks
-  const { id, form, graph, lastUpdated, updateForm, updateGraph, resetGraph, deleteInquiry, publishGraph } =
-    useInquiryBuilder();
+  const { id, form, graph, lastUpdated, updateForm, updateGraph, resetGraph, publishGraph } = useInquiryBuilder();
   const alert = useAddAlert();
-  const navigate = useNavigate();
 
   // Misc
   const previewLink = `${window.location.origin}/inquiry/${id}?preview=true`;
@@ -68,43 +66,19 @@ export default function GraphContextBar() {
           </p>
         </div>
         <div className="flex space-x-4">
-          <button
-            className="bg-green-500 hover:bg-green-700 text-white text-sm font-bold py-2 px-4 rounded-full flex items-center"
-            onClick={handlePublish}
-          >
-            <FontAwesomeIcon icon={faCheckCircle} className="mr-2" />
+          <Button variant="success" iconLeft={faCheckCircle} onClick={handlePublish}>
             Publish
-          </button>
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded-full flex items-center"
-            onClick={handleFormat}
-          >
-            <FontAwesomeIcon icon={faGear} className="mr-2" />
+          </Button>
+          <Button variant="primary" iconLeft={faCog} onClick={handleFormat}>
             Format
-          </button>
-          <Link
-            to={previewLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded-full flex items-center"
-          >
-            <FontAwesomeIcon icon={faEye} className="mr-2" />
+          </Button>
+          <Button variant="primary" iconLeft={faEye} onClick={() => window.open(previewLink, '_blank')}>
             Preview
-          </Link>
-          <button
-            onClick={() => setClearGraphModal(true)}
-            className="bg-gray-500 hover:bg-gray-700 text-white text-sm font-bold py-2 px-4 rounded-full flex items-center"
-          >
-            <FontAwesomeIcon icon={faRotateLeft} className="mr-2" />
+          </Button>
+          <Button variant="secondary" iconLeft={faRotateLeft} onClick={() => setClearGraphModal(true)}>
             Clear
-          </button>
-          <button
-            onClick={() => setDeleteModal(true)}
-            className="bg-red-500 hover:bg-red-700 text-white text-sm font-bold py-2 px-4 rounded-full flex items-center"
-          >
-            <FontAwesomeIcon icon={faTrash} className="mr-2" />
-            Delete
-          </button>
+          </Button>
+          <Button variant="transparentSecondary" iconLeft={faEllipsisV} onClick={() => setSettingsModalOpen(true)} />
         </div>
       </div>
 
@@ -120,22 +94,10 @@ export default function GraphContextBar() {
         confirmText="Clear Graph"
       />
 
-      <ConfirmationModal
-        isOpen={deleteModal}
-        onClose={() => setDeleteModal(false)}
-        onConfirm={async () => {
-          await deleteInquiry(
-            () => {
-              alert('Inquiry deleted successfully!', 'success');
-              navigate('/dashboard/inquiry-builder');
-            },
-            () => {
-              alert('Something went wrong!', 'error');
-            },
-          );
-        }}
-        text="Are you sure you want to delete the inquiry?"
-        confirmText="Delete Inquiry"
+      <ModalSettingsInquiry
+        open={settingsModalOpen}
+        onClose={() => setSettingsModalOpen(false)}
+        onSave={() => setSettingsModalOpen(false)}
       />
 
       <ModalSendInquiry open={sendModalOpen} onClose={() => setSendModalOpen(false)} />

@@ -4,7 +4,7 @@ import { validateGraph } from '@/utils/graphs/graph-utils';
 import { faMagicWandSparkles } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useState } from 'react';
 
-import CustomModal from './modal';
+import CustomModal from '../modal';
 
 interface ValidationErrorsProps {
   /**

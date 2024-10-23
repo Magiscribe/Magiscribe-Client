@@ -3,7 +3,7 @@ import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { faLink } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import CustomModal from './modal';
+import CustomModal from '../modal';
 
 interface SendInquiryProps {
   /**

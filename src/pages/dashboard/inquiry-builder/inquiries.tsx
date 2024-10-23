@@ -1,6 +1,6 @@
 import { GET_INQUIRIES } from '@/clients/queries';
 import GenericHero from '@/components/heroes/generic-hero';
-import ModalUpsertInquiry from '@/components/modals/upsert-inquiry-modal';
+import ModalUpsertInquiry from '@/components/modals/inquiry/create-inquiry-modal';
 import { GetInquiriesQuery } from '@/graphql/graphql';
 import { InquiryBuilderProvider } from '@/providers/inquiry-builder-provider';
 import { useQuery } from '@apollo/client';

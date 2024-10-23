@@ -10,7 +10,7 @@ interface QueueItem {
 export const useElevenLabsAudio = (voice: string) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [generateAudio] = useMutation(GENERATE_AUDIO);
-  
+
   const audioQueueRef = useRef<QueueItem[]>([]);
   const currentIndexRef = useRef(0);
 
@@ -22,7 +22,7 @@ export const useElevenLabsAudio = (voice: string) => {
     }
 
     const currentItem = audioQueueRef.current[currentIndexRef.current];
-    
+
     if (!currentItem.audio) {
       return; // Wait for audio to be generated
     }
@@ -32,16 +32,16 @@ export const useElevenLabsAudio = (voice: string) => {
     try {
       await new Promise<void>((resolve, reject) => {
         if (!currentItem.audio) return reject(new Error('No audio available'));
-        
+
         currentItem.audio.onended = () => {
           currentIndexRef.current++;
-          
+
           // Cleanup completed items
           if (currentIndexRef.current > 0) {
             audioQueueRef.current = audioQueueRef.current.slice(currentIndexRef.current);
             currentIndexRef.current = 0;
           }
-          
+
           resolve();
         };
 
@@ -57,30 +57,33 @@ export const useElevenLabsAudio = (voice: string) => {
     }
   }, []);
 
-  const addSentence = useCallback(async (text: string) => {
-    if (!text.trim()) return;
-    
-    const newItem: QueueItem = { text: text.trim() };
-    audioQueueRef.current.push(newItem);
-    
-    try {
-      const audioUrl = await generateAudio({
-        variables: {
-          text: newItem.text,
-          voice,
-        },
-      });
-      
-      newItem.audio = new Audio(audioUrl.data.generateAudio);
-      
-      if (!isPlaying) {
-        playNextSentence();
+  const addSentence = useCallback(
+    async (text: string) => {
+      if (!text.trim()) return;
+
+      const newItem: QueueItem = { text: text.trim() };
+      audioQueueRef.current.push(newItem);
+
+      try {
+        const audioUrl = await generateAudio({
+          variables: {
+            text: newItem.text,
+            voice,
+          },
+        });
+
+        newItem.audio = new Audio(audioUrl.data.generateAudio);
+
+        if (!isPlaying) {
+          playNextSentence();
+        }
+      } catch (error) {
+        console.error('Error generating audio:', error);
+        throw error;
       }
-    } catch (error) {
-      console.error('Error generating audio:', error);
-      throw error;
-    }
-  }, [generateAudio, voice, isPlaying, playNextSentence]);
+    },
+    [generateAudio, voice, isPlaying, playNextSentence],
+  );
 
   return {
     addSentence,

@@ -7,10 +7,11 @@ import { Description, Label, Radio, RadioGroup } from '@headlessui/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
 
-import Button from '../controls/button';
-import Input from '../controls/input';
-import Textarea from '../controls/textarea';
-import CustomModal from './modal';
+import Button from '../../controls/button';
+import Input from '../../controls/input';
+import Select from '../../controls/select';
+import Textarea from '../../controls/textarea';
+import CustomModal from '../modal';
 
 /**
  * Props for the ModalUpsertInquiry component
@@ -136,6 +137,18 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
     };
 
   /**
+   * Handle select change for the form
+   * @param field - The field to update
+   * @param e - The change event
+   * @returns void
+   */
+  const handleSelectChange =
+    (field: string) =>
+    (e: React.ChangeEvent<HTMLSelectElement>): void => {
+      updateForm({ ...form, [field]: e.target.value });
+    };
+
+  /**
    * Handle changing the graph template
    * @param template - The selected template
    */
@@ -198,15 +211,27 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
   return (
     <CustomModal size="3xl" open={open} onClose={onClose} title={id ? 'Update Inquiry' : 'Create Inquiry'}>
       <form className="space-y-4" onSubmit={handleSave}>
-        <div>
-          <Input
-            name="title"
-            label="Title"
-            subLabel="This will be displayed to the people you are sending the inquiry to"
-            value={form.description}
-            onChange={handleInputChange('title')}
-          />
-        </div>
+        <Input
+          name="title"
+          label="Title"
+          placeholder="Inquiry title"
+          autoFocus
+          subLabel="This will be displayed to the people you are sending the inquiry to"
+          value={form.title}
+          onChange={handleInputChange('title')}
+        />
+
+        <Select
+          name="voice"
+          label="Voice"
+          subLabel="Select the voice you would like to use for your inquiry"
+          value={form.voice ?? 'formal'}
+          onChange={handleSelectChange('voice')}
+          options={[
+            { label: 'Phoebe', value: 'phoebe' },
+            { label: 'Oxley', value: 'oxley' },
+          ]}
+        />
 
         <TemplateSelection value={selectedTemplate} onChange={handleChangeGraphTemplate} />
 

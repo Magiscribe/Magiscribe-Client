@@ -11,11 +11,23 @@ import { useSetTitle } from '@/hooks/title-hook';
 import { InquiryTraversalProvider, useInquiry } from '@/providers/inquiry-traversal-provider';
 import { useQueue } from '@/utils/debounce-queue';
 import { StrippedNode } from '@/utils/graphs/graph';
-import { faChevronRight, faImage, faMicrophone, faMicrophoneSlash, faMoon, faPaperPlane, faSun, faVolumeMute, faVolumeUp } from '@fortawesome/free-solid-svg-icons';
+import {
+  faChevronRight,
+  faImage,
+  faMicrophone,
+  faMicrophoneSlash,
+  faMoon,
+  faPaperPlane,
+  faSun,
+  faVolumeMute,
+  faVolumeUp,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import goHomeGif from '@/assets/imgs/go-home.gif';
+import { SignedIn, SignedOut, SignUpButton } from '@clerk/clerk-react';
 
 interface Message {
   type: 'text' | 'chart' | 'image';
@@ -29,7 +41,7 @@ export const useMessageQueue = () => {
   const calculateMessageDelay = (message: Message): number => {
     if (message.sender !== 'bot' || message.type !== 'text') return 0;
     const content = message.content as string;
-    return content.length * 15; // 5ms per character
+    return content.length * 5; // 5ms per character
   };
 
   const shouldProcessImmediately = (message: Message): boolean => {
@@ -64,11 +76,10 @@ function UserInquiryPage() {
 
   const [enableAudio, setEnableAudio] = useWithLocalStorage(false, 'enableAudio');
   const { isTranscribing, transcript, handleTranscribe } = useTranscribe();
-  const audio = useElevenLabsAudio('OXLEY');
+  const { preview, handleNextNode, form, state, onNodeUpdate, userDetails, setUserDetails } = useInquiry();
+  const audio = useElevenLabsAudio(form.voice);
   const { isDark, toggle: toggleDarkMode } = useDarkMode();
   const navigate = useNavigate();
-
-  const { preview, handleNextNode, form, state, onNodeUpdate, userDetails, setUserDetails } = useInquiry();
 
   useSetTitle()(form?.title);
 
@@ -124,17 +135,17 @@ function UserInquiryPage() {
 
     const userMessage = [...selectedRatings, inputMessage.trim()].filter(Boolean).join(' - ');
 
-    await addMessage({
-      type: 'text',
-      content: userMessage,
-      sender: 'user',
-    });
-
     handleNextNode({
       data: {
         text: inputMessage,
         ...(selectedRatings.length > 0 && { ratings: selectedRatings }),
       },
+    });
+
+    await addMessage({
+      type: 'text',
+      content: userMessage,
+      sender: 'user',
     });
 
     setInputMessage('');
@@ -162,7 +173,6 @@ function UserInquiryPage() {
           sender: 'bot',
         });
 
-
         if (node.type === 'information') {
           await handleNextNode();
         }
@@ -175,17 +185,18 @@ function UserInquiryPage() {
     <header className="w-full bg-white dark:bg-slate-800 flex items-center justify-between shadow-md">
       <div className="relative flex w-full p-4 max-w-4xl min-h-16 mx-auto items-center">
         {screen != 'start' && (
-          <motion.div className="flex items-center absolute left-4"
+          <motion.div
+            className="flex items-center absolute left-4"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.3 }}
           >
-          <img src="https://avatar.iran.liara.run/public" alt="User Avatar" className="w-10 h-10 rounded-full mr-3" />
-          <div>
-            <h2 className="font-bold text-slate-800 dark:text-white">{userDetails.name || 'User'}</h2>
-            <p className="text-sm text-slate-600 dark:text-slate-400">Participant</p>
-          </div>
-        </motion.div>
+            <img src="https://avatar.iran.liara.run/public" alt="User Avatar" className="w-10 h-10 rounded-full mr-3" />
+            <div>
+              <h2 className="font-bold text-slate-800 dark:text-white">{userDetails.name || 'User'}</h2>
+              <p className="text-sm text-slate-600 dark:text-slate-400">Participant</p>
+            </div>
+          </motion.div>
         )}
 
         <div className="absolute left-1/2 transform -translate-x-1/2">
@@ -269,7 +280,43 @@ function UserInquiryPage() {
         </motion.div>
       ))}
       <div ref={messagesEndRef} />
+
+      {(state.loading || isProcessing) && (
+        <div className="flex justify-start items-center pt-4">
+          <AnimatedDots />
+        </div>
+      )}
     </AnimatePresence>
+  );
+
+  const renderSummary = () => (
+    <div className="bg-white dark:bg-slate-700 p-6 rounded-lg shadow-lg">
+      <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white text-center">Thank you!</h2>
+      <p className="text-lg text-slate-600 dark:text-slate-300 text-center">Your responses have been recorded.</p>
+
+      <img src={goHomeGif} alt="Thank You" className="mx-auto rounded-3xl mt-4" />
+      <div className="w-full max-w-3xl mx-auto flex flex-col items-center">
+        {/* Form */}
+        <p className="text-center text-slate-600 dark:text-slate-400 mt-4">
+          Want to make your own inquiry?{' '}
+          <SignedOut>
+            <SignUpButton signInForceRedirectUrl="/dashboard" forceRedirectUrl="/dashboard">
+              <button className="underline dark:text-white text-slate-800 hover:text-purple-600 transition-colors">
+                Sign up for free
+              </button>
+            </SignUpButton>
+          </SignedOut>
+          <SignedIn>
+            <Link
+              to="/dashboard/inquiry-builder"
+              className="underline dark:text-white text-slate-800 hover:text-purple-600 transition-colors"
+            >
+              Go to Graph Builder
+            </Link>
+          </SignedIn>
+        </p>
+      </div>
+    </div>
   );
 
   const renderInputArea = () => (
@@ -287,7 +334,12 @@ function UserInquiryPage() {
 
       {screen === 'inquiry' && (
         <form onSubmit={handleSubmit} className="flex flex-col mt-4 relative">
-          <div className="flex">
+          <motion.div
+            className="flex"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
             <div className="flex-grow flex items-center bg-slate-200 dark:bg-slate-700 rounded-full">
               <button
                 type="button"
@@ -318,10 +370,15 @@ function UserInquiryPage() {
               </button>
             </div>
             <input ref={fileInputRef} type="file" accept="image/*" className="hidden" />
-          </div>
-          <p className="text-slate-400 text-sm mt-2 text-center">
+          </motion.div>
+          <motion.p
+            className="text-slate-400 text-sm mt-2 text-center"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.2 }}
+          >
             <i>Occasionally, mistakes may occur during the inquiry. If you notice any, please let us know.</i>
-          </p>
+          </motion.p>
         </form>
       )}
 
@@ -377,12 +434,8 @@ function UserInquiryPage() {
       {renderHeader()}
       <div className="w-full max-w-4xl flex-grow p-4 overflow-y-auto space-y-4 mx-auto">
         {screen === 'start' && renderStartScreen()}
-        {renderMessages()}
-        {(state.loading || isProcessing) && (
-          <div className="flex justify-start items-center pt-4">
-            <AnimatedDots />
-          </div>
-        )}
+        {(screen === 'start' || screen === 'end') && renderMessages()}
+        {screen === 'summary' && renderSummary()}
         <div ref={messagesEndRef} />
       </div>
       {currentNode && currentNode.type !== 'end' && screen !== 'start' && renderInputArea()}

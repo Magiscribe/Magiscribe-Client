@@ -6,7 +6,7 @@ import { getAgentIdByName } from '@/utils/agents';
 import { NodeData, OptimizedNode } from '@/utils/graphs/graph';
 import { GraphManager } from '@/utils/graphs/graph-manager';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
-import React, { createContext, useContext, useRef, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 
 interface InquiryProviderProps {
   /**
@@ -112,8 +112,6 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
       if (usedGraph) {
         formRef.current = form;
         graphRef.current = new GraphManager(usedGraph);
-        graphRef.current.onNodeVisit = handleOnNodeVisit;
-        graphRef.current.onNodeAddedToHistory = addNodeToHistory;
         setState({ ...INITIAL_STATE, initialized: true });
       } else {
         setState({ ...INITIAL_STATE, notFound: true });
@@ -245,7 +243,7 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
    * on the node. A callback is triggered at the end to notify subscribers of the new node data.
    * @returns {Promise<void>} A promise that resolves when the dynamic generation is complete
    */
-  const handleDynamicGeneration = async () => {
+  const handleDynamicGeneration = async (): Promise<void> => {
     // Base Case 1: The graph manager is initialized.
     if (!graphRef.current) return;
 
@@ -265,6 +263,9 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
         agentId,
         variables: {
           userMessage: currentNode.data.text,
+          userDetails: `
+          Name: ${userDetails.name}
+          `,
           conversationHistory: inquiryHistoryRef.current.join('\n\n'),
           mostRecentMessage,
         },
@@ -272,7 +273,6 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
     });
 
     onSubscriptionDataRef.current = (result) => {
-      console.log(result);
       if (currentNode) {
         currentNode.data = { ...currentNode.data, ...result };
       }
@@ -338,6 +338,12 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
       inquiryHistoryRef.current.push(conversation);
     }
   };
+
+  useEffect(() => {
+    if (!graphRef.current) return;
+    graphRef.current.onNodeVisit = handleOnNodeVisit;
+    graphRef.current.onNodeAddedToHistory = addNodeToHistory;
+  }, [handleOnNodeVisit, addNodeToHistory]);
 
   const contextValue: InquiryContextType = {
     id,

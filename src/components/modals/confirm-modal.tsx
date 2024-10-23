@@ -1,3 +1,4 @@
+import Button from '../controls/button';
 import CustomModal from './modal';
 
 interface ConfirmationModalProps {
@@ -21,12 +22,12 @@ export default function ConfirmationModal({
     <CustomModal title="Confirm" open={isOpen} onClose={onClose} size="md">
       <p>{text}</p>
       <div className="mt-4 flex justify-center space-x-40">
-        <button onClick={onClose} className="bg-gray-500 hover:bg-gray-700 text-white px-4 py-2 rounded-lg">
+        <Button onClick={onClose} variant="secondary">
           {cancelText}
-        </button>
-        <button onClick={onConfirm} className="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded-lg">
+        </Button>
+        <Button onClick={onConfirm} variant="danger">
           {confirmText}
-        </button>
+        </Button>
       </div>
     </CustomModal>
   );
