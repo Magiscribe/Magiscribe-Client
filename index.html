@@ -23,6 +23,15 @@
     <meta name="twitter:title" content="Magiscribe" />
     <meta name="twitter:description" content="Tailor-made interactions for every need | AI Inquiry Tool" />
     <meta name="twitter:image" content="https://magiscribe.com/og-banner.png" />
+
+    <!-- Dark Mode -->
+    <script type="module">
+      document.documentElement.classList.toggle(
+        'dark',
+        localStorage.theme === 'dark' ||
+          (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches),
+      );
+    </script>
   </head>
 
   <body>

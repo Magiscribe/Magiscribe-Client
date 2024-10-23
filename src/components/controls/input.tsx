@@ -56,7 +56,7 @@ export default function Input({ label, subLabel, name, error, className, ...prop
     'ml-2': isCheckbox,
   });
 
-  const inputWrapperClassName = clsx('text-slate-800 w-full flex gap-2', {
+  const inputWrapperClassName = clsx('dark:text-white text-slate-800 w-full flex gap-2', {
     'flex-col': !isCheckbox,
     'flex-row items-center': isCheckbox,
   });

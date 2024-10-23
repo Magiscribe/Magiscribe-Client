@@ -1,79 +1,97 @@
+import { GENERATE_AUDIO } from '@/clients/mutations';
 import { useMutation } from '@apollo/client';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { GENERATE_AUDIO } from '../clients/mutations';
+import { useCallback, useRef, useState } from 'react';
+
+interface QueueItem {
+  text: string;
+  audio?: HTMLAudioElement;
+}
 
 export const useElevenLabsAudio = (voice: string) => {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [transcript, setTranscript] = useState('');
   const [generateAudio] = useMutation(GENERATE_AUDIO);
-  const audioPromiseQueueRef = useRef<Promise<HTMLAudioElement>[]>([]);
-
-  const generateAndPushAudio = useCallback((text: string) => {
-    const audioPromise = new Promise<HTMLAudioElement>((resolve, reject) => {
-      (async () => {
-        try {
-          const audioUrl = await generateAudio({
-            variables: {
-              text,
-              voice,
-            },
-          });
-          const audio = new Audio(audioUrl.data.generateAudio);
-          resolve(audio);
-        } catch (error) {
-          console.error('Error generating audio:', error);
-          reject(error);
-        }
-      })();
-    });
-
-    audioPromiseQueueRef.current.push(audioPromise);
-  }, []);
+  
+  const audioQueueRef = useRef<QueueItem[]>([]);
+  const currentIndexRef = useRef(0);
 
   const playNextSentence = useCallback(async () => {
-    if (audioPromiseQueueRef.current.length === 0) {
+    if (!audioQueueRef.current.length || currentIndexRef.current >= audioQueueRef.current.length) {
       setIsPlaying(false);
+      currentIndexRef.current = 0;
       return;
+    }
+
+    const currentItem = audioQueueRef.current[currentIndexRef.current];
+    
+    if (!currentItem.audio) {
+      return; // Wait for audio to be generated
     }
 
     setIsPlaying(true);
 
     try {
-      const audioPromise = audioPromiseQueueRef.current[0];
-      audioPromiseQueueRef.current = audioPromiseQueueRef.current.slice(1);
+      await new Promise<void>((resolve, reject) => {
+        if (!currentItem.audio) return reject(new Error('No audio available'));
+        
+        currentItem.audio.onended = () => {
+          currentIndexRef.current++;
+          
+          // Cleanup completed items
+          if (currentIndexRef.current > 0) {
+            audioQueueRef.current = audioQueueRef.current.slice(currentIndexRef.current);
+            currentIndexRef.current = 0;
+          }
+          
+          resolve();
+        };
 
-      const audio = await audioPromise;
-      audio.onended = () => {
-        setIsPlaying(false);
-        playNextSentence();
-      };
-      await audio.play();
+        currentItem.audio.onerror = reject;
+        currentItem.audio.play().catch(reject);
+      });
     } catch (error) {
       console.error('Error playing audio:', error);
+      currentIndexRef.current++;
+    } finally {
       setIsPlaying(false);
       playNextSentence();
     }
   }, []);
 
-  const addChunk = useCallback((text: string) => {
-    setTranscript((prev) => prev + text);
-  }, []);
-
-  useEffect(() => {
-    const sentenceRegex = /(.*?[.!?])\s*/;
-    const match = transcript.match(sentenceRegex);
-
-    if (match) {
-      const [fullMatch, sentence] = match;
-      generateAndPushAudio(sentence.trim());
-      setTranscript((prev) => prev.replace(fullMatch, ''));
+  const addSentence = useCallback(async (text: string) => {
+    if (!text.trim()) return;
+    
+    const newItem: QueueItem = { text: text.trim() };
+    audioQueueRef.current.push(newItem);
+    
+    try {
+      const audioUrl = await generateAudio({
+        variables: {
+          text: newItem.text,
+          voice,
+        },
+      });
+      
+      newItem.audio = new Audio(audioUrl.data.generateAudio);
+      
       if (!isPlaying) {
         playNextSentence();
       }
+    } catch (error) {
+      console.error('Error generating audio:', error);
+      throw error;
     }
-  }, [transcript, isPlaying, playNextSentence, generateAndPushAudio]);
+  }, [generateAudio, voice, isPlaying, playNextSentence]);
 
-  return { addChunk };
+  return {
+    addSentence,
+    isPlaying,
+    pendingAudioCount: audioQueueRef.current.length,
+    clearQueue: useCallback(() => {
+      audioQueueRef.current = [];
+      setIsPlaying(false);
+      currentIndexRef.current = 0;
+    }, []),
+  };
 };
 
 export default useElevenLabsAudio;

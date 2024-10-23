@@ -1,17 +1,21 @@
 import AnimatedDots from '@/components/animated/animated-dots';
+import { ChartProps } from '@/components/chart';
 import Input from '@/components/controls/input';
 import RatingInput from '@/components/graph/rating-input';
 import MarkdownCustom from '@/components/markdown-custom';
 import { useTranscribe } from '@/hooks/audio-hook';
+import useElevenLabsAudio from '@/hooks/audio-player';
+import { useDarkMode } from '@/hooks/dark-mode';
+import { useWithLocalStorage } from '@/hooks/local-storage-hook';
 import { useSetTitle } from '@/hooks/title-hook';
 import { InquiryTraversalProvider, useInquiry } from '@/providers/inquiry-traversal-provider';
+import { useQueue } from '@/utils/debounce-queue';
 import { StrippedNode } from '@/utils/graphs/graph';
-import { SignedIn, SignedOut, SignUpButton } from '@clerk/clerk-react';
-import { faChevronRight, faCompress, faExpand, faImage, faMicrophone, faMicrophoneSlash, faMoon, faPaperPlane, faSun } from '@fortawesome/free-solid-svg-icons';
+import { faChevronRight, faImage, faMicrophone, faMicrophoneSlash, faMoon, faPaperPlane, faSun, faVolumeMute, faVolumeUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 interface Message {
   type: 'text' | 'chart' | 'image';
@@ -21,35 +25,64 @@ interface Message {
 
 const emailRegex = /.+@.+\..+/;
 
+export const useMessageQueue = () => {
+  const calculateMessageDelay = (message: Message): number => {
+    if (message.sender !== 'bot' || message.type !== 'text') return 0;
+    const content = message.content as string;
+    return content.length * 15; // 5ms per character
+  };
+
+  const shouldProcessImmediately = (message: Message): boolean => {
+    return message.sender === 'user';
+  };
+
+  const queue = useQueue<Message>({
+    processDelay: calculateMessageDelay,
+    minDelay: 500,
+    maxDelay: 3000,
+    shouldProcessImmediately,
+  });
+
+  return {
+    messages: queue.items,
+    addMessage: queue.addItem,
+    isProcessing: queue.isProcessing,
+    queueSize: queue.queueSize,
+  };
+};
+
 function UserInquiryPage() {
   const [screen, setScreen] = useState<'start' | 'inquiry' | 'end' | 'summary'>('start');
-  const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [selectedRatings, setSelectedRatings] = useState<string[]>([]);
   const [currentNode, setCurrentNode] = useState<StrippedNode | null>(null);
-  const { isTranscribing, transcript, handleTranscribe } = useTranscribe();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  const { messages, addMessage, isProcessing } = useMessageQueue();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [enableAudio, setEnableAudio] = useWithLocalStorage(false, 'enableAudio');
+  const { isTranscribing, transcript, handleTranscribe } = useTranscribe();
+  const audio = useElevenLabsAudio('OXLEY');
+  const { isDark, toggle: toggleDarkMode } = useDarkMode();
   const navigate = useNavigate();
+
   const { preview, handleNextNode, form, state, onNodeUpdate, userDetails, setUserDetails } = useInquiry();
 
   useSetTitle()(form?.title);
 
+  // Scroll to bottom when messages change
   useEffect(() => {
-    const scrollToBottom = () => {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    };
-    scrollToBottom();
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // Handle transcription updates
   useEffect(() => {
-    if (isTranscribing) {
-      setInputMessage((current) => current + transcript);
+    if (isTranscribing && transcript) {
+      setInputMessage((prev) => prev + transcript);
     }
-  }, [transcript]);
+  }, [transcript, isTranscribing]);
 
   useEffect(() => {
     onNodeUpdate(onNodeVisit);
@@ -85,100 +118,101 @@ function UserInquiryPage() {
     setScreen('summary');
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (inputMessage.trim() === '' && selectedRatings.length === 0) return;
 
     const userMessage = [...selectedRatings, inputMessage.trim()].filter(Boolean).join(' - ');
 
-    setMessages((prev) => [...prev, { type: 'text', content: userMessage, sender: 'user' }]);
+    await addMessage({
+      type: 'text',
+      content: userMessage,
+      sender: 'user',
+    });
+
     handleNextNode({
       data: {
         text: inputMessage,
         ...(selectedRatings.length > 0 && { ratings: selectedRatings }),
       },
     });
+
     setInputMessage('');
     setSelectedRatings([]);
   };
 
-  const onNodeVisit = async (node: StrippedNode) => {
-    if (node.type === 'end') {
-      setScreen('end');
-      return;
-    }
-
-    if (node.type === 'information' || node.type === 'question') {
-      setMessages((prev) => [...prev, { type: 'text', content: node.data.text as string, sender: 'bot' }]);
-      setCurrentNode(node);
-
-      if (node.type === 'information') {
-        await handleNextNode();
+  const onNodeVisit = useCallback(
+    async (node: StrippedNode) => {
+      if (node.type === 'end') {
+        setScreen('end');
+        return;
       }
-    }
-  };
 
-  const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-  };
+      if (node.type === 'information' || node.type === 'question') {
+        const messageText = node.data.text as string;
+        setCurrentNode(node);
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const imageUrl = event.target?.result as string;
-        setMessages((prev) => [...prev, { type: 'image', content: imageUrl, sender: 'user' }]);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+        if (enableAudio && messageText) {
+          audio.addSentence(messageText);
+        }
+
+        await addMessage({
+          type: 'text',
+          content: messageText,
+          sender: 'bot',
+        });
+
+
+        if (node.type === 'information') {
+          await handleNextNode();
+        }
+      }
+    },
+    [addMessage, enableAudio, audio, handleNextNode],
+  );
 
   const renderHeader = () => (
-    <motion.header
-      className={`w-full ${isDarkMode ? 'bg-slate-800' : 'bg-white'} flex items-center justify-between shadow-md`}
-      initial={false}
-      animate={{ backgroundColor: isDarkMode ? '#1e293b' : '#ffffff' }}
-      transition={{ duration: 0.3 }}
-    >
+    <header className="w-full bg-white dark:bg-slate-800 flex items-center justify-between shadow-md">
       <div className="relative flex w-full p-4 max-w-4xl min-h-16 mx-auto items-center">
-        <div className="flex items-center absolute left-4">
+        {screen != 'start' && (
+          <motion.div className="flex items-center absolute left-4"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3 }}
+          >
           <img src="https://avatar.iran.liara.run/public" alt="User Avatar" className="w-10 h-10 rounded-full mr-3" />
           <div>
-            <h2 className={`font-bold ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
-              {userDetails.name || 'User'}
-            </h2>
-            <p className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>Participant</p>
+            <h2 className="font-bold text-slate-800 dark:text-white">{userDetails.name || 'User'}</h2>
+            <p className="text-sm text-slate-600 dark:text-slate-400">Participant</p>
           </div>
-        </div>
+        </motion.div>
+        )}
 
         <div className="absolute left-1/2 transform -translate-x-1/2">
-          <h1 className={`text-xl font-bold mx-auto ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>{form.title}</h1>
+          <h1 className="text-xl font-bold mx-auto text-slate-800 dark:text-white">{form.title}</h1>
         </div>
 
         <div className="flex items-center absolute right-4">
           <button
-            onClick={toggleDarkMode}
-            className={`mr-4 ${isDarkMode ? 'text-white' : 'text-slate-800'} hover:text-purple-600`}
+            onClick={() => setEnableAudio(!enableAudio)}
+            className="mr-4 text-slate-800 dark:text-white hover:text-purple-600 transition-colors"
+            aria-label={enableAudio ? 'Disable text-to-speech' : 'Enable text-to-speech'}
+            title={enableAudio ? 'Disable text-to-speech' : 'Enable text-to-speech'}
           >
-            <FontAwesomeIcon icon={isDarkMode ? faSun : faMoon} />
+            <FontAwesomeIcon icon={enableAudio ? faVolumeUp : faVolumeMute} />
+          </button>
+          <button onClick={toggleDarkMode} className="mr-4 text-slate-800 dark:text-white hover:text-purple-600">
+            <FontAwesomeIcon icon={isDark ? faSun : faMoon} />
           </button>
         </div>
       </div>
-    </motion.header>
+    </header>
   );
 
   const renderStartScreen = () => (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      className={`${isDarkMode ? 'bg-slate-700' : 'bg-white'} p-6 rounded-lg shadow-lg`}
-    >
-      <h2 className={`text-2xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>{form.title}</h2>
-      <p className={`${isDarkMode ? 'text-slate-300' : 'text-slate-600'} mb-6`}>
-        Please provide your details to get started.
-      </p>
+    <div className="bg-white dark:bg-slate-700 p-6 rounded-lg shadow-lg">
+      <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white">{form.title}</h2>
+      <p className="text-slate-600 dark:text-slate-300 mb-6">Please provide your details to get started.</p>
       <div className="space-y-4">
         <Input
           label="Name"
@@ -187,7 +221,7 @@ function UserInquiryPage() {
           value={userDetails.name}
           onChange={handleChange}
           error={errors.name}
-          className={`${isDarkMode ? 'bg-slate-600 text-white' : 'bg-white text-slate-800'} border-slate-300`}
+          className="bg-white dark:bg-slate-600 text-slate-800 dark:text-white border-slate-300"
         />
         <Input
           label="Email"
@@ -196,7 +230,7 @@ function UserInquiryPage() {
           value={userDetails.email}
           onChange={handleChange}
           error={errors.email}
-          className={`${isDarkMode ? 'bg-slate-600 text-white' : 'bg-white text-slate-800'} border-slate-300`}
+          className="bg-white dark:bg-slate-600 text-slate-800 dark:text-white border-slate-300"
         />
       </div>
       <button
@@ -205,14 +239,14 @@ function UserInquiryPage() {
       >
         Get Started
       </button>
-    </motion.div>
+    </div>
   );
 
   const renderMessages = () => (
     <AnimatePresence>
-      {messages.map((message, index) => (
+      {messages.map((message) => (
         <motion.div
-          key={index}
+          key={message.id}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
@@ -220,12 +254,10 @@ function UserInquiryPage() {
           className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
         >
           <div
-            className={`max-w-[80%] p-3 rounded-3xl ${
+            className={`max-w-[80%] p-3 rounded-3xl shadow-md ${
               message.sender === 'user'
                 ? 'bg-purple-600 text-white'
-                : isDarkMode
-                  ? 'bg-slate-600 text-white'
-                  : 'bg-slate-200 text-slate-800'
+                : 'bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-white'
             }`}
           >
             {message.type === 'image' ? (
@@ -236,57 +268,61 @@ function UserInquiryPage() {
           </div>
         </motion.div>
       ))}
+      <div ref={messagesEndRef} />
     </AnimatePresence>
   );
 
   const renderInputArea = () => (
     <div className="w-full p-4 max-w-4xl mx-auto">
-      {!state.loading && screen !== 'end' && ((currentNode?.data?.type ?? '') as string).startsWith('rating') && (
-        <RatingInput
-          ratings={currentNode.data.ratings as string[]}
-          isMulti={currentNode.data.type === 'rating-multi'}
-          onRatingChange={setSelectedRatings}
-        />
-      )}
+      {currentNode &&
+        !state.loading &&
+        screen !== 'end' &&
+        ((currentNode?.data?.type ?? '') as string).startsWith('rating') && (
+          <RatingInput
+            ratings={currentNode.data.ratings as string[]}
+            isMulti={currentNode.data.type === 'rating-multi'}
+            onRatingChange={setSelectedRatings}
+          />
+        )}
 
       {screen === 'inquiry' && (
-       <form onSubmit={handleSubmit} className="flex flex-col mt-4 relative">
-       <div className="flex">
-         <div className={`flex-grow flex items-center ${isDarkMode ? 'bg-slate-700' : 'bg-slate-200'} rounded-full`}>
-           <button
-             type="button"
-             onClick={handleTranscribe}
-             className={`py-3 px-5 text-slate-600 hover:text-slate-800 bg-purple-300 rounded-l-full transition-colors`}
-           >
-             <FontAwesomeIcon icon={isTranscribing ? faMicrophone : faMicrophoneSlash} />
-           </button>
-           <button
-             type="button"
-             onClick={() => fileInputRef.current?.click()}
-             className={`py-3 px-5 text-slate-600 hover:text-slate-800 bg-purple-300 rounded-r-full transition-colors`}
-           >
-             <FontAwesomeIcon icon={faImage} />
-           </button>
-           <input
-             type="text"
-             value={inputMessage}
-             onChange={(e) => setInputMessage(e.target.value)}
-             placeholder="Type your message here..."
-             className={`flex-grow p-3 bg-transparent ${isDarkMode ? 'text-white' : 'text-slate-800'} border-transparent focus:border-transparent focus:ring-0`}
-           />
-           <button
-             type="submit"
-             className={`py-3 px-6 text-white bg-purple-600 hover:bg-purple-700 rounded-l-full rounded-r-full transition-colors ml-1`}
-           >
-             <FontAwesomeIcon icon={faPaperPlane} />
-           </button>
-         </div>
-         <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-       </div>
-       <p className="text-slate-400 text-sm mt-2 text-center">
-         <i>Ocasionaly, mistakes may occur during the inquiry. If you notice any, please let us know.</i>
-       </p>
-     </form>
+        <form onSubmit={handleSubmit} className="flex flex-col mt-4 relative">
+          <div className="flex">
+            <div className="flex-grow flex items-center bg-slate-200 dark:bg-slate-700 rounded-full">
+              <button
+                type="button"
+                onClick={handleTranscribe}
+                className="py-3 px-5 bg-slate-300 hover:bg-slate-400 dark:bg-slate-500 rounded-l-full transition-colors"
+              >
+                <FontAwesomeIcon icon={isTranscribing ? faMicrophone : faMicrophoneSlash} />
+              </button>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="py-3 px-5 bg-slate-300 hover:bg-slate-400 dark:bg-slate-500 rounded-r-full transition-colors"
+              >
+                <FontAwesomeIcon icon={faImage} />
+              </button>
+              <input
+                type="text"
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                placeholder="Type your message here..."
+                className="flex-grow p-3 bg-transparent text-slate-800 dark:text-white border-transparent focus:border-transparent focus:ring-0"
+              />
+              <button
+                type="submit"
+                className="py-3 px-6 text-white bg-purple-600 hover:bg-purple-700 rounded-l-full rounded-r-full transition-colors ml-1"
+              >
+                <FontAwesomeIcon icon={faPaperPlane} />
+              </button>
+            </div>
+            <input ref={fileInputRef} type="file" accept="image/*" className="hidden" />
+          </div>
+          <p className="text-slate-400 text-sm mt-2 text-center">
+            <i>Occasionally, mistakes may occur during the inquiry. If you notice any, please let us know.</i>
+          </p>
+        </form>
       )}
 
       {screen === 'end' && (
@@ -294,7 +330,7 @@ function UserInquiryPage() {
           <button
             type="button"
             onClick={handleFinishInquiry}
-            className="px-6 py-3 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition duration-300 ease-in-out"
+            className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-full transition duration-300 ease-in-out"
           >
             Finish Inquiry
             <FontAwesomeIcon icon={faChevronRight} className="ml-2" />
@@ -306,12 +342,10 @@ function UserInquiryPage() {
 
   if (state.notFound) {
     return (
-      <div
-        className={`h-full flex items-center justify-center ${isDarkMode ? 'bg-slate-800 text-white' : 'bg-white text-slate-800'}`}
-      >
+      <div className="h-full flex items-center justify-center bg-white dark:bg-slate-800 text-slate-800 dark:text-white">
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-4">Inquiry Not Found</h2>
-          <p className={isDarkMode ? 'text-slate-400' : 'text-slate-600'}>
+          <p className="text-slate-600 dark:text-slate-400">
             The inquiry you are looking for does not exist. Please check the URL and try again.
           </p>
         </div>
@@ -321,12 +355,10 @@ function UserInquiryPage() {
 
   if (state.error) {
     return (
-      <div
-        className={`h-full flex items-center justify-center ${isDarkMode ? 'bg-slate-800 text-white' : 'bg-white text-slate-800'}`}
-      >
+      <div className="h-full flex items-center justify-center bg-white dark:bg-slate-800 text-slate-800 dark:text-white">
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-4">Something went wrong!</h2>
-          <p className={`${isDarkMode ? 'text-slate-400' : 'text-slate-600'} mb-4`}>
+          <p className="text-slate-600 dark:text-slate-400 mb-4">
             Looks like something broke on our end. Your previous answers have been recorded.
           </p>
           <button
@@ -341,12 +373,12 @@ function UserInquiryPage() {
   }
 
   return (
-    <div className={`flex flex-col h-screen ${isDarkMode ? 'bg-slate-900 text-white' : 'bg-slate-50 text-slate-800'}`}>
+    <div className="flex flex-col h-screen bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-white">
       {renderHeader()}
       <div className="w-full max-w-4xl flex-grow p-4 overflow-y-auto space-y-4 mx-auto">
         {screen === 'start' && renderStartScreen()}
         {renderMessages()}
-        {state.loading && (
+        {(state.loading || isProcessing) && (
           <div className="flex justify-start items-center pt-4">
             <AnimatedDots />
           </div>
