@@ -4,10 +4,15 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTitle } from '../../hooks/title-hook';
 import { Logo } from '../logo';
+import { useDarkMode } from '@/hooks/dark-mode';
+import { faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
+import Button from '../controls/button';
 
 export function NavBar({ isFixed = true }) {
   const [atTop, setAtTop] = useState(true);
+  
   const { title } = useTitle();
+  const { isDark, toggle: toggleDarkMode } = useDarkMode();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -53,6 +58,11 @@ export function NavBar({ isFixed = true }) {
           className={`w-full flex-grow lg:flex lg:items-center lg:w-auto hidden mt-2 lg:mt-0 p-4 lg:p-0 z-20 bg-white lg:bg-transparent`}
         >
           <ul className="list-reset lg:flex justify-end flex-1 items-center">{/* Add menu items here if needed */}</ul>
+            <Button onClick={toggleDarkMode}
+            variant='transparentWhite'
+            size='small'
+            className='mr-4'
+          iconLeft={isDark ? faSun : faMoon} />
           <SignedOut>
             <SignUpButton signInForceRedirectUrl="/dashboard" forceRedirectUrl="/dashboard">
               <button

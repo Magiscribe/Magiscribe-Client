@@ -9,6 +9,7 @@ import { useState } from 'react';
 import Button from '../controls/button';
 import ModalValidationErrors from '../modals/inquiry/inquiry-validation-errors-modal';
 import ModalSettingsInquiry from '../modals/inquiry/settings-inquiry-modal';
+import Input from '../controls/input';
 
 export default function GraphContextBar() {
   // States
@@ -53,15 +54,15 @@ export default function GraphContextBar() {
     <>
       <div className="flex justify-between items-start">
         <div>
-          <input
-            type="text"
+          <Input
+          name='title'
             value={form.title}
             onChange={(e) => {
               updateForm({ ...form, title: e.target.value });
             }}
             className="text-2xl font-bold w-full border-2 border-slate-200 p-2 rounded-lg"
           />
-          <p className="text-sm text-slate-500">
+          <p className="text-sm dark:text-slate-400 text-slate-600">
             Last updated {lastUpdated ? new Date(lastUpdated).toLocaleString() : 'Never'}
           </p>
         </div>

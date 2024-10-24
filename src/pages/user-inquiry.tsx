@@ -1,34 +1,29 @@
+import goHomeGif from '@/assets/imgs/go-home.gif';
 import AnimatedDots from '@/components/animated/animated-dots';
 import { ChartProps } from '@/components/chart';
 import Input from '@/components/controls/input';
+import Textarea from '@/components/controls/textarea';
 import RatingInput from '@/components/graph/rating-input';
 import MarkdownCustom from '@/components/markdown-custom';
 import { useTranscribe } from '@/hooks/audio-hook';
 import useElevenLabsAudio from '@/hooks/audio-player';
-import { useDarkMode } from '@/hooks/dark-mode';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
 import { useSetTitle } from '@/hooks/title-hook';
-import { InquiryTraversalProvider, useInquiry } from '@/providers/inquiry-traversal-provider';
+import { useInquiry } from '@/providers/inquiry-traversal-provider';
 import { useQueue } from '@/utils/debounce-queue';
 import { StrippedNode } from '@/utils/graphs/graph';
+import { SignedIn, SignedOut, SignUpButton } from '@clerk/clerk-react';
 import {
   faChevronRight,
   faImage,
   faMicrophone,
   faMicrophoneSlash,
-  faMoon,
-  faPaperPlane,
-  faSun,
-  faVolumeMute,
-  faVolumeUp,
+  faPaperPlane
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import goHomeGif from '@/assets/imgs/go-home.gif';
-import { SignedIn, SignedOut, SignUpButton } from '@clerk/clerk-react';
-import Textarea from '@/components/controls/textarea';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface Message {
   type: 'text' | 'chart' | 'image';
@@ -64,7 +59,7 @@ export const useMessageQueue = () => {
   };
 };
 
-function UserInquiryPage() {
+export default function UserInquiryPage() {
   const [screen, setScreen] = useState<'start' | 'inquiry' | 'end' | 'summary'>('start');
   const [inputMessage, setInputMessage] = useState('');
   const [selectedRatings, setSelectedRatings] = useState<string[]>([]);
@@ -79,7 +74,6 @@ function UserInquiryPage() {
   const { preview, handleNextNode, form, state, onNodeUpdate, userDetails, setUserDetails } = useInquiry();
   const [enableAudio, setEnableAudio] = useWithLocalStorage(false, 'enableAudio');
   const audio = useElevenLabsAudio(form.voice);
-  const { isDark, toggle: toggleDarkMode } = useDarkMode();
   const navigate = useNavigate();
 
   useSetTitle()(form?.title);
@@ -180,47 +174,6 @@ function UserInquiryPage() {
       }
     },
     [addMessage, enableAudio, audio, handleNextNode],
-  );
-
-  const renderHeader = () => (
-    <header className="w-full bg-white dark:bg-slate-800 flex items-center justify-between shadow-md">
-      <div className="relative flex w-full p-4 max-w-4xl min-h-16 mx-auto items-center">
-        {screen != 'start' && (
-          <motion.div
-            className="flex items-center absolute left-4"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <img src="https://avatar.iran.liara.run/public" alt="User Avatar" className="w-10 h-10 rounded-full mr-3" />
-            <div>
-              <h2 className="font-bold text-slate-800 dark:text-white">{userDetails.name || 'User'}</h2>
-              <p className="text-sm text-slate-600 dark:text-slate-400">Participant</p>
-            </div>
-          </motion.div>
-        )}
-
-        <div className="absolute left-1/2 transform -translate-x-1/2">
-          <h1 className="text-xl font-bold mx-auto text-slate-800 dark:text-white">{form.title}</h1>
-        </div>
-
-        <div className="flex items-center absolute right-4">
-          {form.voice && (
-            <button
-              onClick={() => setEnableAudio(!enableAudio)}
-              className="mr-4 text-slate-800 dark:text-white hover:text-purple-600 transition-colors"
-              aria-label={enableAudio ? 'Disable text-to-speech' : 'Enable text-to-speech'}
-              title={enableAudio ? 'Disable text-to-speech' : 'Enable text-to-speech'}
-            >
-              <FontAwesomeIcon icon={enableAudio ? faVolumeUp : faVolumeMute} />
-            </button>
-          )}
-          <button onClick={toggleDarkMode} className="mr-4 text-slate-800 dark:text-white hover:text-purple-600">
-            <FontAwesomeIcon icon={isDark ? faSun : faMoon} />
-          </button>
-        </div>
-      </div>
-    </header>
   );
 
   const renderStartScreen = () => (
@@ -438,8 +391,7 @@ function UserInquiryPage() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-white">
-      {renderHeader()}
+    <>
       <div className="w-full max-w-4xl flex-grow p-4 overflow-y-auto space-y-4 mx-auto">
         {screen === 'start' && renderStartScreen()}
         {(screen === 'inquiry' || screen === 'end') && renderMessages()}
@@ -447,19 +399,6 @@ function UserInquiryPage() {
         <div ref={messagesEndRef} />
       </div>
       {currentNode && currentNode.type !== 'end' && screen !== 'start' && renderInputArea()}
-    </div>
-  );
-}
-
-export default function InquiryWrapper() {
-  const { id } = useParams<{ id: string }>();
-  const [searchParams] = useSearchParams();
-  const preview = searchParams.get('preview') === 'true';
-
-  if (!id) return null;
-  return (
-    <InquiryTraversalProvider id={id} preview={preview}>
-      <UserInquiryPage />
-    </InquiryTraversalProvider>
+    </>
   );
 }

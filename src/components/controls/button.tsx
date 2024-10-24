@@ -20,10 +20,12 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     | 'secondary'
     | 'danger'
     | 'success'
+    | 'white'
     | 'transparentPrimary'
     | 'transparentSecondary'
     | 'transparentDanger'
     | 'transparentSuccess'
+    | 'transparentWhite'
     | 'inversePrimary'
     | 'inverseSecondary'
     | 'inverseDanger'
@@ -57,18 +59,20 @@ const Button: React.FC<ButtonProps> = ({
     secondary: 'bg-slate-500 text-white hover:bg-slate-600 focus:ring-slate-300',
     danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
     success: 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500',
+    white: 'bg-white text-slate-600 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-700 focus:ring-slate-300',
 
-    transparentPrimary: 'text-blue-600 hover:text-blue-700 focus:ring-blue-500',
-    transparentSecondary: 'text-slate-500 hover:text-slate-500 focus:ring-slate-300',
-    transparentDanger: 'text-red-600 hover:text-red-700 focus:ring-red-500',
-    transparentSuccess: 'text-green-600 hover:text-green-700 focus:ring-green-500',
+    transparentPrimary: 'text-blue-600 hover:text-blue-700',
+    transparentSecondary: 'text-slate-500 hover:text-slate-500',
+    transparentDanger: 'text-red-600 hover:text-red-700',
+    transparentSuccess: 'text-green-600 hover:text-green-700',
+    transparentWhite: 'text-slate-600 dark:text-white hover:text-slate-800 dark:hover:text-white',
 
     inversePrimary:
       'bg-white text-blue-600 hover:bg-blue-600 hover:text-white focus:ring-red-500 border border-2 border-blue-600',
     inverseSecondary:
       'bg-white text-slate-600 hover:bg-red-600 hover:text-white focus:ring-slate-500 border border-2 border-slate-600',
     inverseDanger:
-      'bg-white text-red-600 hover:bg-red-600 hover:text-white focus:ring-red-500 border border-2 border-red-600',
+      'bg-white dark:bg-slate-800 text-red-600 hover:bg-red-600 hover:text-white focus:ring-red-500 border border-2 border-red-600',
     inverseSuccess:
       'bg-white text-red-600 hover:bg-green-600 hover:text-white focus:ring-green-500 border border-2 border-green-600',
   };
