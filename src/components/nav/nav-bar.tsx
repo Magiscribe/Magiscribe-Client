@@ -1,18 +1,20 @@
+import { useDarkMode } from '@/hooks/dark-mode';
 import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from '@clerk/clerk-react';
+import { faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+
 import { useTitle } from '../../hooks/title-hook';
-import { Logo } from '../logo';
-import { useDarkMode } from '@/hooks/dark-mode';
-import { faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
 import Button from '../controls/button';
+import { Logo } from '../logo';
 
 export function NavBar({ isFixed = true }) {
   const [atTop, setAtTop] = useState(true);
-  
+
   const { title } = useTitle();
   const { isDark, toggle: toggleDarkMode } = useDarkMode();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -33,7 +35,7 @@ export function NavBar({ isFixed = true }) {
   return (
     <nav
       className={`relative ${isFixed ? 'sm:fixed' : ''} w-full z-30 top-0 ${
-        !atTop ? 'bg-white shadow-lg text-indigo-800' : 'text-white'
+        !atTop && isFixed ? 'bg-white dark:bg-slate-700 shadow-lg text-indigo-800 dark:text-white' : 'text-white'
       } transition-all duration-300 ease-in-out`}
     >
       <div className="w-full container mx-auto flex flex-wrap items-center justify-between mt-0 py-2">
@@ -58,32 +60,23 @@ export function NavBar({ isFixed = true }) {
           className={`w-full flex-grow lg:flex lg:items-center lg:w-auto hidden mt-2 lg:mt-0 p-4 lg:p-0 z-20 bg-white lg:bg-transparent`}
         >
           <ul className="list-reset lg:flex justify-end flex-1 items-center">{/* Add menu items here if needed */}</ul>
-            <Button onClick={toggleDarkMode}
-            variant='transparentWhite'
-            size='small'
-            className='mr-4'
-          iconLeft={isDark ? faSun : faMoon} />
+          <Button
+            onClick={toggleDarkMode}
+            variant={'transparentWhiteFixed'}
+            size="small"
+            className="mr-4"
+            iconLeft={isDark ? faSun : faMoon}
+          />
           <SignedOut>
             <SignUpButton signInForceRedirectUrl="/dashboard" forceRedirectUrl="/dashboard">
-              <button
-                className={`mx-auto lg:mx-0 hover:underline font-bold rounded-full mt-4 lg:mt-0 py-3 px-5 shadow opacity-75 focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out ${
-                  atTop ? 'bg-white text-slate-800' : 'bg-indigo-800 text-white'
-                }`}
-              >
-                Get Alpha Access
-              </button>
+              <Button variant={atTop ? 'white' : 'primary'}>Get Alpha Access</Button>
             </SignUpButton>
           </SignedOut>
           <SignedIn>
             <div className="flex space-x-4">
-              <Link
-                to="/dashboard"
-                className={`mx-auto lg:mx-0 hover:underline font-bold rounded-full mt-4 lg:mt-0 py-2 px-4 shadow opacity-75 focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out ${
-                  atTop ? 'bg-white text-slate-800' : 'bg-indigo-800 text-white'
-                }`}
-              >
+              <Button variant={atTop ? 'white' : 'primary'} onClick={() => navigate('/dashboard')}>
                 Dashboard
-              </Link>
+              </Button>
             </div>
           </SignedIn>
           <SignedIn>

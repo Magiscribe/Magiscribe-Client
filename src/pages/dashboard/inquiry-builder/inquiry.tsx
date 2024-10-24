@@ -1,15 +1,16 @@
+import { GET_INQUIRY_RESPONSE_COUNT } from '@/clients/queries';
+import { GetInquiryResponseCountQuery } from '@/graphql/graphql';
 import { InquiryBuilderProvider } from '@/providers/inquiry-builder-provider';
+import { useQuery } from '@apollo/client';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
 import { Link, useParams } from 'react-router-dom';
+
 import AnalysisTab from './tabs/analysis';
 import InquiryBuilder from './tabs/builder';
-import { useQuery } from '@apollo/client';
-import { GET_INQUIRY_RESPONSE_COUNT } from '@/clients/queries';
-import { GetInquiryResponseCountQuery } from '@/graphql/graphql';
 
 export default function InquiryPage() {
   // Hooks
@@ -48,7 +49,9 @@ export default function InquiryPage() {
                 clsx(
                   'w-full rounded-lg py-2.5 text-sm font-medium leading-5',
                   'ring-white ring-opacity-60 focus:outline-none focus:ring-2',
-                  selected ? 'bg-white shadow text-slate-700' : 'text-slate-100 hover:bg-white/[0.12]',
+                  selected
+                    ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-white'
+                    : 'text-white dark:text-slate-200',
                 )
               }
             >

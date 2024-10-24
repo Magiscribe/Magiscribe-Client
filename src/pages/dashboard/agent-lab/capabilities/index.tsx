@@ -1,12 +1,13 @@
+import { ADD_UPDATE_CAPABILITY, DELETE_CAPABILITY } from '@/clients/mutations';
+import { GET_ALL_CAPABILITIES } from '@/clients/queries';
+import Button from '@/components/controls/button';
+import ConfirmationModal from '@/components/modals/confirm-modal';
+import { Capability, Prompt } from '@/graphql/graphql';
+import { useAddAlert } from '@/hooks/alert-hook';
 import { useMutation, useQuery } from '@apollo/client';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ADD_UPDATE_CAPABILITY, DELETE_CAPABILITY } from '@/clients/mutations';
-import { GET_ALL_CAPABILITIES } from '@/clients/queries';
-import { useAddAlert } from '@/hooks/alert-hook';
-import ConfirmationModal from '@/components/modals/confirm-modal'; // Adjust the import path as needed
-import { Capability, Prompt } from '@/graphql/graphql';
+import { Link, useNavigate } from 'react-router-dom';
 
 function CapabilityCard({
   capability,
@@ -19,7 +20,9 @@ function CapabilityCard({
 }) {
   const [deleteCapability] = useMutation(DELETE_CAPABILITY);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
   const addAlert = useAddAlert();
+  const navigate = useNavigate();
 
   const handleDelete = async () => {
     try {
@@ -38,10 +41,10 @@ function CapabilityCard({
   };
 
   return (
-    <div className="bg-gray-100 p-4 rounded-lg shadow-md h-full w-full flex flex-col">
+    <div className="bg-slate-100 dark:bg-slate-600 text-slate-700 dark:text-white  p-4 rounded-2xl shadow-md h-full w-full flex flex-col">
       <div className="flex-grow">
         <h2 className="text-xl font-bold mb-2 break-words">
-          {capability.name} <span className="text-sm font-normal text-slate-700 break-all">({capability.alias})</span>
+          {capability.name} <span className="text-sm font-normal break-all">({capability.alias})</span>
         </h2>
         <p className="text-sm mb-4 break-words">{capability.description}</p>
         <div className="flex flex-wrap gap-2 mb-4">
@@ -57,24 +60,15 @@ function CapabilityCard({
         </div>
       </div>
       <div className="flex justify-end gap-2 mt-auto">
-        <Link
-          to={`edit?id=${capability.id}`}
-          className="text-sm bg-blue-500 hover:bg-blue-700 text-white px-2 py-1 rounded-lg whitespace-nowrap"
-        >
+        <Button onClick={() => navigate(`edit?id=${capability.id}`)} variant="primary" size="small">
           Edit
-        </Link>
-        <button
-          onClick={() => onCopy(capability.id)}
-          className="text-sm bg-blue-500 hover:bg-blue-700 text-white px-2 py-1 rounded-lg whitespace-nowrap"
-        >
+        </Button>
+        <Button size="small" onClick={() => onCopy(capability.id)}>
           Copy
-        </button>
-        <button
-          onClick={() => setIsDeleteModalOpen(true)}
-          className="text-sm bg-red-500 hover:bg-red-700 text-white px-2 py-1 rounded-lg whitespace-nowrap"
-        >
+        </Button>
+        <Button onClick={() => setIsDeleteModalOpen(true)} variant="danger" size="small">
           Delete
-        </button>
+        </Button>
       </div>
       <ConfirmationModal
         isOpen={isDeleteModalOpen}
@@ -87,9 +81,11 @@ function CapabilityCard({
 }
 
 export default function CapabilityDashboard() {
-  const addAlert = useAddAlert();
   const { data, refetch } = useQuery(GET_ALL_CAPABILITIES);
   const [upsertCapability] = useMutation(ADD_UPDATE_CAPABILITY);
+
+  const addAlert = useAddAlert();
+  const navigate = useNavigate();
 
   const handleCopy = async (id: string) => {
     const selectedItem = data?.getAllCapabilities.find((capability: Capability) => capability.id === id) as Capability;
@@ -124,12 +120,10 @@ export default function CapabilityDashboard() {
   };
 
   return (
-    <div className="bg-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl text-slate-700">
+    <div className="bg-white dark:bg-slate-700 text-slate-700 dark:text-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Capabilities</h1>
-        <Link to="edit" className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
-          Add Capability
-        </Link>
+        <Button onClick={() => navigate('edit')}>Add Capability</Button>
       </div>
       <hr className="my-4" />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 my-8">

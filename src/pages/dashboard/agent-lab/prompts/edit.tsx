@@ -1,5 +1,8 @@
 import { ADD_UPDATE_PROMPT } from '@/clients/mutations';
 import { GET_PROMPT } from '@/clients/queries';
+import Button from '@/components/controls/button';
+import Input from '@/components/controls/input';
+import Textarea from '@/components/controls/textarea';
 import { useAddAlert } from '@/hooks/alert-hook';
 import { useMutation, useQuery } from '@apollo/client';
 import { useState } from 'react';
@@ -69,36 +72,18 @@ export default function PromptEdit() {
 
   return (
     <>
-      <div className="bg-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl text-slate-700">
+      <div className="bg-white dark:bg-slate-700 text-slate-700 dark:text-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">{form.id ? 'Edit' : 'Add'} Prompt</h1>
         </div>
         <form className="mt-8" onSubmit={handleSave}>
           <div className="mb-4">
-            <label className="block text-sm font-bold mb-2" htmlFor="name">
-              Name
-            </label>
-            <input
-              className="border-2 border-gray-200 p-2 rounded-lg w-full"
-              id="name"
-              type="text"
-              value={form.name}
-              onChange={handleChange}
-            />
+            <Input name="name" label="Name" value={form.name} onChange={handleChange} />
           </div>
           <div className="mb-4">
-            <label className="block text-sm font-bold mb-2" htmlFor="prompt">
-              Text
-            </label>
-            <textarea
-              className="border-2 border-gray-200 p-2 rounded-lg w-full"
-              id="text"
-              rows={30}
-              value={form.text}
-              onChange={handleChange}
-            />
+            <Textarea name="text" label="Text" value={form.text} onChange={handleChange} />
           </div>
-          <button className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">Save</button>
+          <Button>Save</Button>
         </form>
       </div>
     </>

@@ -1,4 +1,6 @@
+import { SignupForm } from '@/components/forms/alpha';
 import { motion } from 'framer-motion';
+
 import ContentSection from '../components/content-section';
 import HomeHero from '../components/heroes/home-hero';
 import SandcastleShape from '../components/shapes/beach';
@@ -6,13 +8,12 @@ import PencilShape from '../components/shapes/drawing';
 import { GradientWaveBottom, GradientWaveTop } from '../components/shapes/gradient-wave';
 import { SectionTemplate } from '../components/templates/section';
 import { useSetTitle } from '../hooks/title-hook';
-import { SignupForm } from '@/components/forms/alpha';
 
 function AboutSection() {
   return (
     <SectionTemplate>
       <motion.h2
-        className="w-full my-2 text-5xl font-bold leading-tight text-center text-gray-800"
+        className="w-full my-2 text-5xl font-bold leading-tight text-center"
         initial={{ opacity: 0, x: 20 }}
         whileInView={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5, delay: 0.25 }}
@@ -93,7 +94,7 @@ function Home() {
         </h3>
         <a
           href="mailto:management@magiscribe.com"
-          className="mx-auto lg:mx-0 hover:underline bg-white text-gray-800 font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
+          className="mx-auto lg:mx-0 hover:underline bg-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
         >
           Contact Us
         </a>

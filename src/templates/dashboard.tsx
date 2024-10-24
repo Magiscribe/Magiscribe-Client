@@ -2,7 +2,6 @@ import AnimatedOutlet from '@/components/animated/animated-outlet';
 import BackLinks from '@/components/nav/back-links';
 import Footer from '@/components/nav/footer';
 import { NavBar } from '@/components/nav/nav-bar';
-import { useDarkMode } from '@/hooks/dark-mode';
 import { Protect, RedirectToSignIn } from '@clerk/clerk-react';
 import clsx from 'clsx';
 import { useMemo } from 'react';
@@ -17,12 +16,12 @@ export default function DashboardTemplate() {
     [pathname],
   );
 
-  const { isDark } = useDarkMode();
-
   return (
     <Protect fallback={<RedirectToSignIn />}>
       <div
-        className={clsx('h-full w-full fixed', 
+        className={clsx(
+          'h-full w-full fixed',
+          'text-white dark:text-slate-800',
           'bg-gradient-to-r from-[#7133d5] to-[#0508be]',
           'dark:from-slate-800 dark:to-slate-800',
         )}

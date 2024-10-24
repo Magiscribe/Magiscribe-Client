@@ -1,7 +1,10 @@
 import { ADD_UPDATE_CAPABILITY, ADD_UPDATE_PROMPT } from '@/clients/mutations';
 import { GET_ALL_MODELS, GET_ALL_PROMPTS, GET_CAPABILITY } from '@/clients/queries';
-import ListBox from '@/components/list/ListBox';
-import ReorderableList from '@/components/list/ReorderableList';
+import Button from '@/components/controls/button';
+import Input from '@/components/controls/input';
+import ListBox from '@/components/controls/list/ListBox';
+import ReorderableList from '@/components/controls/list/ReorderableList';
+import Textarea from '@/components/controls/textarea';
 import CustomModal from '@/components/modals/modal';
 import { Prompt } from '@/graphql/graphql';
 import { useAddAlert } from '@/hooks/alert-hook';
@@ -219,44 +222,24 @@ export default function CapabilityEdit() {
 
   return (
     <>
-      <div className="bg-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl text-slate-700">
+      <div className="bg-white dark:bg-slate-700 text-slate-700 dark:text-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">{form.id ? 'Edit' : 'Add'} Capability</h1>
         </div>
         <form className="mt-8" onSubmit={handleFormSave}>
           <div className="mb-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="mb-4">
-              <label className="block text-sm font-bold mb-2" htmlFor="name">
-                Name
-              </label>
-              <input
-                className="border-2 border-gray-200 p-2 rounded-lg w-full"
-                id="name"
-                type="text"
-                value={form.name}
-                onChange={handleChange}
-              />
+              <Input name="name" label="Name" value={form.name} onChange={handleChange} />
             </div>
             <div className="mb-4">
-              <label className="block text-sm font-bold mb-2" htmlFor="name">
-                Alias
-              </label>
-              <input
-                className="border-2 border-gray-200 p-2 rounded-lg w-full"
-                id="alias"
-                type="text"
-                value={form.alias}
-                onChange={handleChange}
-              />
+              <Input name="alias" label="Alias" value={form.alias} onChange={handleChange} />
             </div>
           </div>
 
           <div className="mb-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="mb-4">
-              <label className="block text-sm font-bold mb-2" htmlFor="capabilities">
-                LLM Model
-              </label>
               <ListBox
+                label="LLM Model"
                 setSelected={(value) => {
                   setForm({
                     ...form,
@@ -278,10 +261,8 @@ export default function CapabilityEdit() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm font-bold mb-2" htmlFor="name">
-                Output Mode
-              </label>
               <ListBox
+                label="Output Mode"
                 setSelected={(value) => {
                   setForm({
                     ...form,
@@ -297,55 +278,33 @@ export default function CapabilityEdit() {
             </div>
           </div>
           <div className="mb-4">
-            <label className="block text-sm font-bold mb-2" htmlFor="description">
-              Description
-            </label>
-            <textarea
-              className="border-2 border-gray-200 p-2 rounded-lg w-full"
-              id="description"
-              value={form.description}
+            <Textarea name="description" label="Description" value={form.description} onChange={handleChange} />
+          </div>
+
+          <div className="mb-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <Input
+              name="subscriptionFilter"
+              label="Subscription Filter (Optional)"
+              value={form.subscriptionFilter}
+              onChange={handleChange}
+            />
+            <Input
+              name="outputFilter"
+              label="Output Filter (Optional)"
+              value={form.outputFilter}
               onChange={handleChange}
             />
           </div>
 
-          <div className="mb-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-bold mb-2" htmlFor="name">
-                Subscription Filter (Optional)
-              </label>
-              <input
-                className="border-2 border-gray-200 p-2 rounded-lg w-full"
-                id="subscriptionFilter"
-                type="text"
-                value={form.subscriptionFilter}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-bold mb-2" htmlFor="name">
-                Output Filter (Optional)
-              </label>
-              <input
-                className="border-2 border-gray-200 p-2 rounded-lg w-full"
-                id="outputFilter"
-                type="text"
-                value={form.outputFilter}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
-
           <div className="mb-4">
-            <label className="block text-sm font-bold mb-2" htmlFor="prompts">
-              Prompts
-            </label>
-            <button
-              type="button"
-              onClick={() => setOpenPromptModal(true)}
-              className="bg-blue-500 hover:bg-blue-700 text-white px-2 py-1 rounded-lg mb-2"
-            >
-              Add Prompt
-            </button>
+            <div className="mb-4">
+              <label className="block text-sm font-bold mb-2" htmlFor="prompts">
+                Prompts
+              </label>
+              <Button type="button" onClick={() => setOpenPromptModal(true)}>
+                Add Prompt
+              </Button>
+            </div>
             <CustomModal title={'Add Item'} size="7xl" open={openPromptModal} onClose={() => setOpenPromptModal(false)}>
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
                 {prompts?.getAllPrompts
@@ -421,38 +380,22 @@ export default function CapabilityEdit() {
                           rows={3}
                         />
                         <div className="flex space-x-2">
-                          <button
-                            type="button"
-                            onClick={(e) => handlePromptSave(item, () => cancelEdit(e))}
-                            className="bg-blue-500 text-white px-2 py-1 rounded-lg"
-                          >
+                          <Button type="button" onClick={(e) => handlePromptSave(item, () => cancelEdit(e))}>
                             Save
-                          </button>
-                          <button
-                            type="button"
-                            onClick={cancelEdit}
-                            className="bg-gray-500 text-white px-2 py-1 rounded-lg"
-                          >
+                          </Button>
+                          <Button type="button" onClick={cancelEdit} variant="inverseDanger">
                             Cancel
-                          </button>
+                          </Button>
                         </div>
                       </div>
                     ) : (
                       <div className="flex-grow space-x-2">
-                        <button
-                          type="button"
-                          onClick={() => edit(item)}
-                          className="bg-blue-500 hover:bg-blue-700 text-white px-2 py-1 rounded-lg"
-                        >
+                        <Button type="button" onClick={() => edit(item)}>
                           Edit
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleDeletePrompt(item.id)}
-                          className="bg-red-500 text-white px-2 py-1 rounded-lg"
-                        >
+                        </Button>
+                        <Button type="button" onClick={() => handleDeletePrompt(item.id)} variant="inverseDanger">
                           Remove
-                        </button>
+                        </Button>
                       </div>
                     )}
                   </div>
@@ -460,9 +403,7 @@ export default function CapabilityEdit() {
               )}
             />
           </div>
-          <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
-            Save
-          </button>
+          <Button type="submit">Save</Button>
         </form>
       </div>
     </>

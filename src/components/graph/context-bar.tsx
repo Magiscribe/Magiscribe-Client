@@ -55,7 +55,7 @@ export default function GraphContextBar() {
       <div className="flex justify-between items-start">
         <div>
           <Input
-          name='title'
+            name="title"
             value={form.title}
             onChange={(e) => {
               updateForm({ ...form, title: e.target.value });

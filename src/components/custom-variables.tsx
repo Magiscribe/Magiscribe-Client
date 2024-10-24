@@ -3,6 +3,8 @@ import { GetAgentWithPromptsQuery } from '@/graphql/graphql';
 import { useQuery } from '@apollo/client';
 import React, { useEffect, useMemo } from 'react';
 
+import Input from './controls/input';
+
 interface Variable {
   key: string;
   value: string;
@@ -16,17 +18,12 @@ interface CustomVariableInputProps {
 export const CustomVariableInput: React.FC<CustomVariableInputProps> = ({ variable, onUpdate }) => {
   return (
     <div className="flex items-center space-x-2 mb-2 gap-2 my-2">
-      <input
-        className="border-2 border-gray-200 p-2 rounded-lg flex-grow"
-        value={variable.key}
-        disabled={true}
-        placeholder="Key"
-      />
-      <input
-        className="border-2 border-gray-200 p-2 rounded-lg flex-grow"
+      <Input name={variable.key} value={variable.key} placeholder="Value" disabled />
+      <Input
+        name={variable.value}
         value={variable.value}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate({ ...variable, value: e.target.value })}
         placeholder="Value"
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate({ ...variable, value: e.target.value })}
       />
     </div>
   );

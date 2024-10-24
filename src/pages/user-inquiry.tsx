@@ -18,7 +18,7 @@ import {
   faImage,
   faMicrophone,
   faMicrophoneSlash,
-  faPaperPlane
+  faPaperPlane,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { AnimatePresence, motion } from 'framer-motion';

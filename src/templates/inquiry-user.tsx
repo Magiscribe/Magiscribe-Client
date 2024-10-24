@@ -1,11 +1,9 @@
-import { Outlet, useParams, useSearchParams } from 'react-router-dom';
-
-import { InquiryTraversalProvider, useInquiry } from '@/providers/inquiry-traversal-provider';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
-import { useDarkMode } from '@/hooks/dark-mode';
-import { motion } from 'framer-motion';
 import Button from '@/components/controls/button';
+import { useDarkMode } from '@/hooks/dark-mode';
+import { InquiryTraversalProvider, useInquiry } from '@/providers/inquiry-traversal-provider';
+import { faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
+import { motion } from 'framer-motion';
+import { Outlet, useParams, useSearchParams } from 'react-router-dom';
 
 function Header() {
   const { form, userDetails } = useInquiry();
@@ -42,10 +40,7 @@ function Header() {
               <FontAwesomeIcon icon={enableAudio ? faVolumeUp : faVolumeMute} />
             </button>
           )} */}
-          <Button onClick={toggleDarkMode}
-            variant='transparentWhite'
-            size='small'
-          iconLeft={isDark ? faSun : faMoon} />
+          <Button onClick={toggleDarkMode} variant="transparentWhite" size="small" iconLeft={isDark ? faSun : faMoon} />
         </div>
       </div>
     </header>
