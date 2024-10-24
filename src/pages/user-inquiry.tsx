@@ -28,6 +28,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import goHomeGif from '@/assets/imgs/go-home.gif';
 import { SignedIn, SignedOut, SignUpButton } from '@clerk/clerk-react';
+import Textarea from '@/components/controls/textarea';
 
 interface Message {
   type: 'text' | 'chart' | 'image';
@@ -74,9 +75,9 @@ function UserInquiryPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [enableAudio, setEnableAudio] = useWithLocalStorage(false, 'enableAudio');
   const { isTranscribing, transcript, handleTranscribe } = useTranscribe();
   const { preview, handleNextNode, form, state, onNodeUpdate, userDetails, setUserDetails } = useInquiry();
+  const [enableAudio, setEnableAudio] = useWithLocalStorage(false, 'enableAudio');
   const audio = useElevenLabsAudio(form.voice);
   const { isDark, toggle: toggleDarkMode } = useDarkMode();
   const navigate = useNavigate();
@@ -204,14 +205,16 @@ function UserInquiryPage() {
         </div>
 
         <div className="flex items-center absolute right-4">
-          <button
-            onClick={() => setEnableAudio(!enableAudio)}
-            className="mr-4 text-slate-800 dark:text-white hover:text-purple-600 transition-colors"
-            aria-label={enableAudio ? 'Disable text-to-speech' : 'Enable text-to-speech'}
-            title={enableAudio ? 'Disable text-to-speech' : 'Enable text-to-speech'}
-          >
-            <FontAwesomeIcon icon={enableAudio ? faVolumeUp : faVolumeMute} />
-          </button>
+          {form.voice && (
+            <button
+              onClick={() => setEnableAudio(!enableAudio)}
+              className="mr-4 text-slate-800 dark:text-white hover:text-purple-600 transition-colors"
+              aria-label={enableAudio ? 'Disable text-to-speech' : 'Enable text-to-speech'}
+              title={enableAudio ? 'Disable text-to-speech' : 'Enable text-to-speech'}
+            >
+              <FontAwesomeIcon icon={enableAudio ? faVolumeUp : faVolumeMute} />
+            </button>
+          )}
           <button onClick={toggleDarkMode} className="mr-4 text-slate-800 dark:text-white hover:text-purple-600">
             <FontAwesomeIcon icon={isDark ? faSun : faMoon} />
           </button>
@@ -232,7 +235,6 @@ function UserInquiryPage() {
           value={userDetails.name}
           onChange={handleChange}
           error={errors.name}
-          className="bg-white dark:bg-slate-600 text-slate-800 dark:text-white border-slate-300"
         />
         <Input
           label="Email"
@@ -241,7 +243,13 @@ function UserInquiryPage() {
           value={userDetails.email}
           onChange={handleChange}
           error={errors.email}
-          className="bg-white dark:bg-slate-600 text-slate-800 dark:text-white border-slate-300"
+        />
+        <Textarea
+          label="Tell us about yourself"
+          name="about"
+          placeholder="Your background, interests, or anything you'd like to share."
+          value={userDetails.about}
+          error={errors.about}
         />
       </div>
       <button
@@ -265,7 +273,7 @@ function UserInquiryPage() {
           className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
         >
           <div
-            className={`max-w-[80%] p-3 rounded-3xl shadow-md ${
+            className={`max-w-[80%] p-3 rounded-3xl ${
               message.sender === 'user'
                 ? 'bg-purple-600 text-white'
                 : 'bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-white'
@@ -434,7 +442,7 @@ function UserInquiryPage() {
       {renderHeader()}
       <div className="w-full max-w-4xl flex-grow p-4 overflow-y-auto space-y-4 mx-auto">
         {screen === 'start' && renderStartScreen()}
-        {(screen === 'start' || screen === 'end') && renderMessages()}
+        {(screen === 'inquiry' || screen === 'end') && renderMessages()}
         {screen === 'summary' && renderSummary()}
         <div ref={messagesEndRef} />
       </div>

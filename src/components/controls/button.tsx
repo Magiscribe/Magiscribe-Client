@@ -63,10 +63,14 @@ const Button: React.FC<ButtonProps> = ({
     transparentDanger: 'text-red-600 hover:text-red-700 focus:ring-red-500',
     transparentSuccess: 'text-green-600 hover:text-green-700 focus:ring-green-500',
 
-    inversePrimary: 'bg-white text-blue-600 hover:bg-blue-50 focus:ring-blue-500',
-    inverseSecondary: 'bg-white text-slate-500 hover:bg-slate-50 focus:ring-slate-300',
-    inverseDanger: 'bg-white text-red-600 hover:bg-red-50 focus:ring-red-500',
-    inverseSuccess: 'bg-white text-green-600 hover:bg-green-50 focus:ring-green-500',
+    inversePrimary:
+      'bg-white text-blue-600 hover:bg-blue-600 hover:text-white focus:ring-red-500 border border-2 border-blue-600',
+    inverseSecondary:
+      'bg-white text-slate-600 hover:bg-red-600 hover:text-white focus:ring-slate-500 border border-2 border-slate-600',
+    inverseDanger:
+      'bg-white text-red-600 hover:bg-red-600 hover:text-white focus:ring-red-500 border border-2 border-red-600',
+    inverseSuccess:
+      'bg-white text-red-600 hover:bg-green-600 hover:text-white focus:ring-green-500 border border-2 border-green-600',
   };
 
   const sizeClassNames = {

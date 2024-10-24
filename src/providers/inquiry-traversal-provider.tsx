@@ -265,6 +265,7 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
           userMessage: currentNode.data.text,
           userDetails: `
           Name: ${userDetails.name}
+          About: ${userDetails.about}
           `,
           conversationHistory: inquiryHistoryRef.current.join('\n\n'),
           mostRecentMessage,

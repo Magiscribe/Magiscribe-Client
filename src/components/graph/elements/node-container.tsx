@@ -21,7 +21,7 @@ const NodeContainer = ({ title, faIcon, id, children }: NodeContainerProps) => {
   };
 
   return (
-    <div className="px-4 py-2 shadow-md rounded-3xl bg-white w-96 shadow-xl">
+    <div className="px-4 py-2 shadow-md rounded-3xl dark:bg-slate-700 bg-white w-96 shadow-xl">
       <div className="flex items-center">
         <FontAwesomeIcon icon={faIcon} className="mr-2 text-blue-600" />
         <Button
@@ -31,7 +31,7 @@ const NodeContainer = ({ title, faIcon, id, children }: NodeContainerProps) => {
           iconLeft={faTimesCircle}
           className="absolute right-3 top-3 flex items-center justify-center"
         />
-        <h3 className="text-lg font-bold text-slate-800">{title}</h3>
+        <h3 className="text-lg font-bold dark:text-white text-slate-800">{title}</h3>
         <p className="ml-2 text-sm text-slate-400">#{id}</p>
       </div>
       {children}

@@ -36,7 +36,7 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
   const handleSelectChange =
     (field: string) =>
     (e: React.ChangeEvent<HTMLSelectElement>): void => {
-      updateForm({ ...form, [field]: e.target.value });
+      updateForm({ ...form, [field]: e.target.value !== '' ? e.target.value : null });
     };
 
   /**
@@ -67,24 +67,23 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
             value={form.voice ?? 'formal'}
             onChange={handleSelectChange('voice')}
             options={[
+              { label: 'No Voice', value: '' },
               { label: 'Phoebe', value: 'phoebe' },
               { label: 'Oxley', value: 'oxley' },
+              { label: 'Robert', value: 'robert' },
             ]}
           />
 
-          <div className="flex">
+          <div className="flex justify-end items-center rounded-2xl">
             <Button
               type="button"
               onClick={() => setDeleteModal(true)}
-              variant="transparentDanger"
+              variant="inverseDanger"
               size="medium"
-              className="ml-auto"
+              className="mr-auto"
             >
               Delete Inquiry
             </Button>
-          </div>
-
-          <div className="flex justify-end items-center p-4 rounded-2xl">
             <Button type="button" onClick={onClose} variant="transparentPrimary" size="medium" className="ml-2">
               Cancel
             </Button>

@@ -230,6 +230,7 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
           options={[
             { label: 'Phoebe', value: 'phoebe' },
             { label: 'Oxley', value: 'oxley' },
+            { label: 'Robert', value: 'robert' },
           ]}
         />
 
@@ -271,7 +272,7 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
             </motion.div>
           )}
         </AnimatePresence>
-        <div className="flex justify-end items-center p-4 rounded-2xl">
+        <div className="flex justify-end items-center rounded-2xl">
           <div className="w-full ">
             <AnimatePresence mode="wait">
               {generatingGraph && (

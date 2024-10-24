@@ -16,7 +16,7 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   subLabel?: string;
   name: string;
   error?: string;
-  options: Array<{ value: string; label: string }>;
+  options: Array<{ value?: string; label: string }>;
   className?: string;
 }
 
@@ -28,11 +28,11 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
  * @returns {JSX.Element} The rendered Select component.
  */
 const Select: React.FC<SelectProps> = ({ label, subLabel, name, error, options, className, ...props }) => {
-  const baseClassName = 'w-full p-3 border rounded-2xl text-slate-800 focus:outline-none focus:ring-2';
+  const baseClassName = 'w-full p-3 border rounded-2xl focus:outline-none focus:ring-2';
 
   const selectClassName = clsx(
     baseClassName,
-    'focus:ring-indigo-500 appearance-none bg-white',
+    'focus:ring-indigo-500 appearance-none dark:bg-slate-600 bg-white',
     {
       'border-slate-300': !error,
       'border-red-700 focus:ring-red-500': error,
@@ -41,7 +41,7 @@ const Select: React.FC<SelectProps> = ({ label, subLabel, name, error, options, 
   );
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 dark:text-white text-slate-800 ">
       <label className="text-sm font-bold" htmlFor={name}>
         {label}
         {subLabel && (
@@ -54,7 +54,7 @@ const Select: React.FC<SelectProps> = ({ label, subLabel, name, error, options, 
       <div className="relative">
         <select id={name} name={name} className={selectClassName} {...props}>
           {options.map((option) => (
-            <option key={option.value} value={option.value}>
+            <option key={option.value} value={option.value} className="text-slate-800 bg-white">
               {option.label}
             </option>
           ))}
