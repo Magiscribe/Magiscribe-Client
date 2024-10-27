@@ -26,7 +26,22 @@ function AboutSection() {
 
       <ContentSection
         content={
-          <div className="pt-8 min-h-64 max-h-64 bg-indigo-700 flex flex-row rounded-2xl">
+          <iframe
+            className="w-full h-full aspect-video bg-indigo-700 flex flex-row rounded-2xl"
+            width="560"
+            height="315"
+            src="https://www.youtube.com/embed/45l_kHRTmdY?si=DQZnYOwZOL1qih1N"
+            title="YouTube video player"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          ></iframe>
+        }
+        title="What is Magicscribe?"
+        description="Learn how Magicscribe can help you create engaging, interactive content that provides valuable insights about your audience. You can checkout our demo video to see how it works."
+        reversed={false}
+      />
+      <ContentSection
+        content={
+          <div className="pt-8 w-full h-full aspect-video bg-[#7133D5] flex flex-row rounded-2xl">
             <PencilShape />
           </div>
         }
@@ -36,7 +51,7 @@ function AboutSection() {
       />
       <ContentSection
         content={
-          <div className="pt-8 min-h-64 max-h-64 bg-indigo-700 flex flex-row rounded-2xl">
+          <div className="pt-8 w-full h-full aspect-video bg-[#7133D5] flex flex-row rounded-2xl">
             <SandcastleShape />
           </div>
         }
