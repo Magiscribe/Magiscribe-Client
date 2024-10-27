@@ -1,15 +1,15 @@
+import { GET_ALL_AUDIO_VOICES } from '@/clients/queries';
+import { GetAllAudioVoicesQuery } from '@/graphql/graphql';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
+import { useQuery } from '@apollo/client';
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import Button from '../../controls/button';
 import Select from '../../controls/select';
-import CustomModal from '../modal';
 import ConfirmationModal from '../confirm-modal';
-import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@apollo/client';
-import { GET_ALL_AUDIO_VOICES } from '@/clients/queries';
-import { GetAllAudioVoicesQuery, Query } from '@/graphql/graphql';
+import CustomModal from '../modal';
 
 /**
  * Props for the ModalUpsertInquiry component

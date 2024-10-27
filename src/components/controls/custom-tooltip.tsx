@@ -37,7 +37,7 @@ export default function CustomTooltip({
   const { styles, attributes } = usePopper(referenceElement, popperElement, {
     placement: placement,
     modifiers: [{ name: 'offset', options: { offset: [0, 24] } }],
-    strategy: 'fixed'
+    strategy: 'fixed',
   });
 
   const handleMouseEnter = useCallback(() => {

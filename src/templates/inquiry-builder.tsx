@@ -1,9 +1,9 @@
 import { Protect, RedirectToSignIn } from '@clerk/clerk-react';
+import clsx from 'clsx';
 import { Outlet } from 'react-router-dom';
 
 import Footer from '../components/nav/footer';
 import { NavBar } from '../components/nav/nav-bar';
-import clsx from 'clsx';
 
 export default function InquiryBuilderTemplate() {
   return (

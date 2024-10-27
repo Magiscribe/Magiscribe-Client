@@ -144,6 +144,7 @@ const ReorderableList = <T extends BaseListItem>({
                   className={clsx(
                     'first:mt-0 mt-2 p-3 rounded-xl',
                     'bg-slate-100 dark:bg-slate-600',
+                    'border border-slate-300 dark:border-slate-600',
                     'flex items-center gap-2',
                     'transition-colors duration-200',
                   )}

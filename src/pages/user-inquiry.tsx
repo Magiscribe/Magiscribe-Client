@@ -7,8 +7,8 @@ import RatingInput from '@/components/graph/rating-input';
 import MarkdownCustom from '@/components/markdown-custom';
 import { useTranscribe } from '@/hooks/audio-hook';
 import useElevenLabsAudio from '@/hooks/audio-player';
-import { useWithLocalStorage } from '@/hooks/local-storage-hook';
 import { useSetTitle } from '@/hooks/title-hook';
+import { useAudioEnabled } from '@/providers/audio-provider';
 import { useInquiry } from '@/providers/inquiry-traversal-provider';
 import { useQueue } from '@/utils/debounce-queue';
 import { StrippedNode } from '@/utils/graphs/graph';
@@ -72,9 +72,9 @@ export default function UserInquiryPage() {
 
   const { isTranscribing, transcript, handleTranscribe } = useTranscribe();
   const { preview, handleNextNode, form, state, onNodeUpdate, userDetails, setUserDetails } = useInquiry();
-  const [enableAudio, setEnableAudio] = useWithLocalStorage(false, 'enableAudio');
   const audio = useElevenLabsAudio(form.voice);
   const navigate = useNavigate();
+  const audioEnabled = useAudioEnabled();
 
   useSetTitle()(form?.title);
 
@@ -158,7 +158,7 @@ export default function UserInquiryPage() {
         const messageText = node.data.text as string;
         setCurrentNode(node);
 
-        if (enableAudio && messageText) {
+        if (audioEnabled && messageText) {
           audio.addSentence(messageText);
         }
 
@@ -173,7 +173,7 @@ export default function UserInquiryPage() {
         }
       }
     },
-    [addMessage, enableAudio, audio, handleNextNode],
+    [addMessage, audioEnabled, audio, handleNextNode],
   );
 
   const renderStartScreen = () => (

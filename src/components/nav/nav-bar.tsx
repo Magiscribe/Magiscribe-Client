@@ -62,7 +62,7 @@ export function NavBar({ isFixed = true }) {
           <ul className="list-reset lg:flex justify-end flex-1 items-center">{/* Add menu items here if needed */}</ul>
           <Button
             onClick={toggleDarkMode}
-            variant={'transparentLightFixed'}
+            variant={isDark ? 'transparentWhiteFixed' : atTop ? 'transparentWhite' : 'transparentPrimary'}
             size="small"
             className="mr-4"
             iconLeft={isDark ? faSun : faMoon}

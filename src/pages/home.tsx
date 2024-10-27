@@ -1,3 +1,4 @@
+import Button from '@/components/controls/button';
 import { SignupForm } from '@/components/forms/alpha';
 import { motion } from 'framer-motion';
 
@@ -92,12 +93,9 @@ function Home() {
           <br />
           Reach out to us!
         </h3>
-        <a
-          href="mailto:management@magiscribe.com"
-          className="mx-auto lg:mx-0 hover:underline bg-white font-bold rounded-full my-6 py-4 px-8 shadow-lg focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out"
-        >
+        <Button as={'a'} size="large" variant="white" href="mailto:management@magiscribe.com">
           Contact Us
-        </a>
+        </Button>
       </section>
     </>
   );

@@ -23,7 +23,7 @@ export default function DashboardTemplate() {
           'h-full w-full fixed',
           'text-white dark:text-slate-800',
           'bg-gradient-to-r from-[#7133d5] to-[#0508be]',
-          'dark:from-slate-800 dark:to-slate-800',
+          ' dark:from-slate-800 dark:to-slate-800',
         )}
       ></div>
       <div className="h-full w-full leading-normal tracking-normal h-full absolute top-0 text-white">

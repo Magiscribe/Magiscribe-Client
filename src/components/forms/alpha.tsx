@@ -1,6 +1,7 @@
 import { SignUpButton } from '@clerk/clerk-react';
 import { motion } from 'framer-motion';
 
+import Button from '../controls/button';
 import { SectionTemplate } from '../templates/section';
 
 export function SignupForm() {
@@ -34,9 +35,7 @@ export function SignupForm() {
       >
         {/* Form */}
         <SignUpButton signInForceRedirectUrl="/dashboard" forceRedirectUrl="/dashboard">
-          <button className="mx-auto lg:mx-0 hover:underline font-bold rounded-full mt-4 lg:mt-0 py-3 px-5 shadow opacity-75 focus:outline-none focus:shadow-outline transform transition hover:scale-105 duration-300 ease-in-out bg-indigo-800 text-white">
-            Sign Up Now
-          </button>
+          <Button size="large">Sign Up Now</Button>
         </SignUpButton>
       </motion.div>
     </SectionTemplate>

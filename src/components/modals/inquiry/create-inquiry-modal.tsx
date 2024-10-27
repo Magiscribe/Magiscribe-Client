@@ -83,10 +83,16 @@ const TemplateSelection: React.FC<TemplateSelectionProps> = ({ value, onChange }
           >
             {({ checked }) => (
               <div className="flex flex-col">
-                <Label as="span" className={`text-lg font-bold ${checked ? 'text-white' : ' text-slate-800 dark:text-white'}`}>
+                <Label
+                  as="span"
+                  className={`text-lg font-bold ${checked ? 'text-white' : ' text-slate-800 dark:text-white'}`}
+                >
                   {template.name}
                 </Label>
-                <Description as="span" className={`text-sm ${checked ? 'text-slate-100' : ' text-slate-800 dark:text-slate-300'}`}>
+                <Description
+                  as="span"
+                  className={`text-sm ${checked ? 'text-slate-100' : ' text-slate-800 dark:text-slate-300'}`}
+                >
                   {template.description}
                 </Description>
               </div>

@@ -29,18 +29,29 @@ const variantClassNames = {
 };
 
 /**
- * Props for the Button component.
- * @typedef {Object} ButtonProps
- * @property {React.ReactNode} children - The content of the button.
- * @property {'primary' | 'secondary' | 'danger'} [variant='primary'] - The visual style variant of the button.
- * @property {'small' | 'medium' | 'large'} [size='medium'] - The size of the button.
- * @property {IconDefinition} [iconLeft] - Optional icon to display on the left side of the button text.
- * @property {IconDefinition} [iconRight] - Optional icon to display on the right side of the button text.
- * @property {string} [className] - Additional CSS classes for the button element.
+ * Type definition for the component's polymorphic "as" prop
  */
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  children?: React.ReactNode;
-  variant?: keyof typeof variantClassNames;
+type AsProp<C extends React.ElementType> = {
+  as?: C;
+};
+
+/**
+ * Type definition for props that depend on the component type
+ */
+type PropsToOmit<C extends React.ElementType, P> = keyof (AsProp<C> & P);
+
+/**
+ * Polymorphic component props type
+ */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+type PolymorphicComponentProp<C extends React.ElementType, Props = {}> = React.PropsWithChildren<Props & AsProp<C>> &
+  Omit<React.ComponentPropsWithoutRef<C>, PropsToOmit<C, Props>>;
+
+/**
+ * Base Button props without the polymorphic behavior
+ */
+interface ButtonBaseProps {
+  variant?: (typeof variantClassNames)[keyof typeof variantClassNames];
   size?: 'small' | 'medium' | 'large';
   iconLeft?: IconDefinition;
   iconRight?: IconDefinition;
@@ -48,12 +59,28 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 /**
- * A flexible button component that supports different variants, sizes, and optional icons.
- *
- * @param {ButtonProps} props - The props for the Button component.
- * @returns {JSX.Element} The rendered Button component.
+ * Props for the Button component including polymorphic behavior
  */
-const Button: React.FC<ButtonProps> = ({
+type ButtonProps<C extends React.ElementType> = PolymorphicComponentProp<C, ButtonBaseProps>;
+
+/**
+ * A flexible, polymorphic button component that supports different variants, sizes, and optional icons.
+ *
+ * @example
+ * // As a button (default)
+ * <Button variant="primary">Click me</Button>
+ *
+ * // As a link
+ * <Button as="a" href="/path" variant="primary">Navigate</Button>
+ *
+ * // As a custom component
+ * <Button as={Link} to="/path" variant="primary">Router Link</Button>
+ *
+ * @param {ButtonProps<C>} props - The props for the Button component
+ * @returns {JSX.Element} The rendered Button component
+ */
+const Button = <C extends React.ElementType = 'button'>({
+  as,
   children,
   variant = 'primary',
   size = 'medium',
@@ -61,11 +88,11 @@ const Button: React.FC<ButtonProps> = ({
   iconRight,
   className,
   ...props
-}) => {
+}: ButtonProps<C>) => {
+  const Component = as || 'button';
+
   const baseClassName =
     'inline-flex items-center justify-center font-medium rounded-3xl transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
-
-
 
   const sizeClassNames = {
     regular: {
@@ -73,7 +100,6 @@ const Button: React.FC<ButtonProps> = ({
       medium: 'px-3 py-2 text-base',
       large: 'px-4 py-3 text-lg',
     },
-
     icon: {
       small: 'p-0 text-2xl',
       medium: 'p-0 text-3xl',
@@ -83,7 +109,7 @@ const Button: React.FC<ButtonProps> = ({
 
   const buttonClassName = clsx(
     baseClassName,
-    variantClassNames[variant],
+    variantClassNames[variant as keyof typeof variantClassNames],
     sizeClassNames[children == null && (iconLeft || iconRight) ? 'icon' : 'regular'][size],
     className,
   );
@@ -93,11 +119,11 @@ const Button: React.FC<ButtonProps> = ({
   const iconRightClassName = clsx(iconClassName, { 'ml-2': children });
 
   return (
-    <button className={buttonClassName} {...props}>
+    <Component className={buttonClassName} {...props}>
       {iconLeft && <FontAwesomeIcon icon={iconLeft} className={iconLeftClassName} />}
       {children}
       {iconRight && <FontAwesomeIcon icon={iconRight} className={iconRightClassName} />}
-    </button>
+    </Component>
   );
 };
 

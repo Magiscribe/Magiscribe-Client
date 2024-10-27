@@ -1,13 +1,17 @@
 import Button from '@/components/controls/button';
 import { useDarkMode } from '@/hooks/dark-mode';
+import AudioProvider, { useAudioContext } from '@/providers/audio-provider';
 import { InquiryTraversalProvider, useInquiry } from '@/providers/inquiry-traversal-provider';
-import { faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
+import { faMoon, faSun, faVolumeMute, faVolumeUp } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { motion } from 'framer-motion';
 import { Outlet, useParams, useSearchParams } from 'react-router-dom';
 
 function Header() {
   const { form, userDetails } = useInquiry();
+
   const { isDark, toggle: toggleDarkMode } = useDarkMode();
+  const { isAudioEnabled, toggleAudio } = useAudioContext();
 
   return (
     <header className="w-full bg-white dark:bg-slate-800 flex items-center justify-between shadow-md">
@@ -30,16 +34,16 @@ function Header() {
         </div>
 
         <div className="flex items-center absolute right-4">
-          {/* {form.voice && (
+          {form.voice && (
             <button
-              onClick={() => setEnableAudio(!enableAudio)}
+              onClick={toggleAudio}
               className="mr-4 text-slate-800 dark:text-white hover:text-purple-600 transition-colors"
-              aria-label={enableAudio ? 'Disable text-to-speech' : 'Enable text-to-speech'}
-              title={enableAudio ? 'Disable text-to-speech' : 'Enable text-to-speech'}
+              aria-label={isAudioEnabled ? 'Disable text-to-speech' : 'Enable text-to-speech'}
+              title={isAudioEnabled ? 'Disable text-to-speech' : 'Enable text-to-speech'}
             >
-              <FontAwesomeIcon icon={enableAudio ? faVolumeUp : faVolumeMute} />
+              <FontAwesomeIcon icon={isAudioEnabled ? faVolumeUp : faVolumeMute} />
             </button>
-          )} */}
+          )}
           <Button onClick={toggleDarkMode} variant="transparentLight" size="small" iconLeft={isDark ? faSun : faMoon} />
         </div>
       </div>
@@ -57,11 +61,13 @@ export default function InquiryUserTemplate() {
   }
 
   return (
-    <InquiryTraversalProvider id={id} preview={preview}>
-      <div className="flex flex-col h-screen bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-white">
-        <Header />
-        <Outlet />
-      </div>
-    </InquiryTraversalProvider>
+    <AudioProvider>
+      <InquiryTraversalProvider id={id} preview={preview}>
+        <div className="flex flex-col h-screen bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-white">
+          <Header />
+          <Outlet />
+        </div>
+      </InquiryTraversalProvider>
+    </AudioProvider>
   );
 }

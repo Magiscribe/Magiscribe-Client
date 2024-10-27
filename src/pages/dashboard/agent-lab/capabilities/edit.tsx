@@ -316,16 +316,15 @@ export default function CapabilityEdit() {
                         {item.text.substring(0, 50)}
                         {item.text.length > 50 ? '...' : ''}
                       </p>
-                      <button
+                      <Button
                         type="button"
                         onClick={() => {
                           handlePromptAdd({ id: item.id });
                           setOpenPromptModal(false);
                         }}
-                        className="bg-blue-500 text-white px-2 py-1 rounded-lg self-start mt-2"
                       >
                         Add
-                      </button>
+                      </Button>
                     </div>
                   ))}
                 <div key={'newPrompt'} className="bg-slate-100 p-2 rounded-lg h-full w-full flex flex-col">
@@ -337,15 +336,14 @@ export default function CapabilityEdit() {
                     placeholder="Enter title of new prompt"
                     onChange={handleNewPromptTitleChange}
                   />
-                  <button
+                  <Button
                     type="button"
                     onClick={() => {
                       handleNewPromptAdd();
                     }}
-                    className="bg-blue-500 text-white px-2 py-1 rounded-lg self-start mt-2"
                   >
                     Add
-                  </button>
+                  </Button>
                 </div>
               </div>
             </CustomModal>

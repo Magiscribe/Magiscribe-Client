@@ -147,6 +147,7 @@ export const GET_INQUIRIES = gql`
   query getInquiries {
     getInquiries {
       id
+      userId
       data
       createdAt
       updatedAt
