@@ -15,12 +15,17 @@ export const nodeTypesInfo = {
     icon: faPlay,
     description: 'The start node represents the beginning of the conversation flow. There can only be one start node.',
     element: StartNode,
+    defaultData: {}
   },
   information: {
     name: 'Information',
     icon: faExclamationCircle,
     description: 'The information node provides information to the user without requiring a response.',
     element: InformationNode,
+    defaultData: {
+      text: '',
+      dynamicGeneration: false
+    }
   },
   question: {
     name: 'Question',
@@ -28,6 +33,12 @@ export const nodeTypesInfo = {
     description:
       "The question node represents a point where the user is asked a question. The question can be dynamically generated based on the user's previous responses.",
     element: QuestionNode,
+    defaultData: {
+      text: '',
+      type: 'open-ended',
+      ratings: [],
+      dynamicGeneration: false,
+    }
   },
   condition: {
     name: 'Condition',
@@ -35,12 +46,14 @@ export const nodeTypesInfo = {
     description:
       "The condition node allows for the conversation to take a different path based on the user's response.",
     element: ConditionNode,
+    defaultData: { conditions: [] }
   },
   end: {
     name: 'End',
     icon: faStop,
     description: 'The end node represents the end of the conversation flow. There can be multiple end nodes.',
     element: EndNode,
+    defaultData: {}
   },
 };
 
@@ -51,6 +64,10 @@ export const nodeTypes: NodeTypes = Object.fromEntries(
 export const edgeTypes: EdgeTypes = {
   button: ButtonEdge,
 };
+
+export function getDefaultNodeData(type: keyof typeof nodeTypesInfo) {
+  return nodeTypesInfo[type].defaultData;
+}
 
 /**
  * A custom React hook for managing node data in a React Flow application.
@@ -107,4 +124,12 @@ export function useNodeData<T>(id: string) {
   );
 
   return { handleInputChange, updateNodeImages };
+}
+
+export function generateRandomColorHex() {
+  const r = Math.floor(Math.random() * 256);
+  const g = Math.floor(Math.random() * 256);
+  const b = Math.floor(Math.random() * 256);
+
+  return `#${r.toString(16)}${g.toString(16)}${b.toString(16)}`;
 }

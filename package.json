@@ -58,6 +58,9 @@
     "autoprefixer": "^10.4.20",
     "eslint": "^9.16.0",
     "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-react-refresh": "^0.4.12",
     "framer-motion": "^11.13.1",
     "postcss": "^8.4.49",
     "prettier": "3.4.2",
@@ -65,5 +68,6 @@
     "typescript": "^5.7.2",
     "vite": "^5.4.11",
     "vite-plugin-graphql-codegen": "^3.4.0"
-  }
+  },
+  "packageManager": "pnpm@9.1.4+sha1.2432063d815cfa88fd9fef1d85a445e3f609851d"
 }

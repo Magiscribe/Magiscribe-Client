@@ -22,7 +22,8 @@ import colors from 'tailwindcss/colors';
 import Button from '../controls/button';
 import CustomTooltip from '../controls/custom-tooltip';
 import CustomModal from '../modals/modal';
-import { edgeTypes, nodeTypes, nodeTypesInfo } from './utils';
+import ContextMenu from './context-menu';
+import { edgeTypes, getDefaultNodeData, nodeTypes, nodeTypesInfo } from './utils';
 
 interface TreeInputProps {
   children?: React.ReactNode;
@@ -135,7 +136,15 @@ function Flow({ children }: TreeInputProps) {
       // Since we are setting both the nodes and edges at the same time, we use the setGraph function
       // to do this in a single render cycle so that the undo/redo history captures both changes as a single action.
       setGraph((prev) => ({
-        nodes: [...prev.nodes, { id: newNodeId, type: node.type, position: node.position, data: { text: '' } }],
+        nodes: [
+          ...prev.nodes,
+          {
+            id: newNodeId,
+            type: node.type,
+            position: node.position,
+            data: getDefaultNodeData(node.type as keyof typeof nodeTypesInfo),
+          },
+        ],
         edges: [...prev.edges, { id: `${edgeNode}-${newNodeId}`, source: edgeNode, target: newNodeId }],
       }));
     } else {
