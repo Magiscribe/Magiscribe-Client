@@ -5,20 +5,24 @@ import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import { useReactFlow } from '@xyflow/react';
 import { ImageUploader } from '@/components/image/image-uploader';
+import PromptDashboard from '@/pages/dashboard/agent-lab/prompts';
 
 type NodeContainerProps = {
   title: string;
   faIcon: IconDefinition;
   id: string;
+  deleteNodeImages?: () => void;
   children: React.ReactNode;
 };
 
-const NodeContainer = ({ title, faIcon, id, children }: NodeContainerProps) => {
+const NodeContainer = ({ title, faIcon, id, children, deleteNodeImages }: NodeContainerProps) => {
   const { setNodes, setEdges } = useReactFlow();
 
   const onNodeClick = () => {
     setNodes((nodes) => nodes.filter((node) => node.id !== id));
     setEdges((edges) => edges.filter((edge) => edge.source !== id && edge.target !== id));
+    // Delete node images from s3, if any exist
+    deleteNodeImages?.();
   };
 
   return (

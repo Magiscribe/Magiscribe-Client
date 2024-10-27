@@ -141,7 +141,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const [updateFormMutation] = useMutation<UpdateInquiryMutation>(UPDATE_INQUIRY);
   const [addPrediction] = useMutation<AddPredictionMutation>(ADD_PREDICTION);
   const [deleteObject] = useMutation<DeleteInquiryMutation>(DELETE_INQUIRY);
-  const deleteImage = useImageDelete();
+  const { deleteImages } = useImageDelete();
   /**
    * Deletes the inquiry.
    * @param onSuccess {Function} The function to call on success.
@@ -150,7 +150,12 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const deleteInquiry = async (onSuccess?: () => void, onError?: () => void) => {
     try {
       // Delete all images stored in the inquiry
-      await Promise.all(graph.nodes?.map((node) => (node.data?.images as ImageMetadata[])?.map((image) => deleteImage(image.s3Key))));
+      await Promise.all(
+        graph.nodes?.map(
+          async (node) => await deleteImages(node.data?.images ? (node.data.images as ImageMetadata[]) : []),
+        ),
+      );
+
       await deleteObject({ variables: { id } });
       if (onSuccess) onSuccess();
     } catch {
