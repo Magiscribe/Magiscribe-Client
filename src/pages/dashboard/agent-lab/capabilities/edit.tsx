@@ -310,7 +310,7 @@ export default function CapabilityEdit() {
                 {prompts?.getAllPrompts
                   .filter((item: Prompt) => !form.prompts.find((i) => i.id === item.id))
                   .map((item: Prompt) => (
-                    <div key={item.id} className="bg-gray-100 p-2 rounded-lg h-full w-full flex flex-col">
+                    <div key={item.id} className="bg-slate-100 p-2 rounded-lg h-full w-full flex flex-col">
                       <h3 className="text-lg font-bold">{item.name}</h3>
                       <p className="flex-grow">
                         {item.text.substring(0, 50)}
@@ -328,10 +328,10 @@ export default function CapabilityEdit() {
                       </button>
                     </div>
                   ))}
-                <div key={'newPrompt'} className="bg-gray-100 p-2 rounded-lg h-full w-full flex flex-col">
+                <div key={'newPrompt'} className="bg-slate-100 p-2 rounded-lg h-full w-full flex flex-col">
                   <h3 className="text-lg font-bold">{'New Prompt'}</h3>
                   <textarea
-                    className="border-2 border-gray-200 p-2 rounded-lg w-full"
+                    className="border-2 border-slate-200 p-2 rounded-lg w-full"
                     id="text"
                     rows={1}
                     placeholder="Enter title of new prompt"
@@ -360,7 +360,7 @@ export default function CapabilityEdit() {
               renderItem={(item, isEditing, edit, cancelEdit) => (
                 <div key={item.id}>
                   <h3 className="text-lg font-semibold">{item.name}</h3>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-slate-600">
                     {item.text.substring(0, 100)}
                     {item.text.length > 100 ? '...' : ''}
                   </p>

@@ -261,12 +261,12 @@ export default function PlaygroundDashboard() {
               </Button>
             </div>
           </form>
-          <div className="mt-6 h-full max-h-96 w-full bg-gray-100 dark:bg-slate-800 rounded-lg">
+          <div className="mt-6 h-full max-h-96 w-full bg-slate-100 dark:bg-slate-800 rounded-lg">
             <code className="h-full w-full block p-4 overflow-y-auto">
               {[...responses].reverse().map((response, i) => {
                 const fields: Array<keyof predictionAdded> = ['id', 'context', 'prompt', 'result', 'type'];
                 return (
-                  <div key={i} className="mb-4 border-2 border-gray-200 p-2 rounded-lg text-sm">
+                  <div key={i} className="mb-4 border-2 border-slate-200 p-2 rounded-lg text-sm">
                     {fields.map((field, i) => {
                       const value = response.predictionAdded[field];
                       return value ? (

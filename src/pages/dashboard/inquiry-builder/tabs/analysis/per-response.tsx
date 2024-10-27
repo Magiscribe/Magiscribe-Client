@@ -139,7 +139,7 @@ export default function PerResponseTab({ data }: TabProps) {
             onClick={generateSummary}
             disabled={isGeneratingSummary}
             className={`px-4 py-2 rounded-md text-white ${
-              isGeneratingSummary ? 'bg-gray-400' : 'bg-blue-500 hover:bg-blue-600'
+              isGeneratingSummary ? 'bg-slate-400' : 'bg-blue-500 hover:bg-blue-600'
             }`}
           >
             {isGeneratingSummary ? (
@@ -188,7 +188,7 @@ export default function PerResponseTab({ data }: TabProps) {
         <div className="my-4 p-4 bg-blue-100 rounded-md">
           <h3 className="font-bold mb-2">Summary</h3>
           <p>{summaries[selectedUser].text}</p>
-          <p className="text-sm text-gray-600 mt-2">Last Updated: {summaries[selectedUser].lastUpdated}</p>
+          <p className="text-sm text-slate-600 mt-2">Last Updated: {summaries[selectedUser].lastUpdated}</p>
         </div>
       )}
       <div>

@@ -174,3 +174,12 @@ export const GET_INQUIRY_RESPONSE_COUNT = gql`
     getInquiryResponseCount(id: $id)
   }
 `;
+
+export const GET_ALL_AUDIO_VOICES = gql`
+  query getAllAudioVoices {
+    getAllAudioVoices {
+      id
+      name
+    }
+  }
+`;

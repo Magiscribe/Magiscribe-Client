@@ -59,7 +59,7 @@ export default function CustomModal(props: Props) {
               leaveTo="opacity-0 scale-95"
             >
               <DialogPanel
-                className={`w-full ${sizeClass} transform rounded-2xl ${backgroundColor} p-6 text-left align-middle shadow-xl transition-all dark:bg-gray-800`}
+                className={`w-full ${sizeClass} transform rounded-2xl ${backgroundColor} p-6 text-left align-middle shadow-xl transition-all dark:bg-slate-800`}
               >
                 <DialogTitle as="h3" className="text-lg font-medium leading-6 text-slate-900 dark:text-slate-100">
                   {props.title}

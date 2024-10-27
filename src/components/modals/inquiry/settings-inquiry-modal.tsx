@@ -7,6 +7,9 @@ import Select from '../../controls/select';
 import CustomModal from '../modal';
 import ConfirmationModal from '../confirm-modal';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@apollo/client';
+import { GET_ALL_AUDIO_VOICES } from '@/clients/queries';
+import { GetAllAudioVoicesQuery, Query } from '@/graphql/graphql';
 
 /**
  * Props for the ModalUpsertInquiry component
@@ -22,10 +25,12 @@ interface ModalUpsertInquiryProps {
  */
 export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUpsertInquiryProps) {
   const [deleteModal, setDeleteModal] = useState(false);
+
   const { id, form, updateForm, saveForm, deleteInquiry } = useInquiryBuilder();
   const alert = useAddAlert();
-
   const navigate = useNavigate();
+
+  const { data: voices } = useQuery<GetAllAudioVoicesQuery>(GET_ALL_AUDIO_VOICES);
 
   /**
    * Handle select change for the form
@@ -63,15 +68,10 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
           <Select
             name="voice"
             label="Voice"
-            subLabel="Select the voice you would like to use for your inquiry"
-            value={form.voice ?? 'formal'}
+            subLabel="This will be the voice used to read responses to the user if they have audio enabled"
+            value={form.voice ?? ''}
             onChange={handleSelectChange('voice')}
-            options={[
-              { label: 'No Voice', value: '' },
-              { label: 'Phoebe', value: 'phoebe' },
-              { label: 'Oxley', value: 'oxley' },
-              { label: 'Robert', value: 'robert' },
-            ]}
+            options={voices?.getAllAudioVoices.map((voice) => ({ value: voice.id, label: voice.name })) ?? []}
           />
 
           <div className="flex justify-end items-center rounded-2xl">

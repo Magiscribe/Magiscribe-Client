@@ -137,7 +137,7 @@ export default function ViaChatTab({ data }: TabProps) {
               className={clsx(
                 'shadow-3xl p-2 rounded-lg',
                 message.type === 'chart' ? 'w-full max-w-[80%]' : 'max-w-[80%]',
-                message.sender === 'user' ? 'bg-blue-500 text-white' : 'bg-slate-200 text-gray-800',
+                message.sender === 'user' ? 'bg-blue-500 text-white' : 'bg-slate-200 text-slate-800',
               )}
             >
               {message.type === 'text' ? (
@@ -159,7 +159,7 @@ export default function ViaChatTab({ data }: TabProps) {
           onChange={(e) => setInputMessage(e.target.value)}
           placeholder="Ask a question about your data..."
           className={clsx(
-            'flex-grow p-2 border border-gray-300 rounded-l-lg text-black',
+            'flex-grow p-2 border border-slate-300 rounded-l-lg text-black',
             'focus:outline-none focus:ring-2 focus:ring-blue-500',
           )}
           disabled={loading}
@@ -169,7 +169,7 @@ export default function ViaChatTab({ data }: TabProps) {
           className={clsx(
             'px-4 py-2 bg-blue-500 text-white rounded-r-lg',
             'hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500',
-            'disabled:bg-gray-400',
+            'disabled:bg-slate-400',
           )}
           disabled={loading}
         >

@@ -66,7 +66,7 @@ export default function Inquiry() {
               onClick={() => navigate(inquiry.id)}
             >
               <h3 className="text-lg font-semibold mb-2">{form.title === '' ? 'Untitled Inquiry' : form.title}</h3>
-              <p className="text-sm text-gray-500 mb-2">
+              <p className="text-sm text-slate-500 mb-2">
                 Created: {formattedCreateDate} | Updated: {formattedUpdateDate}
               </p>
             </motion.div>

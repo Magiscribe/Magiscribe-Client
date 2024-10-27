@@ -40,7 +40,7 @@ function Header() {
               <FontAwesomeIcon icon={enableAudio ? faVolumeUp : faVolumeMute} />
             </button>
           )} */}
-          <Button onClick={toggleDarkMode} variant="transparentWhite" size="small" iconLeft={isDark ? faSun : faMoon} />
+          <Button onClick={toggleDarkMode} variant="transparentLight" size="small" iconLeft={isDark ? faSun : faMoon} />
         </div>
       </div>
     </header>

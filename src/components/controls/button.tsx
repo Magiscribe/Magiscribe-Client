@@ -3,6 +3,31 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import clsx from 'clsx';
 import React from 'react';
 
+const variantClassNames = {
+  primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
+  secondary: 'bg-slate-500 text-white hover:bg-slate-600 focus:ring-slate-300',
+  danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
+  success: 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500',
+  light: 'bg-white text-slate-600 dark:bg-slate-700 dark:text-white hover:bg-slate-100 focus:ring-slate-300',
+  dark: 'bg-slate-600 text-white dark:bg-white dark:text-slate-600 hover:bg-slate-700 focus:ring-slate-300',
+
+  transparentPrimary: 'text-blue-600 hover:text-blue-700',
+  transparentSecondary: 'text-slate-500 hover:text-slate-500',
+  transparentDanger: 'text-red-600 hover:text-red-700',
+  transparentSuccess: 'text-green-600 hover:text-green-700',
+  transparentLight: 'text-white hover:text-white dark:hover:text-slate-700',
+  transparentDark: 'text-slate-600 hover:text-slate-700 dark:hover:text-white',
+
+  inversePrimary:
+    'bg-transperant text-blue-600 hover:bg-blue-600 hover:text-white focus:ring-red-500 border border-2 border-blue-600',
+  inverseSecondary:
+    'bg-transperant text-slate-600 hover:bg-red-600 hover:text-white focus:ring-slate-500 border border-2 border-slate-600',
+  inverseDanger:
+    'bg-transperant text-red-600 hover:bg-red-600 hover:text-white focus:ring-red-500 border border-2 border-red-600',
+  inverseSuccess:
+    'bg-transperant text-red-600 hover:bg-green-600 hover:text-white focus:ring-green-500 border border-2 border-green-600',
+};
+
 /**
  * Props for the Button component.
  * @typedef {Object} ButtonProps
@@ -15,23 +40,7 @@ import React from 'react';
  */
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children?: React.ReactNode;
-  variant?:
-    | 'primary'
-    | 'secondary'
-    | 'danger'
-    | 'success'
-    | 'white'
-    | 'whiteFixed'
-    | 'transparentPrimary'
-    | 'transparentSecondary'
-    | 'transparentDanger'
-    | 'transparentSuccess'
-    | 'transparentWhite'
-    | 'transparentWhiteFixed'
-    | 'inversePrimary'
-    | 'inverseSecondary'
-    | 'inverseDanger'
-    | 'inverseSuccess';
+  variant?: keyof typeof variantClassNames;
   size?: 'small' | 'medium' | 'large';
   iconLeft?: IconDefinition;
   iconRight?: IconDefinition;
@@ -56,30 +65,7 @@ const Button: React.FC<ButtonProps> = ({
   const baseClassName =
     'inline-flex items-center justify-center font-medium rounded-3xl transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
 
-  const variantClassNames = {
-    primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
-    secondary: 'bg-slate-500 text-white hover:bg-slate-600 focus:ring-slate-300',
-    danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
-    success: 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500',
-    white: 'bg-white text-slate-600',
-    whiteFixed: 'bg-white text-slate-600 dark:text-white focus:ring-slate-300',
 
-    transparentPrimary: 'text-blue-600 hover:text-blue-700',
-    transparentSecondary: 'text-slate-500 hover:text-slate-500',
-    transparentDanger: 'text-red-600 hover:text-red-700',
-    transparentSuccess: 'text-green-600 hover:text-green-700',
-    transparentWhite: 'text-white hover:text-white dark:hover:text-slate-700',
-    transparentWhiteFixed: 'text-white ring-transparent	 focus:ring-transparent	focus:ring-offset-0 hover:text-slate-300',
-
-    inversePrimary:
-      'bg-transperant text-blue-600 hover:bg-blue-600 hover:text-white focus:ring-red-500 border border-2 border-blue-600',
-    inverseSecondary:
-      'bg-transperant text-slate-600 hover:bg-red-600 hover:text-white focus:ring-slate-500 border border-2 border-slate-600',
-    inverseDanger:
-      'bg-transperant text-red-600 hover:bg-red-600 hover:text-white focus:ring-red-500 border border-2 border-red-600',
-    inverseSuccess:
-      'bg-transperant text-red-600 hover:bg-green-600 hover:text-white focus:ring-green-500 border border-2 border-green-600',
-  };
 
   const sizeClassNames = {
     regular: {

@@ -12,6 +12,9 @@ import Input from '../../controls/input';
 import Select from '../../controls/select';
 import Textarea from '../../controls/textarea';
 import CustomModal from '../modal';
+import { GetAllAudioVoicesQuery } from '@/graphql/graphql';
+import { GET_ALL_AUDIO_VOICES } from '@/clients/queries';
+import { useQuery } from '@apollo/client';
 
 /**
  * Props for the ModalUpsertInquiry component
@@ -74,16 +77,16 @@ const TemplateSelection: React.FC<TemplateSelectionProps> = ({ value, onChange }
             key={template.name}
             value={template}
             className={({ checked }) =>
-              `${checked ? 'bg-blue-500 text-white' : 'bg-gray-200'}
+              `${checked ? 'bg-blue-500 text-white' : 'bg-slate-200 dark:bg-slate-600'}
                 relative flex cursor-pointer rounded-lg px-4 py-2 shadow-md focus:outline-none`
             }
           >
             {({ checked }) => (
               <div className="flex flex-col">
-                <Label as="span" className={`text-lg font-bold ${checked ? 'text-white' : 'text-gray-800'}`}>
+                <Label as="span" className={`text-lg font-bold ${checked ? 'text-white' : ' text-slate-800 dark:text-white'}`}>
                   {template.name}
                 </Label>
-                <Description as="span" className={`text-sm ${checked ? 'text-indigo-100' : 'text-gray-600'}`}>
+                <Description as="span" className={`text-sm ${checked ? 'text-slate-100' : ' text-slate-800 dark:text-slate-300'}`}>
                   {template.description}
                 </Description>
               </div>
@@ -114,6 +117,8 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
     generatingGraph,
   } = useInquiryBuilder();
   const alert = useAddAlert();
+
+  const { data: voices } = useQuery<GetAllAudioVoicesQuery>(GET_ALL_AUDIO_VOICES);
 
   useEffect(() => {
     if (generatingGraph) {
@@ -224,14 +229,10 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
         <Select
           name="voice"
           label="Voice"
-          subLabel="Select the voice you would like to use for your inquiry"
-          value={form.voice ?? 'formal'}
+          subLabel="This will be the voice used to read responses to the user if they have audio enabled"
+          value={form.voice ?? ''}
           onChange={handleSelectChange('voice')}
-          options={[
-            { label: 'Phoebe', value: 'phoebe' },
-            { label: 'Oxley', value: 'oxley' },
-            { label: 'Robert', value: 'robert' },
-          ]}
+          options={voices?.getAllAudioVoices.map((voice) => ({ value: voice.id, label: voice.name })) ?? []}
         />
 
         <TemplateSelection value={selectedTemplate} onChange={handleChangeGraphTemplate} />
@@ -282,7 +283,7 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 25 }}
                   transition={{ duration: 0.3 }}
-                  className="text-sm italic text-gray-600"
+                  className="text-sm italic text-slate-600"
                 >
                   {loadingQuote}
                 </motion.p>

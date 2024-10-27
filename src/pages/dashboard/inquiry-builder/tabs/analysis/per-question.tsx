@@ -189,7 +189,7 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
           onClick={generateSummary}
           disabled={isGeneratingSummary}
           className={`px-4 py-2 rounded-md text-white ${
-            isGeneratingSummary ? 'bg-gray-400' : 'bg-blue-500 hover:bg-blue-600'
+            isGeneratingSummary ? 'bg-slate-400' : 'bg-blue-500 hover:bg-blue-600'
           }`}
         >
           {isGeneratingSummary ? (
@@ -224,13 +224,13 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
         <div className="my-4 p-4 bg-blue-100 rounded-md">
           <h3 className="font-bold mb-2">Summary</h3>
           <p>{currentSummary.text}</p>
-          <p className="text-sm text-gray-600 mt-2">Last Updated: {currentSummary.lastUpdated}</p>
+          <p className="text-sm text-slate-600 mt-2">Last Updated: {currentSummary.lastUpdated}</p>
         </div>
       )}
       <div>
         <h2 className="font-bold mb-2">Responses</h2>
         <div className="mb-6 p-4">
-          <div className="mb-6 p-4 bg-gray-100 rounded">
+          <div className="mb-6 p-4 bg-slate-100 rounded">
             <p className="font-semibold mb-2 text-black">{nodeData.text}</p>
             {renderAnswers(currentNode.id)}
           </div>

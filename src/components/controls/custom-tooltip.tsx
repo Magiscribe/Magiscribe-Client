@@ -1,7 +1,7 @@
-import React, { Fragment, useState, useCallback } from 'react';
 import { Popover, PopoverButton, PopoverPanel, Transition } from '@headlessui/react';
-import { usePopper } from 'react-popper';
 import { motion } from 'framer-motion';
+import React, { Fragment, useCallback, useState } from 'react';
+import { usePopper } from 'react-popper';
 
 interface CustomTooltipProps {
   children: React.ReactNode;
@@ -36,7 +36,8 @@ export default function CustomTooltip({
   const [isOpen, setIsOpen] = useState(false);
   const { styles, attributes } = usePopper(referenceElement, popperElement, {
     placement: placement,
-    modifiers: [{ name: 'offset', options: { offset: [0, 8] } }],
+    modifiers: [{ name: 'offset', options: { offset: [0, 24] } }],
+    strategy: 'fixed'
   });
 
   const handleMouseEnter = useCallback(() => {
@@ -63,8 +64,8 @@ export default function CustomTooltip({
           <Transition show={triggerOnHover ? isOpen : open} as={Fragment}>
             <PopoverPanel
               static
-              className="fixed z-100 max-w-sm"
               ref={setPopperElement}
+              className="max-w-sm"
               style={styles.popper}
               {...attributes.popper}
               onMouseEnter={handleMouseEnter}
@@ -74,7 +75,7 @@ export default function CustomTooltip({
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.1 }}
-                className="overflow-hidden rounded-lg shadow-xl bg-white p-2"
+                className="z-20 rounded-lg shadow-xl bg-white dark:bg-slate-700 p-2"
               >
                 {children}
               </motion.div>

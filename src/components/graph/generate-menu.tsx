@@ -49,7 +49,7 @@ function ChatBubble({ message, sender }: { message: Message; sender: 'user' | 'a
     <div className={`mb-4 flex ${sender === 'user' ? 'justify-end' : 'justify-start'}`}>
       <div
         className={`max-w-[90%] p-3 rounded-lg ${
-          sender === 'user' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
+          sender === 'user' ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-800'
         }`}
       >
         <p className="text-xs font-semibold mb-1">{sender === 'user' ? 'You' : 'Graph Editor'}</p>
@@ -184,17 +184,17 @@ export default function GraphGeneratorMenu({ open, onUpdate, onClose }: GraphGen
       exit={{ x: '100%' }}
       transition={{ duration: 0.3, ease: 'easeInOut' }}
       style={{ width: `${menuWidth}px` }}
-      className="h-full bg-white absolute right-0 top-0 z-10 shadow-l-2xl flex flex-col border-l border-gray-200"
+      className="h-full bg-white absolute right-0 top-0 z-10 shadow-l-2xl flex flex-col border-l border-slate-200"
       ref={menuRef}
     >
       <div
-        className="absolute left-0 top-0 bottom-0 w-1 cursor-ew-resize bg-gray-300 hover:bg-gray-400"
+        className="absolute left-0 top-0 bottom-0 w-1 cursor-ew-resize bg-slate-300 hover:bg-slate-400"
         onMouseDown={handleMouseDown}
       />
       <div className="w-full h-full bg-white flex flex-col">
-        <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+        <div className="p-4 border-b border-slate-200 flex justify-between items-center">
           <h2 className="text-lg font-semibold">Graph Editor</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+          <button onClick={onClose} className="text-slate-500 hover:text-slate-700">
             <FontAwesomeIcon icon={faTimes} />
           </button>
         </div>
@@ -204,11 +204,11 @@ export default function GraphGeneratorMenu({ open, onUpdate, onClose }: GraphGen
           ))}
           {generatingGraph && (
             <div className={`mb-4 flex justify-end`}>
-              <FontAwesomeIcon icon={faSpinner} className="text-gray-500 animate-spin mr-8" />
+              <FontAwesomeIcon icon={faSpinner} className="text-slate-500 animate-spin mr-8" />
             </div>
           )}
         </div>
-        <div className="p-4 border-t border-gray-200">
+        <div className="p-4 border-t border-slate-200">
           <input
             type="text"
             value={inputMessage}

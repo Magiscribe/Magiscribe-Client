@@ -1,28 +1,11 @@
 import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  addEdge,
-  Background,
-  Controls,
-  Edge,
-  MarkerType,
-  Node,
-  OnConnect,
-  OnConnectEnd,
-  OnConnectStart,
-  OnEdgesChange,
-  OnNodesChange,
-  ReactFlow,
-  ReactFlowProvider,
-  useReactFlow,
-  XYPosition,
-} from '@xyflow/react';
+import { addEdge, Background, Controls, Edge, MarkerType, Node, OnConnect, OnConnectEnd, OnConnectStart, OnEdgesChange, OnNodesChange, ReactFlow, ReactFlowProvider, useReactFlow, XYPosition } from '@xyflow/react';
 import React, { DragEvent, useRef, useState } from 'react';
 import colors from 'tailwindcss/colors';
 
 import CustomTooltip from '../controls/custom-tooltip';
 import CustomModal from '../modals/modal';
-import ContextMenu from './context-menu';
 import { edgeTypes, nodeTypes, nodeTypesInfo } from './utils';
 
 interface TreeInputProps {
@@ -172,32 +155,6 @@ function Flow({ children, nodes, edges, setNodes, onNodesChange, setEdges, onEdg
   };
 
   /**
-   * Handles the opening of the context menu for the graph.
-   * @param event {MouseEvent | React.MouseEvent<Element, MouseEvent>} - The mouse event that triggered the context menu.
-   * @returns {void} - Nothing
-   */
-  const onPaneContextMenu = (event: MouseEvent | React.MouseEvent<Element, MouseEvent>): void => {
-    if (!reactFlow.current) return;
-
-    // Prevent native context menu from showing
-    event.preventDefault();
-
-    // Calculate position of the context menu. We want to make sure it
-    // doesn't get positioned off-screen.
-    const pane = reactFlow.current.getBoundingClientRect();
-    setMenu({
-      top: event.clientY < pane.height ? event.clientY : undefined,
-      left: event.clientX < pane.width ? event.clientX : undefined,
-      right: event.clientX >= pane.width ? pane.width - event.clientX : undefined,
-      bottom: event.clientY >= pane.height ? pane.height - event.clientY : undefined,
-      onAddNode: () => {
-        openNewNodeModal(event.clientX, event.clientY);
-        setMenu(null);
-      },
-    });
-  };
-
-  /**
    * Handles the closing of the context menu when the area outside of the context menu is clicked.
    * @returns
    */
@@ -246,21 +203,20 @@ function Flow({ children, nodes, edges, setNodes, onNodesChange, setEdges, onEdg
               draggable={!disabled}
               onDragStart={() => (disabled ? null : onDragStart(type))}
               disabled={disabled}
-              className="relative w-full max-w-xs px-4 py-2 bg-white border-2 border-slate-400 text-slate-800 font-semibold text-sm rounded-xl shadow-lg disabled:opacity-50 text-left"
+              className="relative w-full max-w-xs px-4 py-2 bg-white dark:bg-slate-700 border-2 border-slate-400 text-slate-800 dark:text-white font-semibold text-sm rounded-xl shadow-lg disabled:opacity-50 text-left"
             >
               <FontAwesomeIcon
                 icon={nodeTypesInfo[type as keyof typeof nodeTypesInfo].icon}
                 className="mr-2 text-blue-600"
               />
               {nodeTypesInfo[type as keyof typeof nodeTypesInfo].name}
-
               <CustomTooltip
                 placement="bottom-start"
                 triggerOnHover
                 render={() => (
                   <FontAwesomeIcon
                     icon={faQuestionCircle}
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-slate-400"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-slate-400 dark:text-white"
                   />
                 )}
               >
@@ -321,7 +277,6 @@ function Flow({ children, nodes, edges, setNodes, onNodesChange, setEdges, onEdg
             onConnect={onConnect}
             onConnectStart={onConnectStart}
             onConnectEnd={onConnectEnd}
-            onPaneContextMenu={onPaneContextMenu}
             onPaneClick={onPaneClick}
             onPaneScroll={onPaneClick}
             onDrop={onDrop}
@@ -345,7 +300,6 @@ function Flow({ children, nodes, edges, setNodes, onNodesChange, setEdges, onEdg
           >
             <Background />
             <Controls position="bottom-left" showInteractive={false} />
-            {menu && <ContextMenu buttons={renderNodeButtonsMenu()} {...menu} />}
           </ReactFlow>
         </div>
 

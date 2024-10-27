@@ -62,7 +62,7 @@ export function NavBar({ isFixed = true }) {
           <ul className="list-reset lg:flex justify-end flex-1 items-center">{/* Add menu items here if needed */}</ul>
           <Button
             onClick={toggleDarkMode}
-            variant={'transparentWhiteFixed'}
+            variant={'transparentLightFixed'}
             size="small"
             className="mr-4"
             iconLeft={isDark ? faSun : faMoon}
@@ -98,7 +98,7 @@ export function NavBar({ isFixed = true }) {
           </SignedOut>
         </div>
       </div>
-      <hr className="border-b border-gray-100 opacity-25 my-0 py-0" />
+      <hr className="border-b border-slate-100 opacity-25 my-0 py-0" />
     </nav>
   );
 }
