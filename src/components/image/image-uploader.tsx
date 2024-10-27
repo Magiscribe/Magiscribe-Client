@@ -60,6 +60,21 @@ export function useImageDownload() {
   return downloadImage;
 }
 
+export function useImageDelete() {
+  const [deleteMediaAsset] = useMutation(DELETE_MEDIA_ASSET);
+  const deleteImage = useCallback(async (s3KeyToDelete: string) => {
+    await deleteMediaAsset({
+      variables: {
+        s3Key: s3KeyToDelete,
+      },
+     })
+     // Placeholder: Replace with actual s3 API output
+     return "success"
+  },[deleteMediaAsset])
+
+  return deleteImage;
+}
+
 async function uploadImageToS3(presignedUrl: string, file: File) {
   try {
     const response = await fetch(presignedUrl, {
@@ -106,9 +121,9 @@ async function downloadImageFromS3(presignedUrl: string) {
 
 export function ImageUploader(props: ImageUploaderProps): React.ReactElement {
   const [base64Images, setBase64Images] = useState<string[]>([]);
-  const [deleteMediaAsset] = useMutation(DELETE_MEDIA_ASSET);
   const uploadImage = useImageUpload();
   const downloadImage = useImageDownload();
+  const deleteImage = useImageDelete();
 
   useEffect(() => {
     // Download the node images from s3
@@ -128,12 +143,12 @@ export function ImageUploader(props: ImageUploaderProps): React.ReactElement {
   }, [props.images]);
 
   const handleImageDelete = async function (imageIndex: number) {
+    // Stop displaying the deleted image immediately and then perform the deletion in the background.
+    setBase64Images(prevImages => prevImages.filter((__, index) => index !==imageIndex))
+
     const s3KeyToDelete = props.images[imageIndex].s3Key;
-    await deleteMediaAsset({
-      variables: {
-        s3Key: s3KeyToDelete,
-      },
-    });
+    await deleteImage(s3KeyToDelete);
+
     // TODO: Verify that image deletion was successful before removing the image from the graph
     props.handleUpdateNodeImages(props.images.filter((_, i) => i !== imageIndex));
   };

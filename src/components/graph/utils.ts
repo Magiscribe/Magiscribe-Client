@@ -78,8 +78,11 @@ export function useNodeData<T>(id: string) {
   );
 
   const updateNodeImages = useCallback((images: ImageMetadata[]) => {
-    if (images?.length) {
+    if (images) {
       update({ 'images': images } as unknown as Partial<T>);
+    }
+    else {
+      update({ 'images': [] } as unknown as Partial<T>);
     }
   }, [updateNodeData]);
 

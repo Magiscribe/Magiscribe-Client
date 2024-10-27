@@ -1,6 +1,7 @@
 import { ADD_PREDICTION, CREATE_INQUIRY, DELETE_INQUIRY, UPDATE_INQUIRY } from '@/clients/mutations';
 import { GET_INQUIRY } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
+import { useImageDelete } from '@/components/image/image-uploader';
 import {
   AddPredictionMutation,
   CreateInquiryMutation,
@@ -9,6 +10,7 @@ import {
   UpdateInquiryMutation,
 } from '@/graphql/graphql';
 import { InquiryDataForm } from '@/graphql/types';
+import { ImageMetadata } from '@/types/conversation';
 import { getAgentIdByName } from '@/utils/agents';
 import { applyGraphChangeset, formatGraph } from '@/utils/graphs/graph-utils';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
@@ -139,7 +141,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const [updateFormMutation] = useMutation<UpdateInquiryMutation>(UPDATE_INQUIRY);
   const [addPrediction] = useMutation<AddPredictionMutation>(ADD_PREDICTION);
   const [deleteObject] = useMutation<DeleteInquiryMutation>(DELETE_INQUIRY);
-
+  const deleteImage = useImageDelete();
   /**
    * Deletes the inquiry.
    * @param onSuccess {Function} The function to call on success.
@@ -147,6 +149,8 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
    */
   const deleteInquiry = async (onSuccess?: () => void, onError?: () => void) => {
     try {
+      // Delete all images stored in the inquiry
+      await Promise.all(graph.nodes?.map((node) => (node.data?.images as ImageMetadata[])?.map((image) => deleteImage(image.s3Key))));
       await deleteObject({ variables: { id } });
       if (onSuccess) onSuccess();
     } catch {
