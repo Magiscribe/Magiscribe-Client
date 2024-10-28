@@ -1,5 +1,6 @@
 import { ADD_PREDICTION } from '@/clients/mutations';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
+import Button from '@/components/controls/button';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
 import { NodeVisitAnalysisData, TabProps } from '@/types/conversation';
 import { getAgentIdByName } from '@/utils/agents';
@@ -28,7 +29,7 @@ export default function PerResponseTab({ data }: TabProps) {
   const client = useApolloClient();
   const [addPrediction] = useMutation(ADD_PREDICTION);
 
-  if (!responses?.length) return <div className="p-4">No data available</div>;
+  if (!responses?.length) return <div className="p-4 text-slate-700 dark:text-white">No data available</div>;
 
   const nodesMap = useMemo(
     () => Object.fromEntries((graph?.nodes || []).map((node) => [node.id, node])),
@@ -109,9 +110,9 @@ export default function PerResponseTab({ data }: TabProps) {
 
       return (
         <>
-          <p className="font-semibold text-black">{nodeText}</p>
-          <hr className="my-2" />
-          <p className="text-black">
+          <p className="font-semibold text-slate-700 dark:text-white">{nodeText}</p>
+          <hr className="my-2 border-slate-300 dark:border-slate-600" />
+          <p className="text-slate-700 dark:text-white">
             {responseText && <span>{responseText}</span>}
             {ratings?.length && ratings?.length > 0 && (
               <span>
@@ -123,7 +124,7 @@ export default function PerResponseTab({ data }: TabProps) {
         </>
       );
     } else {
-      return <p className="font-semibold text-black">{nodeText}</p>;
+      return <p className="font-semibold text-slate-700 dark:text-white">{nodeText}</p>;
     }
   };
 
@@ -131,17 +132,11 @@ export default function PerResponseTab({ data }: TabProps) {
   const displayedUsers = responses.slice(currentPage * usersPerPage, (currentPage + 1) * usersPerPage);
 
   return (
-    <div className="bg-white px-4 py-8 rounded-2xl shadow-xl text-slate-700">
+    <div className="bg-white dark:bg-slate-700 px-4 py-8 rounded-2xl shadow-xl text-slate-700 dark:text-white">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Per Response</h2>
         {selectedUser && (
-          <button
-            onClick={generateSummary}
-            disabled={isGeneratingSummary}
-            className={`px-4 py-2 rounded-md text-white ${
-              isGeneratingSummary ? 'bg-slate-400' : 'bg-blue-500 hover:bg-blue-600'
-            }`}
-          >
+          <Button onClick={generateSummary} disabled={isGeneratingSummary}>
             {isGeneratingSummary ? (
               <>
                 Generating... <FontAwesomeIcon icon={faSpinner} spin className="ml-2" />
@@ -151,7 +146,7 @@ export default function PerResponseTab({ data }: TabProps) {
             ) : (
               'Generate Summary'
             )}
-          </button>
+          </Button>
         )}
       </div>
       <div className="my-4">
@@ -162,7 +157,9 @@ export default function PerResponseTab({ data }: TabProps) {
               key={`${id}-${userId}`}
               onClick={() => setSelectedUser((prev) => (prev === id ? null : (id as string)))}
               className={`p-2 text-sm rounded-md ${
-                selectedUser === id ? 'bg-blue-500 text-white' : 'bg-slate-200 text-black'
+                selectedUser === id
+                  ? 'bg-blue-500 dark:bg-blue-600 text-white'
+                  : 'bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-white'
               }`}
             >
               {data.userDetails?.name || 'Unknown'} ({data.userDetails?.email || id})
@@ -172,23 +169,24 @@ export default function PerResponseTab({ data }: TabProps) {
         {responses.length > usersPerPage && (
           <div className="flex justify-end mt-4 space-x-2">
             {[faChevronLeft, faChevronRight].map((icon, index) => (
-              <button
+              <Button
                 key={index}
                 onClick={() => setCurrentPage((prev) => Math.max(0, Math.min(totalPages - 1, prev + (index ? 1 : -1))))}
                 disabled={index ? currentPage === totalPages - 1 : currentPage === 0}
-                className="p-2 border-2 border-white rounded-full disabled:opacity-50"
               >
                 <FontAwesomeIcon icon={icon} />
-              </button>
+              </Button>
             ))}
           </div>
         )}
       </div>
       {selectedUser && summaries[selectedUser] && (
-        <div className="my-4 p-4 bg-blue-100 rounded-md">
+        <div className="my-4 p-4 bg-blue-100 dark:bg-blue-900 rounded-md">
           <h3 className="font-bold mb-2">Summary</h3>
           <p>{summaries[selectedUser].text}</p>
-          <p className="text-sm text-slate-600 mt-2">Last Updated: {summaries[selectedUser].lastUpdated}</p>
+          <p className="text-sm text-slate-600 dark:text-slate-300 mt-2">
+            Last Updated: {summaries[selectedUser].lastUpdated}
+          </p>
         </div>
       )}
       <div>
@@ -202,7 +200,7 @@ export default function PerResponseTab({ data }: TabProps) {
             const graphNode = nodesMap[node.id];
             if (graphNode?.type === 'question' || graphNode?.type === 'information') {
               return (
-                <div key={i} className="mb-4 p-4 bg-slate-200 rounded-2xl">
+                <div key={i} className="mb-4 p-4 bg-slate-200 dark:bg-slate-600 rounded-2xl">
                   {renderNodeContent(node)}
                 </div>
               );

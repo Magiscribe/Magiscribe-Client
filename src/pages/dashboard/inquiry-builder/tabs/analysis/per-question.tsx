@@ -1,7 +1,8 @@
 import { ADD_PREDICTION } from '@/clients/mutations';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
+import Button from '@/components/controls/button';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
-import { QuestionNodeData, GraphNode, NodeVisitAnalysisData, TabProps } from '@/types/conversation';
+import { GraphNode, NodeVisitAnalysisData, QuestionNodeData, TabProps } from '@/types/conversation';
 import { getAgentIdByName } from '@/utils/agents';
 import { useApolloClient, useMutation, useSubscription } from '@apollo/client';
 import { faChevronLeft, faChevronRight, faSpinner } from '@fortawesome/free-solid-svg-icons';
@@ -128,7 +129,7 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
   }, [questionNodes, currentQuestionIndex, groupedResponses, client, addPrediction, subscriptionId]);
 
   if (!responses || !questionNodes.length) {
-    return <div className="p-4">No data available</div>;
+    return <div className="p-4 text-slate-700 dark:text-white">No data available</div>;
   }
 
   const currentNode = questionNodes[currentQuestionIndex];
@@ -142,7 +143,7 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
       const userName = userIdToDetalsMap.get(userId)?.name;
       return (
         <div key={`${userId}-${nodeId}`} className="ml-4 mb-4">
-          <p className="text-black font-semibold">
+          <p className="text-slate-700 dark:text-white font-semibold">
             {userEmail || userName ? userName + ' (' + userEmail + ')' : userId}:
           </p>
           {userResponses.map((response, index) => {
@@ -163,13 +164,13 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
               <div key={`${userId}-${nodeId}-${index}`} className="ml-4 mt-2">
                 {isDynamicGeneration ? (
                   <>
-                    <p className="text-black font-medium">
+                    <p className="text-slate-700 dark:text-white font-medium">
                       #{index + 1}: {response.data?.text}
                     </p>
-                    <p className="text-black ml-4">{answerContent}</p>
+                    <p className="text-slate-700 dark:text-white ml-4">{answerContent}</p>
                   </>
                 ) : (
-                  <p className="text-black">
+                  <p className="text-slate-700 dark:text-white">
                     <span className="font-medium">#{index + 1}:</span> {answerContent}
                   </p>
                 )}
@@ -182,16 +183,10 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
   };
 
   return (
-    <div className="bg-white px-4 py-8 rounded-2xl shadow-xl text-slate-700">
+    <div className="bg-white dark:bg-slate-700 px-4 py-8 rounded-2xl shadow-xl text-slate-700 dark:text-white">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Per Question</h2>
-        <button
-          onClick={generateSummary}
-          disabled={isGeneratingSummary}
-          className={`px-4 py-2 rounded-md text-white ${
-            isGeneratingSummary ? 'bg-slate-400' : 'bg-blue-500 hover:bg-blue-600'
-          }`}
-        >
+        <Button onClick={generateSummary} disabled={isGeneratingSummary}>
           {isGeneratingSummary ? (
             <>
               Generating... <FontAwesomeIcon icon={faSpinner} spin className="ml-2" />
@@ -201,53 +196,51 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
           ) : (
             'Generate Summary'
           )}
-        </button>
+        </Button>
       </div>
       <div className="my-4">
         <h2 className="font-bold mb-2">Select Question</h2>
         <div className="grid grid-cols-4 sm:grid-col-3 lg:grid-cols-6 gap-2">
           {questionNodes.map((node, index) => (
-            <button
+            <Button
               key={node.id}
               onClick={() => setCurrentQuestionIndex(index)}
-              className={`p-2 text-sm rounded-md ${
-                currentQuestionIndex === index ? 'bg-blue-500 text-white' : 'bg-slate-200 text-black'
-              } overflow-hidden`}
+              variant={currentQuestionIndex === index ? 'primary' : 'secondary'}
               title={node.data.text || `Question ${index + 1}`}
             >
               {truncateText(node.data.text || `Question ${index + 1}`)}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
       {currentSummary && (
-        <div className="my-4 p-4 bg-blue-100 rounded-md">
+        <div className="my-4 p-4 bg-blue-100 dark:bg-blue-900/30 rounded-md">
           <h3 className="font-bold mb-2">Summary</h3>
           <p>{currentSummary.text}</p>
-          <p className="text-sm text-slate-600 mt-2">Last Updated: {currentSummary.lastUpdated}</p>
+          <p className="text-sm text-slate-600 dark:text-slate-300 mt-2">Last Updated: {currentSummary.lastUpdated}</p>
         </div>
       )}
       <div>
         <h2 className="font-bold mb-2">Responses</h2>
         <div className="mb-6 p-4">
-          <div className="mb-6 p-4 bg-slate-100 rounded">
-            <p className="font-semibold mb-2 text-black">{nodeData.text}</p>
+          <div className="mb-6 p-4 bg-slate-100 dark:bg-slate-600 rounded">
+            <p className="font-semibold mb-2 text-slate-700 dark:text-white">{nodeData.text}</p>
             {renderAnswers(currentNode.id)}
           </div>
         </div>
         <div className="flex justify-end mt-4 space-x-2">
           {[faChevronLeft, faChevronRight].map((icon, index) => (
-            <button
+            <Button
+              variant="secondary"
               key={index}
               onClick={() =>
                 setCurrentQuestionIndex(
                   (prev) => (prev + (index ? 1 : -1) + questionNodes.length) % questionNodes.length,
                 )
               }
-              className="p-2 border-2 border-white rounded-full"
             >
               <FontAwesomeIcon icon={icon} />
-            </button>
+            </Button>
           ))}
         </div>
       </div>
