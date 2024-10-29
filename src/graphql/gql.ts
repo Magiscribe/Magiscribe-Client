@@ -40,18 +40,22 @@ const documents = {
     types.CreateInquiryResponseDocument,
   '\n  mutation updateInquiryResponse($id: ID, $inquiryId: ID!, $data: JSONObject!, $fields: [String!]) {\n    upsertInquiryResponse(id: $id, inquiryId: $inquiryId, data: $data, fields: $fields) {\n      id\n    }\n  }\n':
     types.UpdateInquiryResponseDocument,
+  '\n  mutation upsertCollection($input: CollectionInput!) {\n    upsertCollection(input: $input) {\n      id\n      name\n    }\n  }\n':
+    types.UpsertCollectionDocument,
+  '\n  mutation deleteCollection($collectionId: ID!) {\n    deleteCollection(collectionId: $collectionId) {\n      id\n    }\n  }\n':
+    types.DeleteCollectionDocument,
   '\n  query getAllModels {\n    getAllModels {\n      id\n      name\n    }\n  }\n': types.GetAllModelsDocument,
   '\n  query getAgentWithPrompts($agentId: ID!) {\n    getAgentWithPrompts(agentId: $agentId) {\n      id\n      name\n      description\n      reasoning {\n        llmModel\n        prompt\n        variablePassThrough\n      }\n      capabilities {\n        name\n        id\n        prompts {\n          name\n          id\n          text\n        }\n      }\n      memoryEnabled\n      subscriptionFilter\n      outputFilter\n    }\n  }\n':
     types.GetAgentWithPromptsDocument,
-  '\n  query getAllAgents {\n    getAllAgents {\n      id\n      name\n      description\n      capabilities {\n        name\n        id\n      }\n    }\n  }\n':
+  '\n  query getAllAgents($logicalCollection: String) {\n    getAllAgents(logicalCollection: $logicalCollection) {\n      id\n      name\n      description\n      capabilities {\n        name\n        id\n      }\n    }\n  }\n':
     types.GetAllAgentsDocument,
   '\n  query getAgent($agentId: ID!) {\n    getAgent(agentId: $agentId) {\n      id\n      name\n      description\n      reasoning {\n        llmModel\n        prompt\n        variablePassThrough\n      }\n      capabilities {\n        name\n        id\n      }\n      memoryEnabled\n      subscriptionFilter\n      outputFilter\n    }\n  }\n':
     types.GetAgentDocument,
-  '\n  query getAllCapabilities {\n    getAllCapabilities {\n      id\n      prompts {\n        name\n        id\n        text\n      }\n      alias\n      name\n      llmModel\n      description\n      outputMode\n      subscriptionFilter\n      outputFilter\n    }\n  }\n':
+  '\n  query getAllCapabilities($logicalCollection: String) {\n    getAllCapabilities(logicalCollection: $logicalCollection) {\n      id\n      prompts {\n        name\n        id\n        text\n      }\n      alias\n      name\n      llmModel\n      description\n      outputMode\n      subscriptionFilter\n      outputFilter\n    }\n  }\n':
     types.GetAllCapabilitiesDocument,
   '\n  query getCapability($capabilityId: ID!) {\n    getCapability(capabilityId: $capabilityId) {\n      id\n      llmModel\n      prompts {\n        name\n        id\n        text\n      }\n      alias\n      name\n      description\n      outputMode\n      subscriptionFilter\n      outputFilter\n    }\n  }\n':
     types.GetCapabilityDocument,
-  '\n  query getAllPrompts {\n    getAllPrompts {\n      id\n      name\n      text\n    }\n  }\n':
+  '\n  query getAllPrompts($logicalCollection: String) {\n    getAllPrompts(logicalCollection: $logicalCollection) {\n      id\n      name\n      text\n    }\n  }\n':
     types.GetAllPromptsDocument,
   '\n  query getPrompt($promptId: ID!) {\n    getPrompt(promptId: $promptId) {\n      id\n      name\n      text\n    }\n  }\n':
     types.GetPromptDocument,
@@ -65,6 +69,8 @@ const documents = {
     types.GetInquiryResponseCountDocument,
   '\n  query getAllAudioVoices {\n    getAllAudioVoices {\n      id\n      name\n    }\n  }\n':
     types.GetAllAudioVoicesDocument,
+  '\n  query getAllCollections {\n    getAllCollections {\n      id\n      name\n    }\n  }\n':
+    types.GetAllCollectionsDocument,
   '\n  subscription predictionAdded($subscriptionId: ID!) {\n    predictionAdded(subscriptionId: $subscriptionId) {\n      id\n      subscriptionId\n      result\n      type\n    }\n  }\n':
     types.PredictionAddedDocument,
 };
@@ -165,6 +171,18 @@ export function gql(
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(
+  source: '\n  mutation upsertCollection($input: CollectionInput!) {\n    upsertCollection(input: $input) {\n      id\n      name\n    }\n  }\n',
+): (typeof documents)['\n  mutation upsertCollection($input: CollectionInput!) {\n    upsertCollection(input: $input) {\n      id\n      name\n    }\n  }\n'];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(
+  source: '\n  mutation deleteCollection($collectionId: ID!) {\n    deleteCollection(collectionId: $collectionId) {\n      id\n    }\n  }\n',
+): (typeof documents)['\n  mutation deleteCollection($collectionId: ID!) {\n    deleteCollection(collectionId: $collectionId) {\n      id\n    }\n  }\n'];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(
   source: '\n  query getAllModels {\n    getAllModels {\n      id\n      name\n    }\n  }\n',
 ): (typeof documents)['\n  query getAllModels {\n    getAllModels {\n      id\n      name\n    }\n  }\n'];
 /**
@@ -177,8 +195,8 @@ export function gql(
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(
-  source: '\n  query getAllAgents {\n    getAllAgents {\n      id\n      name\n      description\n      capabilities {\n        name\n        id\n      }\n    }\n  }\n',
-): (typeof documents)['\n  query getAllAgents {\n    getAllAgents {\n      id\n      name\n      description\n      capabilities {\n        name\n        id\n      }\n    }\n  }\n'];
+  source: '\n  query getAllAgents($logicalCollection: String) {\n    getAllAgents(logicalCollection: $logicalCollection) {\n      id\n      name\n      description\n      capabilities {\n        name\n        id\n      }\n    }\n  }\n',
+): (typeof documents)['\n  query getAllAgents($logicalCollection: String) {\n    getAllAgents(logicalCollection: $logicalCollection) {\n      id\n      name\n      description\n      capabilities {\n        name\n        id\n      }\n    }\n  }\n'];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -189,8 +207,8 @@ export function gql(
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(
-  source: '\n  query getAllCapabilities {\n    getAllCapabilities {\n      id\n      prompts {\n        name\n        id\n        text\n      }\n      alias\n      name\n      llmModel\n      description\n      outputMode\n      subscriptionFilter\n      outputFilter\n    }\n  }\n',
-): (typeof documents)['\n  query getAllCapabilities {\n    getAllCapabilities {\n      id\n      prompts {\n        name\n        id\n        text\n      }\n      alias\n      name\n      llmModel\n      description\n      outputMode\n      subscriptionFilter\n      outputFilter\n    }\n  }\n'];
+  source: '\n  query getAllCapabilities($logicalCollection: String) {\n    getAllCapabilities(logicalCollection: $logicalCollection) {\n      id\n      prompts {\n        name\n        id\n        text\n      }\n      alias\n      name\n      llmModel\n      description\n      outputMode\n      subscriptionFilter\n      outputFilter\n    }\n  }\n',
+): (typeof documents)['\n  query getAllCapabilities($logicalCollection: String) {\n    getAllCapabilities(logicalCollection: $logicalCollection) {\n      id\n      prompts {\n        name\n        id\n        text\n      }\n      alias\n      name\n      llmModel\n      description\n      outputMode\n      subscriptionFilter\n      outputFilter\n    }\n  }\n'];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -201,8 +219,8 @@ export function gql(
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(
-  source: '\n  query getAllPrompts {\n    getAllPrompts {\n      id\n      name\n      text\n    }\n  }\n',
-): (typeof documents)['\n  query getAllPrompts {\n    getAllPrompts {\n      id\n      name\n      text\n    }\n  }\n'];
+  source: '\n  query getAllPrompts($logicalCollection: String) {\n    getAllPrompts(logicalCollection: $logicalCollection) {\n      id\n      name\n      text\n    }\n  }\n',
+): (typeof documents)['\n  query getAllPrompts($logicalCollection: String) {\n    getAllPrompts(logicalCollection: $logicalCollection) {\n      id\n      name\n      text\n    }\n  }\n'];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -239,6 +257,12 @@ export function gql(
 export function gql(
   source: '\n  query getAllAudioVoices {\n    getAllAudioVoices {\n      id\n      name\n    }\n  }\n',
 ): (typeof documents)['\n  query getAllAudioVoices {\n    getAllAudioVoices {\n      id\n      name\n    }\n  }\n'];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(
+  source: '\n  query getAllCollections {\n    getAllCollections {\n      id\n      name\n    }\n  }\n',
+): (typeof documents)['\n  query getAllCollections {\n    getAllCollections {\n      id\n      name\n    }\n  }\n'];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

@@ -9,7 +9,7 @@ import { GetAgentQuery, GetAllCapabilitiesQuery, GetAllModelsQuery, UpsertAgentM
 import { useAddAlert } from '@/hooks/alert-hook';
 import { useMutation, useQuery } from '@apollo/client';
 import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 interface Form {
   id: string | null;
@@ -45,9 +45,14 @@ export default function AgentEdit() {
   const [searchParams] = useSearchParams();
 
   // Queries and Mutations
+  const { collection } = useParams<{ collection?: string }>();
   const [upsertAgent] = useMutation<UpsertAgentMutation>(ADD_UPDATE_AGENT);
   const { data: models } = useQuery<GetAllModelsQuery>(GET_ALL_MODELS);
-  const { data: capabilities } = useQuery<GetAllCapabilitiesQuery>(GET_ALL_CAPABILITIES);
+  const { data: capabilities } = useQuery<GetAllCapabilitiesQuery>(GET_ALL_CAPABILITIES, {
+    variables: {
+      logicalCollection: collection,
+    },
+  });
 
   useQuery<GetAgentQuery>(GET_AGENT, {
     skip: !searchParams.has('id'),
@@ -105,6 +110,7 @@ export default function AgentEdit() {
           agent: {
             id: form.id,
             name: form.name,
+            logicalCollection: collection,
             description: form.description,
             reasoning: form.reasoning,
             capabilities: form.capabilities,

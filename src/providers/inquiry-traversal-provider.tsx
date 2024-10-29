@@ -252,7 +252,7 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
     if (!currentNode) return;
 
     const agentId = await getAgentIdByName(
-      `Stakeholder | Dynamic ${currentNode.type === 'question' ? 'Question' : 'Information'} Generation`,
+      `Dynamic ${currentNode.type === 'question' ? 'Question' : 'Information'} Generation`,
       client,
     );
     const mostRecentMessage = inquiryHistoryRef.current[inquiryHistoryRef.current.length - 1] || '';
@@ -287,7 +287,7 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
     // Base Case 1: The graph manager is initialized.
     if (!graphRef.current) return;
 
-    const agentId = await getAgentIdByName('Stakeholder | Condition Node', client);
+    const agentId = await getAgentIdByName('Condition Node', client);
     const mostRecentMessage = inquiryHistoryRef.current[inquiryHistoryRef.current.length - 1] || '';
 
     await addPrediction({

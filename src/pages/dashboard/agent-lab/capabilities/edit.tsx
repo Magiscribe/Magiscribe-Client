@@ -10,7 +10,7 @@ import { Prompt } from '@/graphql/graphql';
 import { useAddAlert } from '@/hooks/alert-hook';
 import { useMutation, useQuery } from '@apollo/client';
 import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 const OutputReturnMode = [
   {
@@ -70,9 +70,14 @@ export default function CapabilityEdit() {
   const [searchParams] = useSearchParams();
 
   // Queries and Mutations
+  const { collection } = useParams<{ collection?: string }>();
   const [upsertCapability] = useMutation(ADD_UPDATE_CAPABILITY);
   const [upsertPrompt] = useMutation(ADD_UPDATE_PROMPT);
-  const { data: prompts } = useQuery(GET_ALL_PROMPTS);
+  const { data: prompts } = useQuery(GET_ALL_PROMPTS, {
+    variables: {
+      logicalCollection: collection,
+    },
+  });
   const { data: models } = useQuery(GET_ALL_MODELS);
   useQuery(GET_CAPABILITY, {
     skip: !searchParams.has('id'),
@@ -196,6 +201,7 @@ export default function CapabilityEdit() {
           capability: {
             id: form.id,
             alias: form.alias,
+            logicalCollection: collection,
             name: form.name,
             description: form.description,
             llmModel: form.llmModel,
@@ -310,9 +316,12 @@ export default function CapabilityEdit() {
                 {prompts?.getAllPrompts
                   .filter((item: Prompt) => !form.prompts.find((i) => i.id === item.id))
                   .map((item: Prompt) => (
-                    <div key={item.id} className="bg-slate-100 p-2 rounded-lg h-full w-full flex flex-col">
-                      <h3 className="text-lg font-bold">{item.name}</h3>
-                      <p className="flex-grow">
+                    <div
+                      key={item.id}
+                      className="bg-slate-100 dark:bg-slate-700 p-2 rounded-lg h-full w-full flex flex-col"
+                    >
+                      <h3 className="text-lg font-bold mb-2">{item.name}</h3>
+                      <p className="flex-grow mb-2">
                         {item.text.substring(0, 50)}
                         {item.text.length > 50 ? '...' : ''}
                       </p>
@@ -327,10 +336,14 @@ export default function CapabilityEdit() {
                       </Button>
                     </div>
                   ))}
-                <div key={'newPrompt'} className="bg-slate-100 p-2 rounded-lg h-full w-full flex flex-col">
-                  <h3 className="text-lg font-bold">{'New Prompt'}</h3>
-                  <textarea
-                    className="border-2 border-slate-200 p-2 rounded-lg w-full"
+                <div
+                  key={'newPrompt'}
+                  className="bg-slate-100 dark:bg-slate-700 p-2 rounded-lg h-full w-full flex flex-col"
+                >
+                  <h3 className="text-lg font-bold mb-2">{'New Prompt'}</h3>
+                  <Textarea
+                    name="text"
+                    className="mb-2"
                     id="text"
                     rows={1}
                     placeholder="Enter title of new prompt"

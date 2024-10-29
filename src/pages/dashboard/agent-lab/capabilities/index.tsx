@@ -7,7 +7,7 @@ import { useAddAlert } from '@/hooks/alert-hook';
 import { useMutation, useQuery } from '@apollo/client';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
 function CapabilityCard({
   capability,
@@ -81,7 +81,16 @@ function CapabilityCard({
 }
 
 export default function CapabilityDashboard() {
-  const { data, refetch } = useQuery(GET_ALL_CAPABILITIES);
+  // React Router
+  const params = useParams();
+
+  // Queries
+  const { collection } = useParams<{ collection?: string }>();
+  const { data, refetch } = useQuery(GET_ALL_CAPABILITIES, {
+    variables: {
+      logicalCollection: params.collection,
+    },
+  });
   const [upsertCapability] = useMutation(ADD_UPDATE_CAPABILITY);
 
   const addAlert = useAddAlert();
@@ -96,6 +105,7 @@ export default function CapabilityDashboard() {
           capability: {
             id: null,
             alias: selectedItem.alias + 'Copy_' + timeStamp,
+            logicalCollection: collection,
             name: selectedItem.name + ' Copy ' + timeStamp,
             description: selectedItem.description,
             llmModel: selectedItem.llmModel,

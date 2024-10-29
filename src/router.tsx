@@ -17,8 +17,8 @@ import UserInquiryPage from './pages/user-inquiry';
 import AgentLabTemplate from './templates/agent-lab';
 import DashboardTemplate from './templates/dashboard';
 import InquiryBuilderTemplate from './templates/inquiry-builder';
-import Main from './templates/main';
 import InquiryUserTemplate from './templates/inquiry-user';
+import Main from './templates/main';
 
 const router = createBrowserRouter([
   {
@@ -26,7 +26,7 @@ const router = createBrowserRouter([
     element: <Main />,
     children: [
       {
-        path: '/',
+        path: '',
         element: <HomeHero />,
       },
       {
@@ -40,60 +40,60 @@ const router = createBrowserRouter([
     element: <DashboardTemplate />,
     children: [
       {
-        path: '/dashboard',
+        path: '',
         element: <DashboardPage />,
       },
       {
-        path: '/dashboard/contact',
+        path: 'contact',
         element: <Contact />,
       },
       {
-        path: '/dashboard/faq',
+        path: 'faq',
         element: <FAQPage />,
       },
       {
-        path: '/dashboard/agent-lab',
+        path: 'agent-lab/:collection?',
         element: <AgentLabTemplate />,
         children: [
           {
-            path: '/dashboard/agent-lab',
+            path: '',
             element: <></>,
           },
           {
-            path: '/dashboard/agent-lab/playground',
-            element: <PlaygroundDashboard />,
-          },
-          {
-            path: '/dashboard/agent-lab/agents',
+            path: 'agents',
             element: <AgentDashboard />,
           },
           {
-            path: '/dashboard/agent-lab/agents/edit',
+            path: 'agents/edit',
             element: <AgentEdit />,
           },
           {
-            path: '/dashboard/agent-lab/capabilities',
+            path: 'capabilities',
             element: <CapabilityDashboard />,
           },
           {
-            path: '/dashboard/agent-lab/capabilities/edit',
+            path: 'capabilities/edit',
             element: <CapabilityEdit />,
           },
           {
-            path: '/dashboard/agent-lab/prompts',
+            path: 'prompts',
             element: <PromptDashboard />,
           },
           {
-            path: '/dashboard/agent-lab/prompts/edit',
+            path: 'prompts/edit',
             element: <PromptEdit />,
+          },
+          {
+            path: 'playground',
+            element: <PlaygroundDashboard />,
           },
         ],
       },
       {
-        path: '/dashboard/inquiry-builder',
+        path: 'inquiry-builder',
         children: [
           {
-            path: '/dashboard/inquiry-builder',
+            path: '',
             element: <InquiriesBuilderPage />,
           },
         ],

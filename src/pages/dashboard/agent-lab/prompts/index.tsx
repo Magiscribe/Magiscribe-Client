@@ -7,7 +7,7 @@ import { useAddAlert } from '@/hooks/alert-hook';
 import { useMutation, useQuery } from '@apollo/client';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 function PromptCard({
   prompt,
@@ -73,7 +73,15 @@ function PromptCard({
 }
 
 export default function PromptDashboard() {
-  const { data, refetch } = useQuery(GET_ALL_PROMPTS);
+  // React Router
+  const params = useParams();
+
+  // Queries
+  const { data, refetch } = useQuery(GET_ALL_PROMPTS, {
+    variables: {
+      logicalCollection: params.collection,
+    },
+  });
   const [upsertPrompt] = useMutation(ADD_UPDATE_PROMPT);
 
   const addAlert = useAddAlert();

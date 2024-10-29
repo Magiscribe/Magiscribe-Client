@@ -273,7 +273,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const generateGraph = async (templateOverride: boolean, message: string) => {
     setGeneratingGraph(true);
     let userMessage;
-    const agentId = await getAgentIdByName('Stakeholder | Graph Edit Agent (Sonnet)', client);
+    const agentId = await getAgentIdByName('Graph Edit Agent (Sonnet)', client);
 
     if (templateOverride) {
       userMessage = [

@@ -43,7 +43,7 @@ export default function PerResponseTab({ data }: TabProps) {
     if (!selectedUser) return;
 
     setIsGeneratingSummary(true);
-    const agentId = await getAgentIdByName('Stakeholder | Per Question Summary', client);
+    const agentId = await getAgentIdByName('Per Question Summary', client);
 
     if (agentId) {
       const formattedResponses = userData.map((node) => ({

@@ -21,6 +21,7 @@ export type AgentInput = {
   capabilities: Array<InputMaybe<Scalars['String']['input']>>;
   description: Scalars['String']['input'];
   id?: InputMaybe<Scalars['ID']['input']>;
+  logicalCollection: Scalars['String']['input'];
   memoryEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   name: Scalars['String']['input'];
   outputFilter?: InputMaybe<Scalars['String']['input']>;
@@ -39,11 +40,17 @@ export type CapabilityInput = {
   description: Scalars['String']['input'];
   id?: InputMaybe<Scalars['ID']['input']>;
   llmModel?: InputMaybe<Scalars['String']['input']>;
+  logicalCollection: Scalars['String']['input'];
   name: Scalars['String']['input'];
   outputFilter?: InputMaybe<Scalars['String']['input']>;
   outputMode?: InputMaybe<Scalars['String']['input']>;
   prompts?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   subscriptionFilter?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type CollectionInput = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+  name: Scalars['String']['input'];
 };
 
 export enum PredictionType {
@@ -55,6 +62,7 @@ export enum PredictionType {
 
 export type PromptInput = {
   id?: InputMaybe<Scalars['ID']['input']>;
+  logicalCollection: Scalars['String']['input'];
   name: Scalars['String']['input'];
   text: Scalars['String']['input'];
 };
@@ -209,6 +217,24 @@ export type UpdateInquiryResponseMutation = {
   upsertInquiryResponse: { __typename?: 'InquiryResponse'; id: string };
 };
 
+export type UpsertCollectionMutationVariables = Exact<{
+  input: CollectionInput;
+}>;
+
+export type UpsertCollectionMutation = {
+  __typename?: 'Mutation';
+  upsertCollection?: { __typename?: 'Collection'; id: string; name: string } | null;
+};
+
+export type DeleteCollectionMutationVariables = Exact<{
+  collectionId: Scalars['ID']['input'];
+}>;
+
+export type DeleteCollectionMutation = {
+  __typename?: 'Mutation';
+  deleteCollection?: { __typename?: 'Collection'; id: string } | null;
+};
+
 export type GetAllModelsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetAllModelsQuery = {
@@ -245,7 +271,9 @@ export type GetAgentWithPromptsQuery = {
   } | null;
 };
 
-export type GetAllAgentsQueryVariables = Exact<{ [key: string]: never }>;
+export type GetAllAgentsQueryVariables = Exact<{
+  logicalCollection?: InputMaybe<Scalars['String']['input']>;
+}>;
 
 export type GetAllAgentsQuery = {
   __typename?: 'Query';
@@ -282,7 +310,9 @@ export type GetAgentQuery = {
   } | null;
 };
 
-export type GetAllCapabilitiesQueryVariables = Exact<{ [key: string]: never }>;
+export type GetAllCapabilitiesQueryVariables = Exact<{
+  logicalCollection?: InputMaybe<Scalars['String']['input']>;
+}>;
 
 export type GetAllCapabilitiesQuery = {
   __typename?: 'Query';
@@ -320,7 +350,9 @@ export type GetCapabilityQuery = {
   } | null;
 };
 
-export type GetAllPromptsQueryVariables = Exact<{ [key: string]: never }>;
+export type GetAllPromptsQueryVariables = Exact<{
+  logicalCollection?: InputMaybe<Scalars['String']['input']>;
+}>;
 
 export type GetAllPromptsQuery = {
   __typename?: 'Query';
@@ -386,6 +418,13 @@ export type GetAllAudioVoicesQueryVariables = Exact<{ [key: string]: never }>;
 export type GetAllAudioVoicesQuery = {
   __typename?: 'Query';
   getAllAudioVoices: Array<{ __typename?: 'Voice'; id: string; name: string }>;
+};
+
+export type GetAllCollectionsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetAllCollectionsQuery = {
+  __typename?: 'Query';
+  getAllCollections: Array<{ __typename?: 'Collection'; id: string; name: string }>;
 };
 
 export type PredictionAddedSubscriptionVariables = Exact<{
@@ -1044,6 +1083,83 @@ export const UpdateInquiryResponseDocument = {
     },
   ],
 } as unknown as DocumentNode<UpdateInquiryResponseMutation, UpdateInquiryResponseMutationVariables>;
+export const UpsertCollectionDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'upsertCollection' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+          type: { kind: 'NonNullType', type: { kind: 'NamedType', name: { kind: 'Name', value: 'CollectionInput' } } },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'upsertCollection' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'input' },
+                value: { kind: 'Variable', name: { kind: 'Name', value: 'input' } },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<UpsertCollectionMutation, UpsertCollectionMutationVariables>;
+export const DeleteCollectionDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'deleteCollection' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'collectionId' } },
+          type: { kind: 'NonNullType', type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } } },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'deleteCollection' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'collectionId' },
+                value: { kind: 'Variable', name: { kind: 'Name', value: 'collectionId' } },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [{ kind: 'Field', name: { kind: 'Name', value: 'id' } }],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<DeleteCollectionMutation, DeleteCollectionMutationVariables>;
 export const GetAllModelsDocument = {
   kind: 'Document',
   definitions: [
@@ -1156,12 +1272,26 @@ export const GetAllAgentsDocument = {
       kind: 'OperationDefinition',
       operation: 'query',
       name: { kind: 'Name', value: 'getAllAgents' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'logicalCollection' } },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'String' } },
+        },
+      ],
       selectionSet: {
         kind: 'SelectionSet',
         selections: [
           {
             kind: 'Field',
             name: { kind: 'Name', value: 'getAllAgents' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'logicalCollection' },
+                value: { kind: 'Variable', name: { kind: 'Name', value: 'logicalCollection' } },
+              },
+            ],
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
@@ -1261,12 +1391,26 @@ export const GetAllCapabilitiesDocument = {
       kind: 'OperationDefinition',
       operation: 'query',
       name: { kind: 'Name', value: 'getAllCapabilities' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'logicalCollection' } },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'String' } },
+        },
+      ],
       selectionSet: {
         kind: 'SelectionSet',
         selections: [
           {
             kind: 'Field',
             name: { kind: 'Name', value: 'getAllCapabilities' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'logicalCollection' },
+                value: { kind: 'Variable', name: { kind: 'Name', value: 'logicalCollection' } },
+              },
+            ],
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
@@ -1363,12 +1507,26 @@ export const GetAllPromptsDocument = {
       kind: 'OperationDefinition',
       operation: 'query',
       name: { kind: 'Name', value: 'getAllPrompts' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'logicalCollection' } },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'String' } },
+        },
+      ],
       selectionSet: {
         kind: 'SelectionSet',
         selections: [
           {
             kind: 'Field',
             name: { kind: 'Name', value: 'getAllPrompts' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'logicalCollection' },
+                value: { kind: 'Variable', name: { kind: 'Name', value: 'logicalCollection' } },
+              },
+            ],
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
@@ -1607,6 +1765,32 @@ export const GetAllAudioVoicesDocument = {
     },
   ],
 } as unknown as DocumentNode<GetAllAudioVoicesQuery, GetAllAudioVoicesQueryVariables>;
+export const GetAllCollectionsDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'getAllCollections' },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'getAllCollections' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetAllCollectionsQuery, GetAllCollectionsQueryVariables>;
 export const PredictionAddedDocument = {
   kind: 'Document',
   definitions: [
@@ -1664,6 +1848,7 @@ export type Agent = {
   capabilities: Array<Capability>;
   description: Scalars['String']['output'];
   id: Scalars['ID']['output'];
+  logicalCollection: Collection;
   memoryEnabled: Scalars['Boolean']['output'];
   name: Scalars['String']['output'];
   outputFilter?: Maybe<Scalars['String']['output']>;
@@ -1675,6 +1860,7 @@ export type AgentInput = {
   capabilities: Array<InputMaybe<Scalars['String']['input']>>;
   description: Scalars['String']['input'];
   id?: InputMaybe<Scalars['ID']['input']>;
+  logicalCollection: Scalars['String']['input'];
   memoryEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   name: Scalars['String']['input'];
   outputFilter?: InputMaybe<Scalars['String']['input']>;
@@ -1701,6 +1887,7 @@ export type Capability = {
   description: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   llmModel: Scalars['String']['output'];
+  logicalCollection: Collection;
   name: Scalars['String']['output'];
   outputFilter?: Maybe<Scalars['String']['output']>;
   outputMode: Scalars['String']['output'];
@@ -1713,11 +1900,23 @@ export type CapabilityInput = {
   description: Scalars['String']['input'];
   id?: InputMaybe<Scalars['ID']['input']>;
   llmModel?: InputMaybe<Scalars['String']['input']>;
+  logicalCollection: Scalars['String']['input'];
   name: Scalars['String']['input'];
   outputFilter?: InputMaybe<Scalars['String']['input']>;
   outputMode?: InputMaybe<Scalars['String']['input']>;
   prompts?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   subscriptionFilter?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type Collection = {
+  __typename?: 'Collection';
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+};
+
+export type CollectionInput = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+  name: Scalars['String']['input'];
 };
 
 export type Inquiry = {
@@ -1772,11 +1971,13 @@ export type Mutation = {
   addPrediction?: Maybe<Scalars['String']['output']>;
   deleteAgent?: Maybe<Agent>;
   deleteCapability?: Maybe<Capability>;
+  deleteCollection?: Maybe<Collection>;
   deleteInquiry?: Maybe<Inquiry>;
   deletePrompt?: Maybe<Prompt>;
   generateAudio?: Maybe<Scalars['String']['output']>;
   upsertAgent?: Maybe<Agent>;
   upsertCapability?: Maybe<Capability>;
+  upsertCollection?: Maybe<Collection>;
   upsertInquiry: Inquiry;
   upsertInquiryResponse: InquiryResponse;
   upsertPrompt?: Maybe<Prompt>;
@@ -1802,6 +2003,10 @@ export type MutationDeleteCapabilityArgs = {
   capabilityId: Scalars['ID']['input'];
 };
 
+export type MutationDeleteCollectionArgs = {
+  collectionId: Scalars['ID']['input'];
+};
+
 export type MutationDeleteInquiryArgs = {
   id: Scalars['ID']['input'];
 };
@@ -1821,6 +2026,10 @@ export type MutationUpsertAgentArgs = {
 
 export type MutationUpsertCapabilityArgs = {
   capability: CapabilityInput;
+};
+
+export type MutationUpsertCollectionArgs = {
+  input: CollectionInput;
 };
 
 export type MutationUpsertInquiryArgs = {
@@ -1858,12 +2067,14 @@ export enum PredictionType {
 export type Prompt = {
   __typename?: 'Prompt';
   id: Scalars['ID']['output'];
+  logicalCollection: Collection;
   name: Scalars['String']['output'];
   text: Scalars['String']['output'];
 };
 
 export type PromptInput = {
   id?: InputMaybe<Scalars['ID']['input']>;
+  logicalCollection: Scalars['String']['input'];
   name: Scalars['String']['input'];
   text: Scalars['String']['input'];
 };
@@ -1875,9 +2086,11 @@ export type Query = {
   getAllAgents: Array<Agent>;
   getAllAudioVoices: Array<Voice>;
   getAllCapabilities: Array<Capability>;
+  getAllCollections: Array<Collection>;
   getAllModels: Array<Model>;
   getAllPrompts?: Maybe<Array<Maybe<Prompt>>>;
   getCapability?: Maybe<Capability>;
+  getCollection?: Maybe<Collection>;
   getInquiries?: Maybe<Array<Inquiry>>;
   getInquiry?: Maybe<Inquiry>;
   getInquiryResponseCount: Scalars['Int']['output'];
@@ -1893,8 +2106,24 @@ export type QueryGetAgentWithPromptsArgs = {
   agentId: Scalars['ID']['input'];
 };
 
+export type QueryGetAllAgentsArgs = {
+  logicalCollection?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type QueryGetAllCapabilitiesArgs = {
+  logicalCollection?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type QueryGetAllPromptsArgs = {
+  logicalCollection?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type QueryGetCapabilityArgs = {
   capabilityId: Scalars['ID']['input'];
+};
+
+export type QueryGetCollectionArgs = {
+  collectionId: Scalars['ID']['input'];
 };
 
 export type QueryGetInquiryArgs = {
@@ -2078,6 +2307,24 @@ export type UpdateInquiryResponseMutation = {
   upsertInquiryResponse: { __typename?: 'InquiryResponse'; id: string };
 };
 
+export type UpsertCollectionMutationVariables = Exact<{
+  input: CollectionInput;
+}>;
+
+export type UpsertCollectionMutation = {
+  __typename?: 'Mutation';
+  upsertCollection?: { __typename?: 'Collection'; id: string; name: string } | null;
+};
+
+export type DeleteCollectionMutationVariables = Exact<{
+  collectionId: Scalars['ID']['input'];
+}>;
+
+export type DeleteCollectionMutation = {
+  __typename?: 'Mutation';
+  deleteCollection?: { __typename?: 'Collection'; id: string } | null;
+};
+
 export type GetAllModelsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetAllModelsQuery = {
@@ -2114,7 +2361,9 @@ export type GetAgentWithPromptsQuery = {
   } | null;
 };
 
-export type GetAllAgentsQueryVariables = Exact<{ [key: string]: never }>;
+export type GetAllAgentsQueryVariables = Exact<{
+  logicalCollection?: InputMaybe<Scalars['String']['input']>;
+}>;
 
 export type GetAllAgentsQuery = {
   __typename?: 'Query';
@@ -2151,7 +2400,9 @@ export type GetAgentQuery = {
   } | null;
 };
 
-export type GetAllCapabilitiesQueryVariables = Exact<{ [key: string]: never }>;
+export type GetAllCapabilitiesQueryVariables = Exact<{
+  logicalCollection?: InputMaybe<Scalars['String']['input']>;
+}>;
 
 export type GetAllCapabilitiesQuery = {
   __typename?: 'Query';
@@ -2189,7 +2440,9 @@ export type GetCapabilityQuery = {
   } | null;
 };
 
-export type GetAllPromptsQueryVariables = Exact<{ [key: string]: never }>;
+export type GetAllPromptsQueryVariables = Exact<{
+  logicalCollection?: InputMaybe<Scalars['String']['input']>;
+}>;
 
 export type GetAllPromptsQuery = {
   __typename?: 'Query';
@@ -2255,6 +2508,13 @@ export type GetAllAudioVoicesQueryVariables = Exact<{ [key: string]: never }>;
 export type GetAllAudioVoicesQuery = {
   __typename?: 'Query';
   getAllAudioVoices: Array<{ __typename?: 'Voice'; id: string; name: string }>;
+};
+
+export type GetAllCollectionsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetAllCollectionsQuery = {
+  __typename?: 'Query';
+  getAllCollections: Array<{ __typename?: 'Collection'; id: string; name: string }>;
 };
 
 export type PredictionAddedSubscriptionVariables = Exact<{

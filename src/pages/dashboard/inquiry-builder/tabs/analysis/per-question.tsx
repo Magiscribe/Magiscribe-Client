@@ -93,7 +93,7 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
 
   const generateSummary = useCallback(async () => {
     setIsGeneratingSummary(true);
-    const agentId = await getAgentIdByName('Stakeholder | Per Question Summary', client);
+    const agentId = await getAgentIdByName('Per Question Summary', client);
 
     if (agentId) {
       const currentNode = questionNodes[currentQuestionIndex];

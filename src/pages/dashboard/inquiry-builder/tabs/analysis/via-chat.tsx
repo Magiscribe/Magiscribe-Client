@@ -87,7 +87,7 @@ export default function ViaChatTab({ data }: TabProps) {
     setMessages((prevMessages) => [...prevMessages, { type: 'text', content: inputMessage, sender: 'user' }]);
     setInputMessage('');
 
-    const agentId = await getAgentIdByName('Stakeholder | Chat Analysis', client);
+    const agentId = await getAgentIdByName('Chat Analysis', client);
     if (agentId) {
       setLoading(true);
       try {

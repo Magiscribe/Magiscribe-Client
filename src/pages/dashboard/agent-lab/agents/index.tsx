@@ -2,14 +2,15 @@ import { ADD_UPDATE_AGENT, DELETE_AGENT } from '@/clients/mutations';
 import { GET_ALL_AGENTS } from '@/clients/queries';
 import Button from '@/components/controls/button';
 import ConfirmationModal from '@/components/modals/confirm-modal';
-import { Agent, Capability } from '@/graphql/graphql';
+import { Agent, Capability, GetAllAgentsQuery, UpsertAgentMutation } from '@/graphql/graphql';
 import { useAddAlert } from '@/hooks/alert-hook';
 import { useMutation, useQuery } from '@apollo/client';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
 function AgentCard({ agent, onUpdate, onCopy }: { agent: Agent; onUpdate?: () => void; onCopy: (id: string) => void }) {
+  // Queries
   const [deleteAgent] = useMutation(DELETE_AGENT);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
@@ -71,11 +72,18 @@ function AgentCard({ agent, onUpdate, onCopy }: { agent: Agent; onUpdate?: () =>
 }
 
 export default function AgentDashboard() {
-  const { data, refetch } = useQuery(GET_ALL_AGENTS);
-  const [upsertAgent] = useMutation(ADD_UPDATE_AGENT);
+  // React Router
+  const params = useParams();
+
+  // Queries
+  const { data, refetch } = useQuery<GetAllAgentsQuery>(GET_ALL_AGENTS, {
+    variables: {
+      logicalCollection: params.collection,
+    },
+  });
+  const [upsertAgent] = useMutation<UpsertAgentMutation>(ADD_UPDATE_AGENT);
 
   const addAlert = useAddAlert();
-  const navigate = useNavigate();
 
   const handleCopy = async (id: string) => {
     const selectedItem = data?.getAllAgents.find((agent: Agent) => agent.id === id);
@@ -114,7 +122,9 @@ export default function AgentDashboard() {
     <div className="bg-white dark:bg-slate-700 text-slate-700 dark:text-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Agents</h1>
-        <Button onClick={() => navigate('add')}>Add Agent</Button>
+        <Button as={Link} to="edit">
+          Add Agent
+        </Button>
       </div>
       <hr className="my-4" />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 my-8">

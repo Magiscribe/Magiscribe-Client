@@ -6,7 +6,7 @@ import Textarea from '@/components/controls/textarea';
 import { useAddAlert } from '@/hooks/alert-hook';
 import { useMutation, useQuery } from '@apollo/client';
 import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 export default function PromptEdit() {
   // States
@@ -17,6 +17,7 @@ export default function PromptEdit() {
   });
 
   // Hooks
+  const { collection } = useParams<{ collection?: string }>();
   const addAlert = useAddAlert();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -54,6 +55,7 @@ export default function PromptEdit() {
             id: form.id,
             name: form.name,
             text: form.text,
+            logicalCollection: collection,
           },
         },
       });

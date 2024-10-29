@@ -129,3 +129,20 @@ export const UPDATE_INQUIRY_RESPONSE = gql`
     }
   }
 `;
+
+export const UPSERT_COLLECTION = gql`
+  mutation upsertCollection($input: CollectionInput!) {
+    upsertCollection(input: $input) {
+      id
+      name
+    }
+  }
+`;
+
+export const DELETE_COLLECTION = gql`
+  mutation deleteCollection($collectionId: ID!) {
+    deleteCollection(collectionId: $collectionId) {
+      id
+    }
+  }
+`;
