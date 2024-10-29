@@ -2,8 +2,8 @@ import { ADD_UPDATE_CAPABILITY, ADD_UPDATE_PROMPT } from '@/clients/mutations';
 import { GET_ALL_MODELS, GET_ALL_PROMPTS, GET_CAPABILITY } from '@/clients/queries';
 import Button from '@/components/controls/button';
 import Input from '@/components/controls/input';
-import ListBox from '@/components/controls/list/ListBox';
 import ReorderableList from '@/components/controls/list/ReorderableList';
+import Select from '@/components/controls/select';
 import Textarea from '@/components/controls/textarea';
 import CustomModal from '@/components/modals/modal';
 import { Prompt } from '@/graphql/graphql';
@@ -100,7 +100,7 @@ export default function CapabilityEdit() {
     },
   });
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm({
       ...form,
       [event.target.id]: event.target.value,
@@ -244,43 +244,31 @@ export default function CapabilityEdit() {
 
           <div className="mb-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="mb-4">
-              <ListBox
-                label="LLM Model"
-                setSelected={(value) => {
-                  setForm({
-                    ...form,
-                    llmModel: value.id,
-                  });
-                }}
-                selected={
-                  models?.getAllModels.find((model: { id: string }) => model.id === form.llmModel) ?? {
-                    name: '',
-                    id: '',
-                  }
-                }
-                values={
-                  models?.getAllModels.map((model: { name: string; id: string }) => ({
-                    name: model.name,
-                    id: model.id,
-                  })) ?? []
-                }
+              <Select
+                id="llmModel"
+                name='llmModel'
+                label='LLM Model'
+                value={form.llmModel}
+                options={models?.getAllModels.map((model: { name: string; id: string }) => ({ value: model.id, label: model.name }))}
+                onChange={handleChange}
               />
             </div>
             <div className="mb-4">
-              <ListBox
-                label="Output Mode"
-                setSelected={(value) => {
-                  setForm({
-                    ...form,
-                    outputMode: value.id,
-                  });
-                }}
-                selected={OutputReturnMode.find((mode) => mode.id === form.outputMode) ?? { name: '', id: '' }}
-                values={OutputReturnMode.map((mode) => ({
-                  name: mode.name,
-                  id: mode.id,
-                }))}
-              />
+              <Select
+                id="outputMode"
+                name='outputMode'
+                label='Output Mode'
+                value={form.outputMode}
+                onChange={handleChange}
+      options={OutputReturnMode.map((mode) => ({ value: mode.id, label: mode.name }))}
+  >
+                <option value="">Select an output mode</option>
+                {OutputReturnMode.map((mode) => (
+                  <option key={mode.id} value={mode.id}>
+                    {mode.name}
+                  </option>
+                ))}
+              </Select>
             </div>
           </div>
           <div className="mb-4">

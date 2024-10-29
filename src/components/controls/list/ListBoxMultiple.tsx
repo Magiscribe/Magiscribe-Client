@@ -2,7 +2,6 @@ import { faCheck, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions, Transition } from '@headlessui/react';
 import clsx from 'clsx';
-import React from 'react';
 
 /**
  * Props for the ListBoxMultiple component.

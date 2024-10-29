@@ -3,7 +3,7 @@ import { GET_ALL_AGENTS } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import Button from '@/components/controls/button';
 import Input from '@/components/controls/input';
-import ListBox from '@/components/controls/list/ListBox';
+import Select from '@/components/controls/select';
 import { CustomVariable, CustomVariablesSection } from '@/components/custom-variables';
 import { Agent } from '@/graphql/graphql';
 import useElevenLabsAudio from '@/hooks/audio-player';
@@ -12,6 +12,7 @@ import { useMutation, useQuery, useSubscription } from '@apollo/client';
 import { faVolumeHigh, faVolumeMute } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useCallback, useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 
 interface predictionAdded {
   id: string;
@@ -42,6 +43,9 @@ const initialForm: Form = {
 };
 
 export default function PlaygroundDashboard() {
+    // React Router
+    const params = useParams();
+
   // States
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useWithLocalStorage(initialForm, 'playground-form');
@@ -49,7 +53,11 @@ export default function PlaygroundDashboard() {
   const [base64Images, setBase64Images] = useState<string[]>([]);
 
   // Queries and Mutations
-  const { data: agents } = useQuery(GET_ALL_AGENTS);
+  const { data: agents } = useQuery(GET_ALL_AGENTS, {
+    variables: {
+      logicalCollection: params.collection,
+    },
+  });
   const [addPrediction] = useMutation(ADD_PREDICTION);
 
   // Text to speech
@@ -208,19 +216,15 @@ export default function PlaygroundDashboard() {
               />
             </div>
             <div className="mb-4">
-              <ListBox
+              <Select
+              name='agent'
                 label="Agents"
-                setSelected={(value) =>
-                  setForm({
-                    ...form,
-                    agent: value.id,
-                  })
-                }
-                selected={(agents?.getAllAgents ?? []).find((agent: Agent) => agent.id === form.agent)}
-                values={(agents?.getAllAgents ?? []).map((agent: Agent) => ({
-                  name: agent.name ?? '',
-                  id: agent.id,
-                }))}
+                onChange={(e) => setForm({ ...form, agent: e.target.value })}
+                value={form.agent}
+                options={agents?.getAllAgents.map((agent: Agent) => ({
+                  value: agent.id,
+                  label: agent.name,
+                })) ?? []}
               />
             </div>
             <div className="mb-4">
