@@ -15,8 +15,8 @@ const variantClassNames = {
   transparentSecondary: 'text-slate-500 hover:text-slate-500',
   transparentDanger: 'text-red-600 hover:text-red-700',
   transparentSuccess: 'text-green-600 hover:text-green-700',
-  transparentLight: 'text-white hover:text-white dark:hover:text-slate-700',
-  transparentDark: 'text-slate-600 hover:text-slate-700 dark:hover:text-white',
+  transparentLight: 'text-white dark:text-slate-600 hover:text-slate-400 dark:hover:text-white',
+  transparentDark: 'text-slate-600 dark:text-white hover:text-slate-700 dark:hover:text-slate-400',
 
   inversePrimary:
     'bg-transperant text-blue-600 hover:bg-blue-600 hover:text-white focus:ring-red-500 border border-2 border-blue-600',

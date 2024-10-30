@@ -21,11 +21,12 @@ import {
   faPaperPlane,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 interface Message {
+  id: string;
   type: 'text' | 'chart' | 'image';
   content: string | ChartProps;
   sender: 'user' | 'bot';
@@ -102,7 +103,7 @@ export default function UserInquiryPage() {
     return newErrors;
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setUserDetails((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => ({ ...prev, [name]: '' }));
@@ -202,6 +203,7 @@ export default function UserInquiryPage() {
           name="about"
           placeholder="Your background, interests, or anything you'd like to share."
           value={userDetails.about}
+          onChange={handleChange}
           error={errors.about}
         />
       </div>
@@ -215,7 +217,7 @@ export default function UserInquiryPage() {
   );
 
   const renderMessages = () => (
-    <AnimatePresence>
+      <>
       {messages.map((message) => (
         <motion.div
           key={message.id}
@@ -247,7 +249,7 @@ export default function UserInquiryPage() {
           <AnimatedDots />
         </div>
       )}
-    </AnimatePresence>
+      </>
   );
 
   const renderSummary = () => (

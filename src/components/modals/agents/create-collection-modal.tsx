@@ -69,7 +69,7 @@ const ModalUpsertCollection: React.FC<ModalUpsertInquiryProps> = ({ open, onClos
         <Input
           name="title"
           label="Title"
-          placeholder="Inquiry title"
+          placeholder="Collection title"
           autoFocus
           subLabel="This will be displayed to the people you are sending the inquiry to"
           value={form.title}

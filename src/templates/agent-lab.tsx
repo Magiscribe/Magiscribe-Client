@@ -55,24 +55,6 @@ export default function AgentLabTemplate() {
 
   return (
     <>
-      <div className="my-8 ">
-        <Select
-          label="Collection"
-          name="collection"
-          value={collectionOptions.find((option) => option.value === collection)?.value || 'none'}
-          onChange={handleCollectionChange}
-          options={collectionOptions}
-          className="flex-grow"
-        />
-        <div className="flex justify-end gap-4 mt-4">
-          <Button size="small" onClick={() => setCreateCollectionModalOpen(true)}>
-            Create Collection
-          </Button>
-          <Button size="small" variant="inverseDanger" onClick={() => setDeleteCollectionModalOpen(true)}>
-            Delete Collection
-          </Button>
-        </div>
-      </div>
       {collection && (
         <motion.div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 my-8">
           <LinkCard
@@ -105,6 +87,25 @@ export default function AgentLabTemplate() {
           />
         </motion.div>
       )}
+            <div className="my-8 bg-white dark:bg-slate-700 p-6 rounded-2xl flex flex-col gap-4">
+        <Select
+          label="Collection"
+          subLabel='A collection is a logical grouping of agents, capabilities, and prompts.'
+          name="collection"
+          value={collectionOptions.find((option) => option.value === collection)?.value || 'none'}
+          onChange={handleCollectionChange}
+          options={collectionOptions}
+          className="flex-grow"
+        />
+        <div className="flex justify-end gap-4 mt-4">
+          <Button size="small" onClick={() => setCreateCollectionModalOpen(true)}>
+            Create Collection
+          </Button>
+          <Button size="small" variant="inverseDanger" onClick={() => setDeleteCollectionModalOpen(true)}>
+            Delete Collection
+          </Button>
+        </div>
+      </div>
       <Outlet />
 
       <ModalUpsertCollection open={createCollectionModalOpen} onClose={() => setCreateCollectionModalOpen(false)} />

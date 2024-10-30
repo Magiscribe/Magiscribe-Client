@@ -3,7 +3,7 @@ import ModalSendInquiry from '@/components/modals/inquiry/send-inquiry-modal';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { formatGraph, validateGraph } from '@/utils/graphs/graph-utils';
-import { faCheckCircle, faCog, faEllipsisV, faEye, faRotateLeft } from '@fortawesome/free-solid-svg-icons';
+import { faCheckCircle, faCog, faEllipsisV, faEye, faPaperPlane, faRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
 
 import Button from '../controls/button';
@@ -67,7 +67,7 @@ export default function GraphContextBar() {
           </p>
         </div>
         <div className="flex space-x-4">
-          <Button variant="success" iconLeft={faCheckCircle} onClick={handlePublish}>
+          <Button variant="success" iconLeft={faPaperPlane} onClick={handlePublish}>
             Publish
           </Button>
           <Button variant="primary" iconLeft={faCog} onClick={handleFormat}>

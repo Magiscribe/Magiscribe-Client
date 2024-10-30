@@ -46,7 +46,7 @@ const AnalysisTab: React.FC<AnalysisTabProps> = ({ id }) => {
   const tabs = ['Per Response', 'Per Question', 'Via Chat'];
 
   return (
-    <div className="mt-8 rounded-2xl shadow-xl">
+    <div className="mt-8 rounded-2xl">
       <TabGroup>
         <TabList className="flex space-x-1 rounded-xl border-2 border-white mb-4">
           {tabs.map((category) => (
@@ -57,7 +57,7 @@ const AnalysisTab: React.FC<AnalysisTabProps> = ({ id }) => {
                   'w-full rounded-lg py-2.5 text-sm font-medium leading-5',
                   'ring-white ring-opacity-60 focus:outline-none focus:ring-2',
                   selected
-                    ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-white'
+                    ? 'bg-white dark:bg-slate-700 shadow-xl text-slate-800 dark:text-white'
                     : 'text-white dark:text-slate-200',
                 )
               }

@@ -176,7 +176,7 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
    * @param {HandleNextNodeProps} props - The next node ID and data to pass to the next node.
    * @returns {Promise<void>} A promise that resolves when the next node is visited
    */
-  const handleNextNode = async ({ nextNodeId, data }: HandleNextNodeProps = {}) => {
+    async function handleNextNode({ nextNodeId, data }: HandleNextNodeProps = {}) {
     if (!graphRef.current) return;
     setState((prev) => ({ ...prev, loading: true }));
 
