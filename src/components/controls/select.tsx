@@ -39,8 +39,8 @@ const Select: React.FC<SelectProps> = ({ label, subLabel, name, error, options, 
       <div className="relative">
         <select id={name} name={name} className={baseSelectClassName} {...props}>
           {options.map((option) => (
-            <option 
-              key={option.value} 
+            <option
+              key={option.value}
               value={option.value}
               className="text-slate-800 dark:text-white bg-white dark:bg-slate-600 py-1.5 px-3"
             >

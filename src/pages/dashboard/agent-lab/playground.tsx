@@ -43,8 +43,8 @@ const initialForm: Form = {
 };
 
 export default function PlaygroundDashboard() {
-    // React Router
-    const params = useParams();
+  // React Router
+  const params = useParams();
 
   // States
   const [loading, setLoading] = useState(false);
@@ -217,14 +217,16 @@ export default function PlaygroundDashboard() {
             </div>
             <div className="mb-4">
               <Select
-              name='agent'
+                name="agent"
                 label="Agents"
                 onChange={(e) => setForm({ ...form, agent: e.target.value })}
                 value={form.agent}
-                options={agents?.getAllAgents.map((agent: Agent) => ({
-                  value: agent.id,
-                  label: agent.name,
-                })) ?? []}
+                options={
+                  agents?.getAllAgents.map((agent: Agent) => ({
+                    value: agent.id,
+                    label: agent.name,
+                  })) ?? []
+                }
               />
             </div>
             <div className="mb-4">

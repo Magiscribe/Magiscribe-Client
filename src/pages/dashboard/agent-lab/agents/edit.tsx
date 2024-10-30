@@ -154,10 +154,12 @@ export default function AgentEdit() {
                     },
                   });
                 }}
-                options={models?.getAllModels.map((model) => ({
-                  value: model.id,
-                  label: model.name,
-                })) ?? []}
+                options={
+                  models?.getAllModels.map((model) => ({
+                    value: model.id,
+                    label: model.name,
+                  })) ?? []
+                }
               />
             )}
           </div>
@@ -261,12 +263,7 @@ export default function AgentEdit() {
               value={form.subscriptionFilter ?? ''}
               onChange={handleChange}
             />
-            <Input 
-              name="outputFilter" 
-              label="Output Filter" 
-              value={form.outputFilter ?? ''} 
-              onChange={handleChange} 
-            />
+            <Input name="outputFilter" label="Output Filter" value={form.outputFilter ?? ''} onChange={handleChange} />
           </div>
 
           <Button>Save</Button>

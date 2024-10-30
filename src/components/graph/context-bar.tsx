@@ -3,13 +3,13 @@ import ModalSendInquiry from '@/components/modals/inquiry/send-inquiry-modal';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { formatGraph, validateGraph } from '@/utils/graphs/graph-utils';
-import { faCheckCircle, faCog, faEllipsisV, faEye, faPaperPlane, faRotateLeft } from '@fortawesome/free-solid-svg-icons';
+import { faCog, faEllipsisV, faEye, faPaperPlane, faRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
 
 import Button from '../controls/button';
+import Input from '../controls/input';
 import ModalValidationErrors from '../modals/inquiry/inquiry-validation-errors-modal';
 import ModalSettingsInquiry from '../modals/inquiry/settings-inquiry-modal';
-import Input from '../controls/input';
 
 export default function GraphContextBar() {
   // States

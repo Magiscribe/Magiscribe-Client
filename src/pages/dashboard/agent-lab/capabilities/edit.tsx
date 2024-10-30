@@ -249,10 +249,12 @@ export default function CapabilityEdit() {
                 name="llmModel"
                 label="LLM Model"
                 value={form.llmModel}
-                options={models?.getAllModels.map((model: { name: string; id: string }) => ({
-                  value: model.id,
-                  label: model.name,
-                })) ?? []}
+                options={
+                  models?.getAllModels.map((model: { name: string; id: string }) => ({
+                    value: model.id,
+                    label: model.name,
+                  })) ?? []
+                }
                 onChange={handleChange}
               />
             </div>

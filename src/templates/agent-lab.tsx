@@ -87,10 +87,10 @@ export default function AgentLabTemplate() {
           />
         </motion.div>
       )}
-            <div className="my-8 bg-white dark:bg-slate-700 p-6 rounded-2xl flex flex-col gap-4">
+      <div className="my-8 bg-white dark:bg-slate-700 p-6 rounded-2xl flex flex-col gap-4">
         <Select
           label="Collection"
-          subLabel='A collection is a logical grouping of agents, capabilities, and prompts.'
+          subLabel="A collection is a logical grouping of agents, capabilities, and prompts."
           name="collection"
           value={collectionOptions.find((option) => option.value === collection)?.value || 'none'}
           onChange={handleCollectionChange}

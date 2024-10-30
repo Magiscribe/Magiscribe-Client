@@ -3,7 +3,6 @@ import { useDarkMode } from '@/hooks/dark-mode';
 import AudioProvider, { useAudioContext } from '@/providers/audio-provider';
 import { InquiryTraversalProvider, useInquiry } from '@/providers/inquiry-traversal-provider';
 import { faMoon, faSun, faVolumeMute, faVolumeUp } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Outlet, useParams, useSearchParams } from 'react-router-dom';
 
 function Header() {
@@ -23,7 +22,10 @@ function Header() {
           {form.voice && (
             <Button
               onClick={toggleAudio}
-              variant="transparentDark" size="small" iconLeft={isAudioEnabled ? faVolumeUp : faVolumeMute} />
+              variant="transparentDark"
+              size="small"
+              iconLeft={isAudioEnabled ? faVolumeUp : faVolumeMute}
+            />
           )}
           <Button onClick={toggleDarkMode} variant="transparentDark" size="small" iconLeft={isDark ? faSun : faMoon} />
         </div>

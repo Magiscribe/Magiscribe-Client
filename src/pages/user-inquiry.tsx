@@ -13,7 +13,7 @@ import { useInquiry } from '@/providers/inquiry-traversal-provider';
 import { useQueue } from '@/utils/debounce-queue';
 import { StrippedNode } from '@/utils/graphs/graph';
 import { SignedIn, SignedOut, SignUpButton } from '@clerk/clerk-react';
-import { faChevronRight, faImage, faMicrophone, faMicrophoneSlash, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
+import { faChevronRight, faMicrophone, faMicrophoneSlash, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { motion } from 'framer-motion';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -211,7 +211,7 @@ export default function UserInquiryPage() {
   );
 
   const renderMessages = () => (
-      <>
+    <>
       {messages.map((message) => (
         <motion.div
           key={message.id}
@@ -243,7 +243,7 @@ export default function UserInquiryPage() {
           <AnimatedDots />
         </div>
       )}
-      </>
+    </>
   );
 
   const renderSummary = () => (
