@@ -13,13 +13,7 @@ import { useInquiry } from '@/providers/inquiry-traversal-provider';
 import { useQueue } from '@/utils/debounce-queue';
 import { StrippedNode } from '@/utils/graphs/graph';
 import { SignedIn, SignedOut, SignUpButton } from '@clerk/clerk-react';
-import {
-  faChevronRight,
-  faImage,
-  faMicrophone,
-  faMicrophoneSlash,
-  faPaperPlane,
-} from '@fortawesome/free-solid-svg-icons';
+import { faChevronRight, faImage, faMicrophone, faMicrophoneSlash, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { motion } from 'framer-motion';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -307,17 +301,17 @@ export default function UserInquiryPage() {
               <button
                 type="button"
                 onClick={handleTranscribe}
-                className="py-3 px-5 bg-slate-300 hover:bg-slate-400 dark:bg-slate-500 rounded-l-full transition-colors"
+                className="py-3 px-5 bg-slate-300 hover:bg-slate-400 dark:bg-slate-500 rounded-l-full rounded-r-full transition-colors"
               >
                 <FontAwesomeIcon icon={isTranscribing ? faMicrophone : faMicrophoneSlash} />
               </button>
-              <button
+              {/* <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 className="py-3 px-5 bg-slate-300 hover:bg-slate-400 dark:bg-slate-500 rounded-r-full transition-colors"
               >
                 <FontAwesomeIcon icon={faImage} />
-              </button>
+              </button> */}
               <input
                 type="text"
                 value={inputMessage}

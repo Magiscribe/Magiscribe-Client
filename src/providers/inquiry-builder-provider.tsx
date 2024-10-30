@@ -1,14 +1,7 @@
 import { ADD_PREDICTION, CREATE_INQUIRY, DELETE_INQUIRY, UPDATE_INQUIRY } from '@/clients/mutations';
 import { GET_INQUIRY } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
-import {
-  AddPredictionMutation,
-  CreateInquiryMutation,
-  DeleteInquiryMutation,
-  GetInquiryQuery,
-  InquiryDataForm,
-  UpdateInquiryMutation,
-} from '@/graphql/graphql';
+import { AddPredictionMutation, CreateInquiryMutation, DeleteInquiryMutation, GetInquiryQuery, InquiryDataForm, UpdateInquiryMutation } from '@/graphql/graphql';
 import { getAgentIdByName } from '@/utils/agents';
 import { applyGraphChangeset, formatGraph } from '@/utils/graphs/graph-utils';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
@@ -273,7 +266,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const generateGraph = async (templateOverride: boolean, message: string) => {
     setGeneratingGraph(true);
     let userMessage;
-    const agentId = await getAgentIdByName('Graph Edit Agent (Sonnet)', client);
+    const agentId = await getAgentIdByName('Graph Edit Agent', client);
 
     if (templateOverride) {
       userMessage = [

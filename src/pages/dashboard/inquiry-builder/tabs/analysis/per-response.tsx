@@ -29,7 +29,7 @@ export default function PerResponseTab({ data }: TabProps) {
   const client = useApolloClient();
   const [addPrediction] = useMutation(ADD_PREDICTION);
 
-  if (!responses?.length) return <div className="p-4 text-slate-700 dark:text-white">No data available</div>;
+  if (!responses?.length) return <div className="p-4 text-white">No data available</div>;
 
   const nodesMap = useMemo(
     () => Object.fromEntries((graph?.nodes || []).map((node) => [node.id, node])),

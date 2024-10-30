@@ -1,6 +1,9 @@
 import templates, { Template } from '@/assets/templates';
+import { GET_ALL_AUDIO_VOICES } from '@/clients/queries';
+import { GetAllAudioVoicesQuery } from '@/graphql/graphql';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
+import { useQuery } from '@apollo/client';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Description, Label, Radio, RadioGroup } from '@headlessui/react';
@@ -12,9 +15,6 @@ import Input from '../../controls/input';
 import Select from '../../controls/select';
 import Textarea from '../../controls/textarea';
 import CustomModal from '../modal';
-import { GetAllAudioVoicesQuery } from '@/graphql/graphql';
-import { GET_ALL_AUDIO_VOICES } from '@/clients/queries';
-import { useQuery } from '@apollo/client';
 
 /**
  * Props for the ModalUpsertInquiry component
@@ -137,6 +137,15 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
     }
   }, [generatingGraph]);
 
+  // Sets the default voice once the voices are loaded.
+  useEffect(() => {
+    if (voices) {
+      if (!form.voice) {
+        updateForm({ ...form, voice: voices.getAllAudioVoices[0].id });
+      }
+    }
+  }, [voices, form, updateForm]);
+
   /**
    * Handle input change for the form
    * @param field - The field to update
@@ -236,7 +245,7 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
           name="voice"
           label="Voice"
           subLabel="This will be the voice used to read responses to the user if they have audio enabled"
-          value={form.voice ?? ''}
+          value={form.voice}
           onChange={handleSelectChange('voice')}
           options={voices?.getAllAudioVoices.map((voice) => ({ value: voice.id, label: voice.name })) ?? []}
         />

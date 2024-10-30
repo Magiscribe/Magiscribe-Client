@@ -246,22 +246,25 @@ export default function CapabilityEdit() {
             <div className="mb-4">
               <Select
                 id="llmModel"
-                name='llmModel'
-                label='LLM Model'
+                name="llmModel"
+                label="LLM Model"
                 value={form.llmModel}
-                options={models?.getAllModels.map((model: { name: string; id: string }) => ({ value: model.id, label: model.name }))}
+                options={models?.getAllModels.map((model: { name: string; id: string }) => ({
+                  value: model.id,
+                  label: model.name,
+                })) ?? []}
                 onChange={handleChange}
               />
             </div>
             <div className="mb-4">
               <Select
                 id="outputMode"
-                name='outputMode'
-                label='Output Mode'
+                name="outputMode"
+                label="Output Mode"
                 value={form.outputMode}
                 onChange={handleChange}
-      options={OutputReturnMode.map((mode) => ({ value: mode.id, label: mode.name }))}
-  >
+                options={OutputReturnMode.map((mode) => ({ value: mode.id, label: mode.name }))}
+              >
                 <option value="">Select an output mode</option>
                 {OutputReturnMode.map((mode) => (
                   <option key={mode.id} value={mode.id}>

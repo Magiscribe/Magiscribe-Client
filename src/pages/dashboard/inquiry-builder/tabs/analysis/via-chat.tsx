@@ -115,7 +115,7 @@ export default function ViaChatTab({ data }: TabProps) {
     setMessages([]);
   };
 
-  if (!data.responses) return <div className="p-4 text-slate-700 dark:text-white">No data available</div>;
+  if (!data.responses) return <div className="p-4 text-white">No data available</div>;
 
   return (
     <div className="bg-white dark:bg-slate-700 px-4 py-8 rounded-2xl shadow-xl text-slate-700 dark:text-white">

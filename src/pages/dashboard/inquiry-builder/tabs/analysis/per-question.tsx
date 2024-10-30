@@ -129,7 +129,7 @@ const PerQuestionTab: React.FC<TabProps> = ({ data }) => {
   }, [questionNodes, currentQuestionIndex, groupedResponses, client, addPrediction, subscriptionId]);
 
   if (!responses || !questionNodes.length) {
-    return <div className="p-4 text-slate-700 dark:text-white">No data available</div>;
+    return <div className="p-4 text-white">No data available</div>;
   }
 
   const currentNode = questionNodes[currentQuestionIndex];
