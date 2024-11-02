@@ -371,16 +371,18 @@ export default function CapabilityEdit() {
                   <div className="flex justify-left space-x-2 mt-2">
                     {isEditing ? (
                       <div className="flex-grow">
-                        <input
+                        <Input
+                          name="name"
                           type="text"
                           value={item.name}
                           onChange={(e) => handlePromptChange(item.id, 'name', e.target.value)}
                           className="w-full mb-2 p-1 border rounded-lg"
                         />
-                        <textarea
+                        <Textarea
+                          name="prompt"
                           value={item.text}
                           onChange={(e) => handlePromptChange(item.id, 'text', e.target.value)}
-                          className="w-full mb-2 p-1 border rounded-lg"
+                          className="w-full mb-2 p-1 border rounded-lg no-drag"
                           rows={3}
                         />
                         <div className="flex space-x-2">

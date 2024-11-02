@@ -38,6 +38,11 @@ const Select: React.FC<SelectProps> = ({ label, subLabel, name, error, options, 
       )}
       <div className="relative">
         <select id={name} name={name} className={baseSelectClassName} {...props}>
+          {/* Default */}
+          <option value="" disabled hidden>
+            Select an option...
+          </option>
+
           {options.map((option) => (
             <option
               key={option.value}

@@ -23,7 +23,7 @@ const NodeContainer = ({ title, faIcon, id, children }: NodeContainerProps) => {
   return (
     <div className="px-4 py-2 shadow-md rounded-3xl bg-white dark:bg-slate-700 w-96 shadow-xl">
       <div className="flex items-center">
-        <FontAwesomeIcon icon={faIcon} className="mr-2 text-blue-600" />
+        <FontAwesomeIcon icon={faIcon} className="mr-2 text-blue-600 dark:text-blue-400" />
         <Button
           onClick={onNodeClick}
           variant="transparentSecondary"

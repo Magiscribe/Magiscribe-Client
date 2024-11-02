@@ -1,8 +1,8 @@
 import { faArrowDown, faArrowUp, faGripVertical } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import clsx from 'clsx';
-import { AnimatePresence, Reorder } from 'framer-motion';
-import React, { useState } from 'react';
+import { AnimatePresence, Reorder, useDragControls } from 'framer-motion';
+import React, { useCallback, useRef, useState } from 'react';
 
 /**
  * Base interface for list items
@@ -65,6 +65,8 @@ const ReorderableList = <T extends BaseListItem>({
   showMoveButtons = true,
 }: ReorderableListProps<T>) => {
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
+  const dragControls = useDragControls();
+  const constraintsRef = useRef<HTMLDivElement>(null);
 
   const handleEdit = (itemId: string) => {
     setEditingItemId(itemId);
@@ -83,6 +85,13 @@ const ReorderableList = <T extends BaseListItem>({
     [newItems[index], newItems[newIndex]] = [newItems[newIndex], newItems[index]];
     onItemsChange(newItems);
   };
+
+  const handleDragStart = useCallback(
+    (event: PointerEvent) => {
+      dragControls.start(event);
+    },
+    [dragControls],
+  );
 
   const MoveButton = ({
     direction,
@@ -134,13 +143,22 @@ const ReorderableList = <T extends BaseListItem>({
 
       <div className={baseClassName}>
         {items.length > 0 ? (
-          <Reorder.Group axis="y" values={items} onReorder={onItemsChange} className="p-2">
+          <Reorder.Group
+            axis="y"
+            values={items}
+            onReorder={onItemsChange}
+            className="p-2 relative"
+            ref={constraintsRef}
+          >
             <AnimatePresence mode="sync" initial={false}>
-              {items.map((item, index) => (
+              {items.map((item) => (
                 <Reorder.Item
                   key={item.id}
                   value={item}
-                  dragListener={dragEnabled}
+                  dragListener={false}
+                  dragControls={dragControls}
+                  dragConstraints={constraintsRef}
+                  dragElastic={0}
                   className={clsx(
                     'first:mt-0 mt-2 p-3 rounded-xl',
                     'bg-slate-100 dark:bg-slate-600',
@@ -153,21 +171,31 @@ const ReorderableList = <T extends BaseListItem>({
                   exit={{ opacity: 0, y: -10 }}
                 >
                   {dragEnabled && (
-                    <FontAwesomeIcon
-                      icon={faGripVertical}
-                      className="size-4 text-slate-400 cursor-grab active:cursor-grabbing"
-                    />
+                    <div
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      onPointerDown={handleDragStart as any}
+                      className="touch-none"
+                    >
+                      <FontAwesomeIcon
+                        icon={faGripVertical}
+                        className="size-4 text-slate-400 cursor-grab active:cursor-grabbing"
+                      />
+                    </div>
                   )}
                   <div className="flex-grow">
                     {renderItem(item, editingItemId === item.id, (item) => handleEdit(item.id), handleCancelEdit)}
                   </div>
                   {showMoveButtons && (
                     <div className="flex gap-1">
-                      <MoveButton direction="up" onClick={() => handleMove(index, 'up')} disabled={index === 0} />
+                      <MoveButton
+                        direction="up"
+                        onClick={() => handleMove(items.indexOf(item), 'up')}
+                        disabled={items.indexOf(item) === 0}
+                      />
                       <MoveButton
                         direction="down"
-                        onClick={() => handleMove(index, 'down')}
-                        disabled={index === items.length - 1}
+                        onClick={() => handleMove(items.indexOf(item), 'down')}
+                        disabled={items.indexOf(item) === items.length - 1}
                       />
                     </div>
                   )}
