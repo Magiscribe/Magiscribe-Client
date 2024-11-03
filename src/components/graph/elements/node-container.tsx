@@ -11,18 +11,15 @@ type NodeContainerProps = {
   title: string;
   faIcon: IconDefinition;
   id: string;
-  deleteNodeImages?: () => void;
   children: React.ReactNode;
 };
 
-const NodeContainer = ({ title, faIcon, id, children, deleteNodeImages }: NodeContainerProps) => {
+const NodeContainer = ({ title, faIcon, id, children }: NodeContainerProps) => {
   const { setNodes, setEdges } = useReactFlow();
 
   const onNodeClick = () => {
     setNodes((nodes) => nodes.filter((node) => node.id !== id));
     setEdges((edges) => edges.filter((edge) => edge.source !== id && edge.target !== id));
-    // Delete node images from s3, if any exist
-    deleteNodeImages?.();
   };
 
   return (

@@ -15,7 +15,7 @@ import { getAgentIdByName } from '@/utils/agents';
 import { applyGraphChangeset, formatGraph } from '@/utils/graphs/graph-utils';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
 import { Edge, Node, OnEdgesChange, OnNodesChange, useEdgesState, useNodesState } from '@xyflow/react';
-import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 interface InquiryProviderProps {
@@ -82,6 +82,9 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
+  const [publishedNodes, setPublishedNodes, onPublishedNodesChange] = useNodesState<Node>([]);
+  const [publishedEdges, setPublishedEdges, onPublishedEdgesChange] = useEdgesState<Edge>([]);
+
   // Memoized graph object
   const graph = useMemo(() => ({ nodes, edges }), [nodes, edges]);
 
@@ -100,6 +103,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
       setLastUpdated(new Date(getInquiry.updatedAt));
       updateForm(getInquiry.data.form);
       if (getInquiry.data.draftGraph) updateGraph(getInquiry.data.draftGraph);
+      if (getInquiry.data.graph) updatePublishedGraph(getInquiry.data.graph);
       setInitialized(true);
     },
   });
@@ -230,6 +234,16 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   };
 
   /**
+   * Updates the published graph of the inquiry stored in memory.  This variable is compared with the
+   * inqiry graph during the publish operation to determine differences since the last time the graph was published
+   * @param graph {Object} The graph object to update.
+   */
+  const updatePublishedGraph = ({ nodes, edges }: { nodes: Node[]; edges: Edge[] }) => {
+    setPublishedNodes(nodes);
+    setPublishedEdges(edges);
+  };
+
+  /**
    * Clears the graph and initializes it with a start node.
    */
   const resetGraph = () => {
@@ -251,8 +265,31 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
    * @param onError {Function} The function to call on error.
    */
   const publishGraph = async (onSuccess?: (id: string) => void, onError?: () => void) => {
+    removeDeletedImagesFromS3();
     await save({ graph }, ['graph'], onSuccess, onError);
+    updatePublishedGraph(graph);
   };
+
+  const removeDeletedImagesFromS3 = useCallback(async () => {
+    var draftGraphImages: ImageMetadata[] = [];
+    graph.nodes.forEach((node) => {
+      if (node.data?.images) {
+        draftGraphImages = draftGraphImages.concat(node.data.images as ImageMetadata[]);
+      }
+    });
+
+    var imagesToDeleteFromS3: ImageMetadata[] = [];
+    publishedNodes?.map((node) => {
+      const publishedNodeImages = node.data?.images as ImageMetadata[];
+      publishedNodeImages?.forEach((publishedNodeImage) => {
+        if (!draftGraphImages.some((image) => image.s3Key === publishedNodeImage.s3Key)) {
+          // If the current image was deleted from the graph, then delete it from s3.
+          imagesToDeleteFromS3 = imagesToDeleteFromS3.concat([publishedNodeImage]);
+        }
+      });
+    });
+    await deleteImages(imagesToDeleteFromS3);
+  }, [graph.nodes, publishedNodes]);
 
   /**
    * Saves both the form and graph of the inquiry.

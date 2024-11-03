@@ -130,7 +130,6 @@ export function ImageUploader(props: ImageUploaderProps): React.ReactElement {
   const [base64Images, setBase64Images] = useState<string[]>([]);
   const uploadImage = useImageUpload();
   const downloadImage = useImageDownload();
-  const {deleteImage} = useImageDelete();
 
   useEffect(() => {
     // Download the node images from s3
@@ -152,8 +151,6 @@ export function ImageUploader(props: ImageUploaderProps): React.ReactElement {
   const handleImageDelete = async function (imageIndex: number) {
     // TODO: Verify that image deletion was successful before removing the image from the graph
     props.handleUpdateNodeImages(props.images.filter((_, i) => i !== imageIndex));
-    const s3KeyToDelete = props.images[imageIndex].s3Key;
-    await deleteImage(s3KeyToDelete) 
   };
 
   /**

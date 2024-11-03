@@ -10,7 +10,7 @@ import NodeContainer from '../elements/node-container';
 import CustomHandle from '../handles/limit-handle';
 import { useNodeData } from '../utils';
 import { ImageMetadata } from '@/types/conversation';
-import { ImageUploader, useImageDelete } from '@/components/image/image-uploader';
+import { ImageUploader } from '@/components/image/image-uploader';
 
 enum NodeType {
   OpenEnded = 'open-ended',
@@ -30,11 +30,6 @@ type QuestionNodeProps = NodeProps & {
 
 export default function QuestionNode({ id, data }: QuestionNodeProps) {
   const { handleInputChange, updateNodeImages } = useNodeData<QuestionNodeProps>(id);
-  const {deleteImages} = useImageDelete();
-
-  const deleteNodeImages = useCallback(async () => {
-    await deleteImages(data.images);
-  }, [data.images])
 
   const handleUpdate = useCallback(
     (updates: Partial<QuestionNodeProps['data']>) => {
@@ -71,7 +66,7 @@ export default function QuestionNode({ id, data }: QuestionNodeProps) {
   };
 
   return (
-    <NodeContainer title="Question" faIcon={faQuestionCircle} id={id} deleteNodeImages={deleteNodeImages}>
+    <NodeContainer title="Question" faIcon={faQuestionCircle} id={id} >
       <div className="space-y-4 mt-2">
         <Input
           label="Dynamic Generation"
