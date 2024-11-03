@@ -23,17 +23,25 @@ interface InquiryProviderProps {
   children: React.ReactNode;
 }
 
+export interface InquiryMetadata {
+  images: ImageMetadata[];
+  text: string;
+}
+
 interface ContextType {
   initialized: boolean;
 
   id?: string;
   lastUpdated: Date;
   form: InquiryDataForm;
+  inquiryMetadata: InquiryMetadata;
   graph: { edges: Edge[]; nodes: Node[] };
 
   deleteInquiry: (onSuccess?: () => void, onError?: () => void) => Promise<void>;
 
   updateForm: (form: InquiryDataForm) => void;
+  updateInquiryMetadata: (metadata: InquiryMetadata) => void;
+  saveInquiryMetadata: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
   saveForm: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
 
   updateGraph: (graph: { nodes: Node[]; edges: Edge[] }) => void;
@@ -49,7 +57,7 @@ interface ContextType {
   publishGraph: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
 
   save: (
-    data: { form?: InquiryDataForm; graph?: { nodes: Node[]; edges: Edge[] } },
+    data: { form?: InquiryDataForm; metadata?: InquiryMetadata; graph?: { nodes: Node[]; edges: Edge[] } },
     fields: string[],
     onSuccess?: (id: string) => void,
     onError?: () => void,
@@ -72,6 +80,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const [subscriptionId] = useState<string>(uuidv4());
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   const [form, updateForm] = useState<InquiryDataForm>({} as InquiryDataForm);
+  const [inquiryMetadata, updateInquiryMetadata] = useState<InquiryMetadata>({} as InquiryMetadata);
 
   // Graph Generation States
   const [generatingGraph, setGeneratingGraph] = useState(false);
@@ -81,9 +90,6 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   // Hooks
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
-
-  const [publishedNodes, setPublishedNodes, onPublishedNodesChange] = useNodesState<Node>([]);
-  const [publishedEdges, setPublishedEdges, onPublishedEdgesChange] = useEdgesState<Edge>([]);
 
   // Memoized graph object
   const graph = useMemo(() => ({ nodes, edges }), [nodes, edges]);
@@ -102,8 +108,8 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
       if (!getInquiry) return;
       setLastUpdated(new Date(getInquiry.updatedAt));
       updateForm(getInquiry.data.form);
+      updateInquiryMetadata(getInquiry.data.metadata ?? {});
       if (getInquiry.data.draftGraph) updateGraph(getInquiry.data.draftGraph);
-      if (getInquiry.data.graph) updatePublishedGraph(getInquiry.data.graph);
       setInitialized(true);
     },
   });
@@ -177,6 +183,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const save = async (
     data: {
       form?: InquiryDataForm;
+      metadata?: InquiryMetadata;
       graph?: { nodes: Node[]; edges: Edge[] };
       draftGraph?: { nodes: Node[]; edges: Edge[] };
     },
@@ -225,22 +232,30 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   };
 
   /**
+   * Saves the form of the inquiry.
+   * @param onSuccess {Function} The function to call on success.
+   * @param onError {Function} The function to call on error.
+   */
+  const saveInquiryMetadata = async (onSuccess?: (id: string) => void, onError?: () => void) => {
+    await save(
+      {
+        metadata: {
+          ...inquiryMetadata,
+        },
+      },
+      ['metadata'],
+      onSuccess,
+      onError,
+    );
+  };
+
+  /**
    * Updates the graph of the inquiry.
    * @param graph {Object} The graph object to update.
    */
   const updateGraph = ({ nodes, edges }: { nodes: Node[]; edges: Edge[] }) => {
     setNodes(nodes);
     setEdges(edges);
-  };
-
-  /**
-   * Updates the published graph of the inquiry stored in memory.  This variable is compared with the
-   * inqiry graph during the publish operation to determine differences since the last time the graph was published
-   * @param graph {Object} The graph object to update.
-   */
-  const updatePublishedGraph = ({ nodes, edges }: { nodes: Node[]; edges: Edge[] }) => {
-    setPublishedNodes(nodes);
-    setPublishedEdges(edges);
   };
 
   /**
@@ -267,7 +282,6 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const publishGraph = async (onSuccess?: (id: string) => void, onError?: () => void) => {
     removeDeletedImagesFromS3();
     await save({ graph }, ['graph'], onSuccess, onError);
-    updatePublishedGraph(graph);
   };
 
   const removeDeletedImagesFromS3 = useCallback(async () => {
@@ -279,17 +293,14 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     });
 
     var imagesToDeleteFromS3: ImageMetadata[] = [];
-    publishedNodes?.map((node) => {
-      const publishedNodeImages = node.data?.images as ImageMetadata[];
-      publishedNodeImages?.forEach((publishedNodeImage) => {
-        if (!draftGraphImages.some((image) => image.s3Key === publishedNodeImage.s3Key)) {
-          // If the current image was deleted from the graph, then delete it from s3.
-          imagesToDeleteFromS3 = imagesToDeleteFromS3.concat([publishedNodeImage]);
-        }
-      });
+    inquiryMetadata.images?.map((image) => {
+      if (!draftGraphImages.some((image) => image.s3Key === image.s3Key)) {
+        // If the current image was deleted from the graph, then delete it from s3.
+        imagesToDeleteFromS3 = imagesToDeleteFromS3.concat([image]);
+      }
     });
     await deleteImages(imagesToDeleteFromS3);
-  }, [graph.nodes, publishedNodes]);
+  }, [graph.nodes, inquiryMetadata?.images]);
 
   /**
    * Saves both the form and graph of the inquiry.
@@ -355,12 +366,16 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     id,
     lastUpdated,
     form,
+    inquiryMetadata,
     graph,
 
     deleteInquiry,
 
     updateForm,
     saveForm,
+
+    updateInquiryMetadata,
+    saveInquiryMetadata,
 
     updateGraph,
     updateGraphNodes: setNodes,

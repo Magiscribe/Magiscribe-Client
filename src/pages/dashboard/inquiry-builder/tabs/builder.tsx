@@ -25,6 +25,7 @@ export default function InquiryBuilder() {
   const {
     initialized,
     form,
+    inquiryMetadata,
     graph,
     saveGraph,
     onEdgesChange,
@@ -32,6 +33,7 @@ export default function InquiryBuilder() {
     updateGraphEdges,
     updateGraphNodes,
     saveForm,
+    saveInquiryMetadata
   } = useInquiryBuilder();
 
   /**
@@ -73,6 +75,12 @@ export default function InquiryBuilder() {
       }
     };
   }, [form]);
+
+  useEffect(() => {
+    if (Object.keys(inquiryMetadata).length > 0) {
+      saveInquiryMetadata();
+    }
+  }, [inquiryMetadata])
 
   const toggleChat = () => {
     setIsChatOpen(!isChatOpen);

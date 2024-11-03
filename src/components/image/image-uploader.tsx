@@ -1,6 +1,8 @@
 import { ADD_MEDIA_ASSET, DELETE_MEDIA_ASSET, GET_MEDIA_ASSET } from '@/clients/mutations';
+import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { ImageMetadata } from '@/types/conversation';
 import { useMutation } from '@apollo/client';
+import { useClerk } from '@clerk/clerk-react';
 import { useCallback, useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -38,6 +40,23 @@ function useImageUpload() {
   return uploadImage;
 }
 
+export function useUpdateInquiryMetadatImages() {
+  const { inquiryMetadata, updateInquiryMetadata } = useInquiryBuilder();
+
+  const addImagesToMetadata = useCallback(
+    (images: ImageMetadata[]) => {
+      const inquiryMetadataWithImage = {
+        ...inquiryMetadata,
+        images: inquiryMetadata.images ? inquiryMetadata.images.concat(images) : images,
+      };
+      updateInquiryMetadata(inquiryMetadataWithImage);
+    },
+    [inquiryMetadata, updateInquiryMetadata],
+  );
+
+  return addImagesToMetadata;
+}
+
 export function useImageDownload() {
   const [getMediaAsset] = useMutation(GET_MEDIA_ASSET);
 
@@ -63,23 +82,29 @@ export function useImageDownload() {
 type IUseImageDelete = {
   deleteImage: (s3KeyToDelete: string) => Promise<void>;
   deleteImages: (images: ImageMetadata[]) => Promise<void>;
-}
+};
 
 export function useImageDelete(): IUseImageDelete {
   const [deleteMediaAsset] = useMutation(DELETE_MEDIA_ASSET);
-  const deleteImage = useCallback(async (s3KeyToDelete: string) => {
-    await deleteMediaAsset({
-      variables: {
-        s3Key: s3KeyToDelete,
-      },
-     })
-  },[deleteMediaAsset])
+  const deleteImage = useCallback(
+    async (s3KeyToDelete: string) => {
+      await deleteMediaAsset({
+        variables: {
+          s3Key: s3KeyToDelete,
+        },
+      });
+    },
+    [deleteMediaAsset],
+  );
 
-  const deleteImages = useCallback(async (images: ImageMetadata[]) => {
-    await Promise.all(images?.map(async (image) => await deleteImage(image.s3Key)));
-  }, [deleteImage])
+  const deleteImages = useCallback(
+    async (images: ImageMetadata[]) => {
+      await Promise.all(images?.map(async (image) => await deleteImage(image.s3Key)));
+    },
+    [deleteImage],
+  );
 
-  return {deleteImage, deleteImages};
+  return { deleteImage, deleteImages };
 }
 
 async function uploadImageToS3(presignedUrl: string, file: File) {
@@ -130,6 +155,7 @@ export function ImageUploader(props: ImageUploaderProps): React.ReactElement {
   const [base64Images, setBase64Images] = useState<string[]>([]);
   const uploadImage = useImageUpload();
   const downloadImage = useImageDownload();
+  const addImagesToMetadata = useUpdateInquiryMetadatImages();
 
   useEffect(() => {
     // Download the node images from s3
@@ -169,14 +195,16 @@ export function ImageUploader(props: ImageUploaderProps): React.ReactElement {
         return fileWithS3Key;
       });
       // Upload each file to s3
-      await Promise.all(Array.from(filesWithS3Key).map(async (fileWithS3Key) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setBase64Images((prevImages) => [...prevImages, reader.result as string]);
-        };
-        reader.readAsDataURL(fileWithS3Key.file);
-        return await uploadImage(fileWithS3Key.file, fileWithS3Key.s3Key);
-      }));
+      await Promise.all(
+        Array.from(filesWithS3Key).map(async (fileWithS3Key) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            setBase64Images((prevImages) => [...prevImages, reader.result as string]);
+          };
+          reader.readAsDataURL(fileWithS3Key.file);
+          return await uploadImage(fileWithS3Key.file, fileWithS3Key.s3Key);
+        }),
+      );
 
       // Save image metadata to the graph node
       const newImageMetadata = Array.from(filesWithS3Key).map((file) => {
@@ -186,6 +214,7 @@ export function ImageUploader(props: ImageUploaderProps): React.ReactElement {
         return metadata;
       });
       props.handleUpdateNodeImages(props.images ? [...props.images, ...newImageMetadata] : newImageMetadata);
+      addImagesToMetadata(newImageMetadata);
     }
   };
 
