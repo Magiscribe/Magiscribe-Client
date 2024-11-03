@@ -31,10 +31,6 @@ function useImageUpload() {
     console.log('Image url: ' + s3Url);
     await uploadImageToS3(s3Url, image);
     console.log(`Successfully uploaded ${image.name} to s3 via signed url ${s3Url}`);
-    // Load: In survey, get s3 signed url and load / render image if applicable in each node. Auto download images corresponding to each node
-    // When an image is deleted, delete it from s3
-    // Bonus: Option to select already uploaded images for survey?
-    // Will need to update buildout / terraform to add cors policy to the s3 bucket in each environment
   }, []);
 
   return uploadImage;
