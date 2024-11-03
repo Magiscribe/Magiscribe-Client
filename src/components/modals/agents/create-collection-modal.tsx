@@ -13,14 +13,14 @@ import CustomModal from '../modal';
 /**
  * Props for the ModalUpsertInquiry component
  */
-interface ModalUpsertInquiryProps {
+interface ModalUpsertCollection {
   open: boolean;
   onClose: () => void;
 }
 /**
  * ModalUpsertInquiry component for creating or updating inquiries
  */
-const ModalUpsertCollection: React.FC<ModalUpsertInquiryProps> = ({ open, onClose }) => {
+const ModalUpsertCollection: React.FC<ModalUpsertCollection> = ({ open, onClose }) => {
   // State
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({ title: '' });
@@ -71,7 +71,7 @@ const ModalUpsertCollection: React.FC<ModalUpsertInquiryProps> = ({ open, onClos
           label="Title"
           placeholder="Collection title"
           autoFocus
-          subLabel="This will be displayed to the people you are sending the inquiry to"
+          subLabel="The name of the collection as it will appear in the dashboard"
           value={form.title}
           onChange={handleInputChange('title')}
         />

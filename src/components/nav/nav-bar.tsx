@@ -69,7 +69,7 @@ export function NavBar({ isFixed = true }) {
           />
           <SignedOut>
             <SignUpButton signInForceRedirectUrl="/dashboard" forceRedirectUrl="/dashboard">
-              <Button variant={atTop ? 'white' : 'primary'}>Get Alpha Access</Button>
+              <Button variant={atTop ? 'white' : 'primary'}>Sign Up</Button>
             </SignUpButton>
           </SignedOut>
           <SignedIn>

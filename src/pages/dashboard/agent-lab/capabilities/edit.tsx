@@ -364,7 +364,7 @@ export default function CapabilityEdit() {
               renderItem={(item, isEditing, edit, cancelEdit) => (
                 <div key={item.id}>
                   <h3 className="text-lg font-semibold">{item.name}</h3>
-                  <p className="text-sm text-slate-600">
+                  <p className="text-sm text-slate-600 dark:text-slate-200">
                     {item.text.substring(0, 100)}
                     {item.text.length > 100 ? '...' : ''}
                   </p>

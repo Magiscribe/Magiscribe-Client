@@ -14,7 +14,7 @@ export function SignupForm() {
         transition={{ duration: 0.5, delay: 0.25 }}
         viewport={{ once: true }}
       >
-        Get Alpha Access
+        Sign Up Now
       </motion.h2>
       <motion.div
         className="w-full mb-4"
