@@ -300,6 +300,13 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
       }
     });
     await deleteImages(imagesToDeleteFromS3);
+
+    // Remove all deleted images from the inquiry metadata
+    const inquiryMetadataWithoutDeletedImages = {
+      ...inquiryMetadata,
+      images: inquiryMetadata.images ? inquiryMetadata.images.filter(image => !imagesToDeleteFromS3.some(deletedImage => deletedImage.s3Key === image.s3Key)) : [],
+    };
+    updateInquiryMetadata(inquiryMetadataWithoutDeletedImages)
   }, [graph.nodes, inquiryMetadata?.images]);
 
   /**
