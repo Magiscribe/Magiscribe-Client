@@ -239,7 +239,7 @@ function Flow({ children, nodes, edges, setNodes, onNodesChange, setEdges, onEdg
         <Button
           key={type}
           disabled={disabled}
-          onClick={(e) => {
+          onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
             newNode.current = {
               source,
               target,

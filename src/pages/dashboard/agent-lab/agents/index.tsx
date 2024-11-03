@@ -2,14 +2,22 @@ import { ADD_UPDATE_AGENT, DELETE_AGENT } from '@/clients/mutations';
 import { GET_ALL_AGENTS } from '@/clients/queries';
 import Button from '@/components/controls/button';
 import ConfirmationModal from '@/components/modals/confirm-modal';
-import { Agent, Capability, GetAllAgentsQuery, UpsertAgentMutation } from '@/graphql/graphql';
+import { GetAllAgentsQuery, UpsertAgentMutation } from '@/graphql/graphql';
 import { useAddAlert } from '@/hooks/alert-hook';
 import { useMutation, useQuery } from '@apollo/client';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
-function AgentCard({ agent, onUpdate, onCopy }: { agent: Agent; onUpdate?: () => void; onCopy: (id: string) => void }) {
+function AgentCard({
+  agent,
+  onUpdate,
+  onCopy,
+}: {
+  agent: GetAllAgentsQuery['getAllAgents'][0];
+  onUpdate?: () => void;
+  onCopy: (id: string) => void;
+}) {
   // Queries
   const [deleteAgent] = useMutation(DELETE_AGENT);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -86,7 +94,7 @@ export default function AgentDashboard() {
   const addAlert = useAddAlert();
 
   const handleCopy = async (id: string) => {
-    const selectedItem = data?.getAllAgents.find((agent: Agent) => agent.id === id);
+    const selectedItem = data?.getAllAgents.find((agent) => agent.id === id);
     if (!selectedItem) {
       addAlert('Agent not found', 'error');
       return;
@@ -100,7 +108,7 @@ export default function AgentDashboard() {
             id: null, // Ensure a new agent is created
             name: `${selectedItem.name} Copy ${timeStamp}`,
             description: selectedItem.description,
-            capabilities: selectedItem.capabilities.map((capability: Capability) => capability.id),
+            capabilities: selectedItem.capabilities.map((capability) => capability.id),
           },
         },
       });
@@ -128,7 +136,7 @@ export default function AgentDashboard() {
       </div>
       <hr className="my-4" />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 my-8">
-        {data?.getAllAgents.map((agent: Agent, i: number) => (
+        {data?.getAllAgents.map((agent, i) => (
           <motion.div
             key={agent.id}
             initial={{ opacity: 0, y: 20 }}

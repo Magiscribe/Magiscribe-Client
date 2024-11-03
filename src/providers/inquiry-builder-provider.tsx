@@ -6,9 +6,9 @@ import {
   CreateInquiryMutation,
   DeleteInquiryMutation,
   GetInquiryQuery,
-  InquiryDataForm,
   UpdateInquiryMutation,
 } from '@/graphql/graphql';
+import { InquiryDataForm } from '@/graphql/types';
 import { getAgentIdByName } from '@/utils/agents';
 import { applyGraphChangeset, formatGraph } from '@/utils/graphs/graph-utils';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';

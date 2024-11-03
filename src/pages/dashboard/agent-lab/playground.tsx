@@ -5,7 +5,7 @@ import Button from '@/components/controls/button';
 import Input from '@/components/controls/input';
 import Select from '@/components/controls/select';
 import { CustomVariable, CustomVariablesSection } from '@/components/custom-variables';
-import { Agent } from '@/graphql/graphql';
+import { Agent } from '@/graphql/types';
 import useElevenLabsAudio from '@/hooks/audio-player';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
 import { useMutation, useQuery, useSubscription } from '@apollo/client';

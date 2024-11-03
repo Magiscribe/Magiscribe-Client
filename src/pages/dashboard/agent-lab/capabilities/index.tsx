@@ -2,7 +2,7 @@ import { ADD_UPDATE_CAPABILITY, DELETE_CAPABILITY } from '@/clients/mutations';
 import { GET_ALL_CAPABILITIES } from '@/clients/queries';
 import Button from '@/components/controls/button';
 import ConfirmationModal from '@/components/modals/confirm-modal';
-import { Capability, Prompt } from '@/graphql/graphql';
+import { Capability, Prompt } from '@/graphql/types';
 import { useAddAlert } from '@/hooks/alert-hook';
 import { useMutation, useQuery } from '@apollo/client';
 import { motion } from 'framer-motion';

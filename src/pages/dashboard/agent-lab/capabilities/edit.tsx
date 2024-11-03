@@ -6,7 +6,7 @@ import ReorderableList from '@/components/controls/list/ReorderableList';
 import Select from '@/components/controls/select';
 import Textarea from '@/components/controls/textarea';
 import CustomModal from '@/components/modals/modal';
-import { Prompt } from '@/graphql/graphql';
+import { Prompt } from '@/graphql/types';
 import { useAddAlert } from '@/hooks/alert-hook';
 import { useMutation, useQuery } from '@apollo/client';
 import { useState } from 'react';
@@ -386,7 +386,12 @@ export default function CapabilityEdit() {
                           rows={3}
                         />
                         <div className="flex space-x-2">
-                          <Button type="button" onClick={(e) => handlePromptSave(item, () => cancelEdit(e))}>
+                          <Button
+                            type="button"
+                            onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
+                              handlePromptSave(item, () => cancelEdit(e))
+                            }
+                          >
                             Save
                           </Button>
                           <Button type="button" onClick={cancelEdit} variant="inverseDanger">

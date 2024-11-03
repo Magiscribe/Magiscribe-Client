@@ -245,7 +245,7 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
           name="voice"
           label="Voice"
           subLabel="This will be the voice used to read responses to the user if they have audio enabled"
-          value={form.voice}
+          value={form.voice ?? undefined}
           onChange={handleSelectChange('voice')}
           options={voices?.getAllAudioVoices.map((voice) => ({ value: voice.id, label: voice.name })) ?? []}
         />

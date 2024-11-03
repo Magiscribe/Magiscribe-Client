@@ -33,7 +33,7 @@ interface AudioProviderProps {
  * @param props - The provider props
  * @returns Provider component wrapping its children
  */
-export const AudioProvider: React.FC<AudioProviderProps> = ({ initialAudioEnabled = true, children }) => {
+export const AudioProvider: React.FC<AudioProviderProps> = ({ initialAudioEnabled = false, children }) => {
   const [isAudioEnabled, setIsAudioEnabled] = useWithLocalStorage<boolean>(initialAudioEnabled, 'audioEnabled');
 
   const toggleAudio = useCallback(() => {

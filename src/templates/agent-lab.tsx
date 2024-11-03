@@ -7,7 +7,7 @@ import ConfirmationModal from '@/components/modals/confirm-modal';
 import { GetAllCollectionsQuery } from '@/graphql/graphql';
 import { useMutation, useQuery } from '@apollo/client';
 import { motion } from 'framer-motion';
-import { ChangeEventHandler, useState } from 'react';
+import { useState } from 'react';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 
 import LinkCard from '../components/cards/card';
@@ -32,7 +32,7 @@ export default function AgentLabTemplate() {
 
   if (!collections) return null;
 
-  const handleCollectionChange = (e: ChangeEventHandler<HTMLSelectElement>) => {
+  const handleCollectionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const basePath = '/dashboard/agent-lab';
     const currentPath = location.pathname.replace(basePath, '').replace(`/${collection}`, '');
 
