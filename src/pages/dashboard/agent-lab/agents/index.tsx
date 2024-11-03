@@ -1,17 +1,21 @@
 import { ADD_UPDATE_AGENT, DELETE_AGENT } from '@/clients/mutations';
 import { GET_ALL_AGENTS } from '@/clients/queries';
+import Button from '@/components/controls/button';
 import ConfirmationModal from '@/components/modals/confirm-modal';
-import { Agent, Capability } from '@/graphql/graphql';
+import { Agent, Capability, GetAllAgentsQuery, UpsertAgentMutation } from '@/graphql/graphql';
 import { useAddAlert } from '@/hooks/alert-hook';
 import { useMutation, useQuery } from '@apollo/client';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
 function AgentCard({ agent, onUpdate, onCopy }: { agent: Agent; onUpdate?: () => void; onCopy: (id: string) => void }) {
+  // Queries
   const [deleteAgent] = useMutation(DELETE_AGENT);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
   const addAlert = useAddAlert();
+  const navigate = useNavigate();
 
   const handleDelete = async () => {
     try {
@@ -30,7 +34,7 @@ function AgentCard({ agent, onUpdate, onCopy }: { agent: Agent; onUpdate?: () =>
   };
 
   return (
-    <div className="bg-gray-100 p-4 rounded-2xl shadow-md h-full w-full flex flex-col">
+    <div className="bg-slate-100 dark:bg-slate-600 text-slate-700 dark:text-white  p-4 rounded-2xl shadow-md h-full w-full flex flex-col">
       <div className="flex-grow">
         <h2 className="text-xl font-bold mb-2 break-words">{agent.name}</h2>
         <p className="text-sm mb-4 break-words">{agent.description}</p>
@@ -47,24 +51,15 @@ function AgentCard({ agent, onUpdate, onCopy }: { agent: Agent; onUpdate?: () =>
         </div>
       </div>
       <div className="flex justify-end gap-2 mt-auto">
-        <Link
-          to={`edit?id=${agent.id}`}
-          className="text-sm bg-blue-500 hover:bg-blue-700 text-white px-2 py-1 rounded-lg whitespace-nowrap"
-        >
+        <Button size="small" onClick={() => navigate(`edit?id=${agent.id}`)}>
           Edit
-        </Link>
-        <button
-          onClick={() => onCopy(agent.id)}
-          className="text-sm bg-blue-500 hover:bg-blue-700 text-white px-2 py-1 rounded-lg whitespace-nowrap"
-        >
+        </Button>
+        <Button onClick={() => onCopy(agent.id)} size="small">
           Copy
-        </button>
-        <button
-          onClick={() => setIsDeleteModalOpen(true)}
-          className="text-sm bg-red-500 hover:bg-red-700 text-white px-2 py-1 rounded-lg whitespace-nowrap"
-        >
+        </Button>
+        <Button onClick={() => setIsDeleteModalOpen(true)} size="small" variant="danger">
           Delete
-        </button>
+        </Button>
       </div>
       <ConfirmationModal
         isOpen={isDeleteModalOpen}
@@ -77,8 +72,17 @@ function AgentCard({ agent, onUpdate, onCopy }: { agent: Agent; onUpdate?: () =>
 }
 
 export default function AgentDashboard() {
-  const { data, refetch } = useQuery(GET_ALL_AGENTS);
-  const [upsertAgent] = useMutation(ADD_UPDATE_AGENT);
+  // React Router
+  const params = useParams();
+
+  // Queries
+  const { data, refetch } = useQuery<GetAllAgentsQuery>(GET_ALL_AGENTS, {
+    variables: {
+      logicalCollection: params.collection,
+    },
+  });
+  const [upsertAgent] = useMutation<UpsertAgentMutation>(ADD_UPDATE_AGENT);
+
   const addAlert = useAddAlert();
 
   const handleCopy = async (id: string) => {
@@ -115,12 +119,12 @@ export default function AgentDashboard() {
   };
 
   return (
-    <div className="bg-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl text-slate-700">
+    <div className="bg-white dark:bg-slate-700 text-slate-700 dark:text-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Agents</h1>
-        <Link to="edit" className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+        <Button as={Link} to="edit">
           Add Agent
-        </Link>
+        </Button>
       </div>
       <hr className="my-4" />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 my-8">

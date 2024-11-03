@@ -1,13 +1,16 @@
 import { ADD_UPDATE_CAPABILITY, ADD_UPDATE_PROMPT } from '@/clients/mutations';
 import { GET_ALL_MODELS, GET_ALL_PROMPTS, GET_CAPABILITY } from '@/clients/queries';
-import ListBox from '@/components/list/ListBox';
-import ReorderableList from '@/components/list/ReorderableList';
+import Button from '@/components/controls/button';
+import Input from '@/components/controls/input';
+import ReorderableList from '@/components/controls/list/ReorderableList';
+import Select from '@/components/controls/select';
+import Textarea from '@/components/controls/textarea';
 import CustomModal from '@/components/modals/modal';
 import { Prompt } from '@/graphql/graphql';
 import { useAddAlert } from '@/hooks/alert-hook';
 import { useMutation, useQuery } from '@apollo/client';
 import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 const OutputReturnMode = [
   {
@@ -67,9 +70,14 @@ export default function CapabilityEdit() {
   const [searchParams] = useSearchParams();
 
   // Queries and Mutations
+  const { collection } = useParams<{ collection?: string }>();
   const [upsertCapability] = useMutation(ADD_UPDATE_CAPABILITY);
   const [upsertPrompt] = useMutation(ADD_UPDATE_PROMPT);
-  const { data: prompts } = useQuery(GET_ALL_PROMPTS);
+  const { data: prompts } = useQuery(GET_ALL_PROMPTS, {
+    variables: {
+      logicalCollection: collection,
+    },
+  });
   const { data: models } = useQuery(GET_ALL_MODELS);
   useQuery(GET_CAPABILITY, {
     skip: !searchParams.has('id'),
@@ -92,7 +100,7 @@ export default function CapabilityEdit() {
     },
   });
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm({
       ...form,
       [event.target.id]: event.target.value,
@@ -193,6 +201,7 @@ export default function CapabilityEdit() {
           capability: {
             id: form.id,
             alias: form.alias,
+            logicalCollection: collection,
             name: form.name,
             description: form.description,
             llmModel: form.llmModel,
@@ -219,174 +228,128 @@ export default function CapabilityEdit() {
 
   return (
     <>
-      <div className="bg-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl text-slate-700">
+      <div className="bg-white dark:bg-slate-700 text-slate-700 dark:text-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">{form.id ? 'Edit' : 'Add'} Capability</h1>
         </div>
         <form className="mt-8" onSubmit={handleFormSave}>
           <div className="mb-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="mb-4">
-              <label className="block text-sm font-bold mb-2" htmlFor="name">
-                Name
-              </label>
-              <input
-                className="border-2 border-gray-200 p-2 rounded-lg w-full"
-                id="name"
-                type="text"
-                value={form.name}
-                onChange={handleChange}
-              />
+              <Input name="name" label="Name" value={form.name} onChange={handleChange} />
             </div>
             <div className="mb-4">
-              <label className="block text-sm font-bold mb-2" htmlFor="name">
-                Alias
-              </label>
-              <input
-                className="border-2 border-gray-200 p-2 rounded-lg w-full"
-                id="alias"
-                type="text"
-                value={form.alias}
-                onChange={handleChange}
-              />
+              <Input name="alias" label="Alias" value={form.alias} onChange={handleChange} />
             </div>
           </div>
 
           <div className="mb-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="mb-4">
-              <label className="block text-sm font-bold mb-2" htmlFor="capabilities">
-                LLM Model
-              </label>
-              <ListBox
-                setSelected={(value) => {
-                  setForm({
-                    ...form,
-                    llmModel: value.id,
-                  });
-                }}
-                selected={
-                  models?.getAllModels.find((model: { id: string }) => model.id === form.llmModel) ?? {
-                    name: '',
-                    id: '',
-                  }
-                }
-                values={
+              <Select
+                id="llmModel"
+                name="llmModel"
+                label="LLM Model"
+                value={form.llmModel}
+                options={
                   models?.getAllModels.map((model: { name: string; id: string }) => ({
-                    name: model.name,
-                    id: model.id,
+                    value: model.id,
+                    label: model.name,
                   })) ?? []
                 }
+                onChange={handleChange}
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm font-bold mb-2" htmlFor="name">
-                Output Mode
-              </label>
-              <ListBox
-                setSelected={(value) => {
-                  setForm({
-                    ...form,
-                    outputMode: value.id,
-                  });
-                }}
-                selected={OutputReturnMode.find((mode) => mode.id === form.outputMode) ?? { name: '', id: '' }}
-                values={OutputReturnMode.map((mode) => ({
-                  name: mode.name,
-                  id: mode.id,
-                }))}
-              />
+              <Select
+                id="outputMode"
+                name="outputMode"
+                label="Output Mode"
+                value={form.outputMode}
+                onChange={handleChange}
+                options={OutputReturnMode.map((mode) => ({ value: mode.id, label: mode.name }))}
+              >
+                <option value="">Select an output mode</option>
+                {OutputReturnMode.map((mode) => (
+                  <option key={mode.id} value={mode.id}>
+                    {mode.name}
+                  </option>
+                ))}
+              </Select>
             </div>
           </div>
           <div className="mb-4">
-            <label className="block text-sm font-bold mb-2" htmlFor="description">
-              Description
-            </label>
-            <textarea
-              className="border-2 border-gray-200 p-2 rounded-lg w-full"
-              id="description"
-              value={form.description}
+            <Textarea name="description" label="Description" value={form.description} onChange={handleChange} />
+          </div>
+
+          <div className="mb-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <Input
+              name="subscriptionFilter"
+              label="Subscription Filter (Optional)"
+              value={form.subscriptionFilter}
+              onChange={handleChange}
+            />
+            <Input
+              name="outputFilter"
+              label="Output Filter (Optional)"
+              value={form.outputFilter}
               onChange={handleChange}
             />
           </div>
 
-          <div className="mb-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-bold mb-2" htmlFor="name">
-                Subscription Filter (Optional)
-              </label>
-              <input
-                className="border-2 border-gray-200 p-2 rounded-lg w-full"
-                id="subscriptionFilter"
-                type="text"
-                value={form.subscriptionFilter}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-bold mb-2" htmlFor="name">
-                Output Filter (Optional)
-              </label>
-              <input
-                className="border-2 border-gray-200 p-2 rounded-lg w-full"
-                id="outputFilter"
-                type="text"
-                value={form.outputFilter}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
-
           <div className="mb-4">
-            <label className="block text-sm font-bold mb-2" htmlFor="prompts">
-              Prompts
-            </label>
-            <button
-              type="button"
-              onClick={() => setOpenPromptModal(true)}
-              className="bg-blue-500 hover:bg-blue-700 text-white px-2 py-1 rounded-lg mb-2"
-            >
-              Add Prompt
-            </button>
+            <div className="mb-4">
+              <label className="block text-sm font-bold mb-2" htmlFor="prompts">
+                Prompts
+              </label>
+              <Button type="button" onClick={() => setOpenPromptModal(true)}>
+                Add Prompt
+              </Button>
+            </div>
             <CustomModal title={'Add Item'} size="7xl" open={openPromptModal} onClose={() => setOpenPromptModal(false)}>
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
                 {prompts?.getAllPrompts
                   .filter((item: Prompt) => !form.prompts.find((i) => i.id === item.id))
                   .map((item: Prompt) => (
-                    <div key={item.id} className="bg-gray-100 p-2 rounded-lg h-full w-full flex flex-col">
-                      <h3 className="text-lg font-bold">{item.name}</h3>
-                      <p className="flex-grow">
+                    <div
+                      key={item.id}
+                      className="bg-slate-100 dark:bg-slate-700 p-2 rounded-lg h-full w-full flex flex-col"
+                    >
+                      <h3 className="text-lg font-bold mb-2">{item.name}</h3>
+                      <p className="flex-grow mb-2">
                         {item.text.substring(0, 50)}
                         {item.text.length > 50 ? '...' : ''}
                       </p>
-                      <button
+                      <Button
                         type="button"
                         onClick={() => {
                           handlePromptAdd({ id: item.id });
                           setOpenPromptModal(false);
                         }}
-                        className="bg-blue-500 text-white px-2 py-1 rounded-lg self-start mt-2"
                       >
                         Add
-                      </button>
+                      </Button>
                     </div>
                   ))}
-                <div key={'newPrompt'} className="bg-gray-100 p-2 rounded-lg h-full w-full flex flex-col">
-                  <h3 className="text-lg font-bold">{'New Prompt'}</h3>
-                  <textarea
-                    className="border-2 border-gray-200 p-2 rounded-lg w-full"
+                <div
+                  key={'newPrompt'}
+                  className="bg-slate-100 dark:bg-slate-700 p-2 rounded-lg h-full w-full flex flex-col"
+                >
+                  <h3 className="text-lg font-bold mb-2">{'New Prompt'}</h3>
+                  <Textarea
+                    name="text"
+                    className="mb-2"
                     id="text"
                     rows={1}
                     placeholder="Enter title of new prompt"
                     onChange={handleNewPromptTitleChange}
                   />
-                  <button
+                  <Button
                     type="button"
                     onClick={() => {
                       handleNewPromptAdd();
                     }}
-                    className="bg-blue-500 text-white px-2 py-1 rounded-lg self-start mt-2"
                   >
                     Add
-                  </button>
+                  </Button>
                 </div>
               </div>
             </CustomModal>
@@ -401,58 +364,44 @@ export default function CapabilityEdit() {
               renderItem={(item, isEditing, edit, cancelEdit) => (
                 <div key={item.id}>
                   <h3 className="text-lg font-semibold">{item.name}</h3>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-slate-600 dark:text-slate-200">
                     {item.text.substring(0, 100)}
                     {item.text.length > 100 ? '...' : ''}
                   </p>
                   <div className="flex justify-left space-x-2 mt-2">
                     {isEditing ? (
                       <div className="flex-grow">
-                        <input
+                        <Input
+                          name="name"
                           type="text"
                           value={item.name}
                           onChange={(e) => handlePromptChange(item.id, 'name', e.target.value)}
                           className="w-full mb-2 p-1 border rounded-lg"
                         />
-                        <textarea
+                        <Textarea
+                          name="prompt"
                           value={item.text}
                           onChange={(e) => handlePromptChange(item.id, 'text', e.target.value)}
-                          className="w-full mb-2 p-1 border rounded-lg"
+                          className="w-full mb-2 p-1 border rounded-lg no-drag"
                           rows={3}
                         />
                         <div className="flex space-x-2">
-                          <button
-                            type="button"
-                            onClick={(e) => handlePromptSave(item, () => cancelEdit(e))}
-                            className="bg-blue-500 text-white px-2 py-1 rounded-lg"
-                          >
+                          <Button type="button" onClick={(e) => handlePromptSave(item, () => cancelEdit(e))}>
                             Save
-                          </button>
-                          <button
-                            type="button"
-                            onClick={cancelEdit}
-                            className="bg-gray-500 text-white px-2 py-1 rounded-lg"
-                          >
+                          </Button>
+                          <Button type="button" onClick={cancelEdit} variant="inverseDanger">
                             Cancel
-                          </button>
+                          </Button>
                         </div>
                       </div>
                     ) : (
                       <div className="flex-grow space-x-2">
-                        <button
-                          type="button"
-                          onClick={() => edit(item)}
-                          className="bg-blue-500 hover:bg-blue-700 text-white px-2 py-1 rounded-lg"
-                        >
+                        <Button type="button" onClick={() => edit(item)}>
                           Edit
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleDeletePrompt(item.id)}
-                          className="bg-red-500 text-white px-2 py-1 rounded-lg"
-                        >
+                        </Button>
+                        <Button type="button" onClick={() => handleDeletePrompt(item.id)} variant="inverseDanger">
                           Remove
-                        </button>
+                        </Button>
                       </div>
                     )}
                   </div>
@@ -460,9 +409,7 @@ export default function CapabilityEdit() {
               )}
             />
           </div>
-          <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
-            Save
-          </button>
+          <Button type="submit">Save</Button>
         </form>
       </div>
     </>

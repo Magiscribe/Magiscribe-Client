@@ -36,7 +36,7 @@ export default function Textarea({
 }: TextareaProps): JSX.Element {
   const textareaRef = useAutoResizeTextareaRef(value as string);
 
-  const baseClassName = 'w-full p-2 border rounded-xl focus:outline-none focus:ring-2';
+  const baseClassName = 'w-full p-2 border rounded-xl dark:bg-slate-600 bg-white focus:outline-none focus:ring-2';
 
   const textareaClassName = clsx(
     baseClassName,
@@ -51,7 +51,7 @@ export default function Textarea({
   const labelClassName = 'text-sm font-bold order-first mb-2';
 
   return (
-    <div className="text-slate-800 w-full flex flex-col gap-2">
+    <div className="dark:text-white text-slate-800 w-full flex flex-col gap-2">
       {label && (
         <label className={labelClassName} htmlFor={name}>
           {label}

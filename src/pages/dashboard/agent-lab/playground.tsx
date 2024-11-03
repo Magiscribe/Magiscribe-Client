@@ -1,15 +1,18 @@
+import { ADD_PREDICTION } from '@/clients/mutations';
+import { GET_ALL_AGENTS } from '@/clients/queries';
+import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
+import Button from '@/components/controls/button';
+import Input from '@/components/controls/input';
+import Select from '@/components/controls/select';
+import { CustomVariable, CustomVariablesSection } from '@/components/custom-variables';
+import { Agent } from '@/graphql/graphql';
+import useElevenLabsAudio from '@/hooks/audio-player';
+import { useWithLocalStorage } from '@/hooks/local-storage-hook';
 import { useMutation, useQuery, useSubscription } from '@apollo/client';
 import { faVolumeHigh, faVolumeMute } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useCallback, useEffect, useState } from 'react';
-import { GET_ALL_AGENTS } from '@/clients/queries';
-import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
-import ListBox from '@/components/list/ListBox';
-import { useWithLocalStorage } from '@/hooks/local-storage-hook';
-import { ADD_PREDICTION } from '@/clients/mutations';
-import { CustomVariable, CustomVariablesSection } from '@/components/custom-variables';
-import useElevenLabsAudio from '@/hooks/audio-player';
-import { Agent } from '@/graphql/graphql';
+import { useParams } from 'react-router-dom';
 
 interface predictionAdded {
   id: string;
@@ -40,6 +43,9 @@ const initialForm: Form = {
 };
 
 export default function PlaygroundDashboard() {
+  // React Router
+  const params = useParams();
+
   // States
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useWithLocalStorage(initialForm, 'playground-form');
@@ -47,7 +53,11 @@ export default function PlaygroundDashboard() {
   const [base64Images, setBase64Images] = useState<string[]>([]);
 
   // Queries and Mutations
-  const { data: agents } = useQuery(GET_ALL_AGENTS);
+  const { data: agents } = useQuery(GET_ALL_AGENTS, {
+    variables: {
+      logicalCollection: params.collection,
+    },
+  });
   const [addPrediction] = useMutation(ADD_PREDICTION);
 
   // Text to speech
@@ -173,7 +183,7 @@ export default function PlaygroundDashboard() {
 
       // Add audio chunk if enabled
       if (enableAudio && newPrediction.type === 'DATA') {
-        audio.addChunk(newPrediction.result);
+        audio.addSentence(newPrediction.result);
       }
 
       // Update loading state for 'ERROR' or 'SUCCESS' types
@@ -185,48 +195,38 @@ export default function PlaygroundDashboard() {
 
   return (
     <>
-      <div className="bg-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl text-slate-700">
+      <div className="bg-white dark:bg-slate-700 text-slate-700 dark:text-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl">
         <h1 className="text-3xl font-bold">Playground</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-8">
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
-              <label className="block text-sm font-bold mb-2" htmlFor="subscriptionId">
-                Subscription ID
-              </label>
-              <input
-                className="border-2 border-gray-200 p-2 rounded-lg w-full"
-                id="subscriptionId"
+              <Input
+                name="subscriptionId"
+                label="Subscription ID"
                 value={form.subscriptionId}
                 onChange={(e) => setForm({ ...form, subscriptionId: e.target.value })}
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm font-bold mb-2" htmlFor="voice">
-                Voice
-              </label>
-              <input
-                className="border-2 border-gray-200 p-2 rounded-lg w-full"
-                id="voice"
+              <Input
+                name="voice"
+                label="Voice"
                 value={form.voice}
                 onChange={(e) => setForm({ ...form, voice: e.target.value })}
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm font-bold mb-2" htmlFor="agent">
-                Agents
-              </label>
-              <ListBox
-                setSelected={(value) =>
-                  setForm({
-                    ...form,
-                    agent: value.id,
-                  })
+              <Select
+                name="agent"
+                label="Agents"
+                onChange={(e) => setForm({ ...form, agent: e.target.value })}
+                value={form.agent}
+                options={
+                  agents?.getAllAgents.map((agent: Agent) => ({
+                    value: agent.id,
+                    label: agent.name,
+                  })) ?? []
                 }
-                selected={(agents?.getAllAgents ?? []).find((agent: Agent) => agent.id === form.agent)}
-                values={(agents?.getAllAgents ?? []).map((agent: Agent) => ({
-                  name: agent.name ?? '',
-                  id: agent.id,
-                }))}
               />
             </div>
             <div className="mb-4">
@@ -238,17 +238,7 @@ export default function PlaygroundDashboard() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm font-bold mb-2" htmlFor="image-upload">
-                Upload Images
-              </label>
-              <input
-                type="file"
-                id="image-upload"
-                accept="image/*"
-                multiple
-                onChange={handleImageUpload}
-                className="border-2 border-gray-200 p-2 rounded-lg w-full"
-              />
+              <Input name="image-upload" type="file" label="Upload Images" onChange={handleImageUpload} />
             </div>
             <div className="mb-4">
               <label className="block text-sm font-bold mb-2">Uploaded Images</label>
@@ -256,44 +246,33 @@ export default function PlaygroundDashboard() {
                 {base64Images.map((image, index) => (
                   <div key={index} className="relative">
                     <img src={image} alt={`Uploaded ${index + 1}`} className="w-24 h-24 object-cover rounded" />
-                    <button
+                    <Button
                       type="button"
+                      variant="transparentDanger"
                       onClick={() => setBase64Images(base64Images.filter((_, i) => i !== index))}
-                      className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
                     >
-                      ×
-                    </button>
+                      Remove
+                    </Button>
                   </div>
                 ))}
               </div>
             </div>
-            <button
-              className="bg-blue-500 text-white px-4 py-2 rounded-lg ml-2 hover:bg-blue-600 transition-colors disabled:opacity-50"
-              disabled={loading}
-            >
-              Run
-            </button>
-            <button
-              type="button"
-              className="bg-green-500 text-white px-4 py-2 rounded-lg ml-2 hover:bg-green-600 transition-colors"
-              onClick={() => setEnableAudio(!enableAudio)}
-            >
-              Audio {enableAudio ? 'On' : 'Off'} <FontAwesomeIcon icon={enableAudio ? faVolumeHigh : faVolumeMute} />
-            </button>
-            <button
-              type="button"
-              className="bg-red-500 text-white px-4 py-2 rounded-lg ml-2 hover:bg-red-600 transition-colors"
-              onClick={handleClear}
-            >
-              Clear
-            </button>
+            <div className="space-x-2">
+              <Button disabled={loading}>Run</Button>
+              <Button type="button" variant="success" onClick={() => setEnableAudio(!enableAudio)}>
+                Audio {enableAudio ? 'On' : 'Off'} <FontAwesomeIcon icon={enableAudio ? faVolumeHigh : faVolumeMute} />
+              </Button>
+              <Button type="button" variant="danger" onClick={handleClear}>
+                Clear
+              </Button>
+            </div>
           </form>
-          <div className="mt-6 h-full max-h-96 w-full bg-gray-100 rounded-lg">
+          <div className="mt-6 h-full max-h-96 w-full bg-slate-100 dark:bg-slate-800 rounded-lg">
             <code className="h-full w-full block p-4 overflow-y-auto">
               {[...responses].reverse().map((response, i) => {
                 const fields: Array<keyof predictionAdded> = ['id', 'context', 'prompt', 'result', 'type'];
                 return (
-                  <div key={i} className="mb-4 border-2 border-gray-200 p-2 rounded-lg text-sm">
+                  <div key={i} className="mb-4 border-2 border-slate-200 p-2 rounded-lg text-sm">
                     {fields.map((field, i) => {
                       const value = response.predictionAdded[field];
                       return value ? (

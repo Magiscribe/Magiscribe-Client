@@ -80,8 +80,8 @@ export default function InquiryBuilder() {
 
   return (
     <>
-      <div className="h-[85vh] flex flex-col border-white border-2 rounded-2xl overflow-hidden">
-        <div className="bg-white p-4 space-y-4 text-slate-700">
+      <div className="h-[85vh] flex flex-col border-slate-200 dark:border-white border-2 rounded-2xl overflow-hidden">
+        <div className=" bg-white dark:bg-slate-700 p-4 space-y-4 text-slate-700">
           <GraphContextBar />
         </div>
         <div className="flex-grow">
@@ -98,7 +98,7 @@ export default function InquiryBuilder() {
                 <Button
                   onClick={toggleChat}
                   className="absolute bottom-4 right-4"
-                  variant="inversePrimary"
+                  variant="primary"
                   iconLeft={faMagicWandSparkles}
                 >
                   Graph Editor

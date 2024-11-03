@@ -37,8 +37,8 @@ export const GET_AGENT_WITH_PROMPTS = gql`
 `;
 
 export const GET_ALL_AGENTS = gql`
-  query getAllAgents {
-    getAllAgents {
+  query getAllAgents($logicalCollection: String) {
+    getAllAgents(logicalCollection: $logicalCollection) {
       id
       name
       description
@@ -73,8 +73,8 @@ export const GET_AGENT = gql`
 `;
 
 export const GET_ALL_CAPABILITIES = gql`
-  query getAllCapabilities {
-    getAllCapabilities {
+  query getAllCapabilities($logicalCollection: String) {
+    getAllCapabilities(logicalCollection: $logicalCollection) {
       id
       prompts {
         name
@@ -113,8 +113,8 @@ export const GET_CAPABILITY = gql`
 `;
 
 export const GET_ALL_PROMPTS = gql`
-  query getAllPrompts {
-    getAllPrompts {
+  query getAllPrompts($logicalCollection: String) {
+    getAllPrompts(logicalCollection: $logicalCollection) {
       id
       name
       text
@@ -147,6 +147,7 @@ export const GET_INQUIRIES = gql`
   query getInquiries {
     getInquiries {
       id
+      userId
       data
       createdAt
       updatedAt
@@ -172,5 +173,23 @@ export const GET_INQUIRIES_RESPONSES = gql`
 export const GET_INQUIRY_RESPONSE_COUNT = gql`
   query getInquiryResponseCount($id: ID!) {
     getInquiryResponseCount(id: $id)
+  }
+`;
+
+export const GET_ALL_AUDIO_VOICES = gql`
+  query getAllAudioVoices {
+    getAllAudioVoices {
+      id
+      name
+    }
+  }
+`;
+
+export const GET_ALL_COLLECTIONS = gql`
+  query getAllCollections {
+    getAllCollections {
+      id
+      name
+    }
   }
 `;

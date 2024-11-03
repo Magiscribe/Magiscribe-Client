@@ -1,12 +1,13 @@
+import { ADD_UPDATE_PROMPT, DELETE_PROMPT } from '@/clients/mutations';
+import { GET_ALL_PROMPTS } from '@/clients/queries';
+import Button from '@/components/controls/button';
+import ConfirmationModal from '@/components/modals/confirm-modal';
+import { Prompt } from '@/graphql/graphql';
+import { useAddAlert } from '@/hooks/alert-hook';
 import { useMutation, useQuery } from '@apollo/client';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { DELETE_PROMPT, ADD_UPDATE_PROMPT } from '@/clients/mutations';
-import { GET_ALL_PROMPTS } from '@/clients/queries';
-import ConfirmationModal from '@/components/modals/confirm-modal';
-import { useAddAlert } from '@/hooks/alert-hook';
-import { Prompt } from '@/graphql/graphql';
+import { useNavigate, useParams } from 'react-router-dom';
 
 function PromptCard({
   prompt,
@@ -19,7 +20,9 @@ function PromptCard({
 }) {
   const [deletePrompt] = useMutation(DELETE_PROMPT);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
   const addAlert = useAddAlert();
+  const navigate = useNavigate();
 
   const handleDelete = async () => {
     try {
@@ -38,7 +41,7 @@ function PromptCard({
   };
 
   return (
-    <div className="bg-gray-100 p-4 rounded-lg shadow-md h-full w-full flex flex-col">
+    <div className="bg-slate-100 dark:bg-slate-600 text-slate-700 dark:text-white  p-4 rounded-2xl shadow-md h-full w-full flex flex-col">
       <div className="flex-grow">
         <h2 className="text-xl font-bold mb-4 break-words">{prompt.name}</h2>
       </div>
@@ -49,24 +52,15 @@ function PromptCard({
         </p>
       </div>
       <div className="flex justify-end gap-2 mt-2">
-        <Link
-          to={`edit?id=${prompt.id}`}
-          className="text-sm bg-blue-500 hover:bg-blue-700 text-white px-2 py-1 rounded-lg whitespace-nowrap"
-        >
+        <Button onClick={() => navigate(`edit?id=${prompt.id}`)} size="small">
           Edit
-        </Link>
-        <button
-          onClick={() => onCopy(prompt.id)}
-          className="text-sm bg-blue-500 hover:bg-blue-700 text-white px-2 py-1 rounded-lg whitespace-nowrap"
-        >
+        </Button>
+        <Button onClick={() => onCopy(prompt.id)} size="small">
           Copy
-        </button>
-        <button
-          onClick={() => setIsDeleteModalOpen(true)}
-          className="text-sm bg-red-500 hover:bg-red-700 text-white px-2 py-1 rounded-lg whitespace-nowrap"
-        >
+        </Button>
+        <Button onClick={() => setIsDeleteModalOpen(true)} size="small" variant="danger">
           Delete
-        </button>
+        </Button>
       </div>
       <ConfirmationModal
         isOpen={isDeleteModalOpen}
@@ -79,9 +73,19 @@ function PromptCard({
 }
 
 export default function PromptDashboard() {
-  const { data, refetch } = useQuery(GET_ALL_PROMPTS);
+  // React Router
+  const params = useParams();
+
+  // Queries
+  const { data, refetch } = useQuery(GET_ALL_PROMPTS, {
+    variables: {
+      logicalCollection: params.collection,
+    },
+  });
   const [upsertPrompt] = useMutation(ADD_UPDATE_PROMPT);
+
   const addAlert = useAddAlert();
+  const navigate = useNavigate();
 
   const handleCopy = async (id: string) => {
     const selectedItem = data?.getAllPrompts.find((prompt: Prompt) => prompt.id === id) as Prompt;
@@ -111,12 +115,10 @@ export default function PromptDashboard() {
   };
 
   return (
-    <div className="bg-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl text-slate-700">
+    <div className="bg-white dark:bg-slate-700 text-slate-700 dark:text-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Prompts</h1>
-        <Link to="edit" className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
-          Add Prompt
-        </Link>
+        <Button onClick={() => navigate('edit')}>Add Prompt</Button>
       </div>
       <hr className="my-4" />
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 my-8">

@@ -1,12 +1,15 @@
 import { ADD_UPDATE_AGENT } from '@/clients/mutations';
 import { GET_AGENT, GET_ALL_CAPABILITIES, GET_ALL_MODELS } from '@/clients/queries';
-import ListBox from '@/components/list/ListBox';
-import ListBoxMultiple from '@/components/list/ListBoxMultiple';
+import Button from '@/components/controls/button';
+import Input from '@/components/controls/input';
+import Select from '@/components/controls/select';
+import ListBoxMultiple from '@/components/controls/list/ListBoxMultiple';
+import Textarea from '@/components/controls/textarea';
 import { GetAgentQuery, GetAllCapabilitiesQuery, GetAllModelsQuery, UpsertAgentMutation } from '@/graphql/graphql';
 import { useAddAlert } from '@/hooks/alert-hook';
 import { useMutation, useQuery } from '@apollo/client';
 import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 interface Form {
   id: string | null;
@@ -42,9 +45,14 @@ export default function AgentEdit() {
   const [searchParams] = useSearchParams();
 
   // Queries and Mutations
+  const { collection } = useParams<{ collection?: string }>();
   const [upsertAgent] = useMutation<UpsertAgentMutation>(ADD_UPDATE_AGENT);
   const { data: models } = useQuery<GetAllModelsQuery>(GET_ALL_MODELS);
-  const { data: capabilities } = useQuery<GetAllCapabilitiesQuery>(GET_ALL_CAPABILITIES);
+  const { data: capabilities } = useQuery<GetAllCapabilitiesQuery>(GET_ALL_CAPABILITIES, {
+    variables: {
+      logicalCollection: collection,
+    },
+  });
 
   useQuery<GetAgentQuery>(GET_AGENT, {
     skip: !searchParams.has('id'),
@@ -52,9 +60,7 @@ export default function AgentEdit() {
       agentId: searchParams.get('id'),
     },
     onCompleted: (data) => {
-      if (!data.getAgent) {
-        return;
-      }
+      if (!data.getAgent) return;
 
       setForm({
         id: data.getAgent.id,
@@ -75,7 +81,7 @@ export default function AgentEdit() {
     },
   });
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { id, value } = event.target;
     setForm((prevForm) => ({
       ...prevForm,
@@ -102,6 +108,7 @@ export default function AgentEdit() {
           agent: {
             id: form.id,
             name: form.name,
+            logicalCollection: collection,
             description: form.description,
             reasoning: form.reasoning,
             capabilities: form.capabilities,
@@ -126,60 +133,39 @@ export default function AgentEdit() {
 
   return (
     <>
-      <div className="bg-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl text-slate-700">
+      <div className="bg-white dark:bg-slate-700 text-slate-700 dark:text-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">{form.id ? 'Edit' : 'Add'} Agent</h1>
         </div>
         <form className="mt-8" onSubmit={handleSave}>
           <div className="mb-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div className="mb-4">
-              <label className="block text-sm font-bold mb-2" htmlFor="name">
-                Name
-              </label>
-              <input
-                className="border-2 border-gray-200 p-2 rounded-lg w-full"
-                id="name"
-                type="text"
-                value={form.name}
-                onChange={handleChange}
-              />
-            </div>
+            <Input name="name" label="Name" value={form.name} onChange={handleChange} />
             {form.reasoning && (
-              <div className="mb-4">
-                <label className="block text-sm font-bold mb-2" htmlFor="capabilities">
-                  LLM Model
-                </label>
-                <ListBox
-                  setSelected={(value) => {
-                    setForm({
-                      ...form,
-                      reasoning: {
-                        ...form.reasoning!,
-                        llmModel: value.id,
-                      },
-                    });
-                  }}
-                  selected={
-                    models?.getAllModels.find((model: { id: string }) => model.id === form.reasoning!.llmModel) ?? {
-                      name: '',
-                      id: '',
-                    }
-                  }
-                  values={
-                    models?.getAllModels.map((model: { name: string; id: string }) => ({
-                      name: model.name,
-                      id: model.id,
-                    })) ?? []
-                  }
-                />
-              </div>
+              <Select
+                label="LLM Model"
+                name="llmModel"
+                value={form.reasoning.llmModel ?? ''}
+                onChange={(e) => {
+                  setForm({
+                    ...form,
+                    reasoning: {
+                      ...form.reasoning!,
+                      llmModel: e.target.value,
+                    },
+                  });
+                }}
+                options={
+                  models?.getAllModels.map((model) => ({
+                    value: model.id,
+                    label: model.name,
+                  })) ?? []
+                }
+              />
             )}
           </div>
           <div className="mb-4">
-            <label className="block text-sm font-bold mb-2" htmlFor="capabilities">
-              Capabilities
-            </label>
             <ListBoxMultiple
+              label="Capabilities"
               setSelected={(value) =>
                 setForm({
                   ...form,
@@ -195,138 +181,92 @@ export default function AgentEdit() {
               }))}
             />
           </div>
+
           <div className="mb-4">
-            <label className="block text-sm font-bold mb-2" htmlFor="description">
-              Description
-            </label>
-            <textarea
-              className="border-2 border-gray-200 p-2 rounded-lg w-full"
-              id="description"
-              value={form.description}
-              onChange={handleChange}
-            />
+            <Textarea name="description" label="Description" value={form.description} onChange={handleChange} />
           </div>
 
           <div className="mb-4 grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <div className="mb-4">
-              <label className="block text-sm font-bold mb-2" htmlFor="name">
-                Reasoning Prompt
-              </label>
-              <ListBox
-                setSelected={(value) => {
-                  setForm({
-                    ...form,
-                    reasoning:
-                      value.id === 'true'
-                        ? {
-                            llmModel: '',
-                            prompt: '',
-                            variablePassThrough: false,
-                          }
-                        : null,
-                  });
-                }}
-                selected={{
-                  name: form.reasoning ? 'Enabled' : 'Disabled',
-                  id: form.reasoning ? 'true' : 'false',
-                }}
-                values={[
-                  { name: 'Enabled', id: 'true' },
-                  { name: 'Disabled', id: 'false' },
-                ]}
-              />
-            </div>
+            <Select
+              label="Reasoning"
+              name="reasoning"
+              value={form.reasoning ? 'true' : 'false'}
+              onChange={(e) => {
+                setForm({
+                  ...form,
+                  reasoning:
+                    e.target.value === 'true'
+                      ? {
+                          llmModel: '',
+                          prompt: '',
+                          variablePassThrough: false,
+                        }
+                      : null,
+                });
+              }}
+              options={[
+                { value: 'true', label: 'Enabled' },
+                { value: 'false', label: 'Disabled' },
+              ]}
+            />
             {form.reasoning && (
-              <div className="mb-4">
-                <label className="block text-sm font-bold mb-2" htmlFor="name">
-                  Variable Pass Through to Capabilities
-                </label>
-                <ListBox
-                  setSelected={(value) => {
-                    setForm({
-                      ...form,
-                      reasoning: {
-                        ...form.reasoning!,
-                        variablePassThrough: value.id === 'true',
-                      },
-                    });
-                  }}
-                  selected={{
-                    name: form.reasoning.variablePassThrough ? 'Enabled' : 'Disabled',
-                    id: form.reasoning.variablePassThrough ? 'true' : 'false',
-                  }}
-                  values={[
-                    { name: 'Enabled', id: 'true' },
-                    { name: 'Disabled', id: 'false' },
-                  ]}
-                />
-              </div>
-            )}
-            <div className="mb-4">
-              <label className="block text-sm font-bold mb-2" htmlFor="name">
-                Conversation Memory
-              </label>
-              <ListBox
-                setSelected={(value) => {
+              <Select
+                label="Variable Pass Through"
+                name="variablePassThrough"
+                value={form.reasoning.variablePassThrough ? 'true' : 'false'}
+                onChange={(e) => {
                   setForm({
                     ...form,
-                    memoryEnabled: value.id === 'true',
+                    reasoning: {
+                      ...form.reasoning!,
+                      variablePassThrough: e.target.value === 'true',
+                    },
                   });
                 }}
-                selected={{
-                  name: form.memoryEnabled ? 'Enabled' : 'Disabled',
-                  id: form.memoryEnabled ? 'true' : 'false',
-                }}
-                values={[
-                  { name: 'Enabled', id: 'true' },
-                  { name: 'Disabled', id: 'false' },
+                options={[
+                  { value: 'true', label: 'Enabled' },
+                  { value: 'false', label: 'Disabled' },
                 ]}
               />
-            </div>
+            )}
+
+            <Select
+              label="Memory Enabled"
+              name="memoryEnabled"
+              value={form.memoryEnabled ? 'true' : 'false'}
+              onChange={(e) => {
+                setForm({
+                  ...form,
+                  memoryEnabled: e.target.value === 'true',
+                });
+              }}
+              options={[
+                { value: 'true', label: 'Enabled' },
+                { value: 'false', label: 'Disabled' },
+              ]}
+            />
           </div>
+
           {form.reasoning && (
-            <div className="mb-4">
-              <label className="block text-sm font-bold mb-2" htmlFor="prompt">
-                Reasoning Prompt
-              </label>
-              <textarea
-                className="border-2 border-gray-200 p-2 rounded-lg w-full"
-                id="prompt"
-                rows={30}
-                value={form.reasoning.prompt ?? ''}
-                onChange={handleReasoningChange}
-              />
-            </div>
+            <Textarea
+              name="prompt"
+              label="Reasoning Prompt"
+              value={form.reasoning.prompt ?? ''}
+              onChange={handleReasoningChange}
+            />
           )}
 
-          <div className="mb-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-bold mb-2" htmlFor="name">
-                Subscription Filter
-              </label>
-              <input
-                className="border-2 border-gray-200 p-2 rounded-lg w-full"
-                id="subscriptionFilter"
-                type="text"
-                value={form.subscriptionFilter ?? ''}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-bold mb-2" htmlFor="name">
-                Output Filter
-              </label>
-              <input
-                className="border-2 border-gray-200 p-2 rounded-lg w-full"
-                id="outputFilter"
-                type="text"
-                value={form.outputFilter ?? ''}
-                onChange={handleChange}
-              />
-            </div>
+          <div className="my-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <Input
+              name="subscriptionFilter"
+              label="Subscription Filter"
+              value={form.subscriptionFilter ?? ''}
+              onChange={handleChange}
+            />
+            <Input name="outputFilter" label="Output Filter" value={form.outputFilter ?? ''} onChange={handleChange} />
           </div>
 
-          <button className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">Save</button>
+          <Button>Save</Button>
         </form>
       </div>
     </>

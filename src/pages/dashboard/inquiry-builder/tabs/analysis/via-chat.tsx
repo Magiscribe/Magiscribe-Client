@@ -1,6 +1,8 @@
 import { ADD_PREDICTION } from '@/clients/mutations';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import Chart, { ChartProps } from '@/components/chart';
+import Button from '@/components/controls/button';
+import Input from '@/components/controls/input';
 import MarkdownCustom from '@/components/markdown-custom';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
 import { TabProps } from '@/types/conversation';
@@ -85,7 +87,7 @@ export default function ViaChatTab({ data }: TabProps) {
     setMessages((prevMessages) => [...prevMessages, { type: 'text', content: inputMessage, sender: 'user' }]);
     setInputMessage('');
 
-    const agentId = await getAgentIdByName('Stakeholder | Chat Analysis', client);
+    const agentId = await getAgentIdByName('Chat Analysis', client);
     if (agentId) {
       setLoading(true);
       try {
@@ -113,19 +115,15 @@ export default function ViaChatTab({ data }: TabProps) {
     setMessages([]);
   };
 
-  if (!data.responses) return <div className="p-4">No data available</div>;
+  if (!data.responses) return <div className="p-4 text-white">No data available</div>;
 
   return (
-    <div className="bg-white px-4 py-8 rounded-2xl shadow-xl text-slate-700">
+    <div className="bg-white dark:bg-slate-700 px-4 py-8 rounded-2xl shadow-xl text-slate-700 dark:text-white">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">Chat</h2>
-        <button
-          onClick={handleClearChat}
-          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
-        >
-          <FontAwesomeIcon icon={faTrash} className="mr-2" />
-          Clear Chat
-        </button>
+        <Button onClick={handleClearChat} variant="danger" iconLeft={faTrash}>
+          Clear
+        </Button>
       </div>
       <div className="flex-grow mb-4 rounded-lg overflow-y-auto max-h-[60vh]">
         {messages.map((message, index) => (
@@ -137,7 +135,9 @@ export default function ViaChatTab({ data }: TabProps) {
               className={clsx(
                 'shadow-3xl p-2 rounded-lg',
                 message.type === 'chart' ? 'w-full max-w-[80%]' : 'max-w-[80%]',
-                message.sender === 'user' ? 'bg-blue-500 text-white' : 'bg-slate-200 text-gray-800',
+                message.sender === 'user'
+                  ? 'bg-blue-500 dark:bg-blue-600 text-white'
+                  : 'bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-white',
               )}
             >
               {message.type === 'text' ? (
@@ -153,29 +153,19 @@ export default function ViaChatTab({ data }: TabProps) {
         <div ref={messagesEndRef} />
       </div>
       <form onSubmit={handleSendMessage} className="flex">
-        <input
+        <Input
+          name="message"
           type="text"
           value={inputMessage}
           onChange={(e) => setInputMessage(e.target.value)}
           placeholder="Ask a question about your data..."
-          className={clsx(
-            'flex-grow p-2 border border-gray-300 rounded-l-lg text-black',
-            'focus:outline-none focus:ring-2 focus:ring-blue-500',
-          )}
           disabled={loading}
+          className={clsx('rounded-r-none', 'flex-grow')}
         />
-        <button
-          type="submit"
-          className={clsx(
-            'px-4 py-2 bg-blue-500 text-white rounded-r-lg',
-            'hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500',
-            'disabled:bg-gray-400',
-          )}
-          disabled={loading}
-        >
+        <Button type="submit" className={clsx('rounded-l-none')} disabled={loading}>
           Send
           <FontAwesomeIcon icon={loading ? faSpinner : faPaperPlane} spin={loading} className="ml-2" />
-        </button>
+        </Button>
       </form>
     </div>
   );

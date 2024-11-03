@@ -94,7 +94,7 @@ export default function QuestionNode({ id, data }: QuestionNodeProps) {
 
         {!data.dynamicGeneration && (data.type === NodeType.RatingSingle || data.type === NodeType.RatingMulti) && (
           <div className="flex flex-col gap-4">
-            <label className="text-sm font-medium text-gray-700">Ratings</label>
+            <label className="text-sm font-medium text-slate-700">Ratings</label>
             {data.ratings?.map((rating, index) => (
               <div key={index} className="flex items-center justify-between gap-2">
                 <Input

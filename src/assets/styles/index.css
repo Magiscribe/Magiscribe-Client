@@ -30,5 +30,5 @@ body,
 }
 
 .react-flow__node > div {
-  @apply border-2 bg-white border-slate-400 transition-all;
+  @apply border-2 border-slate-400;
 }

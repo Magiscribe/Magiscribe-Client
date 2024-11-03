@@ -6,6 +6,7 @@ import {
   CreateInquiryMutation,
   DeleteInquiryMutation,
   GetInquiryQuery,
+  InquiryDataForm,
   UpdateInquiryMutation,
 } from '@/graphql/graphql';
 import { getAgentIdByName } from '@/utils/agents';
@@ -20,23 +21,17 @@ interface InquiryProviderProps {
   children: React.ReactNode;
 }
 
-export interface FormData {
-  title: string;
-  description: string;
-  goals: string;
-}
-
 interface ContextType {
   initialized: boolean;
 
   id?: string;
   lastUpdated: Date;
-  form: FormData;
+  form: InquiryDataForm;
   graph: { edges: Edge[]; nodes: Node[] };
 
   deleteInquiry: (onSuccess?: () => void, onError?: () => void) => Promise<void>;
 
-  updateForm: (form: FormData) => void;
+  updateForm: (form: InquiryDataForm) => void;
   saveForm: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
 
   updateGraph: (graph: { nodes: Node[]; edges: Edge[] }) => void;
@@ -52,7 +47,7 @@ interface ContextType {
   publishGraph: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
 
   save: (
-    data: { form?: FormData; graph?: { nodes: Node[]; edges: Edge[] } },
+    data: { form?: InquiryDataForm; graph?: { nodes: Node[]; edges: Edge[] } },
     fields: string[],
     onSuccess?: (id: string) => void,
     onError?: () => void,
@@ -74,7 +69,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const [initialized, setInitialized] = useState(false);
   const [subscriptionId] = useState<string>(uuidv4());
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
-  const [form, updateForm] = useState<FormData>({} as FormData);
+  const [form, updateForm] = useState<InquiryDataForm>({} as InquiryDataForm);
 
   // Graph Generation States
   const [generatingGraph, setGeneratingGraph] = useState(false);
@@ -167,7 +162,11 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
    * @param onError {Function} The function to call on error.
    */
   const save = async (
-    data: { form?: FormData; graph?: { nodes: Node[]; edges: Edge[] }; draftGraph?: { nodes: Node[]; edges: Edge[] } },
+    data: {
+      form?: InquiryDataForm;
+      graph?: { nodes: Node[]; edges: Edge[] };
+      draftGraph?: { nodes: Node[]; edges: Edge[] };
+    },
     fields: string[],
     onSuccess?: (id: string) => void,
     onError?: () => void,
@@ -274,7 +273,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const generateGraph = async (templateOverride: boolean, message: string) => {
     setGeneratingGraph(true);
     let userMessage;
-    const agentId = await getAgentIdByName('Stakeholder | Graph Edit Agent (Sonnet)', client);
+    const agentId = await getAgentIdByName('Graph Edit Agent', client);
 
     if (templateOverride) {
       userMessage = [

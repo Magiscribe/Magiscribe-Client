@@ -1,88 +1,111 @@
+import goHomeGif from '@/assets/imgs/go-home.gif';
 import AnimatedDots from '@/components/animated/animated-dots';
-import { FeatureCard } from '@/components/cards/feature-card';
 import { ChartProps } from '@/components/chart';
 import Input from '@/components/controls/input';
+import Textarea from '@/components/controls/textarea';
 import RatingInput from '@/components/graph/rating-input';
 import MarkdownCustom from '@/components/markdown-custom';
 import { useTranscribe } from '@/hooks/audio-hook';
+import useElevenLabsAudio from '@/hooks/audio-player';
 import { useSetTitle } from '@/hooks/title-hook';
-import { InquiryTraversalProvider, useInquiry } from '@/providers/inquiry-traversal-provider';
+import { useAudioEnabled } from '@/providers/audio-provider';
+import { useInquiry } from '@/providers/inquiry-traversal-provider';
+import { useQueue } from '@/utils/debounce-queue';
 import { StrippedNode } from '@/utils/graphs/graph';
 import { SignedIn, SignedOut, SignUpButton } from '@clerk/clerk-react';
-import { faChevronRight, faComments, faLightbulb, faPaperPlane, faRocket } from '@fortawesome/free-solid-svg-icons';
-import { faMicrophone, faMicrophoneSlash } from '@fortawesome/free-solid-svg-icons';
+import { faChevronRight, faMicrophone, faMicrophoneSlash, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import clsx from 'clsx';
 import { motion } from 'framer-motion';
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
-import goHomeGif from '../assets/imgs/go-home.gif';
-
-/**
- * Represents a message in the chat.
- */
 interface Message {
-  type: 'text' | 'chart';
+  id: string;
+  type: 'text' | 'chart' | 'image';
   content: string | ChartProps;
   sender: 'user' | 'bot';
 }
 
 const emailRegex = /.+@.+\..+/;
 
-/**
- * Container component that provides a gradient background and rounded corners.
- */
-const Container = ({ children }: { children: React.ReactNode }) => (
-  <div className="flex flex-col items-center py-4 px-4 md:py-12">
-    <div className="w-full max-w-4xl mx-auto">
-      <div className="h-3 md:h-4 rounded-t-2xl bg-gradient-to-r from-violet-600 to-pink-600"></div>
-      <div className="bg-white rounded-b-2xl shadow-xl p-6 md:p-8">{children}</div>
-    </div>
-  </div>
-);
+export const useMessageQueue = () => {
+  const calculateMessageDelay = (message: Message): number => {
+    if (message.sender !== 'bot' || message.type !== 'text') return 0;
+    const content = message.content as string;
+    return content.length * 5; // 5ms per character
+  };
 
-/**
- * Main Inquiry component that handles the chat interface and inquiry flow.
- */
-function UserInquiryPage() {
-  // States
+  const shouldProcessImmediately = (message: Message): boolean => {
+    return message.sender === 'user';
+  };
+
+  const queue = useQueue<Message>({
+    processDelay: calculateMessageDelay,
+    minDelay: 500,
+    maxDelay: 3000,
+    shouldProcessImmediately,
+  });
+
+  return {
+    messages: queue.items,
+    addMessage: queue.addItem,
+    isProcessing: queue.isProcessing,
+    queueSize: queue.queueSize,
+  };
+};
+
+export default function UserInquiryPage() {
   const [screen, setScreen] = useState<'start' | 'inquiry' | 'end' | 'summary'>('start');
-  const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [selectedRatings, setSelectedRatings] = useState<string[]>([]);
   const [currentNode, setCurrentNode] = useState<StrippedNode | null>(null);
-  const { isTranscribing, transcript, handleTranscribe } = useTranscribe();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-  // Navigation Hooks
-  const navigate = useNavigate();
+  const { messages, addMessage, isProcessing } = useMessageQueue();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Inquiry hooks
-  const { preview, validGraph, handleNextNode, form, state, onNodeUpdate, userDetails, setUserDetails } = useInquiry();
+  const { isTranscribing, transcript, handleTranscribe } = useTranscribe();
+  const { preview, handleNextNode, form, state, onNodeUpdate, userDetails, setUserDetails } = useInquiry();
+  const audio = useElevenLabsAudio(form.voice);
+  const navigate = useNavigate();
+  const audioEnabled = useAudioEnabled();
+
+  useSetTitle()(form?.title);
+
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  // Handle transcription updates
+  useEffect(() => {
+    if (isTranscribing && transcript) {
+      setInputMessage((prev) => prev + transcript);
+    }
+  }, [transcript, isTranscribing]);
+
+  useEffect(() => {
+    onNodeUpdate(onNodeVisit);
+  }, [onNodeUpdate]);
 
   const validateInput = (input: { [key: string]: string }) => {
     const newErrors: { [key: string]: string } = {};
-
     if (input.email && !emailRegex.test(input.email)) {
       newErrors.email = 'Please enter a valid email address.';
     }
-
     return newErrors;
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setUserDetails((prev) => ({ ...prev, [name]: value }));
-
-    // Clear the error for this field as the user types
     setErrors((prev) => ({ ...prev, [name]: '' }));
   };
 
   const handleStart = () => {
     const newErrors = validateInput(userDetails);
     setErrors(newErrors);
-
     if (Object.keys(newErrors).length === 0) {
       setScreen('inquiry');
       handleNextNode();
@@ -91,336 +114,287 @@ function UserInquiryPage() {
 
   const handleFinishInquiry = () => {
     if (preview) {
-      // Close the current tab if in preview mode
       window.close();
     }
-
     setScreen('summary');
   };
 
-  const handleReset = () => {
-    // Force a reload of the page to reset.
-    // Ref: https://stackoverflow.com/questions/46820682/how-do-i-reload-a-page-with-react-router
-    navigate(0);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (inputMessage.trim() === '' && selectedRatings.length === 0) return;
 
     const userMessage = [...selectedRatings, inputMessage.trim()].filter(Boolean).join(' - ');
 
-    setMessages((prev) => [...prev, { type: 'text', content: userMessage, sender: 'user' }]);
     handleNextNode({
       data: {
         text: inputMessage,
         ...(selectedRatings.length > 0 && { ratings: selectedRatings }),
       },
     });
+
+    await addMessage({
+      type: 'text',
+      content: userMessage,
+      sender: 'user',
+    });
+
     setInputMessage('');
     setSelectedRatings([]);
   };
 
-  const onNodeVisit = async (node: StrippedNode) => {
-    if (node.type === 'end') {
-      setScreen('end');
-      return;
-    }
-
-    if (node.type === 'information' || node.type === 'question') {
-      setMessages((prev) => [...prev, { type: 'text', content: node.data.text as string, sender: 'bot' }]);
-      setCurrentNode(node);
-
-      if (node.type === 'information') {
-        await handleNextNode();
+  const onNodeVisit = useCallback(
+    async (node: StrippedNode) => {
+      if (node.type === 'end') {
+        setScreen('end');
+        return;
       }
-    }
-  };
 
-  /**
-   * Updates the prompt with the transcript.
-   * @param transcript {string} The transcript.
-   * @returns {void}
-   * @sideeffect Updates the prompt with the transcript.
-   */
-  useEffect(() => {
-    if (isTranscribing) {
-      setInputMessage((current) => current + transcript);
-    }
-  }, [transcript]);
+      if (node.type === 'information' || node.type === 'question') {
+        const messageText = node.data.text as string;
+        setCurrentNode(node);
 
-  useEffect(() => {
-    onNodeUpdate(onNodeVisit);
-  }, [onNodeUpdate]);
+        if (audioEnabled && messageText) {
+          audio.addSentence(messageText);
+        }
 
-  useSetTitle()(form?.title);
+        await addMessage({
+          type: 'text',
+          content: messageText,
+          sender: 'bot',
+        });
+
+        if (node.type === 'information') {
+          await handleNextNode();
+        }
+      }
+    },
+    [addMessage, audioEnabled, audio, handleNextNode],
+  );
+
+  const renderStartScreen = () => (
+    <div className="bg-white dark:bg-slate-700 p-6 rounded-lg shadow-lg">
+      <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white">{form.title}</h2>
+      <p className="text-slate-600 dark:text-slate-300 mb-6">Please provide your details to get started.</p>
+      <div className="space-y-4">
+        <Input
+          label="Name"
+          name="name"
+          placeholder="Your name"
+          value={userDetails.name}
+          onChange={handleChange}
+          error={errors.name}
+        />
+        <Input
+          label="Email"
+          name="email"
+          placeholder="Your email address"
+          value={userDetails.email}
+          onChange={handleChange}
+          error={errors.email}
+        />
+        <Textarea
+          label="Tell us about yourself"
+          name="about"
+          placeholder="Your background, interests, or anything you'd like to share."
+          value={userDetails.about}
+          onChange={handleChange}
+          error={errors.about}
+        />
+      </div>
+      <button
+        onClick={handleStart}
+        className="mt-6 w-full px-6 py-3 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition duration-300 ease-in-out"
+      >
+        Get Started
+      </button>
+    </div>
+  );
+
+  const renderMessages = () => (
+    <>
+      {messages.map((message) => (
+        <motion.div
+          key={message.id}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.3 }}
+          className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+        >
+          <div
+            className={`max-w-[80%] p-3 rounded-3xl ${
+              message.sender === 'user'
+                ? 'bg-purple-600 text-white'
+                : 'bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-white'
+            }`}
+          >
+            {message.type === 'image' ? (
+              <img src={message.content as string} alt="User uploaded" className="max-w-full h-auto rounded" />
+            ) : (
+              <MarkdownCustom>{message.content as string}</MarkdownCustom>
+            )}
+          </div>
+        </motion.div>
+      ))}
+      <div ref={messagesEndRef} />
+
+      {(state.loading || isProcessing) && (
+        <div className="flex justify-start items-center pt-4">
+          <AnimatedDots />
+        </div>
+      )}
+    </>
+  );
+
+  const renderSummary = () => (
+    <div className="bg-white dark:bg-slate-700 p-6 rounded-lg shadow-lg">
+      <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white text-center">Thank you!</h2>
+      <p className="text-lg text-slate-600 dark:text-slate-300 text-center">Your responses have been recorded.</p>
+
+      <img src={goHomeGif} alt="Thank You" className="mx-auto rounded-3xl mt-4" />
+      <div className="w-full max-w-3xl mx-auto flex flex-col items-center">
+        {/* Form */}
+        <p className="text-center text-slate-600 dark:text-slate-400 mt-4">
+          Want to make your own inquiry?{' '}
+          <SignedOut>
+            <SignUpButton signInForceRedirectUrl="/dashboard" forceRedirectUrl="/dashboard">
+              <button className="underline dark:text-white text-slate-800 hover:text-purple-600 transition-colors">
+                Sign up for free
+              </button>
+            </SignUpButton>
+          </SignedOut>
+          <SignedIn>
+            <Link
+              to="/dashboard/inquiry-builder"
+              className="underline dark:text-white text-slate-800 hover:text-purple-600 transition-colors"
+            >
+              Go to Graph Builder
+            </Link>
+          </SignedIn>
+        </p>
+      </div>
+    </div>
+  );
+
+  const renderInputArea = () => (
+    <div className="w-full p-4 max-w-4xl mx-auto">
+      {currentNode &&
+        !state.loading &&
+        screen !== 'end' &&
+        ((currentNode?.data?.type ?? '') as string).startsWith('rating') && (
+          <RatingInput
+            ratings={currentNode.data.ratings as string[]}
+            isMulti={currentNode.data.type === 'rating-multi'}
+            onRatingChange={setSelectedRatings}
+          />
+        )}
+
+      {screen === 'inquiry' && (
+        <form onSubmit={handleSubmit} className="flex flex-col mt-4 relative">
+          <motion.div
+            className="flex"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="flex-grow flex items-center bg-slate-200 dark:bg-slate-700 rounded-full">
+              <button
+                type="button"
+                onClick={handleTranscribe}
+                className="py-3 px-5 bg-slate-300 hover:bg-slate-400 dark:bg-slate-500 rounded-l-full rounded-r-full transition-colors"
+              >
+                <FontAwesomeIcon icon={isTranscribing ? faMicrophone : faMicrophoneSlash} />
+              </button>
+              {/* <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="py-3 px-5 bg-slate-300 hover:bg-slate-400 dark:bg-slate-500 rounded-r-full transition-colors"
+              >
+                <FontAwesomeIcon icon={faImage} />
+              </button> */}
+              <input
+                type="text"
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                placeholder="Type your message here..."
+                className="flex-grow p-3 bg-transparent text-slate-800 dark:text-white border-transparent focus:border-transparent focus:ring-0"
+              />
+              <button
+                type="submit"
+                className="py-3 px-6 text-white bg-purple-600 hover:bg-purple-700 rounded-l-full rounded-r-full transition-colors ml-1"
+              >
+                <FontAwesomeIcon icon={faPaperPlane} />
+              </button>
+            </div>
+            <input ref={fileInputRef} type="file" accept="image/*" className="hidden" />
+          </motion.div>
+          <motion.p
+            className="text-slate-400 text-sm mt-2 text-center"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.2 }}
+          >
+            <i>Occasionally, mistakes may occur during the inquiry. If you notice any, please let us know.</i>
+          </motion.p>
+        </form>
+      )}
+
+      {screen === 'end' && (
+        <div className="flex justify-end mt-4">
+          <button
+            type="button"
+            onClick={handleFinishInquiry}
+            className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-full transition duration-300 ease-in-out"
+          >
+            Finish Inquiry
+            <FontAwesomeIcon icon={faChevronRight} className="ml-2" />
+          </button>
+        </div>
+      )}
+    </div>
+  );
 
   if (state.notFound) {
     return (
-      <div className="text-center">
-        <h2 className="text-2xl md:text-3xl font-bold text-indigo-900 text-center">Inquiry Not Found</h2>
-        <div className="h-1 mx-auto w-32 md:w-64 bg-gradient-to-r from-violet-600 to-pink-600 opacity-50 rounded-full"></div>
-        <p className="mt-4 text-lg text-slate-700">
-          The inquiry you are looking for does not exist. Please check the URL and try again.
-        </p>
-      </div>
-    );
-  }
-
-  if (state.error) {
-    return (
-      <div className="text-center">
-        <h2 className="text-2xl md:text-3xl font-bold text-indigo-900 text-center">Something went wrong!</h2>
-        <div className="h-1 mx-auto w-32 md:w-64 bg-gradient-to-r from-violet-600 to-pink-600 opacity-50 rounded-full"></div>
-        <p className="mt-4 text-lg text-slate-700">
-          Looks like something broke on our end. Your previous answers have been recorded. Please feel free to try
-          again.
-        </p>
-        <button onClick={() => handleReset()} className="text-indigo-600 hover:underline mt-4">
-          Restart Inquiry
-        </button>
-      </div>
-    );
-  }
-
-  if (screen === 'start') {
-    return (
-      <div className="space-y-8">
-        <div className="text-center space-y-6">
-          <h2 className="text-2xl md:text-3xl font-bold text-indigo-900 text-center">{form.title}</h2>
-          <div className="h-1 mx-auto w-32 md:w-64 bg-gradient-to-r from-violet-600 to-pink-600 opacity-50 rounded-full"></div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <FeatureCard
-            icon={faRocket}
-            title="Fast"
-            description="Only spend as much time as you want to."
-            color="bg-gradient-to-r from-indigo-600 to-violet-600"
-          />
-          <FeatureCard
-            icon={faComments}
-            title="Interactive"
-            description="Express exactly what you want to say with ease."
-            color="bg-gradient-to-r from-violet-600 to-purple-600"
-          />
-          <FeatureCard
-            icon={faLightbulb}
-            title="Feedback"
-            description="Get instant feedback on your responses."
-            color="bg-gradient-to-r from-purple-600 to-fuchsia-600"
-          />
-        </div>
-
-        {/* Ask for name and email */}
-        {!preview && (
-          <div className="space-y-4">
-            <h3 className="text-xl md:text-2xl font-semibold text-indigo-900">Before we begin...</h3>
-            <p className="text-lg text-slate-700">
-              We would like to know a little bit about you before we start. These are not required fields, but we would
-              appreciate it if you could fill them out.
-            </p>
-            <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="flex flex-col gap-2 text-slate-800">
-                <Input
-                  label="Name"
-                  name="name"
-                  placeholder="Your name"
-                  error={errors.name}
-                  value={userDetails.name}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="flex flex-col gap-2">
-                <Input
-                  label="Email"
-                  name="email"
-                  placeholder="Your email address"
-                  error={errors.email}
-                  value={userDetails.email}
-                  onChange={handleChange}
-                />
-              </div>
-            </form>
-          </div>
-        )}
-
-        {preview && !validGraph && (
-          <div className="my-6 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700">
-            <h3 className="text-lg font-semibold mb-2">Warning: Invalid Graph</h3>
-            <p>This may lead to unexpected behavior or errors during the inquiry process</p>
-          </div>
-        )}
-
+      <div className="h-full flex items-center justify-center bg-white dark:bg-slate-800 text-slate-800 dark:text-white">
         <div className="text-center">
-          <p className="text-lg mb-4 text-slate-700">Ready to start? Click the button below to begin!</p>
-          <button
-            type="button"
-            onClick={handleStart}
-            className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-lg font-semibold rounded-full hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-300 ease-in-out transform hover:scale-105 shadow-lg"
-          >
-            Start Inquiry
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (screen === 'inquiry' || screen === 'end') {
-    return (
-      <div className="space-y-6">
-        <h2 className="text-2xl md:text-3xl font-bold text-indigo-900 text-center">{form.title}</h2>
-        <div className="h-1 mx-auto w-32 md:w-64 bg-gradient-to-r from-violet-600 to-pink-600 opacity-50 rounded-full"></div>
-        <div className="space-y-4">
-          {messages.map((message, index) => (
-            <div key={index} className={clsx('flex', message.sender === 'user' ? 'justify-end' : 'justify-start')}>
-              <motion.div
-                initial={{ opacity: 0, x: message.sender === 'user' ? 20 : -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5 }}
-                className={clsx(
-                  'max-w-[80%] px-4 py-2 rounded-xl shadow-md',
-                  message.sender === 'user'
-                    ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white'
-                    : 'bg-slate-200 text-slate-800',
-                )}
-              >
-                <MarkdownCustom>{message.content as string}</MarkdownCustom>
-              </motion.div>
-            </div>
-          ))}
-          {state.loading && (
-            <div className="flex justify-start items-center pt-4 pl-4">
-              <AnimatedDots />
-            </div>
-          )}
-        </div>
-
-        {currentNode && currentNode.type !== 'end' && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="space-y-4"
-          >
-            {!state.loading && screen !== 'end' && ((currentNode.data?.type ?? '') as string).startsWith('rating') && (
-              <div>
-                <RatingInput
-                  ratings={currentNode.data.ratings as string[]}
-                  isMulti={currentNode.data.type === 'rating-multi'}
-                  onRatingChange={setSelectedRatings}
-                />
-              </div>
-            )}
-
-            <hr className="border-gray-300" />
-
-            {screen === 'inquiry' && (
-              <form onSubmit={handleSubmit} className="flex">
-                <div className="rounded-l-full flex-grow flex border border-slate-300">
-                  <button
-                    type="button"
-                    className="focus:outline-none text-black px-4 py-2 rounded-lg ml-2 mr-2 hover:from-indigo-700 hover:to-purple-700 transition-colors"
-                    onClick={handleTranscribe}
-                  >
-                    <FontAwesomeIcon
-                      icon={isTranscribing ? faMicrophone : faMicrophoneSlash}
-                      className={isTranscribing ? 'text-green-500' : ''}
-                    />
-                  </button>
-                  <input
-                    type="text"
-                    value={inputMessage}
-                    onChange={(e) => setInputMessage(e.target.value)}
-                    placeholder="Type your message here..."
-                    className="flex-grow p-2 sm:p-3 rounded-l-full text-slate-800 focus:outline-none"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="px-6 py-2 sm:py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-r-full hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-300 ease-in-out disabled:opacity-70 disabled:cursor-not-allowed"
-                  disabled={state.loading || (selectedRatings.length === 0 && inputMessage.trim() === '')}
-                >
-                  <span className="hidden md:inline">Send</span>
-                  <FontAwesomeIcon icon={faPaperPlane} className="ml-0 md:ml-2" />
-                </button>
-              </form>
-            )}
-
-            {screen === 'end' && (
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={handleFinishInquiry}
-                  className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-300 ease-in-out disabled:opacity-70 disabled:cursor-not-allowed"
-                >
-                  Finish Inquiry
-                  <FontAwesomeIcon icon={faChevronRight} className="ml-2" />
-                </button>
-              </div>
-            )}
-          </motion.div>
-        )}
-      </div>
-    );
-  }
-
-  if (screen === 'summary') {
-    return (
-      <div className="text-center space-y-6">
-        <h2 className="text-2xl md:text-3xl font-bold text-indigo-900">{form.title}</h2>
-        <div className="h-1 mx-auto w-32 md:w-64 bg-gradient-to-r from-violet-600 to-pink-600 opacity-50 rounded-full"></div>
-        <p className="text-lg text-slate-700">
-          Your responses have been recorded.
-          <br />
-        </p>
-
-        <img src={goHomeGif} alt="Thank You" className="mx-auto rounded-3xl" />
-        <div className="w-full max-w-3xl mx-auto flex flex-col items-center">
-          {/* Form */}
-          <p className="text-lg text-center text-gray-600 mt-4">
-            Want to make your own inquiry?{' '}
-            <SignedOut>
-              <SignUpButton signInForceRedirectUrl="/dashboard" forceRedirectUrl="/dashboard">
-                <button className="px-3 ml-1 py-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-300 ease-in-out transform hover:scale-105 shadow-lg">
-                  Get Alpha Access
-                </button>
-              </SignUpButton>
-            </SignedOut>
-            <SignedIn>
-              <Link
-                to="/dashboard/inquiry-builder"
-                className="px-3 ml-1 py-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-300 ease-in-out transform hover:scale-105 shadow-lg"
-              >
-                Go to Graph Builder
-              </Link>
-            </SignedIn>
+          <h2 className="text-2xl font-bold mb-4">Inquiry Not Found</h2>
+          <p className="text-slate-600 dark:text-slate-400">
+            The inquiry you are looking for does not exist. Please check the URL and try again.
           </p>
         </div>
       </div>
     );
   }
 
-  return <></>;
-}
+  if (state.error) {
+    return (
+      <div className="h-full flex items-center justify-center bg-white dark:bg-slate-800 text-slate-800 dark:text-white">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">Something went wrong!</h2>
+          <p className="text-slate-600 dark:text-slate-400 mb-4">
+            Looks like something broke on our end. Your previous answers have been recorded.
+          </p>
+          <button
+            onClick={() => navigate(0)}
+            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Restart Inquiry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
-/**
- * Wrapper component that provides the InquiryProvider context.
- */
-export default function InquiryWrapper() {
-  // Navigation Hooks
-  const { id } = useParams<{ id: string }>();
-  const [searchParams] = useSearchParams();
-
-  // Search params.
-  const preview = searchParams.get('preview') === 'true';
-
-  if (!id) return null;
   return (
-    <InquiryTraversalProvider id={id} preview={preview}>
-      <Container>
-        <UserInquiryPage />
-      </Container>
-    </InquiryTraversalProvider>
+    <>
+      <div className="w-full max-w-4xl flex-grow p-4 overflow-y-auto space-y-4 mx-auto">
+        {screen === 'start' && renderStartScreen()}
+        {(screen === 'inquiry' || screen === 'end') && renderMessages()}
+        {screen === 'summary' && renderSummary()}
+        <div ref={messagesEndRef} />
+      </div>
+      {currentNode && currentNode.type !== 'end' && screen !== 'start' && renderInputArea()}
+    </>
   );
 }

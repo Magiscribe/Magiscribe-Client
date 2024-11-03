@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
 
 import Button from '../controls/button';
+import Input from '../controls/input';
 import MarkdownCustom from '../markdown-custom';
 
 /**
@@ -49,7 +50,9 @@ function ChatBubble({ message, sender }: { message: Message; sender: 'user' | 'a
     <div className={`mb-4 flex ${sender === 'user' ? 'justify-end' : 'justify-start'}`}>
       <div
         className={`max-w-[90%] p-3 rounded-lg ${
-          sender === 'user' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
+          sender === 'user'
+            ? 'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-white'
+            : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-white'
         }`}
       >
         <p className="text-xs font-semibold mb-1">{sender === 'user' ? 'You' : 'Graph Editor'}</p>
@@ -184,19 +187,17 @@ export default function GraphGeneratorMenu({ open, onUpdate, onClose }: GraphGen
       exit={{ x: '100%' }}
       transition={{ duration: 0.3, ease: 'easeInOut' }}
       style={{ width: `${menuWidth}px` }}
-      className="h-full bg-white absolute right-0 top-0 z-10 shadow-l-2xl flex flex-col border-l border-gray-200"
+      className="h-full bg-white dark:bg-slate-700 text-slate-800 dark:text-white absolute right-0 top-0 z-10 shadow-l-2xl flex flex-col border-l border-gray-200"
       ref={menuRef}
     >
       <div
-        className="absolute left-0 top-0 bottom-0 w-1 cursor-ew-resize bg-gray-300 hover:bg-gray-400"
+        className="absolute left-0 top-0 bottom-0 w-1 cursor-ew-resize bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600"
         onMouseDown={handleMouseDown}
       />
-      <div className="w-full h-full bg-white flex flex-col">
+      <div className="w-full h-full flex flex-col">
         <div className="p-4 border-b border-gray-200 flex justify-between items-center">
           <h2 className="text-lg font-semibold">Graph Editor</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-            <FontAwesomeIcon icon={faTimes} />
-          </button>
+          <Button onClick={onClose} iconLeft={faTimes} variant="transparentSecondary" />
         </div>
         <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-4">
           {messages.map((message) => (
@@ -204,17 +205,16 @@ export default function GraphGeneratorMenu({ open, onUpdate, onClose }: GraphGen
           ))}
           {generatingGraph && (
             <div className={`mb-4 flex justify-end`}>
-              <FontAwesomeIcon icon={faSpinner} className="text-gray-500 animate-spin mr-8" />
+              <FontAwesomeIcon icon={faSpinner} className="animate-spin mr-8" />
             </div>
           )}
         </div>
         <div className="p-4 border-t border-gray-200">
-          <input
-            type="text"
+          <Input
             value={inputMessage}
+            name="message"
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyDown={handleInputKeyDown}
-            className="w-full px-3 py-2 border rounded-lg"
             placeholder="Request a modification..."
           />
           <Button

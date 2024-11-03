@@ -24,8 +24,8 @@ export default function ContentSection({
       </div>
       <div className={`w-${content ? 'full sm:w-2/5' : '5/6 sm:w-1/2'} p-6 ${content ? 'mt-6' : ''}`}>
         <div className="align-middle">
-          <h3 className="text-3xl text-gray-800 font-bold leading-none mb-3">{title}</h3>
-          <p className="text-gray-600 mb-8">{description}</p>
+          <h3 className="text-3xl font-bold leading-none mb-3">{title}</h3>
+          <p className="mb-8">{description}</p>
         </div>
       </div>
     </motion.div>

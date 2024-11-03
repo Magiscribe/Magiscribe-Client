@@ -5,6 +5,7 @@ import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
 import React from 'react';
+
 import PerQuestionTab from './per-question';
 import PerResponseTab from './per-response';
 import ViaChatTab from './via-chat';
@@ -32,30 +33,32 @@ const AnalysisTab: React.FC<AnalysisTabProps> = ({ id }) => {
     errorPolicy: 'all',
   });
 
-  if (graphLoading || dataLoading) return <p>Loading...</p>;
-  if (graphError || dataError) return <p>Error loading data</p>;
+  if (graphLoading || dataLoading) return <p className="text-slate-700 dark:text-white">Loading...</p>;
+  if (graphError || dataError) return <p className="text-slate-700 dark:text-white">Error loading data</p>;
 
   const data = {
     id,
     form: inquiryData?.getInquiry?.data?.form,
-    graph: inquiryData?.getInquiry?.data?.graph,
+    graph: inquiryData?.getInquiry?.data?.graph ?? inquiryData?.getInquiry?.data?.draftGraph,
     responses: inquiryResponseData?.getInquiryResponses ?? [],
   };
 
-  const tabCategories = ['Per Response', 'Per Question', 'Via Chat'];
+  const tabs = ['Per Response', 'Per Question', 'Via Chat'];
 
   return (
-    <div className="mt-8">
+    <div className="mt-8 rounded-2xl">
       <TabGroup>
         <TabList className="flex space-x-1 rounded-xl border-2 border-white mb-4">
-          {tabCategories.map((category) => (
+          {tabs.map((category) => (
             <Tab
               key={category}
               className={({ selected }) =>
                 clsx(
                   'w-full rounded-lg py-2.5 text-sm font-medium leading-5',
                   'ring-white ring-opacity-60 focus:outline-none focus:ring-2',
-                  selected ? 'bg-white shadow text-slate-700' : 'text-slate-100 hover:bg-white/[0.12]',
+                  selected
+                    ? 'bg-white dark:bg-slate-700 shadow-xl text-slate-800 dark:text-white'
+                    : 'text-white dark:text-slate-200',
                 )
               }
             >

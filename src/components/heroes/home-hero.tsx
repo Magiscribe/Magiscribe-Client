@@ -32,7 +32,7 @@ export default function HomeHero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.5 }}
         >
-          Get Alpha Access
+          Sign Up Now
         </motion.a>
       </div>
       <motion.div

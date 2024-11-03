@@ -28,7 +28,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 export default function Input({ label, subLabel, name, error, className, ...props }: InputProps): JSX.Element {
   const isCheckbox = props.type === 'checkbox';
 
-  const baseClassName = 'w-full p-2 border rounded-xl focus:outline-none focus:ring-2';
+  const baseClassName = 'w-full p-2 border rounded-xl dark:bg-slate-600 bg-white focus:outline-none focus:ring-2';
 
   const inputStyles = {
     default: clsx(
@@ -56,7 +56,7 @@ export default function Input({ label, subLabel, name, error, className, ...prop
     'ml-2': isCheckbox,
   });
 
-  const inputWrapperClassName = clsx('text-slate-800 w-full flex gap-2', {
+  const inputWrapperClassName = clsx('dark:text-white text-slate-800 w-full flex gap-2', {
     'flex-col': !isCheckbox,
     'flex-row items-center': isCheckbox,
   });

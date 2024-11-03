@@ -1,16 +1,20 @@
 import templates, { Template } from '@/assets/templates';
+import { GET_ALL_AUDIO_VOICES } from '@/clients/queries';
+import { GetAllAudioVoicesQuery } from '@/graphql/graphql';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
+import { useQuery } from '@apollo/client';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Description, Label, Radio, RadioGroup } from '@headlessui/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
 
-import Button from '../controls/button';
-import Input from '../controls/input';
-import Textarea from '../controls/textarea';
-import CustomModal from './modal';
+import Button from '../../controls/button';
+import Input from '../../controls/input';
+import Select from '../../controls/select';
+import Textarea from '../../controls/textarea';
+import CustomModal from '../modal';
 
 /**
  * Props for the ModalUpsertInquiry component
@@ -73,16 +77,22 @@ const TemplateSelection: React.FC<TemplateSelectionProps> = ({ value, onChange }
             key={template.name}
             value={template}
             className={({ checked }) =>
-              `${checked ? 'bg-blue-500 text-white' : 'bg-gray-200'}
+              `${checked ? 'bg-blue-500 text-white' : 'bg-slate-200 dark:bg-slate-600'}
                 relative flex cursor-pointer rounded-lg px-4 py-2 shadow-md focus:outline-none`
             }
           >
             {({ checked }) => (
               <div className="flex flex-col">
-                <Label as="span" className={`text-lg font-bold ${checked ? 'text-white' : 'text-gray-800'}`}>
+                <Label
+                  as="span"
+                  className={`text-lg font-bold ${checked ? 'text-white' : ' text-slate-800 dark:text-white'}`}
+                >
                   {template.name}
                 </Label>
-                <Description as="span" className={`text-sm ${checked ? 'text-indigo-100' : 'text-gray-600'}`}>
+                <Description
+                  as="span"
+                  className={`text-sm ${checked ? 'text-slate-100' : ' text-slate-800 dark:text-slate-300'}`}
+                >
                   {template.description}
                 </Description>
               </div>
@@ -114,6 +124,8 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
   } = useInquiryBuilder();
   const alert = useAddAlert();
 
+  const { data: voices } = useQuery<GetAllAudioVoicesQuery>(GET_ALL_AUDIO_VOICES);
+
   useEffect(() => {
     if (generatingGraph) {
       const interval = setInterval(() => {
@@ -125,6 +137,15 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
     }
   }, [generatingGraph]);
 
+  // Sets the default voice once the voices are loaded.
+  useEffect(() => {
+    if (voices) {
+      if (!form.voice) {
+        updateForm({ ...form, voice: voices.getAllAudioVoices[0].id });
+      }
+    }
+  }, [voices, form, updateForm]);
+
   /**
    * Handle input change for the form
    * @param field - The field to update
@@ -132,6 +153,18 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
   const handleInputChange =
     (field: string) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
+      updateForm({ ...form, [field]: e.target.value });
+    };
+
+  /**
+   * Handle select change for the form
+   * @param field - The field to update
+   * @param e - The change event
+   * @returns void
+   */
+  const handleSelectChange =
+    (field: string) =>
+    (e: React.ChangeEvent<HTMLSelectElement>): void => {
       updateForm({ ...form, [field]: e.target.value });
     };
 
@@ -198,15 +231,24 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
   return (
     <CustomModal size="3xl" open={open} onClose={onClose} title={id ? 'Update Inquiry' : 'Create Inquiry'}>
       <form className="space-y-4" onSubmit={handleSave}>
-        <div>
-          <Input
-            name="title"
-            label="Title"
-            subLabel="This will be displayed to the people you are sending the inquiry to"
-            value={form.description}
-            onChange={handleInputChange('title')}
-          />
-        </div>
+        <Input
+          name="title"
+          label="Title"
+          placeholder="Inquiry title"
+          autoFocus
+          subLabel="This will be displayed to the people you are sending the inquiry to"
+          value={form.title}
+          onChange={handleInputChange('title')}
+        />
+
+        <Select
+          name="voice"
+          label="Voice"
+          subLabel="This will be the voice used to read responses to the user if they have audio enabled"
+          value={form.voice}
+          onChange={handleSelectChange('voice')}
+          options={voices?.getAllAudioVoices.map((voice) => ({ value: voice.id, label: voice.name })) ?? []}
+        />
 
         <TemplateSelection value={selectedTemplate} onChange={handleChangeGraphTemplate} />
 
@@ -246,7 +288,7 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
             </motion.div>
           )}
         </AnimatePresence>
-        <div className="flex justify-end items-center p-4 rounded-2xl">
+        <div className="flex justify-end items-center rounded-2xl">
           <div className="w-full ">
             <AnimatePresence mode="wait">
               {generatingGraph && (
@@ -256,7 +298,7 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 25 }}
                   transition={{ duration: 0.3 }}
-                  className="text-sm italic text-gray-600"
+                  className="text-sm italic text-slate-600"
                 >
                   {loadingQuote}
                 </motion.p>

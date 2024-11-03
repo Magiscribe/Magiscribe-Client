@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface RatingInputProps {
   ratings: string[];
@@ -27,7 +27,7 @@ const RatingInput: React.FC<RatingInputProps> = ({ ratings, isMulti, onRatingCha
 
   return (
     <div className="flex flex-col items-start md:items-end mb-2 w-full">
-      {isMulti && <p className="text-sm text-gray-500 mb-1">Choose all that apply</p>}
+      {isMulti && <p className="text-sm text-slate-500 mb-1">Choose all that apply</p>}
       <div className="flex flex-wrap gap-2 w-full justify-end">
         {ratings.map((rating) => (
           <button

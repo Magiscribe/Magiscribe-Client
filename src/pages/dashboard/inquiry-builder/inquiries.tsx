@@ -1,14 +1,51 @@
 import { GET_INQUIRIES } from '@/clients/queries';
 import GenericHero from '@/components/heroes/generic-hero';
-import ModalUpsertInquiry from '@/components/modals/upsert-inquiry-modal';
-import { GetInquiriesQuery } from '@/graphql/graphql';
+import ModalUpsertInquiry from '@/components/modals/inquiry/create-inquiry-modal';
+import { GetInquiriesQuery, Inquiry } from '@/graphql/graphql';
 import { InquiryBuilderProvider } from '@/providers/inquiry-builder-provider';
 import { useQuery } from '@apollo/client';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
-export default function Inquiry() {
+function InquiryCard({ inquiry }: { inquiry: Inquiry }) {
+  const form = inquiry.data.form;
+
+  const createdAt = new Date(inquiry.createdAt);
+  const updatedAt = new Date(inquiry.updatedAt);
+
+  const formattedUpdateDate = updatedAt.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+  const formattedCreateDate = createdAt.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+
+  return (
+    <Link to={`/dashboard/inquiry-builder/${inquiry.id}`} className="hover:no-underline">
+      <motion.div
+        key={inquiry.id}
+        initial={{ opacity: 0, y: 25 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -25 }}
+        transition={{ duration: 0.2, type: 'spring', stiffness: 100 }}
+        className="bg-white dark:bg-slate-600 p-4 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow"
+        whileHover={{ scale: 1.05 }}
+      >
+        <h3 className="text-lg text-slate-900 dark:text-slate-100 font-semibold">{form.title}</h3>
+        <p className="text-sm text-slate-500 dark:text-slate-400">
+          Created: {formattedCreateDate} | Updated: {formattedUpdateDate}
+        </p>
+      </motion.div>
+    </Link>
+  );
+}
+
+export default function Inquiries() {
   // States
   const [createFormModal, setCreateFormModal] = useState(false);
 
@@ -37,41 +74,9 @@ export default function Inquiry() {
       <hr className="my-8" />
       <h2 className="text-2xl font-semibold text-slate-100 mb-4">Your Inquiries</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-        {(data?.getInquiries ?? []).map((inquiry, i) => {
-          const form = inquiry.data.form;
-
-          const createdAt = new Date(inquiry.createdAt);
-          const updatedAt = new Date(inquiry.updatedAt);
-
-          const formattedUpdateDate = updatedAt.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-          });
-          const formattedCreateDate = createdAt.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-          });
-
-          return (
-            <motion.div
-              key={inquiry.id}
-              initial={{ opacity: 0, y: 25 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -25 }}
-              transition={{ duration: 0.2, type: 'spring', stiffness: 100, delay: i * 0.1 }}
-              className="bg-white p-4 text-black rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow"
-              whileHover={{ scale: 1.05 }}
-              onClick={() => navigate(inquiry.id)}
-            >
-              <h3 className="text-lg font-semibold mb-2">{form.title === '' ? 'Untitled Inquiry' : form.title}</h3>
-              <p className="text-sm text-gray-500 mb-2">
-                Created: {formattedCreateDate} | Updated: {formattedUpdateDate}
-              </p>
-            </motion.div>
-          );
-        })}
+        {(data?.getInquiries ?? []).map((inquiry) => (
+          <InquiryCard inquiry={inquiry} key={inquiry.id} />
+        ))}
         <motion.div
           className="bg-blue-500 p-4 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow flex items-center justify-center"
           whileHover={{ scale: 1.05 }}
