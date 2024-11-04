@@ -20,6 +20,7 @@ export default function ConditionNode({ id, data }: ConditionNodeProps) {
       <div className="flex flex-col gap-2 mt-2">
         <Textarea
           label="Message"
+          subLabel="Instructions to tell an AI how to choose where to go next"
           name="text"
           value={data.text}
           onChange={handleInputChange}

@@ -50,6 +50,8 @@ interface InquiryContextType {
   preview?: boolean;
   validGraph?: boolean;
 
+  graph: GraphManager | null;
+
   handleNextNode: (props?: HandleNextNodeProps) => Promise<void>;
   onNodeUpdate: (callback: (node: OptimizedNode) => void) => void;
 
@@ -265,7 +267,6 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
           userMessage: currentNode.data.text,
           userDetails: `
           Name: ${userDetails.name}
-          About: ${userDetails.about}
           `,
           conversationHistory: inquiryHistoryRef.current.join('\n\n'),
           mostRecentMessage,
@@ -350,6 +351,8 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
     id,
     preview,
     validGraph: validGraph.current,
+
+    graph: graphRef.current,
 
     onNodeUpdate: (callback: (node: OptimizedNode) => void) => {
       onNodeUpdateRef.current = callback;

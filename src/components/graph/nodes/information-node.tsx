@@ -43,6 +43,11 @@ export default function InformationNode({ id, data }: InformationNodeProps) {
         <Textarea
           label="Message"
           name="text"
+          subLabel={
+            data.dynamicGeneration
+              ? 'Prompt for an AI to generate information'
+              : 'Information displayed directly to the user'
+          }
           value={data.text}
           onChange={(e) => handleUpdate({ text: e.target.value })}
           placeholder="Enter your text here..."
