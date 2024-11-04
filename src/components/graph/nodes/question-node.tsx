@@ -85,6 +85,9 @@ export default function QuestionNode({ id, data }: QuestionNodeProps) {
 
         <Textarea
           label="Message"
+          subLabel={
+            data.dynamicGeneration ? 'Prompt for an AI to generate a question' : 'Question asked directly to the user'
+          }
           name="text"
           value={data.text}
           onChange={(e) => handleUpdate({ text: e.target.value })}
