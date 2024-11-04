@@ -1,11 +1,12 @@
 import { faCodeBranch, faExclamationCircle, faPlay, faQuestionCircle, faStop } from '@fortawesome/free-solid-svg-icons';
 import { EdgeTypes, NodeTypes, useReactFlow } from '@xyflow/react';
 import { useCallback } from 'react';
-import { EndNode, StartNode } from './nodes/start-end-node';
 import QuestionNode from './nodes/question-node';
 import ConditionNode from './nodes/condition-node';
 import InformationNode from './nodes/information-node';
 import ButtonEdge from './edges/button-edge';
+import StartNode from './nodes/start-node';
+import EndNode from './nodes/end-node';
 
 export const nodeTypesInfo = {
   start: {

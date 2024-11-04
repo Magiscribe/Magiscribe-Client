@@ -2,7 +2,6 @@ import goHomeGif from '@/assets/imgs/go-home.gif';
 import AnimatedDots from '@/components/animated/animated-dots';
 import { ChartProps } from '@/components/chart';
 import Input from '@/components/controls/input';
-import Textarea from '@/components/controls/textarea';
 import RatingInput from '@/components/graph/rating-input';
 import MarkdownCustom from '@/components/markdown-custom';
 import { useTranscribe } from '@/hooks/audio-hook';
@@ -66,7 +65,7 @@ export default function UserInquiryPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { isTranscribing, transcript, handleTranscribe } = useTranscribe();
-  const { preview, handleNextNode, form, state, onNodeUpdate, userDetails, setUserDetails } = useInquiry();
+  const { graph, preview, handleNextNode, form, state, onNodeUpdate, userDetails, setUserDetails } = useInquiry();
   const audio = useElevenLabsAudio(form.voice);
   const navigate = useNavigate();
   const audioEnabled = useAudioEnabled();
@@ -171,44 +170,48 @@ export default function UserInquiryPage() {
     [addMessage, audioEnabled, audio, handleNextNode],
   );
 
-  const renderStartScreen = () => (
-    <div className="bg-white dark:bg-slate-700 p-6 rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white">{form.title}</h2>
-      <p className="text-slate-600 dark:text-slate-300 mb-6">Please provide your details to get started.</p>
-      <div className="space-y-4">
-        <Input
-          label="Name"
-          name="name"
-          placeholder="Your name"
-          value={userDetails.name}
-          onChange={handleChange}
-          error={errors.name}
-        />
-        <Input
-          label="Email"
-          name="email"
-          placeholder="Your email address"
-          value={userDetails.email}
-          onChange={handleChange}
-          error={errors.email}
-        />
-        <Textarea
-          label="Tell us about yourself"
-          name="about"
-          placeholder="Your background, interests, or anything you'd like to share."
-          value={userDetails.about}
-          onChange={handleChange}
-          error={errors.about}
-        />
+  const renderStartScreen = () => {
+    const startNode = graph?.getCurrentNode();
+
+    const enableNameCapture = (startNode?.data?.nameCapture as boolean) ?? false;
+    const enableEmailCapture = (startNode?.data?.emailCapture as boolean) ?? false;
+    const description = (startNode?.data?.description as string) ?? '';
+
+    return (
+      <div className="bg-white dark:bg-slate-700 p-6 rounded-lg shadow-lg">
+        <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white">{form.title}</h2>
+        <p className="text-slate-600 dark:text-slate-300 mb-6">{description}</p>
+        <div className="space-y-4">
+          {enableNameCapture && (
+            <Input
+              label="Name"
+              name="name"
+              placeholder="Your name"
+              value={userDetails.name}
+              onChange={handleChange}
+              error={errors.name}
+            />
+          )}
+          {enableEmailCapture && (
+            <Input
+              label="Email"
+              name="email"
+              placeholder="Your email address"
+              value={userDetails.email}
+              onChange={handleChange}
+              error={errors.email}
+            />
+          )}
+        </div>
+        <button
+          onClick={handleStart}
+          className="mt-6 w-full px-6 py-3 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition duration-300 ease-in-out"
+        >
+          Get Started
+        </button>
       </div>
-      <button
-        onClick={handleStart}
-        className="mt-6 w-full px-6 py-3 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition duration-300 ease-in-out"
-      >
-        Get Started
-      </button>
-    </div>
-  );
+    );
+  };
 
   const renderMessages = () => (
     <>
