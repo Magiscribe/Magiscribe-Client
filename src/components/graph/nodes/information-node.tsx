@@ -33,7 +33,7 @@ export default function InformationNode({ id, data }: InformationNodeProps) {
       <div className="space-y-4 mt-2">
         <Input
           label="Dynamic Generation"
-          name="dynamicGeneration"
+          name={`dynamicGeneration_${id}`}
           type="checkbox"
           checked={data.dynamicGeneration}
           onChange={(e) => handleUpdate({ dynamicGeneration: (e.target as HTMLInputElement).checked })}
