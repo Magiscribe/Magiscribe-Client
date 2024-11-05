@@ -9,6 +9,8 @@ import React from 'react';
 import PerQuestionTab from './per-question';
 import PerResponseTab from './per-response';
 import ViaChatTab from './via-chat';
+import ExportCSV from './export-csv';
+import ExportJSON from './export-json';
 
 interface AnalysisTabProps {
   id: string;
@@ -47,6 +49,11 @@ const AnalysisTab: React.FC<AnalysisTabProps> = ({ id }) => {
 
   return (
     <div className="mt-8 rounded-2xl">
+      <div className="flex justify-end items-center gap-4 mb-4">
+        <ExportCSV id={id} responses={inquiryResponseData?.getInquiryResponses ?? []} />
+        <ExportJSON id={id} responses={inquiryResponseData?.getInquiryResponses ?? []} />
+      </div>
+
       <TabGroup>
         <TabList className="flex space-x-1 rounded-xl border-2 border-white mb-4">
           {tabs.map((category) => (
