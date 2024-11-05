@@ -9,7 +9,11 @@ const templateOpenEnded: { nodes: Node[]; edges: Edge[] } = {
         x: 0,
         y: 529,
       },
-      data: {},
+      data: {
+        text: 'Welcome to our Inquiry about HVAC co',
+        requireName: false,
+        requireEmail: false,
+      },
       measured: {
         width: 384,
         height: 48,
