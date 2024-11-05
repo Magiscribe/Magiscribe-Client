@@ -3,6 +3,7 @@ import Textarea from '@/components/controls/textarea';
 import { faPlay } from '@fortawesome/free-solid-svg-icons';
 import { Position } from '@xyflow/react';
 import React, { useCallback } from 'react';
+
 import NodeContainer from '../elements/node-container';
 import CustomHandle from '../handles/limit-handle';
 import { useNodeData } from '../utils';
@@ -12,8 +13,8 @@ interface StartNodeProps {
 
   data: {
     text: string;
-    nameCapture: boolean;
-    emailCapture: boolean;
+    requireName: boolean;
+    requireEmail: boolean;
   };
 }
 
@@ -43,25 +44,24 @@ export default function StartNode({ id, data }: StartNodeProps) {
           placeholder="Enter your text here..."
           className="resize-none overflow-hidden nodrag"
         />
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-slate-700">Start by collecting:</label>
-          <Input
-            label="Name"
-            name="enableNameCapture"
-            type="checkbox"
-            checked={data.nameCapture}
-            onChange={(e) => handleUpdate({ nameCapture: (e.target as HTMLInputElement).checked })}
-            className="nodrag"
-          />
-          <Input
-            label="Email"
-            name="enableEmailCapture"
-            type="checkbox"
-            checked={data.emailCapture}
-            onChange={(e) => handleUpdate({ emailCapture: (e.target as HTMLInputElement).checked })}
-            className="nodrag"
-          />
-        </div>
+        <Input
+          label="Require Name"
+          subLabel="Users will be required to enter their name."
+          name="enableNameCapture"
+          type="checkbox"
+          checked={data.requireName}
+          onChange={(e) => handleUpdate({ requireName: (e.target as HTMLInputElement).checked })}
+          className="nodrag"
+        />
+        <Input
+          label="Require Email"
+          subLabel="Users will be required to provide their email."
+          name="enableEmailCapture"
+          type="checkbox"
+          checked={data.requireEmail}
+          onChange={(e) => handleUpdate({ requireEmail: (e.target as HTMLInputElement).checked })}
+          className="nodrag"
+        />
       </div>
       <CustomHandle connectionCount={1} type={'source'} position={Position.Right} className="w-4 h-4 !bg-green-500" />
     </NodeContainer>

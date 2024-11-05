@@ -54,25 +54,36 @@ export const useMessageQueue = () => {
 };
 
 export default function UserInquiryPage() {
+  // State
   const [screen, setScreen] = useState<'start' | 'inquiry' | 'end' | 'summary'>('start');
   const [inputMessage, setInputMessage] = useState('');
   const [selectedRatings, setSelectedRatings] = useState<string[]>([]);
   const [currentNode, setCurrentNode] = useState<StrippedNode | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
+  // Message Hooks
   const { messages, addMessage, isProcessing } = useMessageQueue();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { isTranscribing, transcript, handleTranscribe } = useTranscribe();
+  // Graph Hooks
   const { graph, preview, handleNextNode, form, state, onNodeUpdate, userDetails, setUserDetails } = useInquiry();
+
+  // Audio Hooks
   const audio = useElevenLabsAudio(form.voice);
-  const navigate = useNavigate();
   const audioEnabled = useAudioEnabled();
+  const { isTranscribing, transcript, handleTranscribe } = useTranscribe();
+
+  // General Hooks
+  const navigate = useNavigate();
 
   useSetTitle()(form?.title);
 
-  // Scroll to bottom when messages change
+  /*================================ SIDE EFFECTS ==============================*/
+
+  /**
+   * Scroll to bottom when messages change
+   */
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -84,24 +95,58 @@ export default function UserInquiryPage() {
     }
   }, [transcript, isTranscribing]);
 
+  /**
+   * Sets up the node visit callback once onNodeUpdate is available.
+   */
   useEffect(() => {
     onNodeUpdate(onNodeVisit);
   }, [onNodeUpdate]);
 
+  /*================================ HELPER FUNCTIONS ==============================*/
+
+  /**
+   * Validates the input based on the current node requirements.
+   * @note This function currently only works for the start node, but can be expanded to other nodes in the future.
+   * @param input { [key: string]: string } - The input object to validate
+   * @returns { [key: string]: string } - An object containing the errors for each field
+   */
   const validateInput = (input: { [key: string]: string }) => {
+    const startNode = graph?.getCurrentNode();
+
+    if (!startNode) return {};
+
+    const requireNameCapture = (startNode?.data?.requireName as boolean) ?? false;
+    const requireEmailCapture = (startNode?.data?.requireEmail as boolean) ?? false;
+
     const newErrors: { [key: string]: string } = {};
+
+    if (requireNameCapture && !input.name) {
+      newErrors.name = 'Please enter your name.';
+    }
+
+    if (requireEmailCapture && !input.email) {
+      newErrors.email = 'Please enter your email address.';
+    }
+
     if (input.email && !emailRegex.test(input.email)) {
       newErrors.email = 'Please enter a valid email address.';
     }
     return newErrors;
   };
 
+  /**
+   * A handler for input changes.
+   * @param e { React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> } - The change event
+   */
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setUserDetails((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => ({ ...prev, [name]: '' }));
   };
 
+  /**
+   * Handles the start button click.
+   */
   const handleStart = () => {
     const newErrors = validateInput(userDetails);
     setErrors(newErrors);
@@ -111,6 +156,9 @@ export default function UserInquiryPage() {
     }
   };
 
+  /**
+   * Handles the finish inquiry button click.
+   */
   const handleFinishInquiry = () => {
     if (preview) {
       window.close();
@@ -118,6 +166,11 @@ export default function UserInquiryPage() {
     setScreen('summary');
   };
 
+  /**
+   * Handles user message submission.
+   * @param e { React.FormEvent } - The form event
+   * @returns { Promise<void> } - A promise that resolves when the message is added
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (inputMessage.trim() === '' && selectedRatings.length === 0) return;
@@ -141,6 +194,9 @@ export default function UserInquiryPage() {
     setSelectedRatings([]);
   };
 
+  /**
+   * Handles the next node visit. This is called when the bot advances to the next node.
+   */
   const onNodeVisit = useCallback(
     async (node: StrippedNode) => {
       if (node.type === 'end') {
@@ -170,11 +226,13 @@ export default function UserInquiryPage() {
     [addMessage, audioEnabled, audio, handleNextNode],
   );
 
+  /*================================ RENDER FUNCTIONS ==============================*/
+
   const renderStartScreen = () => {
     const startNode = graph?.getCurrentNode();
 
-    const enableNameCapture = (startNode?.data?.nameCapture as boolean) ?? false;
-    const enableEmailCapture = (startNode?.data?.emailCapture as boolean) ?? false;
+    const requireNameCapture = (startNode?.data?.requireName as boolean) ?? false;
+    const requireEmailCapture = (startNode?.data?.requireEmail as boolean) ?? false;
     const description = (startNode?.data?.description as string) ?? '';
 
     return (
@@ -182,7 +240,7 @@ export default function UserInquiryPage() {
         <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white">{form.title}</h2>
         <p className="text-slate-600 dark:text-slate-300 mb-6">{description}</p>
         <div className="space-y-4">
-          {enableNameCapture && (
+          {requireNameCapture && (
             <Input
               label="Name"
               name="name"
@@ -192,7 +250,7 @@ export default function UserInquiryPage() {
               error={errors.name}
             />
           )}
-          {enableEmailCapture && (
+          {requireEmailCapture && (
             <Input
               label="Email"
               name="email"
