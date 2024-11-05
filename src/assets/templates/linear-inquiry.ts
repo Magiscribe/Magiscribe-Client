@@ -10,7 +10,9 @@ const templateLinearInquiry: { nodes: Node[]; edges: Edge[] } = {
         y: 291,
       },
       data: {
-        text: '',
+        text: 'This is text that will be displayed on the start screen',
+        requireName: false,
+        requireEmail: false,
       },
       measured: {
         width: 384,

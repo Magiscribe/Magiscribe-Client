@@ -10,7 +10,11 @@ const templateBranchInquiry: { nodes: Node[]; edges: Edge[] } = {
         y: 348.5,
       },
       data: {
-        text: '',
+        data: {
+          text: 'This is text that will be displayed on the start screen',
+          requireName: false,
+          requireEmail: false,
+        },
       },
       measured: {
         width: 384,
