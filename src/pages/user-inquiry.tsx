@@ -233,7 +233,7 @@ export default function UserInquiryPage() {
 
     const requireNameCapture = (startNode?.data?.requireName as boolean) ?? false;
     const requireEmailCapture = (startNode?.data?.requireEmail as boolean) ?? false;
-    const description = (startNode?.data?.description as string) ?? '';
+    const description = (startNode?.data?.text as string) ?? '';
 
     return (
       <div className="bg-white dark:bg-slate-700 p-6 rounded-lg shadow-lg">
