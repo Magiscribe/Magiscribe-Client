@@ -68,8 +68,6 @@ export function useNodeData<T>(id: string) {
       if (type === 'checkbox') {
         const checked = (event.target as HTMLInputElement).checked;
         update({ [name]: checked } as Partial<T>);
-      } else if (type === 'file') {
-
       } else {
         update({ [name]: value } as Partial<T>);
       }
@@ -79,6 +77,7 @@ export function useNodeData<T>(id: string) {
 
   const updateNodeImages = useCallback((images: ImageMetadata[]) => {
     if (images) {
+      // TODO: find a better way to handle the type of images here
       update({ 'images': images } as unknown as Partial<T>);
     }
     else {

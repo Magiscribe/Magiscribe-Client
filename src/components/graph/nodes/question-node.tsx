@@ -66,7 +66,7 @@ export default function QuestionNode({ id, data }: QuestionNodeProps) {
   };
 
   return (
-    <NodeContainer title="Question" faIcon={faQuestionCircle} id={id} >
+    <NodeContainer title="Question" faIcon={faQuestionCircle} id={id}>
       <div className="space-y-4 mt-2">
         <Input
           label="Dynamic Generation"
@@ -126,7 +126,7 @@ export default function QuestionNode({ id, data }: QuestionNodeProps) {
       </div>
       <Handle type="target" position={Position.Left} className="w-4 h-4 !bg-green-500" />
       <CustomHandle connectionCount={1} type="source" position={Position.Right} className="w-4 h-4 !bg-green-500" />
-      <ImageUploader nodeId={id} handleUpdateNodeImages={updateNodeImages} images={data.images}/>
+      <ImageUploader nodeId={id} handleUpdateNodeImages={updateNodeImages} images={data.images} />
     </NodeContainer>
   );
 }

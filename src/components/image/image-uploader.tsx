@@ -1,8 +1,8 @@
 import { ADD_MEDIA_ASSET, DELETE_MEDIA_ASSET, GET_MEDIA_ASSET } from '@/clients/mutations';
+import { AddMediaAssetMutation, DeleteMediaAssetMutation, GetMediaAssetMutation } from '@/graphql/graphql';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { ImageMetadata } from '@/types/conversation';
 import { useMutation } from '@apollo/client';
-import { useClerk } from '@clerk/clerk-react';
 import { useCallback, useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -18,7 +18,7 @@ type FileWithS3Key = {
 };
 
 function useImageUpload() {
-  const [addMediaAsset] = useMutation(ADD_MEDIA_ASSET);
+  const [addMediaAsset] = useMutation<AddMediaAssetMutation>(ADD_MEDIA_ASSET);
 
   const uploadImage = useCallback(async (image: File, s3Key: string) => {
     const signedUrl = await addMediaAsset({
@@ -26,17 +26,21 @@ function useImageUpload() {
         s3Key,
       },
     });
-
-    const s3Url = signedUrl.data['addMediaAsset'];
-    console.log('Image url: ' + s3Url);
-    await uploadImageToS3(s3Url, image);
-    console.log(`Successfully uploaded ${image.name} to s3 via signed url ${s3Url}`);
+      const s3Url = signedUrl.data?.['addMediaAsset'];
+      console.log('Image url: ' + s3Url);
+      if (s3Url) {
+        await uploadImageToS3(s3Url, image);
+        console.log(`Successfully uploaded ${image.name} to s3 via signed url ${s3Url}`);
+      }
+      else {
+        console.error("Failed to generated signed s3url for image");
+      }
   }, []);
 
   return uploadImage;
 }
 
-export function useUpdateInquiryMetadatImages() {
+export function useUpdateInquiryMetadataImages() {
   const { inquiryMetadata, updateInquiryMetadata } = useInquiryBuilder();
 
   const addImagesToMetadata = useCallback(
@@ -54,7 +58,7 @@ export function useUpdateInquiryMetadatImages() {
 }
 
 export function useImageDownload() {
-  const [getMediaAsset] = useMutation(GET_MEDIA_ASSET);
+  const [getMediaAsset] = useMutation<GetMediaAssetMutation>(GET_MEDIA_ASSET);
 
   const downloadImage = useCallback(
     async (image: ImageMetadata) => {
@@ -66,9 +70,13 @@ export function useImageDownload() {
 
       const s3Url = signedUrl.data?.['getMediaAsset'];
       console.log('Image download url: ' + s3Url);
-      const response = await downloadImageFromS3(s3Url);
-
-      return response;
+      if (s3Url) {
+        const response = await downloadImageFromS3(s3Url);
+        return response;
+      }
+      else {
+        
+      }
     },
     [getMediaAsset],
   );
@@ -81,7 +89,7 @@ type IUseImageDelete = {
 };
 
 export function useImageDelete(): IUseImageDelete {
-  const [deleteMediaAsset] = useMutation(DELETE_MEDIA_ASSET);
+  const [deleteMediaAsset] = useMutation<DeleteMediaAssetMutation>(DELETE_MEDIA_ASSET);
   const deleteImage = useCallback(
     async (s3KeyToDelete: string) => {
       await deleteMediaAsset({
@@ -151,7 +159,7 @@ export function ImageUploader(props: ImageUploaderProps): React.ReactElement {
   const [base64Images, setBase64Images] = useState<string[]>([]);
   const uploadImage = useImageUpload();
   const downloadImage = useImageDownload();
-  const addImagesToMetadata = useUpdateInquiryMetadatImages();
+  const addImagesToMetadata = useUpdateInquiryMetadataImages();
 
   useEffect(() => {
     // Download the node images from s3
@@ -171,7 +179,6 @@ export function ImageUploader(props: ImageUploaderProps): React.ReactElement {
   }, [props.images]);
 
   const handleImageDelete = async function (imageIndex: number) {
-    // TODO: Verify that image deletion was successful before removing the image from the graph
     props.handleUpdateNodeImages(props.images.filter((_, i) => i !== imageIndex));
   };
 

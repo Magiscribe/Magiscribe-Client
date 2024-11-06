@@ -77,6 +77,8 @@ export default function InquiryBuilder() {
   }, [form]);
 
   useEffect(() => {
+    // Todo: Investigate how to add debouncing for inquiry metadata.  Adding debouncing for ImageMetadata
+    // sometimes causes images to not be saved to nodes.
     if (Object.keys(inquiryMetadata).length > 0) {
       saveInquiryMetadata();
     }

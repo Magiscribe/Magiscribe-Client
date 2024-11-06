@@ -4,8 +4,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import { useReactFlow } from '@xyflow/react';
-import { ImageUploader } from '@/components/image/image-uploader';
-import PromptDashboard from '@/pages/dashboard/agent-lab/prompts';
 
 type NodeContainerProps = {
   title: string;

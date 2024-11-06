@@ -9,7 +9,6 @@ import { useNodeData } from '../utils';
 type ConditionNodeProps = NodeProps & {
   data: {
     text: string;
-    images: ImageMetadata[];
   };
 };
 
