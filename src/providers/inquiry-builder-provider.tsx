@@ -1,16 +1,25 @@
-import { ADD_PREDICTION, CREATE_INQUIRY, DELETE_INQUIRY, UPDATE_INQUIRY } from '@/clients/mutations';
+import {
+  ADD_PREDICTION,
+  CREATE_INQUIRY,
+  DELETE_INQUIRY,
+  DELETE_MEDIA_ASSET,
+  UPDATE_INQUIRY,
+} from '@/clients/mutations';
 import { GET_INQUIRY } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import {
   AddPredictionMutation,
   CreateInquiryMutation,
   DeleteInquiryMutation,
+  DeleteMediaAssetMutation,
   GetInquiryQuery,
   UpdateInquiryMutation,
 } from '@/graphql/graphql';
 import { InquiryDataForm } from '@/graphql/types';
+import { ImageMetadata } from '@/types/conversation';
 import { getAgentIdByName } from '@/utils/agents';
 import { applyGraphChangeset, formatGraph } from '@/utils/graphs/graph-utils';
+import { removeDeletedImagesFromS3 } from '@/utils/s3';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
 import { Edge, Node, OnEdgesChange, OnNodesChange, useEdgesState, useNodesState } from '@xyflow/react';
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
@@ -21,17 +30,25 @@ interface InquiryProviderProps {
   children: React.ReactNode;
 }
 
+export interface Metadata {
+  images: ImageMetadata[];
+  text: string;
+}
+
 interface ContextType {
   initialized: boolean;
 
   id?: string;
   lastUpdated: Date;
   form: InquiryDataForm;
+  metadata: Metadata;
   graph: { edges: Edge[]; nodes: Node[] };
 
   deleteInquiry: (onSuccess?: () => void, onError?: () => void) => Promise<void>;
 
   updateForm: (form: InquiryDataForm) => void;
+  updateMetadata: (metadata: Metadata) => void;
+  saveMetadata: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
   saveForm: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
 
   updateGraph: (graph: { nodes: Node[]; edges: Edge[] }) => void;
@@ -47,7 +64,7 @@ interface ContextType {
   publishGraph: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
 
   save: (
-    data: { form?: InquiryDataForm; graph?: { nodes: Node[]; edges: Edge[] } },
+    data: { form?: InquiryDataForm; metadata?: Metadata; graph?: { nodes: Node[]; edges: Edge[] } },
     fields: string[],
     onSuccess?: (id: string) => void,
     onError?: () => void,
@@ -70,6 +87,10 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const [subscriptionId] = useState<string>(uuidv4());
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   const [form, updateForm] = useState<InquiryDataForm>({} as InquiryDataForm);
+  const [metadata, setMetadata] = useState<Metadata>({
+    images: [],
+    text: '',
+  });
 
   // Graph Generation States
   const [generatingGraph, setGeneratingGraph] = useState(false);
@@ -96,7 +117,8 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     onCompleted: ({ getInquiry }) => {
       if (!getInquiry) return;
       setLastUpdated(new Date(getInquiry.updatedAt));
-      updateForm(getInquiry.data.form);
+      if (getInquiry.data.form) updateForm(getInquiry.data.form);
+      if (getInquiry.data.metadata) setMetadata(getInquiry.data.metadata);
       if (getInquiry.data.draftGraph) updateGraph(getInquiry.data.draftGraph);
       setInitialized(true);
     },
@@ -139,6 +161,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const [updateFormMutation] = useMutation<UpdateInquiryMutation>(UPDATE_INQUIRY);
   const [addPrediction] = useMutation<AddPredictionMutation>(ADD_PREDICTION);
   const [deleteObject] = useMutation<DeleteInquiryMutation>(DELETE_INQUIRY);
+  const [deleteMediaAsset] = useMutation<DeleteMediaAssetMutation>(DELETE_MEDIA_ASSET);
 
   /**
    * Deletes the inquiry.
@@ -147,6 +170,9 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
    */
   const deleteInquiry = async (onSuccess?: () => void, onError?: () => void) => {
     try {
+      const images = metadata.images ?? [];
+      await Promise.all(images.map(async (image) => await deleteMediaAsset({ variables: { uuid: image.uuid } })));
+
       await deleteObject({ variables: { id } });
       if (onSuccess) onSuccess();
     } catch {
@@ -164,6 +190,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const save = async (
     data: {
       form?: InquiryDataForm;
+      metadata?: Metadata;
       graph?: { nodes: Node[]; edges: Edge[] };
       draftGraph?: { nodes: Node[]; edges: Edge[] };
     },
@@ -212,6 +239,24 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   };
 
   /**
+   * Saves the form of the inquiry.
+   * @param onSuccess {Function} The function to call on success.
+   * @param onError {Function} The function to call on error.
+   */
+  const saveMetadata = async (onSuccess?: (id: string) => void, onError?: () => void) => {
+    await save(
+      {
+        metadata: {
+          ...metadata,
+        },
+      },
+      ['metadata'],
+      onSuccess,
+      onError,
+    );
+  };
+
+  /**
    * Updates the graph of the inquiry.
    * @param graph {Object} The graph object to update.
    */
@@ -242,6 +287,14 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
    * @param onError {Function} The function to call on error.
    */
   const publishGraph = async (onSuccess?: (id: string) => void, onError?: () => void) => {
+    removeDeletedImagesFromS3({
+      nodes: graph.nodes,
+      metadata,
+      setMetadata,
+      deleteImage: async (uuid: string) => {
+        await deleteMediaAsset({ variables: { uuid } });
+      },
+    });
     await save({ graph }, ['graph'], onSuccess, onError);
   };
 
@@ -250,9 +303,12 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
    * @param onSuccess {Function} The function to call on success.
    * @param onError {Function} The function to call on error.
    */
-  const saveFormAndGraph = async (onSuccess?: (id: string) => void, onError?: () => void) => {
+  const SaveAll = async (onSuccess?: (id: string) => void, onError?: () => void) => {
     await save(
       {
+        metadata: {
+          ...metadata,
+        },
         form: {
           ...form,
           // Default title if not provided.
@@ -309,12 +365,16 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     id,
     lastUpdated,
     form,
+    metadata,
     graph,
 
     deleteInquiry,
 
     updateForm,
     saveForm,
+
+    updateMetadata: setMetadata,
+    saveMetadata,
 
     updateGraph,
     updateGraphNodes: setNodes,
@@ -328,7 +388,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     publishGraph,
 
     save,
-    saveFormAndGraph,
+    saveFormAndGraph: SaveAll,
 
     generatingGraph,
 

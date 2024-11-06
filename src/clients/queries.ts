@@ -185,6 +185,12 @@ export const GET_ALL_AUDIO_VOICES = gql`
   }
 `;
 
+export const GET_MEDIA_ASSET = gql`
+  query getMediaAsset($uuid: String!) {
+    getMediaAsset(uuid: $uuid)
+  }
+`;
+
 export const GET_ALL_COLLECTIONS = gql`
   query getAllCollections {
     getAllCollections {

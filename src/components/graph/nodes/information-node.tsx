@@ -1,8 +1,10 @@
-import React, { useCallback } from 'react';
-import { Handle, NodeProps, Position } from '@xyflow/react';
-import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import Input from '@/components/controls/input';
 import Textarea from '@/components/controls/textarea';
+import { ImageUploader } from '@/components/image/image-uploader';
+import { ImageMetadata } from '@/types/conversation';
+import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
+import { Handle, NodeProps, Position } from '@xyflow/react';
+import React, { useCallback } from 'react';
 import NodeContainer from '../elements/node-container';
 import CustomHandle from '../handles/limit-handle';
 import { useNodeData } from '../utils';
@@ -11,6 +13,7 @@ type InformationNodeProps = NodeProps & {
   data: {
     text: string;
     dynamicGeneration: boolean;
+    images: ImageMetadata[];
   };
 };
 
@@ -53,6 +56,8 @@ export default function InformationNode({ id, data }: InformationNodeProps) {
           placeholder="Enter your text here..."
           className="resize-none overflow-hidden nodrag"
         />
+
+        <ImageUploader nodeId={id} images={data.images} />
       </div>
       <Handle type="target" position={Position.Left} className="w-4 h-4 !bg-green-500" />
       <CustomHandle connectionCount={1} type="source" position={Position.Right} className="w-4 h-4 !bg-green-500" />

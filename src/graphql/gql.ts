@@ -15,6 +15,8 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  */
 const documents = {
     "\n  mutation generateAudio($voice: String!, $text: String!) {\n    generateAudio(voice: $voice, text: $text)\n  }\n": types.GenerateAudioDocument,
+    "\n  mutation addMediaAsset {\n    addMediaAsset {\n      signedUrl\n      uuid\n    }\n  }\n": types.AddMediaAssetDocument,
+    "\n  mutation deleteMediaAsset($uuid: String!) {\n    deleteMediaAsset(uuid: $uuid)\n  }\n": types.DeleteMediaAssetDocument,
     "\n  mutation addPrediction($subscriptionId: ID!, $agentId: ID!, $variables: JSONObject, $attachments: [JSONObject!]) {\n    addPrediction(subscriptionId: $subscriptionId, agentId: $agentId, variables: $variables, attachments: $attachments)\n  }\n": types.AddPredictionDocument,
     "\n  mutation upsertAgent($agent: AgentInput!) {\n    upsertAgent(agent: $agent) {\n      id\n      name\n      description\n      reasoning {\n        llmModel\n        prompt\n        variablePassThrough\n      }\n      capabilities {\n        id\n      }\n    }\n  }\n": types.UpsertAgentDocument,
     "\n  mutation deleteAgent($agentId: ID!) {\n    deleteAgent(agentId: $agentId) {\n      id\n    }\n  }\n": types.DeleteAgentDocument,
@@ -42,6 +44,7 @@ const documents = {
     "\n  query getInquiryResponses($id: ID!) {\n    getInquiryResponses(id: $id) {\n      id\n      userId\n      data {\n        userDetails\n        history\n      }\n      createdAt\n      updatedAt\n    }\n  }\n": types.GetInquiryResponsesDocument,
     "\n  query getInquiryResponseCount($id: ID!) {\n    getInquiryResponseCount(id: $id)\n  }\n": types.GetInquiryResponseCountDocument,
     "\n  query getAllAudioVoices {\n    getAllAudioVoices {\n      id\n      name\n    }\n  }\n": types.GetAllAudioVoicesDocument,
+    "\n  query getMediaAsset($uuid: String!) {\n    getMediaAsset(uuid: $uuid)\n  }\n": types.GetMediaAssetDocument,
     "\n  query getAllCollections {\n    getAllCollections {\n      id\n      name\n    }\n  }\n": types.GetAllCollectionsDocument,
     "\n  subscription predictionAdded($subscriptionId: ID!) {\n    predictionAdded(subscriptionId: $subscriptionId) {\n      id\n      subscriptionId\n      result\n      type\n    }\n  }\n": types.PredictionAddedDocument,
 };
@@ -64,6 +67,14 @@ export function gql(source: string): unknown;
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  mutation generateAudio($voice: String!, $text: String!) {\n    generateAudio(voice: $voice, text: $text)\n  }\n"): (typeof documents)["\n  mutation generateAudio($voice: String!, $text: String!) {\n    generateAudio(voice: $voice, text: $text)\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation addMediaAsset {\n    addMediaAsset {\n      signedUrl\n      uuid\n    }\n  }\n"): (typeof documents)["\n  mutation addMediaAsset {\n    addMediaAsset {\n      signedUrl\n      uuid\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation deleteMediaAsset($uuid: String!) {\n    deleteMediaAsset(uuid: $uuid)\n  }\n"): (typeof documents)["\n  mutation deleteMediaAsset($uuid: String!) {\n    deleteMediaAsset(uuid: $uuid)\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -172,6 +183,10 @@ export function gql(source: "\n  query getInquiryResponseCount($id: ID!) {\n    
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  query getAllAudioVoices {\n    getAllAudioVoices {\n      id\n      name\n    }\n  }\n"): (typeof documents)["\n  query getAllAudioVoices {\n    getAllAudioVoices {\n      id\n      name\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query getMediaAsset($uuid: String!) {\n    getMediaAsset(uuid: $uuid)\n  }\n"): (typeof documents)["\n  query getMediaAsset($uuid: String!) {\n    getMediaAsset(uuid: $uuid)\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

@@ -17,11 +17,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { motion } from 'framer-motion';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { ImageLoader } from '@/components/image/image-load';
+import { ImageMetadata } from '@/types/conversation';
 
 interface Message {
   id: string;
   type: 'text' | 'chart' | 'image';
-  content: string | ChartProps;
+  content: string | ChartProps | ImageMetadata[];
   sender: 'user' | 'bot';
 }
 
@@ -218,6 +220,14 @@ export default function UserInquiryPage() {
           sender: 'bot',
         });
 
+        if (node.data.images && (node.data.images as ImageMetadata[]).length > 0) {
+          await addMessage({
+            type: 'image',
+            content: node.data.images as ImageMetadata[],
+            sender: 'bot',
+          });
+        }
+
         if (node.type === 'information') {
           await handleNextNode();
         }
@@ -290,7 +300,7 @@ export default function UserInquiryPage() {
             }`}
           >
             {message.type === 'image' ? (
-              <img src={message.content as string} alt="User uploaded" className="max-w-full h-auto rounded" />
+              <ImageLoader images={message.content as ImageMetadata[]} />
             ) : (
               <MarkdownCustom>{message.content as string}</MarkdownCustom>
             )}
