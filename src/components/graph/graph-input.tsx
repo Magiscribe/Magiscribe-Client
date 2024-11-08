@@ -209,7 +209,7 @@ function Flow({ children, nodes, edges, setNodes, onNodesChange, setEdges, onEdg
             >
               <FontAwesomeIcon
                 icon={nodeTypesInfo[type as keyof typeof nodeTypesInfo].icon}
-                className="mr-2 text-text-blue-600 dark:text-blue-400"
+                className="mr-2 text-blue-600 dark:text-blue-400"
               />
               {nodeTypesInfo[type as keyof typeof nodeTypesInfo].name}
               <CustomTooltip
@@ -282,6 +282,7 @@ function Flow({ children, nodes, edges, setNodes, onNodesChange, setEdges, onEdg
             fitView
             minZoom={0.1}
             maxZoom={2}
+            panOnScroll={true}
             defaultEdgeOptions={{
               type: 'button',
               markerEnd: {

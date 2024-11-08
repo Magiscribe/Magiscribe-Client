@@ -22,7 +22,7 @@ import { applyGraphChangeset, formatGraph } from '@/utils/graphs/graph-utils';
 import { removeDeletedImagesFromS3 } from '@/utils/s3';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
 import { Edge, Node, OnEdgesChange, OnNodesChange, useEdgesState, useNodesState } from '@xyflow/react';
-import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { createContext, useContext, useMemo, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 interface InquiryProviderProps {
@@ -94,8 +94,6 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
 
   // Graph Generation States
   const [generatingGraph, setGeneratingGraph] = useState(false);
-  const [pendingGraph, setPendingGraph] = useState(false);
-  const [explanation, setExplanation] = useState<string>('');
 
   // Hooks
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
@@ -138,22 +136,15 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
         const changeset = JSON.parse(jsonMatch[1]);
         const newGraph = applyGraphChangeset(graph, changeset);
 
-        setExplanation(markdownMatch[1]);
+        onGraphGenerationCompletedRef.current?.(markdownMatch[1]);
+
         updateGraph(formatGraph(newGraph));
 
         setGeneratingGraph(false);
-        setPendingGraph(true);
       }
     },
     onError: () => setGeneratingGraph(false),
   });
-
-  useEffect(() => {
-    if (pendingGraph) {
-      onGraphGenerationCompletedRef.current?.(explanation);
-      setPendingGraph(false);
-    }
-  }, [pendingGraph]);
 
   // Mutations
   const client = useApolloClient();

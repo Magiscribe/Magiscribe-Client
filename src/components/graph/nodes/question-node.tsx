@@ -96,6 +96,7 @@ export default function QuestionNode({ id, data }: QuestionNodeProps) {
           onChange={(e) => handleUpdate({ text: e.target.value })}
           placeholder="Enter your text here..."
           className="resize-none overflow-hidden nodrag"
+          rows={3}
         />
 
         {!data.dynamicGeneration && (data.type === NodeType.RatingSingle || data.type === NodeType.RatingMulti) && (

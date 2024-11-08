@@ -26,6 +26,7 @@ export default function ConditionNode({ id, data }: ConditionNodeProps) {
           onChange={handleInputChange}
           placeholder="Enter your text here..."
           className="resize-none overflow-hidden nodrag"
+          rows={3}
         />
       </div>
 

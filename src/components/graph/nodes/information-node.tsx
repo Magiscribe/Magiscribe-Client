@@ -55,6 +55,7 @@ export default function InformationNode({ id, data }: InformationNodeProps) {
           onChange={(e) => handleUpdate({ text: e.target.value })}
           placeholder="Enter your text here..."
           className="resize-none overflow-hidden nodrag"
+          rows={3}
         />
 
         <ImageUploader nodeId={id} images={data.images} />

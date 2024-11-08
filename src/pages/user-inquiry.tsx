@@ -1,24 +1,26 @@
 import goHomeGif from '@/assets/imgs/go-home.gif';
 import AnimatedDots from '@/components/animated/animated-dots';
 import { ChartProps } from '@/components/chart';
+import Button from '@/components/controls/button';
 import Input from '@/components/controls/input';
+import Textarea from '@/components/controls/textarea';
 import RatingInput from '@/components/graph/rating-input';
+import { ImageLoader } from '@/components/image/image-load';
 import MarkdownCustom from '@/components/markdown-custom';
 import { useTranscribe } from '@/hooks/audio-hook';
 import useElevenLabsAudio from '@/hooks/audio-player';
 import { useSetTitle } from '@/hooks/title-hook';
 import { useAudioEnabled } from '@/providers/audio-provider';
 import { useInquiry } from '@/providers/inquiry-traversal-provider';
+import { ImageMetadata } from '@/types/conversation';
 import { useQueue } from '@/utils/debounce-queue';
 import { StrippedNode } from '@/utils/graphs/graph';
 import { SignedIn, SignedOut, SignUpButton } from '@clerk/clerk-react';
-import { faChevronRight, faMicrophone, faMicrophoneSlash, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
+import { faArrowUp, faChevronRight, faMicrophone, faMicrophoneSlash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { motion } from 'framer-motion';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ImageLoader } from '@/components/image/image-load';
-import { ImageMetadata } from '@/types/conversation';
 
 interface Message {
   id: string;
@@ -137,6 +139,48 @@ export default function UserInquiryPage() {
   };
 
   /**
+   * Handles the next node visit. This is called when the bot advances to the next node.
+   */
+  const onNodeVisit = useCallback(
+    async (node: StrippedNode) => {
+      if (node.type === 'end') {
+        setScreen('end');
+        return;
+      }
+
+      if (node.type === 'information' || node.type === 'question') {
+        const messageText = node.data.text as string;
+        setCurrentNode(node);
+
+        if (audioEnabled && messageText) {
+          audio.addSentence(messageText);
+        }
+
+        await addMessage({
+          type: 'text',
+          content: messageText,
+          sender: 'bot',
+        });
+
+        if (node.data.images && (node.data.images as ImageMetadata[]).length > 0) {
+          await addMessage({
+            type: 'image',
+            content: node.data.images as ImageMetadata[],
+            sender: 'bot',
+          });
+        }
+
+        if (node.type === 'information') {
+          await handleNextNode();
+        }
+      }
+    },
+    [addMessage, audioEnabled, audio, handleNextNode],
+  );
+
+  /*================================ EVENT HANDLERS ==============================*/
+
+  /**
    * A handler for input changes.
    * @param e { React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> } - The change event
    */
@@ -196,45 +240,12 @@ export default function UserInquiryPage() {
     setSelectedRatings([]);
   };
 
-  /**
-   * Handles the next node visit. This is called when the bot advances to the next node.
-   */
-  const onNodeVisit = useCallback(
-    async (node: StrippedNode) => {
-      if (node.type === 'end') {
-        setScreen('end');
-        return;
-      }
-
-      if (node.type === 'information' || node.type === 'question') {
-        const messageText = node.data.text as string;
-        setCurrentNode(node);
-
-        if (audioEnabled && messageText) {
-          audio.addSentence(messageText);
-        }
-
-        await addMessage({
-          type: 'text',
-          content: messageText,
-          sender: 'bot',
-        });
-
-        if (node.data.images && (node.data.images as ImageMetadata[]).length > 0) {
-          await addMessage({
-            type: 'image',
-            content: node.data.images as ImageMetadata[],
-            sender: 'bot',
-          });
-        }
-
-        if (node.type === 'information') {
-          await handleNextNode();
-        }
-      }
-    },
-    [addMessage, audioEnabled, audio, handleNextNode],
-  );
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e);
+    }
+  };
 
   /*================================ RENDER FUNCTIONS ==============================*/
 
@@ -368,34 +379,30 @@ export default function UserInquiryPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
           >
-            <div className="flex-grow flex items-center bg-slate-200 dark:bg-slate-700 rounded-full">
-              <button
+            <div className="flex-grow flex items-center">
+              <Button
                 type="button"
+                variant="transparentDark"
+                size="small"
                 onClick={handleTranscribe}
-                className="py-3 px-5 bg-slate-300 hover:bg-slate-400 dark:bg-slate-500 rounded-l-full rounded-r-full transition-colors"
-              >
-                <FontAwesomeIcon icon={isTranscribing ? faMicrophone : faMicrophoneSlash} />
-              </button>
-              {/* <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="py-3 px-5 bg-slate-300 hover:bg-slate-400 dark:bg-slate-500 rounded-r-full transition-colors"
-              >
-                <FontAwesomeIcon icon={faImage} />
-              </button> */}
-              <input
-                type="text"
+                iconLeft={isTranscribing ? faMicrophone : faMicrophoneSlash}
+              ></Button>
+              <Textarea
+                name="text"
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 placeholder="Type your message here..."
-                className="flex-grow p-3 bg-transparent text-slate-800 dark:text-white border-transparent focus:border-transparent focus:ring-0"
+                rows={1}
+                className="resize-none overflow-hidden rounded-3xl flex-grow ml-2"
+                onKeyDown={handleInputKeyDown}
               />
-              <button
+              <Button
                 type="submit"
-                className="py-3 px-6 text-white bg-purple-600 hover:bg-purple-700 rounded-l-full rounded-r-full transition-colors ml-1"
+                className="absolute right-1 top-1.5 disabled:opacity-0 transition-opacity"
+                disabled={state.loading || (inputMessage.trim() === '' && selectedRatings.length === 0)}
               >
-                <FontAwesomeIcon icon={faPaperPlane} />
-              </button>
+                <FontAwesomeIcon icon={faArrowUp} />
+              </Button>
             </div>
             <input ref={fileInputRef} type="file" accept="image/*" className="hidden" />
           </motion.div>

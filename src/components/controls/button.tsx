@@ -92,7 +92,7 @@ const Button = <C extends React.ElementType = 'button'>({
   const Component = as || 'button';
 
   const baseClassName =
-    'inline-flex items-center justify-center font-medium rounded-3xl transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
+    'inline-flex items-center justify-center font-medium rounded-2xl transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
 
   const sizeClassNames = {
     regular: {

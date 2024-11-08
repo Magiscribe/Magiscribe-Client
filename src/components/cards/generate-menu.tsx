@@ -1,12 +1,12 @@
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
-import { faMagicWandSparkles, faSpinner, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faArrowUp, faSpinner, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
 
 import Button from '../controls/button';
-import Input from '../controls/input';
+import Textarea from '../controls/textarea';
 import MarkdownCustom from '../markdown-custom';
 
 /**
@@ -136,8 +136,8 @@ export default function GraphGeneratorMenu({ open, onUpdate, onClose }: GraphGen
     sendMessage(inputMessage);
   };
 
-  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
       handleSendButtonClick();
     }
   };
@@ -210,25 +210,24 @@ export default function GraphGeneratorMenu({ open, onUpdate, onClose }: GraphGen
           )}
         </div>
         <div className="p-4 border-t border-gray-200">
-          <Input
-            value={inputMessage}
-            name="message"
-            onChange={(e) => setInputMessage(e.target.value)}
-            onKeyDown={handleInputKeyDown}
-            placeholder="Request a modification..."
-          />
-          <Button
-            onClick={handleSendButtonClick}
-            className="mt-2 w-full"
-            disabled={generatingGraph || !inputMessage.trim()}
-          >
-            {generatingGraph ? 'Generating...' : 'Generate'}
-            <FontAwesomeIcon
-              className="ml-2"
-              icon={generatingGraph ? faSpinner : faMagicWandSparkles}
-              spin={generatingGraph}
+          <div className="relative flex-grow flex items-center">
+            <Textarea
+              value={inputMessage}
+              name="message"
+              onChange={(e) => setInputMessage(e.target.value)}
+              placeholder="Request a modification..."
+              onKeyDown={handleInputKeyDown}
+              rows={1}
+              className="resize-none overflow-hidden"
             />
-          </Button>
+            <Button
+              onClick={handleSendButtonClick}
+              className="absolute right-2 top-1.5 disabled:opacity-0 transition-opacity"
+              disabled={generatingGraph || !inputMessage.trim()}
+            >
+              <FontAwesomeIcon className="" icon={generatingGraph ? faSpinner : faArrowUp} spin={generatingGraph} />
+            </Button>
+          </div>
         </div>
       </div>
     </motion.div>
