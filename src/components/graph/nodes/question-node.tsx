@@ -114,12 +114,12 @@ export default function QuestionNode({ id, data }: QuestionNodeProps) {
                   onClick={() => removeRating(index)}
                   variant="transparentSecondary"
                   size="small"
-                  iconLeft={faTimesCircle}
+                  icon={faTimesCircle}
                   className="nodrag flex-shrink-0 text-slate-400"
                 />
               </div>
             ))}
-            <Button onClick={addRating} variant="primary" size="medium" iconLeft={faPlus} className="nodrag mt-2">
+            <Button onClick={addRating} variant="primary" size="medium" icon={faPlus} className="nodrag mt-2">
               Add Rating
             </Button>
 

@@ -36,8 +36,8 @@ const RatingInput: React.FC<RatingInputProps> = ({ ratings, isMulti, onRatingCha
             onClick={() => handleRatingClick(rating)}
             className={`px-3 py-1 rounded-2xl ${
               selectedRatings.includes(rating)
-                ? 'bg-blue-500 text-white'
-                : 'bg-slate-200 text-slate-800 hover:bg-slate-300'
+                ? 'bg-blue-600 text-white'
+                : 'bg-white text-slate-800 hover:bg-slate-300'
             }`}
             initial={{ opacity: 0, y: -15 }}
             animate={{ opacity: 1, y: 0 }}

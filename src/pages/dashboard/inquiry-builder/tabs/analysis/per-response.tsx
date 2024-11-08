@@ -269,7 +269,7 @@ const PerResponseTab: React.FC<PerResponseTabProps> = ({ id }) => {
       <div>
         {selectedUser && (
           <h2 className="font-bold mb-2">
-            User Response <> | {selectedUser}</>
+            User Response | {userResponse?.data.userDetails?.name ? userResponse?.data.userDetails?.name : (userResponse?.data.userDetails?.email ?? selectedUser)}
           </h2>
         )}
         {selectedUser &&

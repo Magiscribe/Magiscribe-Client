@@ -282,12 +282,12 @@ export default function UserInquiryPage() {
             />
           )}
         </div>
-        <button
+        <Button
           onClick={handleStart}
-          className="mt-6 w-full px-6 py-3 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition duration-300 ease-in-out"
+          className='mt-4 w-full'
         >
           Get Started
-        </button>
+        </Button>
       </div>
     );
   };
@@ -306,8 +306,8 @@ export default function UserInquiryPage() {
           <div
             className={`max-w-[80%] p-3 rounded-3xl ${
               message.sender === 'user'
-                ? 'bg-purple-600 text-white'
-                : 'bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-white'
+                ? 'bg-blue-600 text-white'
+                : 'bg-white dark:bg-slate-600 text-slate-800 dark:text-white'
             }`}
           >
             {message.type === 'image' ? (
@@ -385,7 +385,7 @@ export default function UserInquiryPage() {
                 variant="transparentDark"
                 size="small"
                 onClick={handleTranscribe}
-                iconLeft={isTranscribing ? faMicrophone : faMicrophoneSlash}
+                icon={isTranscribing ? faMicrophone : faMicrophoneSlash}
               ></Button>
               <Textarea
                 name="text"
@@ -407,7 +407,7 @@ export default function UserInquiryPage() {
             <input ref={fileInputRef} type="file" accept="image/*" className="hidden" />
           </motion.div>
           <motion.p
-            className="text-slate-400 text-sm mt-2 text-center"
+            className="text-slate-500 text-sm mt-2 text-center"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.2 }}
@@ -418,16 +418,18 @@ export default function UserInquiryPage() {
       )}
 
       {screen === 'end' && (
+        <>
+        <div className="h-0.5 w-full bg-slate-300 dark:bg-slate-800" />
         <div className="flex justify-end mt-4">
-          <button
+          <Button
             type="button"
             onClick={handleFinishInquiry}
-            className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-full transition duration-300 ease-in-out"
           >
-            Finish Inquiry
+            Finish
             <FontAwesomeIcon icon={faChevronRight} className="ml-2" />
-          </button>
+          </Button>
         </div>
+        </>
       )}
     </div>
   );
@@ -466,7 +468,7 @@ export default function UserInquiryPage() {
 
   return (
     <>
-      <div className="w-full max-w-4xl flex-grow p-4 overflow-y-auto space-y-4 mx-auto">
+      <div className="w-full max-w-4xl flex-grow p-4 space-y-4 mx-auto">
         {screen === 'start' && renderStartScreen()}
         {(screen === 'inquiry' || screen === 'end') && renderMessages()}
         {screen === 'summary' && renderSummary()}

@@ -197,7 +197,7 @@ export default function GraphGeneratorMenu({ open, onUpdate, onClose }: GraphGen
       <div className="w-full h-full flex flex-col">
         <div className="p-4 border-b border-gray-200 flex justify-between items-center">
           <h2 className="text-lg font-semibold">Graph Editor</h2>
-          <Button onClick={onClose} iconLeft={faTimes} variant="transparentSecondary" />
+          <Button onClick={onClose} icon={faTimes} variant="transparentSecondary" />
         </div>
         <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-4">
           {messages.map((message) => (
@@ -222,7 +222,7 @@ export default function GraphGeneratorMenu({ open, onUpdate, onClose }: GraphGen
             />
             <Button
               onClick={handleSendButtonClick}
-              className="absolute right-2 top-1.5 disabled:opacity-0 transition-opacity"
+              className="absolute right-2 top-1.5"
               disabled={generatingGraph || !inputMessage.trim()}
             >
               <FontAwesomeIcon className="" icon={generatingGraph ? faSpinner : faArrowUp} spin={generatingGraph} />

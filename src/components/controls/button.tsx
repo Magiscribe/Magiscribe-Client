@@ -53,8 +53,7 @@ type PolymorphicComponentProp<C extends React.ElementType, Props = {}> = React.P
 interface ButtonBaseProps {
   variant?: (typeof variantClassNames)[keyof typeof variantClassNames];
   size?: 'small' | 'medium' | 'large';
-  iconLeft?: IconDefinition;
-  iconRight?: IconDefinition;
+  icon?: IconDefinition;
   className?: string;
 }
 
@@ -84,8 +83,7 @@ const Button = <C extends React.ElementType = 'button'>({
   children,
   variant = 'primary',
   size = 'medium',
-  iconLeft,
-  iconRight,
+  icon,
   className,
   ...props
 }: ButtonProps<C>) => {
@@ -110,19 +108,16 @@ const Button = <C extends React.ElementType = 'button'>({
   const buttonClassName = clsx(
     baseClassName,
     variantClassNames[variant as keyof typeof variantClassNames],
-    sizeClassNames[children == null && (iconLeft || iconRight) ? 'icon' : 'regular'][size],
+    sizeClassNames[children == null && icon ? 'icon' : 'regular'][size],
     className,
   );
 
-  const iconClassName = 'inline-block';
-  const iconLeftClassName = clsx(iconClassName, { 'mr-2': children });
-  const iconRightClassName = clsx(iconClassName, { 'ml-2': children });
+  const iconClassName = clsx({ 'inline-block mr-2': children });
 
   return (
     <Component className={buttonClassName} {...props}>
-      {iconLeft && <FontAwesomeIcon icon={iconLeft} className={iconLeftClassName} />}
+      {icon && <FontAwesomeIcon icon={icon} className={iconClassName} />}
       {children}
-      {iconRight && <FontAwesomeIcon icon={iconRight} className={iconRightClassName} />}
     </Component>
   );
 };

@@ -28,7 +28,7 @@ const NodeContainer = ({ title, faIcon, id, children }: NodeContainerProps) => {
           onClick={onNodeClick}
           variant="transparentSecondary"
           size="small"
-          iconLeft={faTimesCircle}
+          icon={faTimesCircle}
           className="absolute right-3 top-3 flex items-center justify-center"
         />
         <h3 className="text-lg font-bold text-slate-800 dark:text-white">{title}</h3>

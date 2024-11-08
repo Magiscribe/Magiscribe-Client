@@ -156,11 +156,8 @@ const ViaChatTab: React.FC<ViaChatTabProps> = ({ id }) => {
   return (
     <div className="bg-white dark:bg-slate-700 px-4 py-8 rounded-2xl shadow-xl text-slate-700 dark:text-white">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">
-          Chat - Analyzing {inquiryResponseData.getInquiryResponses.length}{' '}
-          {inquiryResponseData.getInquiryResponses.length === 1 ? 'Response' : 'Responses'}
-        </h2>
-        <Button onClick={handleClearChat} variant="danger" iconLeft={faTrash}>
+        <h2 className="text-2xl font-bold">Chat</h2>
+        <Button onClick={handleClearChat} variant="danger" icon={faTrash}>
           Clear
         </Button>
       </div>

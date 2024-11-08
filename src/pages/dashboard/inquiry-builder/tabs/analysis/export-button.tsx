@@ -42,7 +42,7 @@ const ExportButton: React.FC<ExportButtonProps> = ({ id, responses, type, classN
     <Button
       onClick={handleExport}
       disabled={isExporting}
-      iconLeft={isExporting ? faSpinner : faDownload}
+      icon={isExporting ? faSpinner : faDownload}
       className={className}
       variant="primary"
       size="medium"
