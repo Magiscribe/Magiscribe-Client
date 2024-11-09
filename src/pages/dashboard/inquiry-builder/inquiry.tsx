@@ -1,5 +1,5 @@
 import { GET_INQUIRY_RESPONSE_COUNT } from '@/clients/queries';
-import { GetInquiryResponseCountQuery } from '@/graphql/graphql';
+import { GetInquiryResponseCountQuery, InquiryResponseFilters } from '@/graphql/graphql';
 import { InquiryBuilderProvider } from '@/providers/inquiry-builder-provider';
 import { useQuery } from '@apollo/client';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
@@ -8,18 +8,20 @@ import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
 import { Link, useParams } from 'react-router-dom';
+import { useState } from 'react';
 
 import AnalysisTab from './tabs/analysis';
 import InquiryBuilder from './tabs/builder';
 
 export default function InquiryPage() {
-  // Hooks
   const { id } = useParams<{ id: string }>();
-
-  // States
+  const [currentFilters, setCurrentFilters] = useState<InquiryResponseFilters>({});
 
   const { data: responseCountData } = useQuery<GetInquiryResponseCountQuery>(GET_INQUIRY_RESPONSE_COUNT, {
-    variables: { id },
+    variables: {
+      id,
+      filters: currentFilters,
+    },
   });
 
   const responseCount = responseCountData?.getInquiryResponseCount;
@@ -28,6 +30,10 @@ export default function InquiryPage() {
   if (!id) {
     return <></>;
   }
+
+  const handleFiltersChange = (filters: InquiryResponseFilters) => {
+    setCurrentFilters(filters);
+  };
 
   return (
     <InquiryBuilderProvider id={id}>
@@ -67,7 +73,7 @@ export default function InquiryPage() {
           </TabPanel>
           <TabPanel>
             <motion.div initial={{ opacity: 0, x: -100 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 100 }}>
-              <AnalysisTab id={id} />
+              <AnalysisTab id={id} onFiltersChange={handleFiltersChange} />
             </motion.div>
           </TabPanel>
         </TabPanels>

@@ -156,8 +156,8 @@ export const GET_INQUIRIES = gql`
 `;
 
 export const GET_INQUIRIES_RESPONSES = gql`
-  query getInquiryResponses($id: ID!) {
-    getInquiryResponses(id: $id) {
+  query getInquiryResponses($id: ID!, $filters: InquiryResponseFilters) {
+    getInquiryResponses(id: $id, filters: $filters) {
       id
       userId
       data {
@@ -171,8 +171,8 @@ export const GET_INQUIRIES_RESPONSES = gql`
 `;
 
 export const GET_INQUIRY_RESPONSE_COUNT = gql`
-  query getInquiryResponseCount($id: ID!) {
-    getInquiryResponseCount(id: $id)
+  query getInquiryResponseCount($id: ID!, $filters: InquiryResponseFilters) {
+    getInquiryResponseCount(id: $id, filters: $filters)
   }
 `;
 
