@@ -1,5 +1,5 @@
 import { GET_INQUIRY_RESPONSE_COUNT } from '@/clients/queries';
-import { GetInquiryResponseCountQuery, InquiryResponseFilters } from '@/graphql/graphql';
+import { GetInquiryResponseCountQuery } from '@/graphql/graphql';
 import { InquiryBuilderProvider } from '@/providers/inquiry-builder-provider';
 import { useQuery } from '@apollo/client';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
@@ -15,25 +15,36 @@ import InquiryBuilder from './tabs/builder';
 
 export default function InquiryPage() {
   const { id } = useParams<{ id: string }>();
-  const [currentFilters, setCurrentFilters] = useState<InquiryResponseFilters>({});
 
-  const { data: responseCountData } = useQuery<GetInquiryResponseCountQuery>(GET_INQUIRY_RESPONSE_COUNT, {
+  const [responseCount, setResponseCount] = useState<number | undefined>();
+  const [hasInitialCount, setHasInitialCount] = useState(false);
+
+  // Only fetch the initial count
+  useQuery<GetInquiryResponseCountQuery>(GET_INQUIRY_RESPONSE_COUNT, {
     variables: {
       id,
-      filters: currentFilters,
+      filters: {}, // Empty filters for initial count
+    },
+    onCompleted: (data) => {
+      if (!hasInitialCount) {
+        setResponseCount(data.getInquiryResponseCount);
+        setHasInitialCount(true);
+      }
     },
   });
 
-  const responseCount = responseCountData?.getInquiryResponseCount;
-  const tabs = ['Builder', `Analysis${responseCount ? ` (${responseCount})` : ''}`];
+  const handleResponseCountChange = (count: number) => {
+    // Only update count from AnalysisTab after we have the initial count
+    if (hasInitialCount) {
+      setResponseCount(count);
+    }
+  };
+
+  const tabs = ['Builder', `Analysis${responseCount !== undefined ? ` (${responseCount})` : ''}`];
 
   if (!id) {
     return <></>;
   }
-
-  const handleFiltersChange = (filters: InquiryResponseFilters) => {
-    setCurrentFilters(filters);
-  };
 
   return (
     <InquiryBuilderProvider id={id}>
@@ -73,7 +84,7 @@ export default function InquiryPage() {
           </TabPanel>
           <TabPanel>
             <motion.div initial={{ opacity: 0, x: -100 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 100 }}>
-              <AnalysisTab id={id} onFiltersChange={handleFiltersChange} />
+              <AnalysisTab id={id} onResponseCountChange={handleResponseCountChange} />
             </motion.div>
           </TabPanel>
         </TabPanels>

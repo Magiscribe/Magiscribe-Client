@@ -130,6 +130,13 @@ export type InquiryResponseData = {
   userDetails?: Maybe<Scalars['JSONObject']['output']>;
 };
 
+export type InquiryResponseFilters = {
+  endDate?: InputMaybe<Scalars['Float']['input']>;
+  startDate?: InputMaybe<Scalars['Float']['input']>;
+  userEmail?: InputMaybe<Scalars['String']['input']>;
+  userName?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type Model = {
   __typename?: 'Model';
   id: Scalars['ID']['output'];
@@ -326,11 +333,13 @@ export type QueryGetInquiryArgs = {
 
 
 export type QueryGetInquiryResponseCountArgs = {
+  filters?: InputMaybe<InquiryResponseFilters>;
   id: Scalars['ID']['input'];
 };
 
 
 export type QueryGetInquiryResponsesArgs = {
+  filters?: InputMaybe<InquiryResponseFilters>;
   id: Scalars['ID']['input'];
 };
 
@@ -544,6 +553,7 @@ export type GetInquiriesQuery = { __typename?: 'Query', getInquiries?: Array<{ _
 
 export type GetInquiryResponsesQueryVariables = Exact<{
   id: Scalars['ID']['input'];
+  filters?: InputMaybe<InquiryResponseFilters>;
 }>;
 
 

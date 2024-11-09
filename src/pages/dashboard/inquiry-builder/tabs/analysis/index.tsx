@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { GET_INQUIRIES_RESPONSES, GET_INQUIRY } from '@/clients/queries';
 import { GetInquiryQuery, GetInquiryResponsesQuery, InquiryResponseFilters } from '@/graphql/graphql';
 import { useQuery } from '@apollo/client';
@@ -13,10 +13,11 @@ import FilterControls from './filter-controls';
 
 interface AnalysisTabProps {
   id: string;
-  onFiltersChange: (filters: InquiryResponseFilters) => void;
+
+  onResponseCountChange: (count: number) => void; // Add this prop
 }
 
-const AnalysisTab: React.FC<AnalysisTabProps> = ({ id, onFiltersChange }) => {
+const AnalysisTab: React.FC<AnalysisTabProps> = ({ id, onResponseCountChange }) => {
   const [appliedFilters, setAppliedFilters] = useState<InquiryResponseFilters>({});
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
 
@@ -41,9 +42,15 @@ const AnalysisTab: React.FC<AnalysisTabProps> = ({ id, onFiltersChange }) => {
     errorPolicy: 'all',
   });
 
+  // Update parent component whenever response count changes
+  useEffect(() => {
+    if (inquiryResponseData?.getInquiryResponses) {
+      onResponseCountChange(inquiryResponseData.getInquiryResponses.length);
+    }
+  }, [inquiryResponseData?.getInquiryResponses, onResponseCountChange]);
+
   const handleApplyFilters = (filters: InquiryResponseFilters) => {
     setAppliedFilters(filters);
-    onFiltersChange(filters);
   };
 
   if (graphLoading || dataLoading) return <p className="text-slate-700 dark:text-white">Loading...</p>;
@@ -55,7 +62,6 @@ const AnalysisTab: React.FC<AnalysisTabProps> = ({ id, onFiltersChange }) => {
     graph: inquiryData?.getInquiry?.data?.graph ?? inquiryData?.getInquiry?.data?.draftGraph,
     responses: inquiryResponseData?.getInquiryResponses ?? [],
   };
-
   const tabs = ['Per Response', 'Per Question', 'Via Chat'];
 
   return (

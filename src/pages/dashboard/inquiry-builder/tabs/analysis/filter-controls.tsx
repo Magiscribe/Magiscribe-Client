@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faFilter, faCalendar } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faFilter } from '@fortawesome/free-solid-svg-icons';
 import { InquiryResponseFilters } from '@/graphql/graphql';
 import Button from '@/components/controls/button';
 
@@ -101,11 +101,11 @@ const FilterControls: React.FC<FilterControlsProps> = ({ onApplyFilters, hasActi
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            className="pl-10 pr-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 
+            className="py-2 px-4 rounded-lg border border-gray-300 dark:border-gray-600 
                      bg-white dark:bg-slate-800 text-gray-900 dark:text-white
-                     focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                     focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                     [&::-webkit-calendar-picker-indicator]:dark:invert"
           />
-          <FontAwesomeIcon icon={faCalendar} className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
         </div>
 
         <span className="text-white dark:text-gray-400">to</span>
@@ -115,11 +115,11 @@ const FilterControls: React.FC<FilterControlsProps> = ({ onApplyFilters, hasActi
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-            className="pl-10 pr-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 
+            className="py-2 px-4 rounded-lg border border-gray-300 dark:border-gray-600 
                      bg-white dark:bg-slate-800 text-gray-900 dark:text-white
-                     focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                     focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                     [&::-webkit-calendar-picker-indicator]:dark:invert"
           />
-          <FontAwesomeIcon icon={faCalendar} className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
         </div>
       </div>
     </div>
