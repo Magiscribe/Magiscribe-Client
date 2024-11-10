@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faFilter } from '@fortawesome/free-solid-svg-icons';
 import { InquiryResponseFilters } from '@/graphql/graphql';
 import Button from '@/components/controls/button';
+import Input from '@/components/controls/input';
 
 interface FilterControlsProps {
   onApplyFilters: (filters: InquiryResponseFilters) => void;
@@ -11,32 +12,63 @@ interface FilterControlsProps {
 }
 
 const FilterControls: React.FC<FilterControlsProps> = ({ onApplyFilters, hasActiveFilters, initialFilters }) => {
-  const [nameFilter, setNameFilter] = useState(initialFilters.userName || '');
-  const [emailFilter, setEmailFilter] = useState(initialFilters.userEmail || '');
-  const [startDate, setStartDate] = useState(
-    initialFilters.startDate ? new Date(initialFilters.startDate).toISOString().split('T')[0] : '',
+  const [nameFilter, setNameFilter] = useState<string>(initialFilters.userName?.contains ?? '');
+  const [emailFilter, setEmailFilter] = useState<string>(initialFilters.userEmail?.contains ?? '');
+  // Helper to convert UTC timestamp to YYYY-MM-DD
+  const formatDateForInput = (timestamp: number): string => {
+    const date = new Date(timestamp);
+    return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`;
+  };
+
+  const [startDate, setStartDate] = useState<string>(
+    initialFilters.createdAt?.gte ? formatDateForInput(initialFilters.createdAt.gte) : '',
   );
-  const [endDate, setEndDate] = useState(
-    initialFilters.endDate ? new Date(initialFilters.endDate - 86400000).toISOString().split('T')[0] : '',
+  const [endDate, setEndDate] = useState<string>(
+    initialFilters.createdAt?.lte ? formatDateForInput(initialFilters.createdAt.lte) : '',
   );
 
   useEffect(() => {
-    setNameFilter(initialFilters.userName || '');
-    setEmailFilter(initialFilters.userEmail || '');
-    setStartDate(initialFilters.startDate ? new Date(initialFilters.startDate).toISOString().split('T')[0] : '');
-    setEndDate(initialFilters.endDate ? new Date(initialFilters.endDate - 86400000).toISOString().split('T')[0] : '');
+    setNameFilter(initialFilters.userName?.contains ?? '');
+    setEmailFilter(initialFilters.userEmail?.contains ?? '');
+    setStartDate(initialFilters.createdAt?.gte ? formatDateForInput(initialFilters.createdAt.gte) : '');
+    setEndDate(initialFilters.createdAt?.lte ? formatDateForInput(initialFilters.createdAt.lte) : '');
   }, [initialFilters]);
 
   const handleApplyFilter = () => {
     const filters: InquiryResponseFilters = {};
 
-    if (nameFilter) filters.userName = nameFilter;
-    if (emailFilter) filters.userEmail = emailFilter;
-    if (startDate) filters.startDate = new Date(startDate).getTime();
-    if (endDate) {
-      const endDateTime = new Date(endDate);
-      endDateTime.setDate(endDateTime.getDate() + 1);
-      filters.endDate = endDateTime.getTime();
+    if (nameFilter) {
+      filters.userName = { contains: nameFilter };
+    }
+
+    if (emailFilter) {
+      filters.userEmail = { contains: emailFilter };
+    }
+
+    if (startDate || endDate) {
+      filters.createdAt = {};
+
+      if (startDate) {
+        // Create UTC timestamp at start of day
+        filters.createdAt.gte = Date.UTC(
+          parseInt(startDate.split('-')[0]), // year
+          parseInt(startDate.split('-')[1]) - 1, // month (0-based)
+          parseInt(startDate.split('-')[2]), // day
+        );
+      }
+
+      if (endDate) {
+        // Create UTC timestamp at end of day
+        filters.createdAt.lte = Date.UTC(
+          parseInt(endDate.split('-')[0]), // year
+          parseInt(endDate.split('-')[1]) - 1, // month (0-based)
+          parseInt(endDate.split('-')[2]), // day
+          23,
+          59,
+          59,
+          999,
+        );
+      }
     }
 
     onApplyFilters(filters);
@@ -55,30 +87,34 @@ const FilterControls: React.FC<FilterControlsProps> = ({ onApplyFilters, hasActi
       {/* Name and Email Filters Row with Action Buttons */}
       <div className="flex flex-wrap items-center justify-between">
         <div className="flex flex-wrap gap-4">
-          <div className="relative">
-            <input
+          <div className="relative w-64">
+            <Input
+              name="name-filter"
               type="text"
               placeholder="Filter by name..."
               value={nameFilter}
               onChange={(e) => setNameFilter(e.target.value)}
-              className="pl-10 pr-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 
-                       bg-white dark:bg-slate-800 text-gray-900 dark:text-white
-                       focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="pl-10"
             />
-            <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <FontAwesomeIcon
+              icon={faSearch}
+              className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none"
+            />
           </div>
 
-          <div className="relative">
-            <input
+          <div className="relative w-64">
+            <Input
+              name="email-filter"
               type="email"
               placeholder="Filter by email..."
               value={emailFilter}
               onChange={(e) => setEmailFilter(e.target.value)}
-              className="pl-10 pr-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 
-                       bg-white dark:bg-slate-800 text-gray-900 dark:text-white
-                       focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="pl-10"
             />
-            <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <FontAwesomeIcon
+              icon={faSearch}
+              className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none"
+            />
           </div>
         </div>
 
@@ -96,29 +132,25 @@ const FilterControls: React.FC<FilterControlsProps> = ({ onApplyFilters, hasActi
 
       {/* Date Range Row */}
       <div className="flex items-center gap-4">
-        <div className="relative">
-          <input
+        <div className="w-48">
+          <Input
+            name="start-date"
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            className="py-2 px-4 rounded-lg border border-gray-300 dark:border-gray-600 
-                     bg-white dark:bg-slate-800 text-gray-900 dark:text-white
-                     focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                     [&::-webkit-calendar-picker-indicator]:dark:invert"
+            className="[&::-webkit-calendar-picker-indicator]:dark:invert"
           />
         </div>
 
-        <span className="text-white dark:text-gray-400">to</span>
+        <span className="text-slate-400">to</span>
 
-        <div className="relative">
-          <input
+        <div className="w-48">
+          <Input
+            name="end-date"
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-            className="py-2 px-4 rounded-lg border border-gray-300 dark:border-gray-600 
-                     bg-white dark:bg-slate-800 text-gray-900 dark:text-white
-                     focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                     [&::-webkit-calendar-picker-indicator]:dark:invert"
+            className="[&::-webkit-calendar-picker-indicator]:dark:invert"
           />
         </div>
       </div>

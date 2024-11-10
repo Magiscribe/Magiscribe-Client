@@ -53,11 +53,18 @@ export type CollectionInput = {
   name: Scalars['String']['input'];
 };
 
+export type FloatFilter = {
+  eq?: InputMaybe<Scalars['Float']['input']>;
+  gt?: InputMaybe<Scalars['Float']['input']>;
+  gte?: InputMaybe<Scalars['Float']['input']>;
+  lt?: InputMaybe<Scalars['Float']['input']>;
+  lte?: InputMaybe<Scalars['Float']['input']>;
+};
+
 export type InquiryResponseFilters = {
-  endDate?: InputMaybe<Scalars['Float']['input']>;
-  startDate?: InputMaybe<Scalars['Float']['input']>;
-  userEmail?: InputMaybe<Scalars['String']['input']>;
-  userName?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<FloatFilter>;
+  userEmail?: InputMaybe<StringFilter>;
+  userName?: InputMaybe<StringFilter>;
 };
 
 export enum PredictionType {
@@ -79,6 +86,13 @@ export enum Role {
   Default = 'default',
   Member = 'member'
 }
+
+export type StringFilter = {
+  contains?: InputMaybe<Scalars['String']['input']>;
+  endsWith?: InputMaybe<Scalars['String']['input']>;
+  eq?: InputMaybe<Scalars['String']['input']>;
+  startsWith?: InputMaybe<Scalars['String']['input']>;
+};
 
 export type GenerateAudioMutationVariables = Exact<{
   voice: Scalars['String']['input'];

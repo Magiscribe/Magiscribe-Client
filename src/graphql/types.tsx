@@ -91,6 +91,14 @@ export type CollectionInput = {
   name: Scalars['String']['input'];
 };
 
+export type FloatFilter = {
+  eq?: InputMaybe<Scalars['Float']['input']>;
+  gt?: InputMaybe<Scalars['Float']['input']>;
+  gte?: InputMaybe<Scalars['Float']['input']>;
+  lt?: InputMaybe<Scalars['Float']['input']>;
+  lte?: InputMaybe<Scalars['Float']['input']>;
+};
+
 export type Inquiry = {
   __typename?: 'Inquiry';
   createdAt: Scalars['Float']['output'];
@@ -131,10 +139,9 @@ export type InquiryResponseData = {
 };
 
 export type InquiryResponseFilters = {
-  endDate?: InputMaybe<Scalars['Float']['input']>;
-  startDate?: InputMaybe<Scalars['Float']['input']>;
-  userEmail?: InputMaybe<Scalars['String']['input']>;
-  userName?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<FloatFilter>;
+  userEmail?: InputMaybe<StringFilter>;
+  userName?: InputMaybe<StringFilter>;
 };
 
 export type Model = {
@@ -333,7 +340,6 @@ export type QueryGetInquiryArgs = {
 
 
 export type QueryGetInquiryResponseCountArgs = {
-  filters?: InputMaybe<InquiryResponseFilters>;
   id: Scalars['ID']['input'];
 };
 
@@ -353,6 +359,13 @@ export enum Role {
   Default = 'default',
   Member = 'member'
 }
+
+export type StringFilter = {
+  contains?: InputMaybe<Scalars['String']['input']>;
+  endsWith?: InputMaybe<Scalars['String']['input']>;
+  eq?: InputMaybe<Scalars['String']['input']>;
+  startsWith?: InputMaybe<Scalars['String']['input']>;
+};
 
 export type Subscription = {
   __typename?: 'Subscription';

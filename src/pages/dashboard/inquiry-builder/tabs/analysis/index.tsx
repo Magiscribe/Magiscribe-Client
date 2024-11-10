@@ -13,12 +13,16 @@ import FilterControls from './filter-controls';
 
 interface AnalysisTabProps {
   id: string;
-
-  onResponseCountChange: (count: number) => void; // Add this prop
+  onResponseCountChange: (count: number) => void;
 }
 
 const AnalysisTab: React.FC<AnalysisTabProps> = ({ id, onResponseCountChange }) => {
-  const [appliedFilters, setAppliedFilters] = useState<InquiryResponseFilters>({});
+  // Updated initial state to match new filter structure
+  const [appliedFilters, setAppliedFilters] = useState<InquiryResponseFilters>({
+    createdAt: {},
+    userName: {},
+    userEmail: {},
+  });
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
 
   const {
@@ -42,15 +46,30 @@ const AnalysisTab: React.FC<AnalysisTabProps> = ({ id, onResponseCountChange }) 
     errorPolicy: 'all',
   });
 
-  // Update parent component whenever response count changes
   useEffect(() => {
     if (inquiryResponseData?.getInquiryResponses) {
       onResponseCountChange(inquiryResponseData.getInquiryResponses.length);
     }
   }, [inquiryResponseData?.getInquiryResponses, onResponseCountChange]);
 
+  // Updated to handle the new filter structure
   const handleApplyFilters = (filters: InquiryResponseFilters) => {
-    setAppliedFilters(filters);
+    // Remove any empty filter objects to keep the query clean
+    const cleanedFilters: InquiryResponseFilters = {};
+
+    if (filters.createdAt && Object.keys(filters.createdAt).length > 0) {
+      cleanedFilters.createdAt = filters.createdAt;
+    }
+
+    if (filters.userName && Object.keys(filters.userName).length > 0) {
+      cleanedFilters.userName = filters.userName;
+    }
+
+    if (filters.userEmail && Object.keys(filters.userEmail).length > 0) {
+      cleanedFilters.userEmail = filters.userEmail;
+    }
+
+    setAppliedFilters(cleanedFilters);
   };
 
   if (graphLoading || dataLoading) return <p className="text-slate-700 dark:text-white">Loading...</p>;
@@ -63,6 +82,9 @@ const AnalysisTab: React.FC<AnalysisTabProps> = ({ id, onResponseCountChange }) 
     responses: inquiryResponseData?.getInquiryResponses ?? [],
   };
   const tabs = ['Per Response', 'Per Question', 'Via Chat'];
+
+  // Check if any filters are actually applied (have values)
+  const hasActiveFilters = Object.values(appliedFilters).some((filter) => filter && Object.keys(filter).length > 0);
 
   return (
     <div className="mt-8 rounded-2xl">
@@ -94,11 +116,10 @@ const AnalysisTab: React.FC<AnalysisTabProps> = ({ id, onResponseCountChange }) 
           ))}
         </TabList>
 
-        {/* Filter controls below tabs */}
         <div className="mt-6 mb-6">
           <FilterControls
             onApplyFilters={handleApplyFilters}
-            hasActiveFilters={Object.keys(appliedFilters).length > 0}
+            hasActiveFilters={hasActiveFilters}
             initialFilters={appliedFilters}
           />
         </div>
