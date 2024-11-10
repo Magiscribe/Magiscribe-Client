@@ -116,42 +116,40 @@ const FilterControls: React.FC<FilterControlsProps> = ({ onApplyFilters, hasActi
               className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none"
             />
           </div>
+          <div className="flex items-center gap-4">
+            <div className="w-48">
+              <Input
+                name="start-date"
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="[&::-webkit-calendar-picker-indicator]:dark:invert"
+              />
+            </div>
+
+            <span className="text-white">to</span>
+
+            <div className="w-48">
+              <Input
+                name="end-date"
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="[&::-webkit-calendar-picker-indicator]:dark:invert"
+              />
+            </div>
+          </div>
         </div>
 
         <div className="flex gap-4">
           <Button onClick={handleApplyFilter} iconLeft={faFilter} variant="primary" size="medium">
-            Apply Filters
+            Filter
           </Button>
           {hasActiveFilters && (
             <Button onClick={handleClearFilter} variant="secondary" size="medium">
-              Clear Filters
+              Clear
             </Button>
           )}
-        </div>
-      </div>
-
-      {/* Date Range Row */}
-      <div className="flex items-center gap-4">
-        <div className="w-48">
-          <Input
-            name="start-date"
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            className="[&::-webkit-calendar-picker-indicator]:dark:invert"
-          />
-        </div>
-
-        <span className="text-slate-400">to</span>
-
-        <div className="w-48">
-          <Input
-            name="end-date"
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            className="[&::-webkit-calendar-picker-indicator]:dark:invert"
-          />
         </div>
       </div>
     </div>
