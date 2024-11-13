@@ -14,10 +14,11 @@ interface FilterControlsProps {
 const FilterControls: React.FC<FilterControlsProps> = ({ onApplyFilters, hasActiveFilters, initialFilters }) => {
   const [nameFilter, setNameFilter] = useState<string>(initialFilters.userName?.contains ?? '');
   const [emailFilter, setEmailFilter] = useState<string>(initialFilters.userEmail?.contains ?? '');
-  // Helper to convert UTC timestamp to YYYY-MM-DD
+
+  // Helper to convert timestamp to YYYY-MM-DD in local time
   const formatDateForInput = (timestamp: number): string => {
     const date = new Date(timestamp);
-    return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`;
+    return date.toLocaleDateString('en-CA'); // en-CA locale gives YYYY-MM-DD format
   };
 
   const [startDate, setStartDate] = useState<string>(
@@ -49,25 +50,13 @@ const FilterControls: React.FC<FilterControlsProps> = ({ onApplyFilters, hasActi
       filters.createdAt = {};
 
       if (startDate) {
-        // Create UTC timestamp at start of day
-        filters.createdAt.gte = Date.UTC(
-          parseInt(startDate.split('-')[0]), // year
-          parseInt(startDate.split('-')[1]) - 1, // month (0-based)
-          parseInt(startDate.split('-')[2]), // day
-        );
+        const startDateTime = new Date(`${startDate}T00:00:00`);
+        filters.createdAt.gte = startDateTime.getTime();
       }
 
       if (endDate) {
-        // Create UTC timestamp at end of day
-        filters.createdAt.lte = Date.UTC(
-          parseInt(endDate.split('-')[0]), // year
-          parseInt(endDate.split('-')[1]) - 1, // month (0-based)
-          parseInt(endDate.split('-')[2]), // day
-          23,
-          59,
-          59,
-          999,
-        );
+        const endDateTime = new Date(`${endDate}T23:59:59.999`);
+        filters.createdAt.lte = endDateTime.getTime();
       }
     }
 
@@ -84,7 +73,6 @@ const FilterControls: React.FC<FilterControlsProps> = ({ onApplyFilters, hasActi
 
   return (
     <div className="space-y-4">
-      {/* Name and Email Filters Row with Action Buttons */}
       <div className="flex flex-wrap items-center justify-between">
         <div className="flex flex-wrap gap-4">
           <div className="relative w-64">
@@ -105,7 +93,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({ onApplyFilters, hasActi
           <div className="relative w-64">
             <Input
               name="email-filter"
-              type="email"
+              type="text"
               placeholder="Filter by email..."
               value={emailFilter}
               onChange={(e) => setEmailFilter(e.target.value)}
