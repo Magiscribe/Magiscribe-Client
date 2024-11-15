@@ -12,8 +12,8 @@ interface FilterControlsProps {
 }
 
 const FilterControls: React.FC<FilterControlsProps> = ({ onApplyFilters, hasActiveFilters, initialFilters }) => {
-  const [nameFilter, setNameFilter] = useState<string>(initialFilters.userName?.contains ?? '');
-  const [emailFilter, setEmailFilter] = useState<string>(initialFilters.userEmail?.contains ?? '');
+  const [nameFilter, setNameFilter] = useState<string>(initialFilters.name?.contains ?? '');
+  const [emailFilter, setEmailFilter] = useState<string>(initialFilters.email?.contains ?? '');
 
   // Helper to convert timestamp to YYYY-MM-DD in local time
   const formatDateForInput = (timestamp: number): string => {
@@ -29,8 +29,8 @@ const FilterControls: React.FC<FilterControlsProps> = ({ onApplyFilters, hasActi
   );
 
   useEffect(() => {
-    setNameFilter(initialFilters.userName?.contains ?? '');
-    setEmailFilter(initialFilters.userEmail?.contains ?? '');
+    setNameFilter(initialFilters.name?.contains ?? '');
+    setEmailFilter(initialFilters.email?.contains ?? '');
     setStartDate(initialFilters.createdAt?.gte ? formatDateForInput(initialFilters.createdAt.gte) : '');
     setEndDate(initialFilters.createdAt?.lte ? formatDateForInput(initialFilters.createdAt.lte) : '');
   }, [initialFilters]);
@@ -39,11 +39,11 @@ const FilterControls: React.FC<FilterControlsProps> = ({ onApplyFilters, hasActi
     const filters: InquiryResponseFilters = {};
 
     if (nameFilter) {
-      filters.userName = { contains: nameFilter };
+      filters.name = { contains: nameFilter };
     }
 
     if (emailFilter) {
-      filters.userEmail = { contains: emailFilter };
+      filters.email = { contains: emailFilter };
     }
 
     if (startDate || endDate) {

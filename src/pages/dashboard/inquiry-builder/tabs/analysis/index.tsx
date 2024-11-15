@@ -20,8 +20,8 @@ const AnalysisTab: React.FC<AnalysisTabProps> = ({ id, onResponseCountChange }) 
   // Updated initial state to match new filter structure
   const [appliedFilters, setAppliedFilters] = useState<InquiryResponseFilters>({
     createdAt: {},
-    userName: {},
-    userEmail: {},
+    name: {},
+    email: {},
   });
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
 
@@ -61,12 +61,12 @@ const AnalysisTab: React.FC<AnalysisTabProps> = ({ id, onResponseCountChange }) 
       cleanedFilters.createdAt = filters.createdAt;
     }
 
-    if (filters.userName && Object.keys(filters.userName).length > 0) {
-      cleanedFilters.userName = filters.userName;
+    if (filters.name && Object.keys(filters.name).length > 0) {
+      cleanedFilters.name = filters.name;
     }
 
-    if (filters.userEmail && Object.keys(filters.userEmail).length > 0) {
-      cleanedFilters.userEmail = filters.userEmail;
+    if (filters.email && Object.keys(filters.email).length > 0) {
+      cleanedFilters.email = filters.email;
     }
 
     setAppliedFilters(cleanedFilters);
