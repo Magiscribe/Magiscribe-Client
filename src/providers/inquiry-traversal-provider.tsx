@@ -5,6 +5,7 @@ import { CreateInquiryResponseMutation, GetInquiryQuery, UpdateInquiryResponseMu
 import { getAgentIdByName } from '@/utils/agents';
 import { NodeData, OptimizedNode } from '@/utils/graphs/graph';
 import { GraphManager } from '@/utils/graphs/graph-manager';
+import { parseMarkdownCodeBlocks } from '@/utils/markdown';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 
@@ -69,9 +70,7 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
   const formRef = useRef<{ [key: string]: string }>({});
   const graphRef = useRef<GraphManager | null>(null);
   const inquiryResponseIdRef = useRef<string | undefined>(undefined);
-  const isCreatingResponseRef = useRef<boolean>(false);
   const inquiryHistoryRef = useRef<string[]>([]);
-  const errorRetryCountRef = useRef<number>(0);
   const validGraph = useRef<boolean>(true);
 
   // States
@@ -85,7 +84,15 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
   const subscriptionId = useRef<string>(`inquiry_${Date.now()}`).current;
 
   // Event handlers
+  
+  /**
+   * A callback that is triggered when a new prediction is received from the backend.
+   */
   const onSubscriptionDataRef = useRef<(data: NodeData) => void>(() => {});
+
+  /**
+   * A callback that is triggered when a node is updated.
+   */
   const onNodeUpdateRef = useRef<(node: OptimizedNode) => void>(() => {});
 
   // Mutations and Apollo client
@@ -137,35 +144,16 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
         if (prediction?.type === 'SUCCESS') {
           setState((prev) => ({ ...prev, loading: false }));
 
-          // TODO: Avoid double parsing. Will require changes to the backend.
           const result = JSON.parse(prediction.result);
-          const content = result[0];
-          const jsonMatch = content.match(/```json\n([\s\S]*?)\n```/);
-          const markdownMatch = content.match(/```markdown\n([\s\S]*?)\n```/);
+          const content = parseMarkdownCodeBlocks(result[0]);
 
-          let parsedResult = { text: '' };
-          if (jsonMatch) {
-            parsedResult = JSON.parse(jsonMatch[1]);
-          }
-          if (markdownMatch) {
-            parsedResult['text'] = markdownMatch[1];
-          }
           if (onSubscriptionDataRef.current) {
-            onSubscriptionDataRef.current(parsedResult);
+            onSubscriptionDataRef.current(content);
           }
-
-          // Reset the error count if the prediction was successful
-          errorRetryCountRef.current = 0;
         }
       } catch {
-        errorRetryCountRef.current += 1;
-
-        if (errorRetryCountRef.current >= 3) {
-          setState({ ...INITIAL_STATE, error: true });
-        } else {
-          setState({ ...INITIAL_STATE, loading: true });
-          handleOnNodeVisit(graphRef.current?.getCurrentNode() as OptimizedNode);
-        }
+        setState({ ...INITIAL_STATE, loading: true });
+        handleOnNodeVisit(graphRef.current?.getCurrentNode() as OptimizedNode);
       }
     },
     onError: () => {
@@ -183,8 +171,10 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
     setState((prev) => ({ ...prev, loading: true }));
 
     try {
+      // TODO: Simplify this
       const carryOverData = graphRef.current.getCurrentNode()?.data;
       await graphRef.current.updateCurrentNodeData({ response: data, ...carryOverData });
+
       await graphRef.current.goToNextNode(nextNodeId);
 
       if (preview) {
@@ -192,8 +182,7 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
         return;
       }
 
-      if (!inquiryResponseIdRef.current && !isCreatingResponseRef.current) {
-        isCreatingResponseRef.current = true;
+      if (!inquiryResponseIdRef.current) {
         const result = await createResponse({
           variables: {
             inquiryId: id,
@@ -204,7 +193,6 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
           },
         });
         inquiryResponseIdRef.current = result.data?.upsertInquiryResponse.id;
-        isCreatingResponseRef.current = false;
       } else if (inquiryResponseIdRef.current) {
         await updateResponse({
           variables: {
@@ -221,6 +209,22 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
       console.error('Error in handleNextNode:', error);
       setState((prev) => ({ ...prev, error: true }));
     }
+  }
+
+  async function handleError() {
+    setState((prev) => ({ ...prev, error: true }));
+
+    await addPrediction({
+      variables: {
+        subscriptionId,
+        agentId,
+        variables: {
+          userMessage: `The instruction is: ${graphRef.current.getCurrentNode()?.data.text}`,
+          conversationHistory: inquiryHistoryRef.current.join('\n\n'),
+          mostRecentMessage,
+        },
+      },
+    });
   }
 
   /**
@@ -265,9 +269,7 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
         agentId,
         variables: {
           userMessage: currentNode.data.text,
-          userDetails: `
-          Name: ${userDetails.name}
-          `,
+          userDetails: `Name: ${userDetails.name}`,
           conversationHistory: inquiryHistoryRef.current.join('\n\n'),
           mostRecentMessage,
         },

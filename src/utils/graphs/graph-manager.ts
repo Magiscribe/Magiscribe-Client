@@ -1,5 +1,6 @@
 import { NodeData, OptimizedGraph, OptimizedNode, StrippedGraph, StrippedNode } from '@/utils/graphs/graph';
 import { Edge, Node } from '@xyflow/react';
+
 import { convertToOptimizedGraph, stripGraph } from './graph-utils';
 
 /**
@@ -80,29 +81,31 @@ export class GraphManager {
    * Moves to the next node.
    * @param {string} nextNodeId - ID of the next node to move to
    */
-  async goToNextNode(nextNodeId?: string): Promise<void> {
-    if (!this.currentNode) return;
+  async goToNextNode(nextNodeId?: string): Promise<boolean> {
+    if (!this.currentNode) return false;
 
     this.addNodeToHistory(this.currentNode);
     this.onNodeAddedToHistoryCallback?.(this.currentNode);
 
     const outgoingEdges = this.currentNode.outgoingEdges;
-    if (!outgoingEdges.length) return;
+    if (!outgoingEdges.length) return false;
 
     const nextEdgeId = nextNodeId
       ? outgoingEdges.find((edgeId) => this.traversalGraph.edges[edgeId]?.target === nextNodeId)
       : outgoingEdges[0];
 
-    if (!nextEdgeId) return;
+    if (!nextEdgeId) return false;
 
     const edge = this.traversalGraph.edges[nextEdgeId];
-    if (!edge) return;
+    if (!edge) return false;
 
     const nextNode = this.traversalGraph.nodes[edge.target];
-    if (!nextNode) return;
+    if (!nextNode) return false;
 
     this.currentNode = this.deepCopy(nextNode);
     this.onNodeVisitCallback?.(nextNode);
+
+    return true;
   }
 
   /**
