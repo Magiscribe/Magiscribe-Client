@@ -23,7 +23,7 @@ export interface Graph {
 }
 
 export type ImageMetadata = {
-  uuid: string;
+  id: string;
 };
 
 export interface GraphNode {

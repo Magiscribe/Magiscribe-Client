@@ -63,19 +63,19 @@ export const removeDeletedImagesFromS3 = async ({
   // Find images that exist in metadata but not in graph
   const imagesToDelete =
     metadata.images?.filter(
-      (metadataImage) => !graphImages.some((graphImage) => graphImage.uuid === metadataImage.uuid),
+      (metadataImage) => !graphImages.some((graphImage) => graphImage.id === metadataImage.id),
     ) ?? [];
 
   console.log('Images to delete:', imagesToDelete);
 
   // Delete images from S3 in parallel
-  await Promise.all(imagesToDelete.map((image) => deleteImage(image.uuid)));
+  await Promise.all(imagesToDelete.map((image) => deleteImage(image.id)));
 
   // Update metadata by filtering out deleted images
   setMetadata({
     ...metadata,
     images:
-      metadata.images?.filter((image) => !imagesToDelete.some((deletedImage) => deletedImage.uuid === image.uuid)) ??
+      metadata.images?.filter((image) => !imagesToDelete.some((deletedImage) => deletedImage.id === image.id)) ??
       [],
   });
 };

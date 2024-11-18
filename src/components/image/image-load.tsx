@@ -19,7 +19,7 @@ export function ImageLoader(props: ImageLoaderProps): React.ReactElement {
         props.images.map(async (image) => {
           const result = await getMediaAsset({
             variables: {
-              uuid: image.uuid,
+              id: image.id,
             },
           });
 

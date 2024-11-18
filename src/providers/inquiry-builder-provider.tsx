@@ -171,7 +171,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const deleteInquiry = async (onSuccess?: () => void, onError?: () => void) => {
     try {
       const images = metadata.images ?? [];
-      await Promise.all(images.map(async (image) => await deleteMediaAsset({ variables: { uuid: image.uuid } })));
+      await Promise.all(images.map(async (image) => await deleteMediaAsset({ variables: { id: image.id } })));
 
       await deleteObject({ variables: { id } });
       if (onSuccess) onSuccess();

@@ -10,14 +10,14 @@ export const ADD_MEDIA_ASSET = gql`
   mutation addMediaAsset {
     addMediaAsset {
       signedUrl
-      uuid
+      id
     }
   }
 `;
 
 export const DELETE_MEDIA_ASSET = gql`
-  mutation deleteMediaAsset($uuid: String!) {
-    deleteMediaAsset(uuid: $uuid)
+  mutation deleteMediaAsset($id: String!) {
+    deleteMediaAsset(id: $id)
   }
 `;
 

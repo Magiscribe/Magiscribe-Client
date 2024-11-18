@@ -19,7 +19,7 @@ type ImageUploaderProps = {
 export function ImageUploader({ nodeId, images }: ImageUploaderProps): React.ReactElement {
   const { updateNodeImages } = useNodeData(nodeId);
 
-  const [displayImages, setDisplayImages] = useState<{ uuid: string; url: string }[]>([]);
+  const [displayImages, setDisplayImages] = useState<{ id: string; url: string }[]>([]);
 
   // Inquiry
   const { updateMetadata, metadata } = useInquiryBuilder();
@@ -34,18 +34,18 @@ export function ImageUploader({ nodeId, images }: ImageUploaderProps): React.Rea
         images.map(async (image) => {
           const result = await getMediaAsset({
             variables: {
-              uuid: image.uuid,
+              id: image.id,
             },
           });
 
           return {
-            uuid: image.uuid,
+            id: image.id,
             url: result.data?.getMediaAsset,
           };
         }),
       );
 
-      setDisplayImages(signedImages.filter((image) => image.url !== undefined) as { uuid: string; url: string }[]);
+      setDisplayImages(signedImages.filter((image) => image.url !== undefined) as { id: string; url: string }[]);
     };
 
     fetchImages();
@@ -55,27 +55,27 @@ export function ImageUploader({ nodeId, images }: ImageUploaderProps): React.Rea
     async (image: File) => {
       const { data } = await addMediaAsset();
       if (!data?.addMediaAsset) throw new Error('Failed to generate signed s3 url for image');
-      const { signedUrl, uuid } = data.addMediaAsset;
+      const { signedUrl, id } = data.addMediaAsset;
       await uploadImageToS3(signedUrl, image);
-      updateMetadata({ ...metadata, images: [...metadata.images, { uuid }] });
-      return uuid;
+      updateMetadata({ ...metadata, images: [...metadata.images, { id }] });
+      return id;
     },
     [addMediaAsset],
   );
 
-  const deleteImage = async (uuid: string) => {
-    updateNodeImages(images.filter((image) => image.uuid !== uuid));
+  const deleteImage = async (id: string) => {
+    updateNodeImages(images.filter((image) => image.id !== id));
   };
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files) {
-      const fileUuids = await Promise.all(
+      const fileIds = await Promise.all(
         Array.from(files).map(async (file) => {
           return await uploadImage(file);
         }),
       );
-      const newImageMetadata = fileUuids.map((file) => ({ uuid: file }));
+      const newImageMetadata = fileIds.map((file) => ({ id: file }));
       updateNodeImages(images ? [...images, ...newImageMetadata] : newImageMetadata);
     }
   };
@@ -104,7 +104,7 @@ export function ImageUploader({ nodeId, images }: ImageUploaderProps): React.Rea
                   iconLeft={faX}
                   type="button"
                   variant="transparentDanger"
-                  onClick={() => deleteImage(image.uuid)}
+                  onClick={() => deleteImage(image.id)}
                   className="absolute top-0 right-0"
                 />
               </div>

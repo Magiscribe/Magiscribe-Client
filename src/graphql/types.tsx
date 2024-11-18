@@ -17,8 +17,8 @@ export type Scalars = {
 
 export type AddMediaAssetResponse = {
   __typename?: 'AddMediaAssetResponse';
+  id: Scalars['String']['output'];
   signedUrl: Scalars['String']['output'];
-  uuid: Scalars['String']['output'];
 };
 
 export type Agent = {
@@ -192,7 +192,7 @@ export type MutationDeleteInquiryArgs = {
 
 
 export type MutationDeleteMediaAssetArgs = {
-  uuid: Scalars['String']['input'];
+  id: Scalars['String']['input'];
 };
 
 
@@ -343,7 +343,7 @@ export type QueryGetInquiryResponsesArgs = {
 
 
 export type QueryGetMediaAssetArgs = {
-  uuid: Scalars['String']['input'];
+  id: Scalars['String']['input'];
 };
 
 
@@ -384,10 +384,10 @@ export type GenerateAudioMutation = { __typename?: 'Mutation', generateAudio?: s
 export type AddMediaAssetMutationVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AddMediaAssetMutation = { __typename?: 'Mutation', addMediaAsset?: { __typename?: 'AddMediaAssetResponse', signedUrl: string, uuid: string } | null };
+export type AddMediaAssetMutation = { __typename?: 'Mutation', addMediaAsset?: { __typename?: 'AddMediaAssetResponse', signedUrl: string, id: string } | null };
 
 export type DeleteMediaAssetMutationVariables = Exact<{
-  uuid: Scalars['String']['input'];
+  id: Scalars['String']['input'];
 }>;
 
 
@@ -586,7 +586,7 @@ export type GetAllAudioVoicesQueryVariables = Exact<{ [key: string]: never; }>;
 export type GetAllAudioVoicesQuery = { __typename?: 'Query', getAllAudioVoices: Array<{ __typename?: 'Voice', id: string, name: string }> };
 
 export type GetMediaAssetQueryVariables = Exact<{
-  uuid: Scalars['String']['input'];
+  id: Scalars['String']['input'];
 }>;
 
 
