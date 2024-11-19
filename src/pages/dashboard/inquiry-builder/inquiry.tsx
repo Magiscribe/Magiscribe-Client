@@ -1,14 +1,10 @@
-import { GET_INQUIRY_RESPONSE_COUNT } from '@/clients/queries';
-import { GetInquiryResponseCountQuery } from '@/graphql/graphql';
 import { InquiryBuilderProvider } from '@/providers/inquiry-builder-provider';
-import { useQuery } from '@apollo/client';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
 import { Link, useParams } from 'react-router-dom';
-import { useState } from 'react';
 
 import AnalysisTab from './tabs/analysis';
 import InquiryBuilder from './tabs/builder';
@@ -16,31 +12,7 @@ import InquiryBuilder from './tabs/builder';
 export default function InquiryPage() {
   const { id } = useParams<{ id: string }>();
 
-  const [responseCount, setResponseCount] = useState<number | undefined>();
-  const [hasInitialCount, setHasInitialCount] = useState(false);
-
-  // Only fetch the initial count
-  useQuery<GetInquiryResponseCountQuery>(GET_INQUIRY_RESPONSE_COUNT, {
-    variables: {
-      id,
-      filters: {}, // Empty filters for initial count
-    },
-    onCompleted: (data) => {
-      if (!hasInitialCount) {
-        setResponseCount(data.getInquiryResponseCount);
-        setHasInitialCount(true);
-      }
-    },
-  });
-
-  const handleResponseCountChange = (count: number) => {
-    // Only update count from AnalysisTab after we have the initial count
-    if (hasInitialCount) {
-      setResponseCount(count);
-    }
-  };
-
-  const tabs = ['Builder', `Analysis${responseCount !== undefined ? ` (${responseCount})` : ''}`];
+  const tabs = ['Builder', 'Analysis'];
 
   if (!id) {
     return <></>;
@@ -84,7 +56,7 @@ export default function InquiryPage() {
           </TabPanel>
           <TabPanel>
             <motion.div initial={{ opacity: 0, x: -100 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 100 }}>
-              <AnalysisTab id={id} onResponseCountChange={handleResponseCountChange} />
+              <AnalysisTab id={id} />
             </motion.div>
           </TabPanel>
         </TabPanels>
