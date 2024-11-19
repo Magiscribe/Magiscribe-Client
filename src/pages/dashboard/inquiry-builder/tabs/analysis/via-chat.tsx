@@ -1,18 +1,19 @@
+import React, { useEffect, useRef, useState } from 'react';
 import { ADD_PREDICTION } from '@/clients/mutations';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
+import { GET_INQUIRIES_RESPONSES, GET_INQUIRY } from '@/clients/queries';
+import { GetInquiryQuery, GetInquiryResponsesQuery } from '@/graphql/graphql';
 import Chart, { ChartProps } from '@/components/chart';
 import Button from '@/components/controls/button';
 import Input from '@/components/controls/input';
 import MarkdownCustom from '@/components/markdown-custom';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
-import { TabProps } from '@/types/conversation';
 import { getAgentIdByName } from '@/utils/agents';
-import { useApolloClient, useMutation, useSubscription } from '@apollo/client';
+import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
 import { faPaperPlane, faSpinner, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
-import React, { useEffect, useRef, useState } from 'react';
 
 interface Message {
   type: 'text' | 'chart';
@@ -20,15 +21,39 @@ interface Message {
   sender: 'user' | 'bot';
 }
 
-export default function ViaChatTab({ data }: TabProps) {
+interface ViaChatTabProps {
+  id: string;
+}
+
+const ViaChatTab: React.FC<ViaChatTabProps> = ({ id }) => {
   const [inputMessage, setInputMessage] = useState('');
   const [loading, setLoading] = useState<boolean>(false);
   const [subscriptionId] = useState<string>(`advanced_analysis_${Date.now()}`);
-  const [messages, setMessages] = useWithLocalStorage<Message[]>([], `${data.id}-chat`);
+  const [messages, setMessages] = useWithLocalStorage<Message[]>([], `${id}-chat`);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const client = useApolloClient();
   const [addPrediction] = useMutation(ADD_PREDICTION);
+
+  // Query for form and graph data
+  const {
+    loading: graphLoading,
+    data: inquiryData,
+    error: graphError,
+  } = useQuery<GetInquiryQuery>(GET_INQUIRY, {
+    variables: { id },
+    errorPolicy: 'all',
+  });
+
+  // Query for all responses (unfiltered)
+  const {
+    loading: dataLoading,
+    data: inquiryResponseData,
+    error: dataError,
+  } = useQuery<GetInquiryResponsesQuery>(GET_INQUIRIES_RESPONSES, {
+    variables: { id },
+    errorPolicy: 'all',
+  });
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -91,6 +116,13 @@ export default function ViaChatTab({ data }: TabProps) {
     if (agentId) {
       setLoading(true);
       try {
+        const data = {
+          id,
+          form: inquiryData?.getInquiry?.data?.form,
+          graph: inquiryData?.getInquiry?.data?.graph ?? inquiryData?.getInquiry?.data?.draftGraph,
+          responses: inquiryResponseData?.getInquiryResponses ?? [],
+        };
+
         await addPrediction({
           variables: {
             subscriptionId,
@@ -115,12 +147,19 @@ export default function ViaChatTab({ data }: TabProps) {
     setMessages([]);
   };
 
-  if (!data.responses) return <div className="p-4 text-white">No data available</div>;
+  if (graphLoading || dataLoading) return <p className="text-slate-700 dark:text-white">Loading...</p>;
+  if (graphError || dataError) return <p className="text-slate-700 dark:text-white">Error loading data</p>;
+  if (!inquiryResponseData?.getInquiryResponses) {
+    return <div className="p-4 text-white">No data available</div>;
+  }
 
   return (
     <div className="bg-white dark:bg-slate-700 px-4 py-8 rounded-2xl shadow-xl text-slate-700 dark:text-white">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Chat</h2>
+        <h2 className="text-2xl font-bold">
+          Chat - Analyzing {inquiryResponseData.getInquiryResponses.length}{' '}
+          {inquiryResponseData.getInquiryResponses.length === 1 ? 'Response' : 'Responses'}
+        </h2>
         <Button onClick={handleClearChat} variant="danger" iconLeft={faTrash}>
           Clear
         </Button>
@@ -169,4 +208,6 @@ export default function ViaChatTab({ data }: TabProps) {
       </form>
     </div>
   );
-}
+};
+
+export default ViaChatTab;

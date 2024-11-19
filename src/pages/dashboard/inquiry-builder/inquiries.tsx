@@ -1,4 +1,4 @@
-import { GET_INQUIRIES } from '@/clients/queries';
+import { GET_INQUIRIES, GET_INQUIRY_RESPONSE_COUNT } from '@/clients/queries';
 import GenericHero from '@/components/heroes/generic-hero';
 import ModalUpsertInquiry from '@/components/modals/inquiry/create-inquiry-modal';
 import { GetInquiriesQuery } from '@/graphql/graphql';
@@ -11,6 +11,11 @@ import { Link, useNavigate } from 'react-router-dom';
 
 function InquiryCard({ inquiry }: { inquiry: Inquiry }) {
   const form = inquiry.data.form;
+
+  // Add the response count query
+  const { data: responseCountData } = useQuery(GET_INQUIRY_RESPONSE_COUNT, {
+    variables: { id: inquiry.id },
+  });
 
   const createdAt = new Date(inquiry.createdAt);
   const updatedAt = new Date(inquiry.updatedAt);
@@ -38,9 +43,17 @@ function InquiryCard({ inquiry }: { inquiry: Inquiry }) {
         whileHover={{ scale: 1.05 }}
       >
         <h3 className="text-lg text-slate-900 dark:text-slate-100 font-semibold">{form.title}</h3>
-        <p className="text-sm text-slate-500 dark:text-slate-400">
-          Created: {formattedCreateDate} | Updated: {formattedUpdateDate}
-        </p>
+        <div className="flex justify-between items-center mt-2">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            Created: {formattedCreateDate} | Updated: {formattedUpdateDate}
+          </p>
+          <div className="bg-blue-100 dark:bg-blue-900 px-2 py-1 rounded-full">
+            <span className="text-sm text-blue-800 dark:text-blue-200">
+              {responseCountData?.getInquiryResponseCount ?? 0}{' '}
+              {responseCountData?.getInquiryResponseCount == 1 ? 'response' : 'responses'}
+            </span>
+          </div>
+        </div>
       </motion.div>
     </Link>
   );

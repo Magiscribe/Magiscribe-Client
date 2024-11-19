@@ -156,8 +156,8 @@ export const GET_INQUIRIES = gql`
 `;
 
 export const GET_INQUIRIES_RESPONSES = gql`
-  query getInquiryResponses($id: ID!) {
-    getInquiryResponses(id: $id) {
+  query getInquiryResponses($id: ID!, $filters: InquiryResponseFilters) {
+    getInquiryResponses(id: $id, filters: $filters) {
       id
       userId
       data {

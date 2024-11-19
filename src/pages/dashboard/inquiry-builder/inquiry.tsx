@@ -1,7 +1,4 @@
-import { GET_INQUIRY_RESPONSE_COUNT } from '@/clients/queries';
-import { GetInquiryResponseCountQuery } from '@/graphql/graphql';
 import { InquiryBuilderProvider } from '@/providers/inquiry-builder-provider';
-import { useQuery } from '@apollo/client';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
@@ -13,17 +10,9 @@ import AnalysisTab from './tabs/analysis';
 import InquiryBuilder from './tabs/builder';
 
 export default function InquiryPage() {
-  // Hooks
   const { id } = useParams<{ id: string }>();
 
-  // States
-
-  const { data: responseCountData } = useQuery<GetInquiryResponseCountQuery>(GET_INQUIRY_RESPONSE_COUNT, {
-    variables: { id },
-  });
-
-  const responseCount = responseCountData?.getInquiryResponseCount;
-  const tabs = ['Builder', `Analysis${responseCount ? ` (${responseCount})` : ''}`];
+  const tabs = ['Builder', 'Analysis'];
 
   if (!id) {
     return <></>;

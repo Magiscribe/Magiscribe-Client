@@ -1,61 +1,41 @@
-import { GET_INQUIRIES_RESPONSES, GET_INQUIRY } from '@/clients/queries';
-import { GetInquiryQuery, GetInquiryResponsesQuery } from '@/graphql/graphql';
-import { useQuery } from '@apollo/client';
+import React, { useState } from 'react';
+import { GET_INQUIRIES_RESPONSES } from '@/clients/queries';
+import { GetInquiryResponsesQuery } from '@/graphql/graphql';
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
-import React from 'react';
-
 import PerQuestionTab from './per-question';
 import PerResponseTab from './per-response';
 import ViaChatTab from './via-chat';
 import ExportButton from './export-button';
+import { useQuery } from '@apollo/client';
 
 interface AnalysisTabProps {
   id: string;
 }
 
 const AnalysisTab: React.FC<AnalysisTabProps> = ({ id }) => {
-  const {
-    loading: graphLoading,
-    data: inquiryData,
-    error: graphError,
-  } = useQuery<GetInquiryQuery>(GET_INQUIRY, {
+  const [selectedTabIndex, setSelectedTabIndex] = useState(0);
+
+  // Keep only the unfiltered query for export functionality
+  const { data: inquiryResponseData } = useQuery<GetInquiryResponsesQuery>(GET_INQUIRIES_RESPONSES, {
     variables: { id },
     errorPolicy: 'all',
   });
-
-  const {
-    loading: dataLoading,
-    data: inquiryResponseData,
-    error: dataError,
-  } = useQuery<GetInquiryResponsesQuery>(GET_INQUIRIES_RESPONSES, {
-    variables: { id },
-    errorPolicy: 'all',
-  });
-
-  if (graphLoading || dataLoading) return <p className="text-slate-700 dark:text-white">Loading...</p>;
-  if (graphError || dataError) return <p className="text-slate-700 dark:text-white">Error loading data</p>;
-
-  const data = {
-    id,
-    form: inquiryData?.getInquiry?.data?.form,
-    graph: inquiryData?.getInquiry?.data?.graph ?? inquiryData?.getInquiry?.data?.draftGraph,
-    responses: inquiryResponseData?.getInquiryResponses ?? [],
-  };
 
   const tabs = ['Per Response', 'Per Question', 'Via Chat'];
 
   return (
     <div className="mt-8 rounded-2xl">
+      {/* Export buttons remain at the top level */}
       {(inquiryResponseData?.getInquiryResponses?.length ?? 0) > 0 && (
-        <div className="flex justify-end items-center gap-4 mb-4">
+        <div className="flex justify-end gap-4 mb-6">
           <ExportButton id={id} responses={inquiryResponseData?.getInquiryResponses ?? []} type="csv" />
           <ExportButton id={id} responses={inquiryResponseData?.getInquiryResponses ?? []} type="json" />
         </div>
       )}
 
-      <TabGroup>
+      <TabGroup selectedIndex={selectedTabIndex} onChange={setSelectedTabIndex}>
         <TabList className="flex space-x-1 rounded-xl border-2 border-white mb-4">
           {tabs.map((category) => (
             <Tab
@@ -74,20 +54,21 @@ const AnalysisTab: React.FC<AnalysisTabProps> = ({ id }) => {
             </Tab>
           ))}
         </TabList>
+
         <TabPanels className="mt-2">
           <TabPanel>
             <motion.div initial={{ opacity: 0, x: -100 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 100 }}>
-              <PerResponseTab data={data} />
+              <PerResponseTab id={id} />
             </motion.div>
           </TabPanel>
           <TabPanel>
             <motion.div initial={{ opacity: 0, x: -100 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 100 }}>
-              <PerQuestionTab data={data} />
+              <PerQuestionTab id={id} />
             </motion.div>
           </TabPanel>
           <TabPanel>
             <motion.div initial={{ opacity: 0, x: -100 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 100 }}>
-              <ViaChatTab data={data} />
+              <ViaChatTab id={id} />
             </motion.div>
           </TabPanel>
         </TabPanels>
