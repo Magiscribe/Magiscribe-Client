@@ -15,6 +15,12 @@ export type Scalars = {
   JSONObject: { input: any; output: any; }
 };
 
+export type AddMediaAssetResponse = {
+  __typename?: 'AddMediaAssetResponse';
+  id: Scalars['String']['output'];
+  signedUrl: Scalars['String']['output'];
+};
+
 export type Agent = {
   __typename?: 'Agent';
   capabilities: Array<Capability>;
@@ -153,12 +159,13 @@ export type Model = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  addMediaAsset?: Maybe<Scalars['String']['output']>;
+  addMediaAsset?: Maybe<AddMediaAssetResponse>;
   addPrediction?: Maybe<Scalars['String']['output']>;
   deleteAgent?: Maybe<Agent>;
   deleteCapability?: Maybe<Capability>;
   deleteCollection?: Maybe<Collection>;
   deleteInquiry?: Maybe<Inquiry>;
+  deleteMediaAsset?: Maybe<Scalars['Int']['output']>;
   deletePrompt?: Maybe<Prompt>;
   generateAudio?: Maybe<Scalars['String']['output']>;
   upsertAgent?: Maybe<Agent>;
@@ -167,12 +174,6 @@ export type Mutation = {
   upsertInquiry: Inquiry;
   upsertInquiryResponse: InquiryResponse;
   upsertPrompt?: Maybe<Prompt>;
-};
-
-
-export type MutationAddMediaAssetArgs = {
-  fileName: Scalars['String']['input'];
-  fileType: Scalars['String']['input'];
 };
 
 
@@ -201,6 +202,11 @@ export type MutationDeleteCollectionArgs = {
 
 export type MutationDeleteInquiryArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteMediaAssetArgs = {
+  id: Scalars['String']['input'];
 };
 
 
@@ -295,6 +301,7 @@ export type Query = {
   getInquiry?: Maybe<Inquiry>;
   getInquiryResponseCount: Scalars['Int']['output'];
   getInquiryResponses?: Maybe<Array<InquiryResponse>>;
+  getMediaAsset?: Maybe<Scalars['String']['output']>;
   getPrompt?: Maybe<Prompt>;
 };
 
@@ -350,6 +357,11 @@ export type QueryGetInquiryResponsesArgs = {
 };
 
 
+export type QueryGetMediaAssetArgs = {
+  id: Scalars['String']['input'];
+};
+
+
 export type QueryGetPromptArgs = {
   promptId: Scalars['ID']['input'];
 };
@@ -390,6 +402,18 @@ export type GenerateAudioMutationVariables = Exact<{
 
 
 export type GenerateAudioMutation = { __typename?: 'Mutation', generateAudio?: string | null };
+
+export type AddMediaAssetMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AddMediaAssetMutation = { __typename?: 'Mutation', addMediaAsset?: { __typename?: 'AddMediaAssetResponse', signedUrl: string, id: string } | null };
+
+export type DeleteMediaAssetMutationVariables = Exact<{
+  id: Scalars['String']['input'];
+}>;
+
+
+export type DeleteMediaAssetMutation = { __typename?: 'Mutation', deleteMediaAsset?: number | null };
 
 export type AddPredictionMutationVariables = Exact<{
   subscriptionId: Scalars['ID']['input'];
@@ -583,6 +607,13 @@ export type GetAllAudioVoicesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetAllAudioVoicesQuery = { __typename?: 'Query', getAllAudioVoices: Array<{ __typename?: 'Voice', id: string, name: string }> };
+
+export type GetMediaAssetQueryVariables = Exact<{
+  id: Scalars['String']['input'];
+}>;
+
+
+export type GetMediaAssetQuery = { __typename?: 'Query', getMediaAsset?: string | null };
 
 export type GetAllCollectionsQueryVariables = Exact<{ [key: string]: never; }>;
 

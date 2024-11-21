@@ -7,6 +7,7 @@ import InformationNode from './nodes/information-node';
 import ButtonEdge from './edges/button-edge';
 import StartNode from './nodes/start-node';
 import EndNode from './nodes/end-node';
+import { ImageMetadata } from '@/types/conversation';
 
 export const nodeTypesInfo = {
   start: {
@@ -51,16 +52,34 @@ export const edgeTypes: EdgeTypes = {
   button: ButtonEdge,
 };
 
+/**
+ * A custom React hook for managing node data in a React Flow application.
+ *
+ * @param {string} id - The unique identifier of the node.
+ * @returns {Object} - An object containing the `handleInputChange` and `updateNodeImages` functions.
+ */
 export function useNodeData<T>(id: string) {
   const { updateNodeData } = useReactFlow();
 
+  /**
+   * Updates the node data with the provided partial updates.
+   *
+   * @param {Partial<T>} updates - The partial updates to apply to the node data.
+   * @returns {void}
+   */
   const update = useCallback(
     (updates: Partial<T>) => {
       updateNodeData(id, updates);
     },
-    [id],
+    [id, updateNodeData],
   );
 
+  /**
+   * Handles input changes for the node data.
+   *
+   * @param {React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>} event - The input change event.
+   * @returns {void}
+   */
   const handleInputChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
       const { name, value, type } = event.target;
@@ -74,5 +93,18 @@ export function useNodeData<T>(id: string) {
     [updateNodeData],
   );
 
-  return { handleInputChange };
+  /**
+   * Updates the node images in the component state.
+   *
+   * @param {ImageMetadata[]} images - An array of image metadata objects.
+   * @returns {void}
+   */
+  const updateNodeImages = useCallback(
+    (images: ImageMetadata[]) => {
+      updateNodeData(id, { images: images || [] });
+    },
+    [id, updateNodeData],
+  );
+
+  return { handleInputChange, updateNodeImages };
 }

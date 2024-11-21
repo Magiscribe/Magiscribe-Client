@@ -1,6 +1,6 @@
 import Button from '@/components/controls/button';
 import GraphContextBar from '@/components/graph/context-bar';
-import GraphGeneratorMenu from '@/components/graph/generate-menu';
+import GraphGeneratorMenu from '@/components/cards/generate-menu';
 import GraphInput from '@/components/graph/graph-input';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { faMagicWandSparkles } from '@fortawesome/free-solid-svg-icons';
@@ -25,6 +25,7 @@ export default function InquiryBuilder() {
   const {
     initialized,
     form,
+    metadata,
     graph,
     saveGraph,
     onEdgesChange,
@@ -32,6 +33,7 @@ export default function InquiryBuilder() {
     updateGraphEdges,
     updateGraphNodes,
     saveForm,
+    saveMetadata,
   } = useInquiryBuilder();
 
   /**
@@ -73,6 +75,14 @@ export default function InquiryBuilder() {
       }
     };
   }, [form]);
+
+  useEffect(() => {
+    // Todo: Investigate how to add debouncing for inquiry metadata.  Adding debouncing for ImageMetadata
+    // sometimes causes images to not be saved to nodes.
+    if (Object.keys(metadata).length > 0) {
+      saveMetadata();
+    }
+  }, [metadata]);
 
   const toggleChat = () => {
     setIsChatOpen(!isChatOpen);

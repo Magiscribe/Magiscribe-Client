@@ -9,6 +9,8 @@ import React, { useCallback } from 'react';
 import NodeContainer from '../elements/node-container';
 import CustomHandle from '../handles/limit-handle';
 import { useNodeData } from '../utils';
+import { ImageMetadata } from '@/types/conversation';
+import { ImageUploader } from '@/components/image/image-uploader';
 
 enum NodeType {
   OpenEnded = 'open-ended',
@@ -22,6 +24,7 @@ type QuestionNodeProps = NodeProps & {
     type: NodeType;
     ratings?: string[];
     dynamicGeneration?: boolean;
+    images: ImageMetadata[];
   };
 };
 
@@ -118,6 +121,8 @@ export default function QuestionNode({ id, data }: QuestionNodeProps) {
             <Button onClick={addRating} variant="primary" size="medium" iconLeft={faPlus} className="nodrag mt-2">
               Add Rating
             </Button>
+
+            <ImageUploader nodeId={id} images={data.images} />
           </div>
         )}
       </div>
