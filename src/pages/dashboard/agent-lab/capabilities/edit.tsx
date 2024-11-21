@@ -165,16 +165,27 @@ export default function CapabilityEdit() {
   };
 
   const handlePromptSave = async (prompt: Prompt, callback: () => void) => {
-    await upsertPrompt({
-      variables: {
-        prompt: {
-          id: prompt.id,
-          name: prompt.name,
-          text: prompt.text,
+    try {
+      const result =  await upsertPrompt({
+        variables: {
+          prompt: {
+            id: prompt.id,
+            name: prompt.name,
+            text: prompt.text,
+            logicalCollection: collection,
+          },
         },
-      },
-    });
-    addAlert('Prompt saved successfully', 'success');
+      });
+
+      if (result.errors) {
+        addAlert('Error saving prompt', 'error');
+        return;
+      }
+    } catch (error) {
+      console.error(error);
+      addAlert('Error saving prompt', 'error');
+    }
+    
     callback();
   };
 
@@ -191,6 +202,7 @@ export default function CapabilityEdit() {
                 id: prompt.id,
                 name: prompt.name,
                 text: prompt.text,
+                logicalCollection: collection,
               },
             },
           }),
