@@ -72,6 +72,7 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
   const inquiryResponseIdRef = useRef<string | undefined>(undefined);
   const inquiryHistoryRef = useRef<string[]>([]);
   const validGraph = useRef<boolean>(true);
+  const lastPredictionVariablesRef = useRef<any>({});
 
   // States
   const [userDetails, setUserDetails] = useState<{ [key: string]: string }>({});
@@ -84,7 +85,7 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
   const subscriptionId = useRef<string>(`inquiry_${Date.now()}`).current;
 
   // Event handlers
-  
+
   /**
    * A callback that is triggered when a new prediction is received from the backend.
    */
@@ -175,7 +176,11 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
       const carryOverData = graphRef.current.getCurrentNode()?.data;
       await graphRef.current.updateCurrentNodeData({ response: data, ...carryOverData });
 
-      await graphRef.current.goToNextNode(nextNodeId);
+      const validNode = await graphRef.current.goToNextNode(nextNodeId);
+
+      if (!validNode) {
+        handleError();
+      }
 
       if (preview) {
         console.log('Preview mode, not saving response');
@@ -216,13 +221,8 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
 
     await addPrediction({
       variables: {
-        subscriptionId,
-        agentId,
-        variables: {
-          userMessage: `The instruction is: ${graphRef.current.getCurrentNode()?.data.text}`,
-          conversationHistory: inquiryHistoryRef.current.join('\n\n'),
-          mostRecentMessage,
-        },
+        ...lastPredictionVariablesRef.current,
+        error: 'An error occurred. Fix it!',
       },
     });
   }
@@ -263,17 +263,19 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
     );
     const mostRecentMessage = inquiryHistoryRef.current[inquiryHistoryRef.current.length - 1] || '';
 
-    await addPrediction({
+    // TODO: Clean this up
+    lastPredictionVariablesRef.current = {
+      subscriptionId,
+      agentId,
       variables: {
-        subscriptionId,
-        agentId,
-        variables: {
-          userMessage: currentNode.data.text,
-          userDetails: `Name: ${userDetails.name}`,
-          conversationHistory: inquiryHistoryRef.current.join('\n\n'),
-          mostRecentMessage,
-        },
+        userMessage: currentNode.data.text,
+        userDetails: `Name: ${userDetails.name}`,
+        conversationHistory: inquiryHistoryRef.current.join('\n\n'),
+        mostRecentMessage,
       },
+    };
+    await addPrediction({
+      variables: lastPredictionVariablesRef.current,
     });
 
     onSubscriptionDataRef.current = (result) => {
@@ -293,16 +295,18 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
     const agentId = await getAgentIdByName('Condition Node', client);
     const mostRecentMessage = inquiryHistoryRef.current[inquiryHistoryRef.current.length - 1] || '';
 
-    await addPrediction({
+    // TODO: Clean this up
+    lastPredictionVariablesRef.current = {
+      subscriptionId,
+      agentId,
       variables: {
-        subscriptionId,
-        agentId,
-        variables: {
-          userMessage: `The instruction is: ${graphRef.current.getCurrentNode()?.data.text}`,
-          conversationHistory: inquiryHistoryRef.current.join('\n\n'),
-          mostRecentMessage,
-        },
+        userMessage: `The instruction is: ${graphRef.current.getCurrentNode()?.data.text}`,
+        conversationHistory: inquiryHistoryRef.current.join('\n\n'),
+        mostRecentMessage,
       },
+    };
+    await addPrediction({
+      variables: lastPredictionVariablesRef.current,
     });
 
     onSubscriptionDataRef.current = (result) => {

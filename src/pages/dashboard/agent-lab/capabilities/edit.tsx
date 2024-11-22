@@ -166,7 +166,7 @@ export default function CapabilityEdit() {
 
   const handlePromptSave = async (prompt: Prompt, callback: () => void) => {
     try {
-      const result =  await upsertPrompt({
+      const result = await upsertPrompt({
         variables: {
           prompt: {
             id: prompt.id,
@@ -185,7 +185,7 @@ export default function CapabilityEdit() {
       console.error(error);
       addAlert('Error saving prompt', 'error');
     }
-    
+
     callback();
   };
 

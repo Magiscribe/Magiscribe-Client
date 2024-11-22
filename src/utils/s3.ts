@@ -62,9 +62,8 @@ export const removeDeletedImagesFromS3 = async ({
 
   // Find images that exist in metadata but not in graph
   const imagesToDelete =
-    metadata.images?.filter(
-      (metadataImage) => !graphImages.some((graphImage) => graphImage.id === metadataImage.id),
-    ) ?? [];
+    metadata.images?.filter((metadataImage) => !graphImages.some((graphImage) => graphImage.id === metadataImage.id)) ??
+    [];
 
   console.log('Images to delete:', imagesToDelete);
 
@@ -75,7 +74,6 @@ export const removeDeletedImagesFromS3 = async ({
   setMetadata({
     ...metadata,
     images:
-      metadata.images?.filter((image) => !imagesToDelete.some((deletedImage) => deletedImage.id === image.id)) ??
-      [],
+      metadata.images?.filter((image) => !imagesToDelete.some((deletedImage) => deletedImage.id === image.id)) ?? [],
   });
 };

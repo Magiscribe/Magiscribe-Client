@@ -20,7 +20,7 @@ import { faArrowUp, faChevronRight, faMicrophone, faMicrophoneSlash } from '@for
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { motion } from 'framer-motion';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 interface Message {
   id: string;
@@ -77,9 +77,6 @@ export default function UserInquiryPage() {
   const audio = useElevenLabsAudio(form.voice);
   const audioEnabled = useAudioEnabled();
   const { isTranscribing, transcript, handleTranscribe } = useTranscribe();
-
-  // General Hooks
-  const navigate = useNavigate();
 
   useSetTitle()(form?.title);
 
@@ -282,10 +279,7 @@ export default function UserInquiryPage() {
             />
           )}
         </div>
-        <Button
-          onClick={handleStart}
-          className='mt-4 w-full'
-        >
+        <Button onClick={handleStart} className="mt-4 w-full">
           Get Started
         </Button>
       </div>
@@ -419,52 +413,42 @@ export default function UserInquiryPage() {
 
       {screen === 'end' && (
         <>
-        <div className="h-0.5 w-full bg-slate-300 dark:bg-slate-800" />
-        <div className="flex justify-end mt-4">
-          <Button
-            type="button"
-            onClick={handleFinishInquiry}
-          >
-            Finish
-            <FontAwesomeIcon icon={faChevronRight} className="ml-2" />
-          </Button>
-        </div>
+          <div className="h-0.5 w-full bg-slate-300 dark:bg-slate-800" />
+          <div className="flex justify-end mt-4">
+            <Button type="button" onClick={handleFinishInquiry}>
+              Finish
+              <FontAwesomeIcon icon={faChevronRight} className="ml-2" />
+            </Button>
+          </div>
         </>
       )}
     </div>
   );
 
-  if (state.notFound) {
-    return (
-      <div className="h-full flex items-center justify-center bg-white dark:bg-slate-800 text-slate-800 dark:text-white">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Inquiry Not Found</h2>
-          <p className="text-slate-600 dark:text-slate-400">
-            The inquiry you are looking for does not exist. Please check the URL and try again.
-          </p>
-        </div>
-      </div>
-    );
-  }
+  const renderNotFound = () => (
+    <div className="bg-white dark:bg-slate-700 p-6 rounded-lg shadow-lg">
+      <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white">Inquiry Not Found</h2>
+      <p className="text-slate-600 dark:text-slate-300 mb-6">
+        The inquiry you are looking for does not exist. Please check the URL and try again.
+      </p>
+    </div>
+  );
 
-  if (state.error) {
-    return (
-      <div className="h-full flex items-center justify-center bg-white dark:bg-slate-800 text-slate-800 dark:text-white">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Something went wrong!</h2>
-          <p className="text-slate-600 dark:text-slate-400 mb-4">
-            Looks like something broke on our end. Your previous answers have been recorded.
-          </p>
-          <button
-            onClick={() => navigate(0)}
-            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
-          >
-            Restart Inquiry
-          </button>
-        </div>
-      </div>
-    );
-  }
+  const renderError = () => (
+    <div className="bg-white dark:bg-slate-700 p-6 rounded-lg shadow-lg">
+      <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white">Something Went Wrong</h2>
+      <p className="text-slate-600 dark:text-slate-300 mb-6">
+        An error occurred while loading the inquiry. Please try again later.
+      </p>
+      <p className="text-slate-600 dark:text-slate-300 mb-6">
+        If the problem persists, please contact support at{' '}
+        <a href="mailto:support@magiscribe.com" className="underline">
+          support@magiscribe.com
+        </a>
+        .
+      </p>
+    </div>
+  );
 
   return (
     <>
@@ -472,6 +456,8 @@ export default function UserInquiryPage() {
         {screen === 'start' && renderStartScreen()}
         {(screen === 'inquiry' || screen === 'end') && renderMessages()}
         {screen === 'summary' && renderSummary()}
+        {state.notFound && renderNotFound()}
+        {state.error && renderError()}
         <div ref={messagesEndRef} />
       </div>
       {currentNode && currentNode.type !== 'end' && screen !== 'start' && renderInputArea()}

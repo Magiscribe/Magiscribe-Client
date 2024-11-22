@@ -50,7 +50,7 @@ export default function InquiryUserTemplate() {
           <div className="fixed w-full h-screen bg-slate-200 dark:bg-slate-900 -z-10"></div>
           <Header />
           <div className="flex flex-col h-screen pt-20">
-          <Outlet />
+            <Outlet />
           </div>
         </div>
       </InquiryTraversalProvider>
