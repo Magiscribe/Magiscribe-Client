@@ -1,11 +1,7 @@
-import Textarea from '@/components/controls/textarea';
-import { QuestionNodeData } from '@/types/conversation';
 import { faCodeBranch, faPlus } from '@fortawesome/free-solid-svg-icons';
-import { getConnectedEdges, Handle, NodeProps, Position, useReactFlow, useStoreApi } from '@xyflow/react';
+import { Handle, NodeProps, Position, useReactFlow } from '@xyflow/react';
 import NodeContainer from '../elements/node-container';
-import { useNodeData } from '../utils';
 import Button from '@/components/controls/button';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Condition from '../elements/condition';
 
 type ConditionNodeProps = NodeProps & {

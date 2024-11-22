@@ -1,6 +1,5 @@
-import { getIncomers, getOutgoers, Node, useEdges, useNodes, useReactFlow } from '@xyflow/react';
-import { useEffect, useState } from 'react';
-import { generateRandomColorHex, useNodeData } from '../utils';
+import { getOutgoers, useEdges, useNodes, useReactFlow } from '@xyflow/react';
+import { useEffect } from 'react';
 import Input from '@/components/controls/input';
 import Button from '@/components/controls/button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
