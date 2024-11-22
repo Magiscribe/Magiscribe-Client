@@ -66,7 +66,7 @@ export const edgeTypes: EdgeTypes = {
 };
 
 export function getDefaultNodeData(type: keyof typeof nodeTypesInfo) {
-  return nodeTypesInfo[type].defaultData;
+  return { ...nodeTypesInfo[type].defaultData, nodeColor: generateRandomColorHex() };
 }
 
 /**
@@ -131,5 +131,5 @@ export function generateRandomColorHex() {
   const g = Math.floor(Math.random() * 256);
   const b = Math.floor(Math.random() * 256);
 
-  return `#${r.toString(16)}${g.toString(16)}${b.toString(16)}`;
+  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 }

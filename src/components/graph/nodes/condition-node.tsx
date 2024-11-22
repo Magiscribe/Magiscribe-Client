@@ -11,7 +11,6 @@ import Condition from '../elements/condition';
 type ConditionNodeProps = NodeProps & {
   data: {
     conditions: {
-      from: string;
       to: string;
       condition: string;
     }[];
@@ -28,9 +27,9 @@ export default function ConditionNode({ id, data }: ConditionNodeProps) {
           <Condition
             {...cond}
             nodeId={id}
-            onChange={({ from, to, condition }) => {
+            onChange={({ to, condition }) => {
               let conditions = [...data.conditions];
-              conditions[index] = { from, to, condition };
+              conditions[index] = { to, condition };
               updateNodeData(id, { conditions });
             }}
             onRemove={() => {
