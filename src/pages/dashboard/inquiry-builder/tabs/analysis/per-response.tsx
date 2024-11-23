@@ -1,17 +1,23 @@
-import React, { useState, useMemo } from 'react';
-import { GET_INQUIRIES_RESPONSES, GET_INQUIRY } from '@/clients/queries';
 import { ADD_PREDICTION } from '@/clients/mutations';
+import { GET_INQUIRIES_RESPONSES, GET_INQUIRY } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
-import { GetInquiryQuery, GetInquiryResponsesQuery, InquiryResponseFilters } from '@/graphql/graphql';
-import { useQuery, useMutation, useSubscription, useApolloClient } from '@apollo/client';
-import { faSpinner } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Button from '@/components/controls/button';
+import {
+  AddPredictionMutation,
+  GetInquiryQuery,
+  GetInquiryResponsesQuery,
+  InquiryResponseFilters,
+} from '@/graphql/graphql';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
 import { NodeVisitAnalysisData } from '@/types/conversation';
-import { getAgentIdByName } from '@/utils/agents';
-import FilterControls from './filter-controls';
 import { GraphNode } from '@/types/conversation';
+import { getAgentIdByName } from '@/utils/agents';
+import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
+import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React, { useMemo, useState } from 'react';
+
+import FilterControls from './filter-controls';
 
 interface PerResponseTabProps {
   id: string;
@@ -39,7 +45,7 @@ const PerResponseTab: React.FC<PerResponseTabProps> = ({ id }) => {
   });
 
   const client = useApolloClient();
-  const [addPrediction] = useMutation(ADD_PREDICTION);
+  const [addPrediction] = useMutation<AddPredictionMutation>(ADD_PREDICTION);
 
   // Query for form and graph data
   const {
@@ -155,7 +161,7 @@ const PerResponseTab: React.FC<PerResponseTabProps> = ({ id }) => {
           variables: {
             subscriptionId,
             agentId,
-            variables: { userMessage: JSON.stringify(input) },
+            input: { userMessage: JSON.stringify(input) },
           },
         });
       } catch (error) {

@@ -11,6 +11,7 @@ import { useTranscribe } from '@/hooks/audio-hook';
 import useElevenLabsAudio from '@/hooks/audio-player';
 import { useQueue } from '@/hooks/debounce-queue';
 import { useSetTitle } from '@/hooks/title-hook';
+import { useAddAlert } from '@/providers/alert-provider';
 import { useAudioEnabled } from '@/providers/audio-provider';
 import { useInquiry } from '@/providers/inquiry-traversal-provider';
 import { ImageMetadata } from '@/types/conversation';
@@ -71,12 +72,16 @@ export default function UserInquiryPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Graph Hooks
-  const { graph, preview, handleNextNode, form, state, onNodeUpdate, userDetails, setUserDetails } = useInquiry();
+  const { graph, preview, handleNextNode, form, state, onNodeUpdate, onNodeError, userDetails, setUserDetails } =
+    useInquiry();
 
   // Audio Hooks
   const audio = useElevenLabsAudio(form.voice);
   const audioEnabled = useAudioEnabled();
   const { isTranscribing, transcript, handleTranscribe } = useTranscribe();
+
+  // Alerts
+  const addAlert = useAddAlert();
 
   useSetTitle()(form?.title);
 
@@ -102,6 +107,13 @@ export default function UserInquiryPage() {
   useEffect(() => {
     onNodeUpdate(onNodeVisit);
   }, [onNodeUpdate]);
+
+  /**
+   * Handles errors from the graph.
+   */
+  useEffect(() => {
+    onNodeError(onError);
+  }, [onNodeError]);
 
   /*================================ HELPER FUNCTIONS ==============================*/
 
@@ -174,6 +186,10 @@ export default function UserInquiryPage() {
     },
     [addMessage, audioEnabled, audio, handleNextNode],
   );
+
+  const onError = () => {
+    addAlert('This response is taking longer than expected...', 'error');
+  };
 
   /*================================ EVENT HANDLERS ==============================*/
 

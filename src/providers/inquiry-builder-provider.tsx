@@ -13,6 +13,8 @@ import {
   DeleteInquiryMutation,
   DeleteMediaAssetMutation,
   GetInquiryQuery,
+  PredictionAddedSubscription,
+  PredictionType,
   UpdateInquiryMutation,
 } from '@/graphql/graphql';
 import { InquiryDataForm } from '@/graphql/types';
@@ -77,6 +79,7 @@ interface ContextType {
 
   onGraphGenerationStarted: (callback: (message: string) => void) => void;
   onGraphGenerationCompleted: (callback: (message: string) => void) => void;
+  onGraphGenerationError: (callback: () => void) => void;
 }
 
 const InquiryContext = createContext<ContextType | undefined>(undefined);
@@ -105,6 +108,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   // Events
   const onGraphGenerationStartedRef = useRef<(message: string) => void>();
   const onGraphGenerationCompletedRef = useRef<(message: string) => void>();
+  const onGraphGenerationErrorRef = useRef<() => void>();
 
   /**
    * Fetches the inquiry data from the server.
@@ -125,25 +129,37 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   /**
    * Subscribes to the prediction added subscription to get the generated graph.
    */
-  useSubscription(GRAPHQL_SUBSCRIPTION, {
+  useSubscription<PredictionAddedSubscription>(GRAPHQL_SUBSCRIPTION, {
     variables: { subscriptionId },
     onSubscriptionData: ({ subscriptionData }) => {
       const prediction = subscriptionData.data?.predictionAdded;
-      if (prediction?.type === 'SUCCESS') {
-        const result = JSON.parse(prediction.result)[0];
-        const jsonMatch = result.match(/```json\n([\s\S]*?)\n```/);
-        const markdownMatch = result.match(/```markdown\n([\s\S]*?)\n```/);
-        const changeset = JSON.parse(jsonMatch[1]);
-        const newGraph = applyGraphChangeset(graph, changeset);
+      try {
+        if (prediction?.type === PredictionType.Success) {
+          // Node: The prediction result is always present when the type is success.
+          const result = JSON.parse(prediction.result!)[0];
+          const jsonMatch = result.match(/```json\n([\s\S]*?)\n```/);
+          const markdownMatch = result.match(/```markdown\n([\s\S]*?)\n```/);
 
-        onGraphGenerationCompletedRef.current?.(markdownMatch[1]);
+          const changeset = JSON.parse(jsonMatch[1]);
+          const newGraph = applyGraphChangeset(graph, changeset);
 
-        updateGraph(formatGraph(newGraph));
+          onGraphGenerationCompletedRef.current?.(markdownMatch[1]);
 
+          updateGraph(formatGraph(newGraph));
+          setGeneratingGraph(false);
+        } else if (prediction?.type === PredictionType.Error) {
+          onGraphGenerationErrorRef.current?.();
+          setGeneratingGraph(false);
+        }
+      } catch {
+        onGraphGenerationErrorRef.current?.();
         setGeneratingGraph(false);
       }
     },
-    onError: () => setGeneratingGraph(false),
+    onError: () => {
+      setGeneratingGraph(false);
+      onGraphGenerationErrorRef.current?.();
+    },
   });
 
   // Mutations
@@ -342,7 +358,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
       variables: {
         subscriptionId,
         agentId,
-        variables: {
+        input: {
           userMessage,
           conversationGraph: JSON.stringify(graph),
         },
@@ -389,6 +405,9 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     },
     onGraphGenerationStarted: (callback: (message: string) => void) => {
       onGraphGenerationStartedRef.current = callback;
+    },
+    onGraphGenerationError: (callback: () => void) => {
+      onGraphGenerationErrorRef.current = callback;
     },
   };
 

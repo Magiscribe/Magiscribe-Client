@@ -4,7 +4,8 @@ import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import Button from '@/components/controls/button';
 import Input from '@/components/controls/input';
 import Select from '@/components/controls/select';
-import { CustomVariable, CustomVariablesSection } from '@/components/custom-variables';
+import { CustomInputSection, CustomInput } from '@/components/custom-variables';
+import { AddPredictionMutation } from '@/graphql/graphql';
 import { Agent } from '@/graphql/types';
 import useElevenLabsAudio from '@/hooks/audio-player';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
@@ -30,7 +31,7 @@ interface Form {
   subscriptionId: string;
   voice: string;
   agent: string;
-  customVariables: CustomVariable[];
+  customInput: CustomInput[];
   prompt: string;
 }
 
@@ -38,7 +39,7 @@ const initialForm: Form = {
   subscriptionId: Math.random().toString(36),
   voice: 'PHOEBE',
   agent: '',
-  customVariables: [{ key: 'userMessage', value: 'Placeholder' }],
+  customInput: [{ key: 'userMessage', value: 'Placeholder' }],
   prompt: '',
 };
 
@@ -58,28 +59,26 @@ export default function PlaygroundDashboard() {
       logicalCollection: params.collection,
     },
   });
-  const [addPrediction] = useMutation(ADD_PREDICTION);
+  const [addPrediction] = useMutation<AddPredictionMutation>(ADD_PREDICTION);
 
   // Text to speech
   const [enableAudio, setEnableAudio] = useState(false);
   const audio = useElevenLabsAudio(form.voice);
 
   useEffect(() => {
-    if (!form.customVariables || form.customVariables.length === 0) {
+    if (!form.customInput || form.customInput.length === 0) {
       setForm(() => ({
         ...initialForm,
       }));
     }
   }, []);
 
-  const setCustomVariables = useCallback(
-    (agentVariables: CustomVariable[]) => {
+  const setCustomInput = useCallback(
+    (agentVariables: CustomInput[]) => {
       if (!agentVariables.length) return;
-      const customVariables = agentVariables.map((variable) => {
-        const value = (form as Form).customVariables
-          .filter((formVariable) => formVariable.key === variable.key)
-          .shift();
-        const variableWithFormValue: CustomVariable = {
+      const customInput = agentVariables.map((variable) => {
+        const value = (form as Form).customInput.filter((formVariable) => formVariable.key === variable.key).shift();
+        const variableWithFormValue: CustomInput = {
           key: variable.key,
           value: value?.value ?? '',
         };
@@ -87,7 +86,7 @@ export default function PlaygroundDashboard() {
       });
       setForm((prevForm: Form) => ({
         ...prevForm,
-        customVariables,
+        customInput,
       }));
     },
     [form],
@@ -96,24 +95,22 @@ export default function PlaygroundDashboard() {
   const updateCustomVariable = (index: number, updatedVariable: { key: string; value: string }) => {
     setForm((prevForm: Form) => ({
       ...prevForm,
-      customVariables: (prevForm.customVariables || []).map((variable, i) =>
-        i === index ? updatedVariable : variable,
-      ),
+      customInput: (prevForm.customInput || []).map((variable, i) => (i === index ? updatedVariable : variable)),
     }));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
 
-    const customVariables = form.customVariables as CustomVariable[];
-    const variables = Object.fromEntries(customVariables.map(({ key, value }) => [key, value]));
+    const customInput = form.customInput as CustomInput[];
+    const input = Object.fromEntries(customInput.map(({ key, value }) => [key, value]));
 
     try {
       const result = await addPrediction({
         variables: {
           subscriptionId: form.subscriptionId,
           agentId: form.agent,
-          variables,
+          variables: input,
           attachments: base64Images.map((image) => ({
             type: 'image_url',
             image_url: {
@@ -230,11 +227,11 @@ export default function PlaygroundDashboard() {
               />
             </div>
             <div className="mb-4">
-              <CustomVariablesSection
+              <CustomInputSection
                 agentId={form.agent}
-                variables={form.customVariables || []}
+                variables={form.customInput || []}
                 onUpdateVariable={updateCustomVariable}
-                setCustomVariables={setCustomVariables}
+                setCustomInput={setCustomInput}
               />
             </div>
             <div className="mb-4">

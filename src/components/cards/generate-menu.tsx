@@ -1,4 +1,5 @@
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
+import { useAddAlert } from '@/providers/alert-provider';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { faArrowUp, faSpinner, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -69,14 +70,21 @@ export default function GraphGeneratorMenu({ open, onUpdate, onClose }: GraphGen
   const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
   const [inputMessage, setInputMessage] = useState('');
   const [isDragging, setIsDragging] = useState(false);
-  const [menuWidth, setMenuWidth] = useWithLocalStorage(INITIAL_MENU_WIDTH, 'playground-form');
+  const [menuWidth, setMenuWidth] = useWithLocalStorage(INITIAL_MENU_WIDTH, 'menu');
 
   // Refs
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Hooks
-  const { generatingGraph, generateGraph, onGraphGenerationCompleted, onGraphGenerationStarted } = useInquiryBuilder();
+  const {
+    generatingGraph,
+    generateGraph,
+    onGraphGenerationCompleted,
+    onGraphGenerationStarted,
+    onGraphGenerationError,
+  } = useInquiryBuilder();
+  const addAlert = useAddAlert();
 
   /*================================ EFFECTS ==============================*/
 
@@ -93,11 +101,9 @@ export default function GraphGeneratorMenu({ open, onUpdate, onClose }: GraphGen
   useEffect(() => {
     if (isDragging) {
       window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
     }
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
     };
   }, [isDragging]);
 
@@ -138,6 +144,7 @@ export default function GraphGeneratorMenu({ open, onUpdate, onClose }: GraphGen
 
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
       handleSendButtonClick();
     }
   };
@@ -176,6 +183,10 @@ export default function GraphGeneratorMenu({ open, onUpdate, onClose }: GraphGen
     }
   });
 
+  onGraphGenerationError?.(() => {
+    addAlert('An error occurred while generating the graph...', 'error');
+  });
+
   if (!open) {
     return null;
   }
@@ -193,6 +204,7 @@ export default function GraphGeneratorMenu({ open, onUpdate, onClose }: GraphGen
       <div
         className="absolute left-0 top-0 bottom-0 w-1 cursor-ew-resize bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600"
         onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
       />
       <div className="w-full h-full flex flex-col">
         <div className="p-4 border-b border-gray-200 flex justify-between items-center">
@@ -225,7 +237,7 @@ export default function GraphGeneratorMenu({ open, onUpdate, onClose }: GraphGen
               className="absolute right-2 top-1.5"
               disabled={generatingGraph || !inputMessage.trim()}
             >
-              <FontAwesomeIcon className="" icon={generatingGraph ? faSpinner : faArrowUp} spin={generatingGraph} />
+              <FontAwesomeIcon className="" icon={faArrowUp} />
             </Button>
           </div>
         </div>

@@ -1,12 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
 import { ADD_PREDICTION } from '@/clients/mutations';
-import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import { GET_INQUIRIES_RESPONSES, GET_INQUIRY } from '@/clients/queries';
-import { GetInquiryQuery, GetInquiryResponsesQuery } from '@/graphql/graphql';
+import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import Chart, { ChartProps } from '@/components/chart';
 import Button from '@/components/controls/button';
 import Input from '@/components/controls/input';
 import MarkdownCustom from '@/components/markdown-custom';
+import { AddPredictionMutation, GetInquiryQuery, GetInquiryResponsesQuery } from '@/graphql/graphql';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
 import { getAgentIdByName } from '@/utils/agents';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
@@ -14,6 +13,7 @@ import { faPaperPlane, faSpinner, faTrash } from '@fortawesome/free-solid-svg-ic
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface Message {
   type: 'text' | 'chart';
@@ -33,7 +33,7 @@ const ViaChatTab: React.FC<ViaChatTabProps> = ({ id }) => {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const client = useApolloClient();
-  const [addPrediction] = useMutation(ADD_PREDICTION);
+  const [addPrediction] = useMutation<AddPredictionMutation>(ADD_PREDICTION);
 
   // Query for form and graph data
   const {
@@ -127,7 +127,7 @@ const ViaChatTab: React.FC<ViaChatTabProps> = ({ id }) => {
           variables: {
             subscriptionId,
             agentId,
-            variables: {
+            input: {
               userMessage: inputMessage,
               conversationData: JSON.stringify(data),
               numResponses: data.responses?.length ?? 0,

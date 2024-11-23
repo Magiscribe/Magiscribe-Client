@@ -260,7 +260,7 @@ export type Prediction = {
   id: Scalars['ID']['output'];
   result?: Maybe<Scalars['String']['output']>;
   subscriptionId: Scalars['ID']['output'];
-  type: Scalars['String']['output'];
+  type: PredictionType;
 };
 
 export enum PredictionType {
@@ -418,7 +418,7 @@ export type DeleteMediaAssetMutation = { __typename?: 'Mutation', deleteMediaAss
 export type AddPredictionMutationVariables = Exact<{
   subscriptionId: Scalars['ID']['input'];
   agentId: Scalars['ID']['input'];
-  variables?: InputMaybe<Scalars['JSONObject']['input']>;
+  input?: InputMaybe<Scalars['JSONObject']['input']>;
   attachments?: InputMaybe<Array<Scalars['JSONObject']['input']> | Scalars['JSONObject']['input']>;
 }>;
 
@@ -625,4 +625,4 @@ export type PredictionAddedSubscriptionVariables = Exact<{
 }>;
 
 
-export type PredictionAddedSubscription = { __typename?: 'Subscription', predictionAdded?: { __typename?: 'Prediction', id: string, subscriptionId: string, result?: string | null, type: string } | null };
+export type PredictionAddedSubscription = { __typename?: 'Subscription', predictionAdded?: { __typename?: 'Prediction', id: string, subscriptionId: string, result?: string | null, type: PredictionType } | null };

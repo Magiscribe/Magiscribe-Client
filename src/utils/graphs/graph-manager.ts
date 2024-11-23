@@ -126,9 +126,21 @@ export class GraphManager {
 
   /**
    * Returns the node history.
-   * @returns {Object[]} The node history
+   * @returns {StrippedNode[]} The node history
    */
   getNodeHistory(): StrippedNode[] {
     return this.nodeHistory;
+  }
+
+  /**
+   * Returns all the nodes that are reachable from the current node.
+   * @returns {OptimizedNode[]} The outgoing nodes
+   */
+  getOutgoingNodes(): OptimizedNode[] {
+    if (!this.currentNode) return [];
+
+    return this.currentNode.outgoingEdges.map(
+      (edgeId) => this.traversalGraph.nodes[this.traversalGraph.edges[edgeId].target],
+    );
   }
 }

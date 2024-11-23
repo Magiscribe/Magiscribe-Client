@@ -1,7 +1,13 @@
 import { ADD_PREDICTION, CREATE_INQUIRY_RESPONSE, UPDATE_INQUIRY_RESPONSE } from '@/clients/mutations';
 import { GET_INQUIRY } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
-import { CreateInquiryResponseMutation, GetInquiryQuery, UpdateInquiryResponseMutation } from '@/graphql/graphql';
+import {
+  AddPredictionMutation,
+  CreateInquiryResponseMutation,
+  GetInquiryQuery,
+  PredictionType,
+  UpdateInquiryResponseMutation,
+} from '@/graphql/graphql';
 import { getAgentIdByName } from '@/utils/agents';
 import { NodeData, OptimizedNode } from '@/utils/graphs/graph';
 import { GraphManager } from '@/utils/graphs/graph-manager';
@@ -54,7 +60,9 @@ interface InquiryContextType {
   graph: GraphManager | null;
 
   handleNextNode: (props?: HandleNextNodeProps) => Promise<void>;
+
   onNodeUpdate: (callback: (node: OptimizedNode) => void) => void;
+  onNodeError: (callback: (error: Error) => void) => void;
 
   userDetails: { [key: string]: string };
   setUserDetails: React.Dispatch<React.SetStateAction<{ [key: string]: string }>>;
@@ -71,8 +79,11 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
   const graphRef = useRef<GraphManager | null>(null);
   const inquiryResponseIdRef = useRef<string | undefined>(undefined);
   const inquiryHistoryRef = useRef<string[]>([]);
-  const validGraph = useRef<boolean>(true);
-  const lastPredictionVariablesRef = useRef<any>({});
+
+  // Note: This is used to store the last prediction variables so that we can use them in the.
+  //       We have to ignore the ESLint rule here because we can be storing any type of data.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const lastPredictionVariablesRef = useRef<any>();
 
   // States
   const [userDetails, setUserDetails] = useState<{ [key: string]: string }>({});
@@ -96,8 +107,16 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
    */
   const onNodeUpdateRef = useRef<(node: OptimizedNode) => void>(() => {});
 
+  /**
+   * A callback that is triggered when an error occurs in the node.
+   * This is used to handle errors in the node traversal process.
+   * @param error {Error} The error that occurred
+   * @returns {Promise<void>} A promise that resolves when the error is handled
+   */
+  const onNodeErrorRef = useRef<(error: Error) => void>(() => {});
+
   // Mutations and Apollo client
-  const [addPrediction] = useMutation(ADD_PREDICTION);
+  const [addPrediction] = useMutation<AddPredictionMutation>(ADD_PREDICTION);
   const [createResponse] = useMutation<CreateInquiryResponseMutation>(CREATE_INQUIRY_RESPONSE);
   const [updateResponse] = useMutation<UpdateInquiryResponseMutation>(UPDATE_INQUIRY_RESPONSE);
   const client = useApolloClient();
@@ -142,7 +161,7 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
       try {
         const prediction = subscriptionData.data?.predictionAdded;
 
-        if (prediction?.type === 'SUCCESS') {
+        if (prediction?.type === PredictionType.Success) {
           setState((prev) => ({ ...prev, loading: false }));
 
           const result = JSON.parse(prediction.result);
@@ -152,13 +171,17 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
             onSubscriptionDataRef.current(content);
           }
         }
-      } catch {
-        setState({ ...INITIAL_STATE, loading: true });
-        handleOnNodeVisit(graphRef.current?.getCurrentNode() as OptimizedNode);
+      } catch (e) {
+        setState((prev) => ({ ...prev, loading: true }));
+
+        if (e instanceof Error) {
+          handleError(e);
+        }
       }
     },
-    onError: () => {
-      setState((prev) => ({ ...prev, loading: false }));
+    onError: (e) => {
+      setState((prev) => ({ ...prev, loading: true }));
+      handleError(e);
     },
   });
 
@@ -179,7 +202,17 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
       const validNode = await graphRef.current.goToNextNode(nextNodeId);
 
       if (!validNode) {
-        handleError();
+        handleError(
+          new Error(
+            [
+              `A node with the ID ${nextNodeId} was not found.`,
+              `The valid reachable nodes are: ${graphRef.current
+                .getOutgoingNodes()
+                .map((node) => node.id)
+                .join(', ')}`,
+            ].join('\n'),
+          ),
+        );
       }
 
       if (preview) {
@@ -216,13 +249,19 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
     }
   }
 
-  async function handleError() {
-    setState((prev) => ({ ...prev, error: true }));
+  async function handleError(error: Error) {
+    // setState((prev) => ({ ...prev, error: true }));
+    if (onNodeErrorRef.current) {
+      onNodeErrorRef.current(error);
+    }
 
     await addPrediction({
       variables: {
         ...lastPredictionVariablesRef.current,
-        error: 'An error occurred. Fix it!',
+        input: {
+          ...(lastPredictionVariablesRef.current?.input ?? {}),
+          errorHandling: error?.message || 'An error occurred,  please identify and resolve the issue.',
+        },
       },
     });
   }
@@ -261,13 +300,13 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
       `Dynamic ${currentNode.type === 'question' ? 'Question' : 'Information'} Generation`,
       client,
     );
-    const mostRecentMessage = inquiryHistoryRef.current[inquiryHistoryRef.current.length - 1] || '';
+    const mostRecentMessage = inquiryHistoryRef.current[inquiryHistoryRef.current.length - 1];
 
     // TODO: Clean this up
     lastPredictionVariablesRef.current = {
       subscriptionId,
       agentId,
-      variables: {
+      input: {
         userMessage: currentNode.data.text,
         userDetails: `Name: ${userDetails.name}`,
         conversationHistory: inquiryHistoryRef.current.join('\n\n'),
@@ -299,8 +338,16 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
     lastPredictionVariablesRef.current = {
       subscriptionId,
       agentId,
-      variables: {
-        userMessage: `The instruction is: ${graphRef.current.getCurrentNode()?.data.text}`,
+      input: {
+        userMessage: [
+          `The instruction is: ${graphRef.current.getCurrentNode()?.data.text}`,
+
+          // TODO: Remove this so that user can't provide invalid nodes.
+          `The valid reachable nodes are: ${graphRef.current
+            .getOutgoingNodes()
+            .map((node) => node.id)
+            .join(', ')}`,
+        ].join('\n\n'),
         conversationHistory: inquiryHistoryRef.current.join('\n\n'),
         mostRecentMessage,
       },
@@ -356,12 +403,14 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
   const contextValue: InquiryContextType = {
     id,
     preview,
-    validGraph: validGraph.current,
 
     graph: graphRef.current,
 
     onNodeUpdate: (callback: (node: OptimizedNode) => void) => {
       onNodeUpdateRef.current = callback;
+    },
+    onNodeError: (callback: (error: Error) => void) => {
+      onNodeErrorRef.current = callback;
     },
     handleNextNode,
 

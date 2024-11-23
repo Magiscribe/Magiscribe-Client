@@ -1,15 +1,15 @@
-import React, { useCallback, useMemo, useState } from 'react';
-import { GET_INQUIRIES_RESPONSES, GET_INQUIRY } from '@/clients/queries';
 import { ADD_PREDICTION } from '@/clients/mutations';
+import { GET_INQUIRIES_RESPONSES, GET_INQUIRY } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
-import { GetInquiryQuery, GetInquiryResponsesQuery } from '@/graphql/graphql';
 import Button from '@/components/controls/button';
+import { AddPredictionMutation, GetInquiryQuery, GetInquiryResponsesQuery } from '@/graphql/graphql';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
 import { GraphNode, NodeVisitAnalysisData, QuestionNodeData } from '@/types/conversation';
 import { getAgentIdByName } from '@/utils/agents';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
 import { faChevronLeft, faChevronRight, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React, { useCallback, useMemo, useState } from 'react';
 
 export type ResponseSummary = {
   [nodeId: string]: {
@@ -34,7 +34,7 @@ const PerQuestionTab: React.FC<PerQuestionTabProps> = ({ id }) => {
   const [summaries, setSummaries] = useWithLocalStorage<ResponseSummary>({}, `${id}-per-question-summary`);
 
   const client = useApolloClient();
-  const [addPrediction] = useMutation(ADD_PREDICTION);
+  const [addPrediction] = useMutation<AddPredictionMutation>(ADD_PREDICTION);
 
   // Query for form and graph data
   const {
@@ -140,7 +140,7 @@ const PerQuestionTab: React.FC<PerQuestionTabProps> = ({ id }) => {
           variables: {
             subscriptionId,
             agentId,
-            variables: { userMessage: JSON.stringify(input) },
+            input: { userMessage: JSON.stringify(input) },
           },
         });
       } catch (error) {
