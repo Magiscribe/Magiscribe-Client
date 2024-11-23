@@ -34,7 +34,7 @@ export default function StartNode({ id, data }: StartNodeProps) {
 
   return (
     <NodeContainer title={'Start'} faIcon={faPlay} id={id}>
-      <div className="space-y-4 mt-2">
+      <div className="space-y-4 my-4">
         <Textarea
           label="Message"
           subLabel="Text that will be shown to the user on the start screen"

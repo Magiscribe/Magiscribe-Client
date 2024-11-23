@@ -38,7 +38,7 @@ export function ImageLoader(props: ImageLoaderProps): React.ReactElement {
       <div className="flex flex-wrap gap-2">
         {images.map((image, index) => (
           <div key={index} className="relative">
-            <img src={image} className="w-40 h-40 object-cover rounded-2xl" />
+            <img src={image} className="w-full object-cover rounded-2xl" />
           </div>
         ))}
       </div>

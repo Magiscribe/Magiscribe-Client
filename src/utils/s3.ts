@@ -10,7 +10,7 @@ import { Dispatch, SetStateAction } from 'react';
  * @throws {Error} Throws an error if the upload fails
  * @returns {Promise<void>} A promise that resolves when the upload is successful
  */
-export const uploadImageToS3 = async (presignedUrl: string, file: File) => {
+export const uploadImageToS3 = async (presignedUrl: string, file: Blob) => {
   const response = await fetch(presignedUrl, {
     method: 'PUT',
     body: file,
