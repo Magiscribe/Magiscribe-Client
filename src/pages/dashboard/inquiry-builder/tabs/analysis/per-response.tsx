@@ -94,7 +94,7 @@ const PerResponseTab: React.FC<PerResponseTabProps> = ({ id }) => {
     variables: {
       subscriptionId,
     },
-    onSubscriptionData: ({ subscriptionData }) => {
+    onData: ({ data: subscriptionData }) => {
       const prediction = subscriptionData.data?.predictionAdded;
 
       if (prediction && prediction.type === 'SUCCESS' && selectedUser) {

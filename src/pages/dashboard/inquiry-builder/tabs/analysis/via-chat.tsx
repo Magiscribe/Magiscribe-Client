@@ -61,7 +61,7 @@ const ViaChatTab: React.FC<ViaChatTabProps> = ({ id }) => {
 
   useSubscription(GRAPHQL_SUBSCRIPTION, {
     variables: { subscriptionId },
-    onSubscriptionData: ({ subscriptionData }) => {
+    onData: ({ data: subscriptionData }) => {
       const prediction = subscriptionData.data?.predictionAdded;
       if (prediction && prediction.type === 'SUCCESS') {
         setLoading(false);

@@ -4,9 +4,9 @@ import { faUpload } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useRef, useState } from 'react';
 import ReactCrop, { centerCrop, Crop, makeAspectCrop, PixelCrop } from 'react-image-crop';
 
-import Button from '../controls/button';
-import Input from '../controls/input';
-import CustomModal from './modal';
+import Button from '../../controls/button';
+import Input from '../../controls/input';
+import CustomModal from '../modal';
 
 import 'react-image-crop/dist/ReactCrop.css';
 
@@ -125,14 +125,18 @@ export default function ImageUploadModal(props: Props) {
         }}
         buttons={
           <>
-            <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-              Close
+            <Button
+              type="button"
+              onClick={() => setOpen(false)}
+              variant="transparentPrimary"
+              size="medium"
+              className="ml-auto"
+            >
+              Cancel
             </Button>
-            {imgSrc && (
-              <Button type="button" onClick={onSubmit} disabled={loading}>
-                {loading ? 'Uploading...' : 'Upload'}
-              </Button>
-            )}
+            <Button onClick={onSubmit} variant="primary" size="medium" className="ml-2">
+              {loading ? 'Uploading...' : 'Upload'}
+            </Button>
           </>
         }
       >
@@ -142,7 +146,7 @@ export default function ImageUploadModal(props: Props) {
         </div>
         <div className="flex w-full mt-2 justify-center">
           <div className="rounded-xl overflow-hidden relative">
-            {!!imgSrc && (
+            {imgSrc && (
               <ReactCrop
                 crop={crop}
                 onChange={(_, percentCrop) => setCrop(percentCrop)}
@@ -167,7 +171,7 @@ export default function ImageUploadModal(props: Props) {
               </ReactCrop>
             )}
           </div>
-          {!!completedCrop && <canvas ref={previewCanvasRef} className="hidden" />}
+          {completedCrop && <canvas ref={previewCanvasRef} className="hidden" />}
         </div>
       </CustomModal>
     </>

@@ -89,7 +89,11 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const [initialized, setInitialized] = useState(false);
   const [subscriptionId] = useState<string>(uuidv4());
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
-  const [form, updateForm] = useState<InquiryDataForm>({} as InquiryDataForm);
+  const [form, updateForm] = useState<InquiryDataForm>({
+    title: '',
+    goals: '',
+    voice: '',
+  } as InquiryDataForm);
   const [metadata, setMetadata] = useState<Metadata>({
     images: [],
     text: '',
@@ -131,7 +135,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
    */
   useSubscription<PredictionAddedSubscription>(GRAPHQL_SUBSCRIPTION, {
     variables: { subscriptionId },
-    onSubscriptionData: ({ subscriptionData }) => {
+    onData: ({ data: subscriptionData }) => {
       const prediction = subscriptionData.data?.predictionAdded;
       try {
         if (prediction?.type === PredictionType.Success) {

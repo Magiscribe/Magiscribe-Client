@@ -157,7 +157,7 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
    */
   useSubscription(GRAPHQL_SUBSCRIPTION, {
     variables: { subscriptionId },
-    onSubscriptionData: ({ subscriptionData }) => {
+    onData: ({ data: subscriptionData }) => {
       try {
         const prediction = subscriptionData.data?.predictionAdded;
 

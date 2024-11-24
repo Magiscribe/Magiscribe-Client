@@ -3,7 +3,7 @@ import { GET_MEDIA_ASSET } from '@/clients/queries';
 import Input from '@/components/controls/input';
 import Textarea from '@/components/controls/textarea';
 import { ImageUploader } from '@/components/image/image-viewer';
-import ImageUploadModal from '@/components/modals/image-upload-modal';
+import ImageUploadModal from '@/components/modals/inquiry/image-upload-modal';
 import { AddMediaAssetMutation, GetMediaAssetQuery } from '@/graphql/graphql';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { ImageMetadata } from '@/types/conversation';
@@ -39,6 +39,8 @@ export default function InformationNode({ id, data }: InformationNodeProps) {
 
   useEffect(() => {
     const fetchImages = async () => {
+      if (!data.images) return;
+
       const signedImages = await Promise.all(
         data.images.map(async (image) => {
           const result = await getMediaAsset({

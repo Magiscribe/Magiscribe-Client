@@ -1,6 +1,9 @@
 import Button from '@/components/controls/button';
 import { SignupForm } from '@/components/forms/alpha';
+import { useUser } from '@clerk/clerk-react';
 import { motion } from 'framer-motion';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import ContentSection from '../components/content-section';
 import HomeHero from '../components/heroes/home-hero';
@@ -66,7 +69,16 @@ function AboutSection() {
 }
 
 function Home() {
+  const user = useUser();
+  const navigate = useNavigate();
+
   useSetTitle()('');
+
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard');
+    }
+  }, [user]);
 
   return (
     <>
