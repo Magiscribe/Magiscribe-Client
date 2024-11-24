@@ -1,22 +1,7 @@
-import {
-  ADD_PREDICTION,
-  CREATE_INQUIRY,
-  DELETE_INQUIRY,
-  DELETE_MEDIA_ASSET,
-  UPDATE_INQUIRY,
-} from '@/clients/mutations';
+import { ADD_PREDICTION, CREATE_INQUIRY, DELETE_INQUIRY, DELETE_MEDIA_ASSET, UPDATE_INQUIRY } from '@/clients/mutations';
 import { GET_INQUIRY } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
-import {
-  AddPredictionMutation,
-  CreateInquiryMutation,
-  DeleteInquiryMutation,
-  DeleteMediaAssetMutation,
-  GetInquiryQuery,
-  PredictionAddedSubscription,
-  PredictionType,
-  UpdateInquiryMutation,
-} from '@/graphql/graphql';
+import { AddPredictionMutation, CreateInquiryMutation, DeleteInquiryMutation, DeleteMediaAssetMutation, GetInquiryQuery, PredictionAddedSubscription, PredictionType, UpdateInquiryMutation } from '@/graphql/graphql';
 import { InquiryDataForm } from '@/graphql/types';
 import { ImageMetadata } from '@/types/conversation';
 import { getAgentIdByName } from '@/utils/agents';
@@ -25,7 +10,7 @@ import { parseCodeBlocks } from '@/utils/markdown';
 import { removeDeletedImagesFromS3 } from '@/utils/s3';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
 import { Edge, Node, OnEdgesChange, OnNodesChange, useEdgesState, useNodesState } from '@xyflow/react';
-import React, { createContext, useContext, useMemo, useRef, useState } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 interface InquiryProviderProps {
@@ -90,11 +75,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const [initialized, setInitialized] = useState(false);
   const [subscriptionId] = useState<string>(uuidv4());
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
-  const [form, updateForm] = useState<InquiryDataForm>({
-    title: '',
-    goals: '',
-    voice: '',
-  } as InquiryDataForm);
+  const [form, updateForm] = useState<InquiryDataForm>({} as InquiryDataForm);
   const [metadata, setMetadata] = useState<Metadata>({
     images: [],
     text: '',
@@ -102,6 +83,8 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
 
   // Graph Generation States
   const [generatingGraph, setGeneratingGraph] = useState(false);
+  const [pendingGraph, setPendingGraph] = useState(false);
+  const [explanation, setExplanation] = useState<string>('');
 
   // Hooks
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
@@ -147,10 +130,11 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
           const changeset = JSON.parse(matches['json'] as string);
           const newGraph = applyGraphChangeset(graph, changeset);
 
-          onGraphGenerationCompletedRef.current?.(matches['markdown'] as string);
-
+          setExplanation(matches['markdown'] as string);
           updateGraph(formatGraph(newGraph));
+
           setGeneratingGraph(false);
+          setPendingGraph(true);
         } else if (prediction?.type === PredictionType.Error) {
           onGraphGenerationErrorRef.current?.();
           setGeneratingGraph(false);
@@ -165,6 +149,13 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
       onGraphGenerationErrorRef.current?.();
     },
   });
+
+  useEffect(() => {
+    if (pendingGraph) {
+      onGraphGenerationCompletedRef.current?.(explanation);
+      setPendingGraph(false);
+    }
+  }, [pendingGraph]);
 
   // Mutations
   const client = useApolloClient();
@@ -314,7 +305,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
    * @param onSuccess {Function} The function to call on success.
    * @param onError {Function} The function to call on error.
    */
-  const SaveAll = async (onSuccess?: (id: string) => void, onError?: () => void) => {
+  const saveAll = async (onSuccess?: (id: string) => void, onError?: () => void) => {
     await save(
       {
         metadata: {
@@ -399,7 +390,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     publishGraph,
 
     save,
-    saveFormAndGraph: SaveAll,
+    saveFormAndGraph: saveAll,
 
     generatingGraph,
 
