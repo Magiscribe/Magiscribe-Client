@@ -12,13 +12,12 @@ export function parseMarkdownCodeBlocks(content: string) {
   const jsonMatch = content.match(/```json\n([\s\S]*?)\n```/);
   const markdownMatch = content.match(/```markdown\n([\s\S]*?)\n```/);
 
+  let parsedResult = { text: '' };
   if (jsonMatch) {
-    return JSON.parse(jsonMatch[1]);
+    parsedResult = JSON.parse(jsonMatch[1]);
   }
-
   if (markdownMatch) {
-    return { text: markdownMatch[1] };
+    parsedResult['text'] = markdownMatch[1];
   }
-
-  return {};
+  return parsedResult;
 }
