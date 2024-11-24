@@ -389,29 +389,30 @@ export default function UserInquiryPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
           >
-            <div className="flex-grow flex items-center">
+            <div className="relative flex-grow flex items-center">
+              <Textarea
+                value={inputMessage}
+                name="message"
+                onChange={(e) => setInputMessage(e.target.value)}
+                placeholder="Type your message here..."
+                onKeyDown={handleInputKeyDown}
+                rows={1}
+                className="rounded-3xl resize-none overflow-hidden pb-12"
+              />
               <Button
                 type="button"
                 variant="transparentDark"
-                size="small"
+                className="absolute left-2 bottom-1.5"
                 onClick={handleTranscribe}
-                icon={isTranscribing ? faMicrophone : faMicrophoneSlash}
-              ></Button>
-              <Textarea
-                name="text"
-                value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                placeholder="Type your message here..."
-                rows={1}
-                className="resize-none overflow-hidden rounded-3xl flex-grow ml-2"
-                onKeyDown={handleInputKeyDown}
-              />
-              <Button
-                type="submit"
-                className="absolute right-1 top-1.5 disabled:opacity-0 transition-opacity"
-                disabled={state.loading || (inputMessage.trim() === '' && selectedRatings.length === 0)}
               >
-                <FontAwesomeIcon icon={faArrowUp} />
+                <FontAwesomeIcon className="" icon={isTranscribing ? faMicrophone : faMicrophoneSlash} />
+              </Button>
+              <Button
+                type="button"
+                className="absolute right-2 bottom-1.5"
+                disabled={isProcessing || !inputMessage.trim()}
+              >
+                <FontAwesomeIcon className="" icon={faArrowUp} />
               </Button>
             </div>
             <input ref={fileInputRef} type="file" accept="image/*" className="hidden" />

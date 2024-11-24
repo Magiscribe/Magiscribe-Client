@@ -69,16 +69,16 @@ function AboutSection() {
 }
 
 function Home() {
-  const user = useUser();
+  const { isSignedIn } = useUser();
   const navigate = useNavigate();
 
   useSetTitle()('');
 
   useEffect(() => {
-    if (user) {
+    if (isSignedIn) {
       navigate('/dashboard');
     }
-  }, [user]);
+  }, [isSignedIn]);
 
   return (
     <>

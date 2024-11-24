@@ -36,10 +36,8 @@ export function ImageLoader(props: ImageLoaderProps): React.ReactElement {
   return (
     <div className="mb-4">
       <div className="flex flex-wrap gap-2">
-        {images.map((image, index) => (
-          <div key={index} className="relative">
-            <img src={image} className="w-full object-cover rounded-2xl" />
-          </div>
+        {images.map((image) => (
+          <img key={image} src={image} className="w-full rounded-2xl" />
         ))}
       </div>
     </div>

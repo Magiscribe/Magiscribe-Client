@@ -230,11 +230,11 @@ export default function GraphGeneratorMenu({ open, onUpdate, onClose }: GraphGen
               placeholder="Request a modification..."
               onKeyDown={handleInputKeyDown}
               rows={1}
-              className="resize-none overflow-hidden"
+              className="resize-none overflow-hidden pb-12"
             />
             <Button
               onClick={handleSendButtonClick}
-              className="absolute right-2 top-1.5"
+              className="absolute right-2 bottom-1.5"
               disabled={generatingGraph || !inputMessage.trim()}
             >
               <FontAwesomeIcon className="" icon={faArrowUp} />
