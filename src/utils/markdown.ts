@@ -21,3 +21,29 @@ export function parseMarkdownCodeBlocks(content: string) {
   }
   return parsedResult;
 }
+
+export function parseCodeBlocks(content: string, blocks: string[]) {
+  const results: { [key: string]: string | null } = {};
+
+  blocks.forEach((blockType) => {
+    try {
+      // Create regex pattern for this block type
+      const pattern = new RegExp(`\`\`\`${blockType}\\n([\\s\\S]*?)\\n\`\`\``, 'g');
+      const matches = content.match(pattern);
+
+      if (!matches || matches.length === 0) {
+        results[blockType] = null;
+        return;
+      }
+
+      // Extract content from first match
+      const blockContent = matches[0].match(/```.*\n([\s\S]*?)\n```/);
+      results[blockType] = blockContent ? blockContent[1].trim() : null;
+    } catch (error) {
+      console.error(`Error parsing ${blockType} block:`, error);
+      results[blockType] = null;
+    }
+  });
+
+  return results;
+}

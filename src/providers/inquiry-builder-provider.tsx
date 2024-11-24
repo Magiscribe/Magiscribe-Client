@@ -21,6 +21,7 @@ import { InquiryDataForm } from '@/graphql/types';
 import { ImageMetadata } from '@/types/conversation';
 import { getAgentIdByName } from '@/utils/agents';
 import { applyGraphChangeset, formatGraph } from '@/utils/graphs/graph-utils';
+import { parseCodeBlocks } from '@/utils/markdown';
 import { removeDeletedImagesFromS3 } from '@/utils/s3';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
 import { Edge, Node, OnEdgesChange, OnNodesChange, useEdgesState, useNodesState } from '@xyflow/react';
@@ -141,13 +142,12 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
         if (prediction?.type === PredictionType.Success) {
           // Node: The prediction result is always present when the type is success.
           const result = JSON.parse(prediction.result!)[0];
-          const jsonMatch = result.match(/```json\n([\s\S]*?)\n```/);
-          const markdownMatch = result.match(/```markdown\n([\s\S]*?)\n```/);
+          const matches = parseCodeBlocks(result, ['json', 'markdown']);
 
-          const changeset = JSON.parse(jsonMatch[1]);
+          const changeset = JSON.parse(matches['json'] as string);
           const newGraph = applyGraphChangeset(graph, changeset);
 
-          onGraphGenerationCompletedRef.current?.(markdownMatch[1]);
+          onGraphGenerationCompletedRef.current?.(matches['markdown'] as string);
 
           updateGraph(formatGraph(newGraph));
           setGeneratingGraph(false);
@@ -302,8 +302,8 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
       nodes: graph.nodes,
       metadata,
       setMetadata,
-      deleteImage: async (uuid: string) => {
-        await deleteMediaAsset({ variables: { uuid } });
+      deleteImage: async (id: string) => {
+        await deleteMediaAsset({ variables: { id } });
       },
     });
     await save({ graph }, ['graph'], onSuccess, onError);

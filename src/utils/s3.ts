@@ -57,15 +57,10 @@ export const removeDeletedImagesFromS3 = async ({
     .map((node) => node.data.images)
     .flat() as ImageMetadata[];
 
-  console.log('Graph images:', graphImages);
-  console.log('Graph images:', metadata.images);
-
   // Find images that exist in metadata but not in graph
   const imagesToDelete =
     metadata.images?.filter((metadataImage) => !graphImages.some((graphImage) => graphImage.id === metadataImage.id)) ??
     [];
-
-  console.log('Images to delete:', imagesToDelete);
 
   // Delete images from S3 in parallel
   await Promise.all(imagesToDelete.map((image) => deleteImage(image.id)));

@@ -8,6 +8,7 @@ import MarkdownCustom from '@/components/markdown-custom';
 import { AddPredictionMutation, GetInquiryQuery, GetInquiryResponsesQuery } from '@/graphql/graphql';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
 import { getAgentIdByName } from '@/utils/agents';
+import { parseCodeBlocks } from '@/utils/markdown';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
 import { faPaperPlane, faSpinner, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -81,11 +82,10 @@ const ViaChatTab: React.FC<ViaChatTabProps> = ({ id }) => {
     }
 
     const content = result[0];
-    const jsonMatch = content.match(/```json\n([\s\S]*?)\n```/);
-    const markdownMatch = content.match(/```markdown\n([\s\S]*?)\n```/);
+    const matches = parseCodeBlocks(content, ['json', 'markdown']);
 
-    if (jsonMatch) {
-      const parsedResult = JSON.parse(jsonMatch[1]);
+    if (matches['json']) {
+      const parsedResult = JSON.parse(matches['json'] as string);
       if (parsedResult.chartType && Array.isArray(parsedResult.data)) {
         const chartProps: ChartProps = {
           title: parsedResult.title || '',
@@ -100,8 +100,11 @@ const ViaChatTab: React.FC<ViaChatTabProps> = ({ id }) => {
       }
     }
 
-    if (markdownMatch) {
-      setMessages((prevMessages) => [...prevMessages, { type: 'text', content: markdownMatch[1], sender: 'bot' }]);
+    if (matches['markdown']) {
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { type: 'text', content: matches['markdown'] as string, sender: 'bot' },
+      ]);
     }
   };
 
