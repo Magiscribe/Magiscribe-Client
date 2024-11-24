@@ -408,9 +408,9 @@ export default function UserInquiryPage() {
                 <FontAwesomeIcon className="" icon={isTranscribing ? faMicrophone : faMicrophoneSlash} />
               </Button>
               <Button
-                type="button"
+                type="submit"
                 className="absolute right-2 bottom-1.5"
-                disabled={isProcessing || !inputMessage.trim()}
+                disabled={state.loading || (inputMessage.trim() === '' && selectedRatings.length === 0)}
               >
                 <FontAwesomeIcon className="" icon={faArrowUp} />
               </Button>
