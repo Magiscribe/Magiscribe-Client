@@ -53,7 +53,7 @@ export const useMessageQueue = () => {
   return {
     messages: queue.items,
     addMessage: queue.addItem,
-    isProcessing: queue.isProcessing,
+    isQueueProcessing: queue.isProcessing,
     queueSize: queue.queueSize,
   };
 };
@@ -67,7 +67,7 @@ export default function UserInquiryPage() {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   // Message Hooks
-  const { messages, addMessage, isProcessing } = useMessageQueue();
+  const { messages, addMessage, isQueueProcessing: isProcessing } = useMessageQueue();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -232,7 +232,10 @@ export default function UserInquiryPage() {
    */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (inputMessage.trim() === '' && selectedRatings.length === 0) return;
+    if (state.loading) return;
+    if (isProcessing) return;
 
     const userMessage = [...selectedRatings, inputMessage.trim()].filter(Boolean).join(' - ');
 
@@ -372,62 +375,64 @@ export default function UserInquiryPage() {
     <div className="w-full p-4 max-w-4xl mx-auto">
       {screen === 'inquiry' && (
         <>
-      {currentNode &&
-        !state.loading &&
-        ((currentNode?.data?.type ?? '') as string).startsWith('rating') && (
-          <RatingInput
-            ratings={currentNode.data.ratings as string[]}
-            isMulti={currentNode.data.type === 'rating-multi'}
-            onRatingChange={setSelectedRatings}
-          />
-        )}
+          {currentNode && !state.loading && ((currentNode?.data?.type ?? '') as string).startsWith('rating') && (
+            <RatingInput
+              ratings={currentNode.data.ratings as string[]}
+              isMulti={currentNode.data.type === 'rating-multi'}
+              onRatingChange={setSelectedRatings}
+            />
+          )}
 
-        <form onSubmit={handleSubmit} className="flex flex-col mt-4 relative">
-          <motion.div
-            className="flex"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <div className="relative flex-grow flex items-center">
-              <Textarea
-                value={inputMessage}
-                name="message"
-                onChange={(e) => setInputMessage(e.target.value)}
-                placeholder="Type your message here..."
-                onKeyDown={handleInputKeyDown}
-                rows={1}
-                className="rounded-3xl resize-none overflow-hidden pb-12"
-              />
-              <Button
-                type="button"
-                variant="transparentDark"
-                className="absolute left-2 bottom-1.5"
-                onClick={handleTranscribe}
-              >
-                <FontAwesomeIcon className="" icon={isTranscribing ? faMicrophone : faMicrophoneSlash} />
-              </Button>
-              <Button
-                type="submit"
-                className="absolute right-2 bottom-1.5"
-                disabled={state.loading || (inputMessage.trim() === '' && selectedRatings.length === 0)}
-              >
-                <FontAwesomeIcon className="" icon={faArrowUp} />
-              </Button>
-            </div>
-            <input ref={fileInputRef} type="file" accept="image/*" className="hidden" />
-          </motion.div>
-          <motion.p
-            className="text-slate-500 text-sm mt-2 text-center"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.2 }}
-          >
-            <i>Occasionally, mistakes may occur. If you notice any, please let us know at <a href="mailto:support@magiscribe.com" className="underline">
-              support@magiscribe.com
-            </a>.</i>
-          </motion.p>
-        </form>
+          <form onSubmit={handleSubmit} className="flex flex-col mt-4 relative">
+            <motion.div
+              className="flex"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="relative flex-grow flex items-center">
+                <Textarea
+                  value={inputMessage}
+                  name="message"
+                  onChange={(e) => setInputMessage(e.target.value)}
+                  placeholder="Type your message here..."
+                  onKeyDown={handleInputKeyDown}
+                  rows={1}
+                  className="rounded-3xl resize-none overflow-hidden pb-12"
+                />
+                <Button
+                  type="button"
+                  variant="transparentDark"
+                  className="absolute left-2 bottom-1.5"
+                  onClick={handleTranscribe}
+                >
+                  <FontAwesomeIcon className="" icon={isTranscribing ? faMicrophone : faMicrophoneSlash} />
+                </Button>
+                <Button
+                  type="submit"
+                  className="absolute right-2 bottom-1.5"
+                  disabled={state.loading || (inputMessage.trim() === '' && selectedRatings.length === 0)}
+                >
+                  <FontAwesomeIcon className="" icon={faArrowUp} />
+                </Button>
+              </div>
+              <input ref={fileInputRef} type="file" accept="image/*" className="hidden" />
+            </motion.div>
+            <motion.p
+              className="text-slate-500 text-sm mt-2 text-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.2 }}
+            >
+              <i>
+                Occasionally, mistakes may occur. If you notice any, please let us know at{' '}
+                <a href="mailto:support@magiscribe.com" className="underline">
+                  support@magiscribe.com
+                </a>
+                .
+              </i>
+            </motion.p>
+          </form>
         </>
       )}
 

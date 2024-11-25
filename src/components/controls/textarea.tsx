@@ -37,7 +37,7 @@ export default function Textarea({
   const textareaRef = useAutoResizeTextareaRef(value as string);
 
   const baseClassName =
-    'w-full p-2 border rounded-2xl dark:bg-slate-600 bg-white focus:outline-none focus:ring-2 placeholder-slate-400';
+    'w-full p-4 border rounded-2xl dark:bg-slate-600 bg-white focus:outline-none focus:ring-2 placeholder-slate-400';
 
   const textareaClassName = clsx(
     baseClassName,

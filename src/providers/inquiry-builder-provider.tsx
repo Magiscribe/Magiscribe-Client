@@ -1,7 +1,22 @@
-import { ADD_PREDICTION, CREATE_INQUIRY, DELETE_INQUIRY, DELETE_MEDIA_ASSET, UPDATE_INQUIRY } from '@/clients/mutations';
+import {
+  ADD_PREDICTION,
+  CREATE_INQUIRY,
+  DELETE_INQUIRY,
+  DELETE_MEDIA_ASSET,
+  UPDATE_INQUIRY,
+} from '@/clients/mutations';
 import { GET_INQUIRY } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
-import { AddPredictionMutation, CreateInquiryMutation, DeleteInquiryMutation, DeleteMediaAssetMutation, GetInquiryQuery, PredictionAddedSubscription, PredictionType, UpdateInquiryMutation } from '@/graphql/graphql';
+import {
+  AddPredictionMutation,
+  CreateInquiryMutation,
+  DeleteInquiryMutation,
+  DeleteMediaAssetMutation,
+  GetInquiryQuery,
+  PredictionAddedSubscription,
+  PredictionType,
+  UpdateInquiryMutation,
+} from '@/graphql/graphql';
 import { InquiryDataForm } from '@/graphql/types';
 import { ImageMetadata } from '@/types/conversation';
 import { getAgentIdByName } from '@/utils/agents';
@@ -77,7 +92,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   const [form, updateForm] = useState<InquiryDataForm>({
     title: 'Untitled Inquiry',
-    goals: ''
+    goals: '',
   } as InquiryDataForm);
   const [metadata, setMetadata] = useState<Metadata>({
     images: [],
@@ -231,7 +246,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const saveForm = async (onSuccess?: (id: string) => void, onError?: () => void) => {
     await save(
       {
-        form
+        form,
       },
       ['form'],
       onSuccess,

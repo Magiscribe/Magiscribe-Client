@@ -127,6 +127,10 @@ export default function GraphGeneratorMenu({ open, onUpdate, onClose }: GraphGen
   };
 
   const sendMessage = (message: string, isUserMessage: boolean = true) => {
+    if (generatingGraph) {
+      return;
+    }
+
     if (message.trim()) {
       const newMessage: Message = {
         id: Date.now().toString(),

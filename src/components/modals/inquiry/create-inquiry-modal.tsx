@@ -166,17 +166,16 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
       updateForm({ ...form, [field]: e.target.value });
     };
 
-    /** 
-     * Handle input key down for the form
-     * @param e 
-     */
-    const handleInputKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        handleSave(e);
-      }
-    };
-  
+  /**
+   * Handle input key down for the form
+   * @param e
+   */
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSave(e);
+    }
+  };
 
   /**
    * Handle select change for the form
