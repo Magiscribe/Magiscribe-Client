@@ -1,12 +1,13 @@
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
+import { useAddAlert } from '@/providers/alert-provider';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
-import { faMagicWandSparkles, faSpinner, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faArrowUp, faSpinner, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
 
 import Button from '../controls/button';
-import Input from '../controls/input';
+import Textarea from '../controls/textarea';
 import MarkdownCustom from '../markdown-custom';
 
 /**
@@ -69,14 +70,21 @@ export default function GraphGeneratorMenu({ open, onUpdate, onClose }: GraphGen
   const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
   const [inputMessage, setInputMessage] = useState('');
   const [isDragging, setIsDragging] = useState(false);
-  const [menuWidth, setMenuWidth] = useWithLocalStorage(INITIAL_MENU_WIDTH, 'playground-form');
+  const [menuWidth, setMenuWidth] = useWithLocalStorage(INITIAL_MENU_WIDTH, 'menu');
 
   // Refs
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Hooks
-  const { generatingGraph, generateGraph, onGraphGenerationCompleted, onGraphGenerationStarted } = useInquiryBuilder();
+  const {
+    generatingGraph,
+    generateGraph,
+    onGraphGenerationCompleted,
+    onGraphGenerationStarted,
+    onGraphGenerationError,
+  } = useInquiryBuilder();
+  const addAlert = useAddAlert();
 
   /*================================ EFFECTS ==============================*/
 
@@ -93,11 +101,9 @@ export default function GraphGeneratorMenu({ open, onUpdate, onClose }: GraphGen
   useEffect(() => {
     if (isDragging) {
       window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
     }
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
     };
   }, [isDragging]);
 
@@ -121,6 +127,10 @@ export default function GraphGeneratorMenu({ open, onUpdate, onClose }: GraphGen
   };
 
   const sendMessage = (message: string, isUserMessage: boolean = true) => {
+    if (generatingGraph) {
+      return;
+    }
+
     if (message.trim()) {
       const newMessage: Message = {
         id: Date.now().toString(),
@@ -136,8 +146,9 @@ export default function GraphGeneratorMenu({ open, onUpdate, onClose }: GraphGen
     sendMessage(inputMessage);
   };
 
-  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
       handleSendButtonClick();
     }
   };
@@ -176,6 +187,10 @@ export default function GraphGeneratorMenu({ open, onUpdate, onClose }: GraphGen
     }
   });
 
+  onGraphGenerationError?.(() => {
+    addAlert('An error occurred while generating the graph...', 'error');
+  });
+
   if (!open) {
     return null;
   }
@@ -193,11 +208,12 @@ export default function GraphGeneratorMenu({ open, onUpdate, onClose }: GraphGen
       <div
         className="absolute left-0 top-0 bottom-0 w-1 cursor-ew-resize bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600"
         onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
       />
       <div className="w-full h-full flex flex-col">
         <div className="p-4 border-b border-gray-200 flex justify-between items-center">
           <h2 className="text-lg font-semibold">Graph Editor</h2>
-          <Button onClick={onClose} iconLeft={faTimes} variant="transparentSecondary" />
+          <Button onClick={onClose} icon={faTimes} variant="transparentSecondary" />
         </div>
         <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-4">
           {messages.map((message) => (
@@ -210,25 +226,24 @@ export default function GraphGeneratorMenu({ open, onUpdate, onClose }: GraphGen
           )}
         </div>
         <div className="p-4 border-t border-gray-200">
-          <Input
-            value={inputMessage}
-            name="message"
-            onChange={(e) => setInputMessage(e.target.value)}
-            onKeyDown={handleInputKeyDown}
-            placeholder="Request a modification..."
-          />
-          <Button
-            onClick={handleSendButtonClick}
-            className="mt-2 w-full"
-            disabled={generatingGraph || !inputMessage.trim()}
-          >
-            {generatingGraph ? 'Generating...' : 'Generate'}
-            <FontAwesomeIcon
-              className="ml-2"
-              icon={generatingGraph ? faSpinner : faMagicWandSparkles}
-              spin={generatingGraph}
+          <div className="relative flex-grow flex items-center">
+            <Textarea
+              value={inputMessage}
+              name="message"
+              onChange={(e) => setInputMessage(e.target.value)}
+              placeholder="Request a modification..."
+              onKeyDown={handleInputKeyDown}
+              rows={1}
+              className="resize-none overflow-hidden pb-12"
             />
-          </Button>
+            <Button
+              onClick={handleSendButtonClick}
+              className="absolute right-2 bottom-1.5"
+              disabled={generatingGraph || !inputMessage.trim()}
+            >
+              <FontAwesomeIcon className="" icon={faArrowUp} />
+            </Button>
+          </div>
         </div>
       </div>
     </motion.div>

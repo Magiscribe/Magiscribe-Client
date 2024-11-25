@@ -201,17 +201,19 @@ function Flow({ children, nodes, edges, setNodes, onNodesChange, setEdges, onEdg
 
         return (
           <div key={type} className="w-44 flex items-center z-10">
-            <button
-              draggable={!disabled}
-              onDragStart={() => (disabled ? null : onDragStart(type))}
-              disabled={disabled}
-              className="relative w-full max-w-xs px-4 py-2 bg-white dark:bg-slate-700 border-2 border-slate-400 text-slate-800 dark:text-white font-semibold text-sm rounded-xl shadow-lg disabled:opacity-50 text-left"
-            >
-              <FontAwesomeIcon
-                icon={nodeTypesInfo[type as keyof typeof nodeTypesInfo].icon}
-                className="mr-2 text-text-blue-600 dark:text-blue-400"
-              />
-              {nodeTypesInfo[type as keyof typeof nodeTypesInfo].name}
+            <div className="relative w-full text-slate-800 dark:text-white ">
+              <button
+                draggable={!disabled}
+                onDragStart={() => (disabled ? null : onDragStart(type))}
+                disabled={disabled}
+                className="relative w-full max-w-xs px-4 py-2 bg-white dark:bg-slate-700 border-2 border-slate-400 font-semibold text-sm rounded-xl shadow-lg disabled:opacity-50 text-left"
+              >
+                <FontAwesomeIcon
+                  icon={nodeTypesInfo[type as keyof typeof nodeTypesInfo].icon}
+                  className="mr-2 text-blue-600 dark:text-blue-400"
+                />
+                {nodeTypesInfo[type as keyof typeof nodeTypesInfo].name}
+              </button>
               <CustomTooltip
                 placement="bottom-start"
                 triggerOnHover
@@ -224,7 +226,7 @@ function Flow({ children, nodes, edges, setNodes, onNodesChange, setEdges, onEdg
               >
                 <p className="text-xs font-normal">{nodeTypesInfo[type as keyof typeof nodeTypesInfo].description}</p>
               </CustomTooltip>
-            </button>
+            </div>
           </div>
         );
       })}
@@ -282,6 +284,7 @@ function Flow({ children, nodes, edges, setNodes, onNodesChange, setEdges, onEdg
             fitView
             minZoom={0.1}
             maxZoom={2}
+            panOnScroll={true}
             defaultEdgeOptions={{
               type: 'button',
               markerEnd: {

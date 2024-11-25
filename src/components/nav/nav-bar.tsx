@@ -1,5 +1,5 @@
 import { useDarkMode } from '@/hooks/dark-mode';
-import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from '@clerk/clerk-react';
+import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton, useUser } from '@clerk/clerk-react';
 import { faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
@@ -12,6 +12,7 @@ import { Logo } from '../logo';
 export function NavBar({ isFixed = true }) {
   const [atTop, setAtTop] = useState(true);
 
+  const user = useUser();
   const { title } = useTitle();
   const { isDark, toggle: toggleDarkMode } = useDarkMode();
   const navigate = useNavigate();
@@ -39,7 +40,7 @@ export function NavBar({ isFixed = true }) {
       } transition-all duration-300 ease-in-out`}
     >
       <div className="w-full container mx-auto flex flex-wrap items-center justify-between mt-0 py-2">
-        <Link to="/" className="pl-4 flex items-center">
+        <Link to={user ? '/dashboard' : '/'} className="pl-4 flex items-center">
           <Logo />
           <AnimatePresence mode="wait">
             {title && (
@@ -65,7 +66,7 @@ export function NavBar({ isFixed = true }) {
             variant={isDark ? 'transparentWhiteFixed' : atTop ? 'transparentWhite' : 'transparentPrimary'}
             size="small"
             className="mr-4"
-            iconLeft={isDark ? faSun : faMoon}
+            icon={isDark ? faSun : faMoon}
           />
           <SignedOut>
             <SignUpButton signInForceRedirectUrl="/dashboard" forceRedirectUrl="/dashboard">

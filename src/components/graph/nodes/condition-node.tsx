@@ -17,7 +17,7 @@ export default function ConditionNode({ id, data }: ConditionNodeProps) {
 
   return (
     <NodeContainer title="Condition" faIcon={faCodeBranch} id={id}>
-      <div className="flex flex-col gap-2 mt-2">
+      <div className="flex flex-col space-y-4 my-4">
         <Textarea
           label="Message"
           subLabel="Instructions to tell an AI how to choose where to go next"
@@ -26,6 +26,7 @@ export default function ConditionNode({ id, data }: ConditionNodeProps) {
           onChange={handleInputChange}
           placeholder="Enter your text here..."
           className="resize-none overflow-hidden nodrag"
+          rows={3}
         />
       </div>
 

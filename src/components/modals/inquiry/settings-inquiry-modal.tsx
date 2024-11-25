@@ -63,18 +63,13 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
 
   return (
     <>
-      <CustomModal size="3xl" open={open} onClose={onClose} title={id ? 'Update Inquiry' : 'Create Inquiry'}>
-        <form className="space-y-4" onSubmit={handleSave}>
-          <Select
-            name="voice"
-            label="Voice"
-            subLabel="This will be the voice used to read responses to the user if they have audio enabled"
-            value={form.voice ?? ''}
-            onChange={handleSelectChange('voice')}
-            options={voices?.getAllAudioVoices.map((voice) => ({ value: voice.id, label: voice.name })) ?? []}
-          />
-
-          <div className="flex justify-end items-center rounded-2xl">
+      <CustomModal
+        size="3xl"
+        open={open}
+        onClose={onClose}
+        title={id ? 'Update Inquiry' : 'Create Inquiry'}
+        buttons={
+          <>
             <Button
               type="button"
               onClick={() => setDeleteModal(true)}
@@ -90,7 +85,18 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
             <Button onClick={handleSave} variant="primary" size="medium" className="ml-2">
               Save
             </Button>
-          </div>
+          </>
+        }
+      >
+        <form className="space-y-4" onSubmit={handleSave}>
+          <Select
+            name="voice"
+            label="Voice"
+            subLabel="This will be the voice used to read responses to the user if they have audio enabled"
+            value={form.voice ?? ''}
+            onChange={handleSelectChange('voice')}
+            options={voices?.getAllAudioVoices.map((voice) => ({ value: voice.id, label: voice.name })) ?? []}
+          />
         </form>
       </CustomModal>
 

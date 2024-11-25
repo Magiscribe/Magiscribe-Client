@@ -1,10 +1,17 @@
 import { ADD_PREDICTION, CREATE_INQUIRY_RESPONSE, UPDATE_INQUIRY_RESPONSE } from '@/clients/mutations';
 import { GET_INQUIRY } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
-import { CreateInquiryResponseMutation, GetInquiryQuery, UpdateInquiryResponseMutation } from '@/graphql/graphql';
+import {
+  AddPredictionMutation,
+  CreateInquiryResponseMutation,
+  GetInquiryQuery,
+  PredictionType,
+  UpdateInquiryResponseMutation,
+} from '@/graphql/graphql';
 import { getAgentIdByName } from '@/utils/agents';
 import { NodeData, OptimizedNode } from '@/utils/graphs/graph';
 import { GraphManager } from '@/utils/graphs/graph-manager';
+import { parseMarkdownCodeBlocks } from '@/utils/markdown';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 
@@ -53,7 +60,9 @@ interface InquiryContextType {
   graph: GraphManager | null;
 
   handleNextNode: (props?: HandleNextNodeProps) => Promise<void>;
+
   onNodeUpdate: (callback: (node: OptimizedNode) => void) => void;
+  onNodeError: (callback: (error: Error) => void) => void;
 
   userDetails: { [key: string]: string };
   setUserDetails: React.Dispatch<React.SetStateAction<{ [key: string]: string }>>;
@@ -69,10 +78,12 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
   const formRef = useRef<{ [key: string]: string }>({});
   const graphRef = useRef<GraphManager | null>(null);
   const inquiryResponseIdRef = useRef<string | undefined>(undefined);
-  const isCreatingResponseRef = useRef<boolean>(false);
   const inquiryHistoryRef = useRef<string[]>([]);
-  const errorRetryCountRef = useRef<number>(0);
-  const validGraph = useRef<boolean>(true);
+
+  // Note: This is used to store the last prediction variables so that we can use them in the.
+  //       We have to ignore the ESLint rule here because we can be storing any type of data.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const lastPredictionVariablesRef = useRef<any>();
 
   // States
   const [userDetails, setUserDetails] = useState<{ [key: string]: string }>({});
@@ -85,11 +96,27 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
   const subscriptionId = useRef<string>(`inquiry_${Date.now()}`).current;
 
   // Event handlers
+
+  /**
+   * A callback that is triggered when a new prediction is received from the backend.
+   */
   const onSubscriptionDataRef = useRef<(data: NodeData) => void>(() => {});
+
+  /**
+   * A callback that is triggered when a node is updated.
+   */
   const onNodeUpdateRef = useRef<(node: OptimizedNode) => void>(() => {});
 
+  /**
+   * A callback that is triggered when an error occurs in the node.
+   * This is used to handle errors in the node traversal process.
+   * @param error {Error} The error that occurred
+   * @returns {Promise<void>} A promise that resolves when the error is handled
+   */
+  const onNodeErrorRef = useRef<(error: Error) => void>(() => {});
+
   // Mutations and Apollo client
-  const [addPrediction] = useMutation(ADD_PREDICTION);
+  const [addPrediction] = useMutation<AddPredictionMutation>(ADD_PREDICTION);
   const [createResponse] = useMutation<CreateInquiryResponseMutation>(CREATE_INQUIRY_RESPONSE);
   const [updateResponse] = useMutation<UpdateInquiryResponseMutation>(UPDATE_INQUIRY_RESPONSE);
   const client = useApolloClient();
@@ -130,46 +157,31 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
    */
   useSubscription(GRAPHQL_SUBSCRIPTION, {
     variables: { subscriptionId },
-    onSubscriptionData: ({ subscriptionData }) => {
+    onData: ({ data: subscriptionData }) => {
       try {
         const prediction = subscriptionData.data?.predictionAdded;
 
-        if (prediction?.type === 'SUCCESS') {
+        if (prediction?.type === PredictionType.Success) {
           setState((prev) => ({ ...prev, loading: false }));
 
-          // TODO: Avoid double parsing. Will require changes to the backend.
           const result = JSON.parse(prediction.result);
-          const content = result[0];
-          const jsonMatch = content.match(/```json\n([\s\S]*?)\n```/);
-          const markdownMatch = content.match(/```markdown\n([\s\S]*?)\n```/);
+          const content = parseMarkdownCodeBlocks(result[0]);
 
-          let parsedResult = { text: '' };
-          if (jsonMatch) {
-            parsedResult = JSON.parse(jsonMatch[1]);
-          }
-          if (markdownMatch) {
-            parsedResult['text'] = markdownMatch[1];
-          }
           if (onSubscriptionDataRef.current) {
-            onSubscriptionDataRef.current(parsedResult);
+            onSubscriptionDataRef.current(content);
           }
-
-          // Reset the error count if the prediction was successful
-          errorRetryCountRef.current = 0;
         }
-      } catch {
-        errorRetryCountRef.current += 1;
+      } catch (e) {
+        setState((prev) => ({ ...prev, loading: true }));
 
-        if (errorRetryCountRef.current >= 3) {
-          setState({ ...INITIAL_STATE, error: true });
-        } else {
-          setState({ ...INITIAL_STATE, loading: true });
-          handleOnNodeVisit(graphRef.current?.getCurrentNode() as OptimizedNode);
+        if (e instanceof Error) {
+          handleError(e);
         }
       }
     },
-    onError: () => {
-      setState((prev) => ({ ...prev, loading: false }));
+    onError: (e) => {
+      setState((prev) => ({ ...prev, loading: true }));
+      handleError(e);
     },
   });
 
@@ -183,17 +195,32 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
     setState((prev) => ({ ...prev, loading: true }));
 
     try {
+      // TODO: Simplify this
       const carryOverData = graphRef.current.getCurrentNode()?.data;
       await graphRef.current.updateCurrentNodeData({ response: data, ...carryOverData });
-      await graphRef.current.goToNextNode(nextNodeId);
+
+      const validNode = await graphRef.current.goToNextNode(nextNodeId);
+
+      if (!validNode) {
+        handleError(
+          new Error(
+            [
+              `A node with the ID ${nextNodeId} was not found.`,
+              `The valid reachable nodes are: ${graphRef.current
+                .getOutgoingNodes()
+                .map((node) => node.id)
+                .join(', ')}`,
+            ].join('\n'),
+          ),
+        );
+      }
 
       if (preview) {
         console.log('Preview mode, not saving response');
         return;
       }
 
-      if (!inquiryResponseIdRef.current && !isCreatingResponseRef.current) {
-        isCreatingResponseRef.current = true;
+      if (!inquiryResponseIdRef.current) {
         const result = await createResponse({
           variables: {
             inquiryId: id,
@@ -204,7 +231,6 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
           },
         });
         inquiryResponseIdRef.current = result.data?.upsertInquiryResponse.id;
-        isCreatingResponseRef.current = false;
       } else if (inquiryResponseIdRef.current) {
         await updateResponse({
           variables: {
@@ -221,6 +247,23 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
       console.error('Error in handleNextNode:', error);
       setState((prev) => ({ ...prev, error: true }));
     }
+  }
+
+  async function handleError(error: Error) {
+    // setState((prev) => ({ ...prev, error: true }));
+    if (onNodeErrorRef.current) {
+      onNodeErrorRef.current(error);
+    }
+
+    await addPrediction({
+      variables: {
+        ...lastPredictionVariablesRef.current,
+        input: {
+          ...(lastPredictionVariablesRef.current?.input ?? {}),
+          errorHandling: error?.message || 'An error occurred,  please identify and resolve the issue.',
+        },
+      },
+    });
   }
 
   /**
@@ -257,21 +300,21 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
       `Dynamic ${currentNode.type === 'question' ? 'Question' : 'Information'} Generation`,
       client,
     );
-    const mostRecentMessage = inquiryHistoryRef.current[inquiryHistoryRef.current.length - 1] || '';
+    const mostRecentMessage = inquiryHistoryRef.current[inquiryHistoryRef.current.length - 1];
 
-    await addPrediction({
-      variables: {
-        subscriptionId,
-        agentId,
-        variables: {
-          userMessage: currentNode.data.text,
-          userDetails: `
-          Name: ${userDetails.name}
-          `,
-          conversationHistory: inquiryHistoryRef.current.join('\n\n'),
-          mostRecentMessage,
-        },
+    // TODO: Clean this up
+    lastPredictionVariablesRef.current = {
+      subscriptionId,
+      agentId,
+      input: {
+        userMessage: currentNode.data.text,
+        userDetails: `Name: ${userDetails.name}`,
+        conversationHistory: inquiryHistoryRef.current.join('\n\n'),
+        mostRecentMessage,
       },
+    };
+    await addPrediction({
+      variables: lastPredictionVariablesRef.current,
     });
 
     onSubscriptionDataRef.current = (result) => {
@@ -291,16 +334,26 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
     const agentId = await getAgentIdByName('Condition Node', client);
     const mostRecentMessage = inquiryHistoryRef.current[inquiryHistoryRef.current.length - 1] || '';
 
-    await addPrediction({
-      variables: {
-        subscriptionId,
-        agentId,
-        variables: {
-          userMessage: `The instruction is: ${graphRef.current.getCurrentNode()?.data.text}`,
-          conversationHistory: inquiryHistoryRef.current.join('\n\n'),
-          mostRecentMessage,
-        },
+    // TODO: Clean this up
+    lastPredictionVariablesRef.current = {
+      subscriptionId,
+      agentId,
+      input: {
+        userMessage: [
+          `The instruction is: ${graphRef.current.getCurrentNode()?.data.text}`,
+
+          // TODO: Remove this so that user can't provide invalid nodes.
+          `The valid reachable nodes are: ${graphRef.current
+            .getOutgoingNodes()
+            .map((node) => node.id)
+            .join(', ')}`,
+        ].join('\n\n'),
+        conversationHistory: inquiryHistoryRef.current.join('\n\n'),
+        mostRecentMessage,
       },
+    };
+    await addPrediction({
+      variables: lastPredictionVariablesRef.current,
     });
 
     onSubscriptionDataRef.current = (result) => {
@@ -350,12 +403,14 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
   const contextValue: InquiryContextType = {
     id,
     preview,
-    validGraph: validGraph.current,
 
     graph: graphRef.current,
 
     onNodeUpdate: (callback: (node: OptimizedNode) => void) => {
       onNodeUpdateRef.current = callback;
+    },
+    onNodeError: (callback: (error: Error) => void) => {
+      onNodeErrorRef.current = callback;
     },
     handleNextNode,
 

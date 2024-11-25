@@ -1,19 +1,20 @@
-import React, { useEffect, useRef, useState } from 'react';
 import { ADD_PREDICTION } from '@/clients/mutations';
-import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import { GET_INQUIRIES_RESPONSES, GET_INQUIRY } from '@/clients/queries';
-import { GetInquiryQuery, GetInquiryResponsesQuery } from '@/graphql/graphql';
+import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import Chart, { ChartProps } from '@/components/chart';
 import Button from '@/components/controls/button';
 import Input from '@/components/controls/input';
 import MarkdownCustom from '@/components/markdown-custom';
+import { AddPredictionMutation, GetInquiryQuery, GetInquiryResponsesQuery } from '@/graphql/graphql';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
 import { getAgentIdByName } from '@/utils/agents';
+import { parseCodeBlocks } from '@/utils/markdown';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
 import { faPaperPlane, faSpinner, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface Message {
   type: 'text' | 'chart';
@@ -33,7 +34,7 @@ const ViaChatTab: React.FC<ViaChatTabProps> = ({ id }) => {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const client = useApolloClient();
-  const [addPrediction] = useMutation(ADD_PREDICTION);
+  const [addPrediction] = useMutation<AddPredictionMutation>(ADD_PREDICTION);
 
   // Query for form and graph data
   const {
@@ -61,7 +62,7 @@ const ViaChatTab: React.FC<ViaChatTabProps> = ({ id }) => {
 
   useSubscription(GRAPHQL_SUBSCRIPTION, {
     variables: { subscriptionId },
-    onSubscriptionData: ({ subscriptionData }) => {
+    onData: ({ data: subscriptionData }) => {
       const prediction = subscriptionData.data?.predictionAdded;
       if (prediction && prediction.type === 'SUCCESS') {
         setLoading(false);
@@ -81,11 +82,10 @@ const ViaChatTab: React.FC<ViaChatTabProps> = ({ id }) => {
     }
 
     const content = result[0];
-    const jsonMatch = content.match(/```json\n([\s\S]*?)\n```/);
-    const markdownMatch = content.match(/```markdown\n([\s\S]*?)\n```/);
+    const matches = parseCodeBlocks(content, ['json', 'markdown']);
 
-    if (jsonMatch) {
-      const parsedResult = JSON.parse(jsonMatch[1]);
+    if (matches['json']) {
+      const parsedResult = JSON.parse(matches['json'] as string);
       if (parsedResult.chartType && Array.isArray(parsedResult.data)) {
         const chartProps: ChartProps = {
           title: parsedResult.title || '',
@@ -100,8 +100,11 @@ const ViaChatTab: React.FC<ViaChatTabProps> = ({ id }) => {
       }
     }
 
-    if (markdownMatch) {
-      setMessages((prevMessages) => [...prevMessages, { type: 'text', content: markdownMatch[1], sender: 'bot' }]);
+    if (matches['markdown']) {
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { type: 'text', content: matches['markdown'] as string, sender: 'bot' },
+      ]);
     }
   };
 
@@ -127,7 +130,7 @@ const ViaChatTab: React.FC<ViaChatTabProps> = ({ id }) => {
           variables: {
             subscriptionId,
             agentId,
-            variables: {
+            input: {
               userMessage: inputMessage,
               conversationData: JSON.stringify(data),
               numResponses: data.responses?.length ?? 0,
@@ -156,11 +159,8 @@ const ViaChatTab: React.FC<ViaChatTabProps> = ({ id }) => {
   return (
     <div className="bg-white dark:bg-slate-700 px-4 py-8 rounded-2xl shadow-xl text-slate-700 dark:text-white">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">
-          Chat - Analyzing {inquiryResponseData.getInquiryResponses.length}{' '}
-          {inquiryResponseData.getInquiryResponses.length === 1 ? 'Response' : 'Responses'}
-        </h2>
-        <Button onClick={handleClearChat} variant="danger" iconLeft={faTrash}>
+        <h2 className="text-2xl font-bold">Chat</h2>
+        <Button onClick={handleClearChat} variant="danger" icon={faTrash}>
           Clear
         </Button>
       </div>

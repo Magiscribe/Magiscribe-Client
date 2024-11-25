@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faFilter } from '@fortawesome/free-solid-svg-icons';
-import { InquiryResponseFilters } from '@/graphql/graphql';
 import Button from '@/components/controls/button';
 import Input from '@/components/controls/input';
+import { InquiryResponseFilters } from '@/graphql/graphql';
+import { faFilter, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React, { useEffect, useState } from 'react';
 
 interface FilterControlsProps {
   onApplyFilters: (filters: InquiryResponseFilters) => void;
@@ -130,7 +130,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({ onApplyFilters, hasActi
         </div>
 
         <div className="flex gap-4">
-          <Button onClick={handleApplyFilter} iconLeft={faFilter} variant="primary" size="medium">
+          <Button onClick={handleApplyFilter} icon={faFilter} variant="primary" size="medium">
             Filter
           </Button>
           {hasActiveFilters && (

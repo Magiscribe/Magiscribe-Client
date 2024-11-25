@@ -13,12 +13,15 @@ import {
   DeleteInquiryMutation,
   DeleteMediaAssetMutation,
   GetInquiryQuery,
+  PredictionAddedSubscription,
+  PredictionType,
   UpdateInquiryMutation,
 } from '@/graphql/graphql';
 import { InquiryDataForm } from '@/graphql/types';
 import { ImageMetadata } from '@/types/conversation';
 import { getAgentIdByName } from '@/utils/agents';
 import { applyGraphChangeset, formatGraph } from '@/utils/graphs/graph-utils';
+import { parseCodeBlocks } from '@/utils/markdown';
 import { removeDeletedImagesFromS3 } from '@/utils/s3';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
 import { Edge, Node, OnEdgesChange, OnNodesChange, useEdgesState, useNodesState } from '@xyflow/react';
@@ -77,6 +80,7 @@ interface ContextType {
 
   onGraphGenerationStarted: (callback: (message: string) => void) => void;
   onGraphGenerationCompleted: (callback: (message: string) => void) => void;
+  onGraphGenerationError: (callback: () => void) => void;
 }
 
 const InquiryContext = createContext<ContextType | undefined>(undefined);
@@ -86,7 +90,10 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const [initialized, setInitialized] = useState(false);
   const [subscriptionId] = useState<string>(uuidv4());
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
-  const [form, updateForm] = useState<InquiryDataForm>({} as InquiryDataForm);
+  const [form, updateForm] = useState<InquiryDataForm>({
+    title: 'Untitled Inquiry',
+    goals: '',
+  } as InquiryDataForm);
   const [metadata, setMetadata] = useState<Metadata>({
     images: [],
     text: '',
@@ -107,6 +114,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   // Events
   const onGraphGenerationStartedRef = useRef<(message: string) => void>();
   const onGraphGenerationCompletedRef = useRef<(message: string) => void>();
+  const onGraphGenerationErrorRef = useRef<() => void>();
 
   /**
    * Fetches the inquiry data from the server.
@@ -127,25 +135,37 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   /**
    * Subscribes to the prediction added subscription to get the generated graph.
    */
-  useSubscription(GRAPHQL_SUBSCRIPTION, {
+  useSubscription<PredictionAddedSubscription>(GRAPHQL_SUBSCRIPTION, {
     variables: { subscriptionId },
-    onSubscriptionData: ({ subscriptionData }) => {
+    onData: ({ data: subscriptionData }) => {
       const prediction = subscriptionData.data?.predictionAdded;
-      if (prediction?.type === 'SUCCESS') {
-        const result = JSON.parse(prediction.result)[0];
-        const jsonMatch = result.match(/```json\n([\s\S]*?)\n```/);
-        const markdownMatch = result.match(/```markdown\n([\s\S]*?)\n```/);
-        const changeset = JSON.parse(jsonMatch[1]);
-        const newGraph = applyGraphChangeset(graph, changeset);
+      try {
+        if (prediction?.type === PredictionType.Success) {
+          // Node: The prediction result is always present when the type is success.
+          const result = JSON.parse(prediction.result!)[0];
+          const matches = parseCodeBlocks(result, ['json', 'markdown']);
 
-        setExplanation(markdownMatch[1]);
-        updateGraph(formatGraph(newGraph));
+          const changeset = JSON.parse(matches['json'] as string);
+          const newGraph = applyGraphChangeset(graph, changeset);
 
+          setExplanation(matches['markdown'] as string);
+          updateGraph(formatGraph(newGraph));
+
+          setGeneratingGraph(false);
+          setPendingGraph(true);
+        } else if (prediction?.type === PredictionType.Error) {
+          onGraphGenerationErrorRef.current?.();
+          setGeneratingGraph(false);
+        }
+      } catch {
+        onGraphGenerationErrorRef.current?.();
         setGeneratingGraph(false);
-        setPendingGraph(true);
       }
     },
-    onError: () => setGeneratingGraph(false),
+    onError: () => {
+      setGeneratingGraph(false);
+      onGraphGenerationErrorRef.current?.();
+    },
   });
 
   useEffect(() => {
@@ -226,11 +246,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const saveForm = async (onSuccess?: (id: string) => void, onError?: () => void) => {
     await save(
       {
-        form: {
-          ...form,
-          // Default title if not provided.
-          title: form.title ?? 'Untitled Inquiry',
-        },
+        form,
       },
       ['form'],
       onSuccess,
@@ -291,8 +307,8 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
       nodes: graph.nodes,
       metadata,
       setMetadata,
-      deleteImage: async (uuid: string) => {
-        await deleteMediaAsset({ variables: { uuid } });
+      deleteImage: async (id: string) => {
+        await deleteMediaAsset({ variables: { id } });
       },
     });
     await save({ graph }, ['graph'], onSuccess, onError);
@@ -303,17 +319,13 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
    * @param onSuccess {Function} The function to call on success.
    * @param onError {Function} The function to call on error.
    */
-  const SaveAll = async (onSuccess?: (id: string) => void, onError?: () => void) => {
+  const saveAll = async (onSuccess?: (id: string) => void, onError?: () => void) => {
     await save(
       {
         metadata: {
           ...metadata,
         },
-        form: {
-          ...form,
-          // Default title if not provided.
-          title: form.title ?? 'Untitled Inquiry',
-        },
+        form,
         draftGraph: graph,
       },
       ['form', 'draftGraph'],
@@ -351,7 +363,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
       variables: {
         subscriptionId,
         agentId,
-        variables: {
+        input: {
           userMessage,
           conversationGraph: JSON.stringify(graph),
         },
@@ -388,7 +400,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     publishGraph,
 
     save,
-    saveFormAndGraph: SaveAll,
+    saveFormAndGraph: saveAll,
 
     generatingGraph,
 
@@ -398,6 +410,9 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     },
     onGraphGenerationStarted: (callback: (message: string) => void) => {
       onGraphGenerationStartedRef.current = callback;
+    },
+    onGraphGenerationError: (callback: () => void) => {
+      onGraphGenerationErrorRef.current = callback;
     },
   };
 

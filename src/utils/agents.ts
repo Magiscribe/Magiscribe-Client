@@ -12,6 +12,5 @@ export async function getAgentIdByName(name: string, client: ApolloClient<object
     query: GET_ALL_AGENTS,
   });
 
-  const conditionAgent = data.getAllAgents.find((agent: { id: string; name: string }) => agent.name === name);
-  return conditionAgent.id;
+  return data.getAllAgents.find((agent: { id: string; name: string }) => agent.name === name).id;
 }

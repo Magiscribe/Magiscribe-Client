@@ -29,16 +29,16 @@ export const CustomVariableInput: React.FC<CustomVariableInputProps> = ({ variab
   );
 };
 
-export interface CustomVariable {
+export interface CustomInput {
   key: string;
   value: string;
 }
 
-interface CustomVariablesSectionProps {
+interface CustomInputSectionProps {
   variables: Variable[];
   agentId: string;
   onUpdateVariable: (index: number, updatedVariable: Variable) => void;
-  setCustomVariables: (customVariables: CustomVariable[]) => void;
+  setCustomInput: (customInput: CustomInput[]) => void;
 }
 
 export function ExtractPromptVariables(prompt: string): string[] {
@@ -48,11 +48,11 @@ export function ExtractPromptVariables(prompt: string): string[] {
   return matches.map((match) => match[1]);
 }
 
-export const CustomVariablesSection: React.FC<CustomVariablesSectionProps> = ({
+export const CustomInputSection: React.FC<CustomInputSectionProps> = ({
   variables,
   agentId,
   onUpdateVariable,
-  setCustomVariables,
+  setCustomInput,
 }) => {
   const { data: agent } = useQuery<GetAgentWithPromptsQuery>(GET_AGENT_WITH_PROMPTS, {
     variables: {
@@ -77,19 +77,19 @@ export const CustomVariablesSection: React.FC<CustomVariablesSectionProps> = ({
     // Remove duplicates
     const flattenedVariables = [...new Set(variables)] as string[];
 
-    const customVariables: CustomVariable[] = flattenedVariables.map((variable) => {
-      const customVariable: CustomVariable = {
+    const customInput: CustomInput[] = flattenedVariables.map((variable) => {
+      const customVariable: CustomInput = {
         key: variable,
         value: '',
       };
       return customVariable;
     });
-    return customVariables;
+    return customInput;
   }, [agent]);
 
   useEffect(() => {
     if (customPromptVariables?.length > 0) {
-      setCustomVariables(customPromptVariables);
+      setCustomInput(customPromptVariables);
     }
   }, [customPromptVariables]);
 

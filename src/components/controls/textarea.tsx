@@ -36,13 +36,14 @@ export default function Textarea({
 }: TextareaProps): JSX.Element {
   const textareaRef = useAutoResizeTextareaRef(value as string);
 
-  const baseClassName = 'w-full p-2 border rounded-xl dark:bg-slate-600 bg-white focus:outline-none focus:ring-2';
+  const baseClassName =
+    'w-full p-4 border rounded-2xl dark:bg-slate-600 bg-white focus:outline-none focus:ring-2 placeholder-slate-400';
 
   const textareaClassName = clsx(
     baseClassName,
-    'focus:ring-indigo-500 resize-vertical min-h-[100px]',
+    'focus:ring-blue-600 resize-vertical min-h-[45px]',
     {
-      'border-slate-300': !error,
+      'border-slate-400': !error,
       'border-red-700 focus:ring-red-500': error,
     },
     className,

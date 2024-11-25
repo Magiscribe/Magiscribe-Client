@@ -1,24 +1,27 @@
 import goHomeGif from '@/assets/imgs/go-home.gif';
 import AnimatedDots from '@/components/animated/animated-dots';
 import { ChartProps } from '@/components/chart';
+import Button from '@/components/controls/button';
 import Input from '@/components/controls/input';
+import Textarea from '@/components/controls/textarea';
 import RatingInput from '@/components/graph/rating-input';
+import { ImageLoader } from '@/components/image/image-load';
 import MarkdownCustom from '@/components/markdown-custom';
 import { useTranscribe } from '@/hooks/audio-hook';
 import useElevenLabsAudio from '@/hooks/audio-player';
+import { useQueue } from '@/hooks/debounce-queue';
 import { useSetTitle } from '@/hooks/title-hook';
+import { useAddAlert } from '@/providers/alert-provider';
 import { useAudioEnabled } from '@/providers/audio-provider';
 import { useInquiry } from '@/providers/inquiry-traversal-provider';
-import { useQueue } from '@/utils/debounce-queue';
+import { ImageMetadata } from '@/types/conversation';
 import { StrippedNode } from '@/utils/graphs/graph';
 import { SignedIn, SignedOut, SignUpButton } from '@clerk/clerk-react';
-import { faChevronRight, faMicrophone, faMicrophoneSlash, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
+import { faArrowUp, faChevronRight, faMicrophone, faMicrophoneSlash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { motion } from 'framer-motion';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { ImageLoader } from '@/components/image/image-load';
-import { ImageMetadata } from '@/types/conversation';
+import { Link } from 'react-router-dom';
 
 interface Message {
   id: string;
@@ -50,7 +53,7 @@ export const useMessageQueue = () => {
   return {
     messages: queue.items,
     addMessage: queue.addItem,
-    isProcessing: queue.isProcessing,
+    isQueueProcessing: queue.isProcessing,
     queueSize: queue.queueSize,
   };
 };
@@ -64,20 +67,21 @@ export default function UserInquiryPage() {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   // Message Hooks
-  const { messages, addMessage, isProcessing } = useMessageQueue();
+  const { messages, addMessage, isQueueProcessing: isProcessing } = useMessageQueue();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Graph Hooks
-  const { graph, preview, handleNextNode, form, state, onNodeUpdate, userDetails, setUserDetails } = useInquiry();
+  const { graph, preview, handleNextNode, form, state, onNodeUpdate, onNodeError, userDetails, setUserDetails } =
+    useInquiry();
 
   // Audio Hooks
   const audio = useElevenLabsAudio(form.voice);
   const audioEnabled = useAudioEnabled();
   const { isTranscribing, transcript, handleTranscribe } = useTranscribe();
 
-  // General Hooks
-  const navigate = useNavigate();
+  // Alerts
+  const addAlert = useAddAlert();
 
   useSetTitle()(form?.title);
 
@@ -103,6 +107,13 @@ export default function UserInquiryPage() {
   useEffect(() => {
     onNodeUpdate(onNodeVisit);
   }, [onNodeUpdate]);
+
+  /**
+   * Handles errors from the graph.
+   */
+  useEffect(() => {
+    onNodeError(onError);
+  }, [onNodeError]);
 
   /*================================ HELPER FUNCTIONS ==============================*/
 
@@ -134,66 +145,6 @@ export default function UserInquiryPage() {
       newErrors.email = 'Please enter a valid email address.';
     }
     return newErrors;
-  };
-
-  /**
-   * A handler for input changes.
-   * @param e { React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> } - The change event
-   */
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setUserDetails((prev) => ({ ...prev, [name]: value }));
-    setErrors((prev) => ({ ...prev, [name]: '' }));
-  };
-
-  /**
-   * Handles the start button click.
-   */
-  const handleStart = () => {
-    const newErrors = validateInput(userDetails);
-    setErrors(newErrors);
-    if (Object.keys(newErrors).length === 0) {
-      setScreen('inquiry');
-      handleNextNode();
-    }
-  };
-
-  /**
-   * Handles the finish inquiry button click.
-   */
-  const handleFinishInquiry = () => {
-    if (preview) {
-      window.close();
-    }
-    setScreen('summary');
-  };
-
-  /**
-   * Handles user message submission.
-   * @param e { React.FormEvent } - The form event
-   * @returns { Promise<void> } - A promise that resolves when the message is added
-   */
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (inputMessage.trim() === '' && selectedRatings.length === 0) return;
-
-    const userMessage = [...selectedRatings, inputMessage.trim()].filter(Boolean).join(' - ');
-
-    handleNextNode({
-      data: {
-        text: inputMessage,
-        ...(selectedRatings.length > 0 && { ratings: selectedRatings }),
-      },
-    });
-
-    await addMessage({
-      type: 'text',
-      content: userMessage,
-      sender: 'user',
-    });
-
-    setInputMessage('');
-    setSelectedRatings([]);
   };
 
   /**
@@ -236,6 +187,82 @@ export default function UserInquiryPage() {
     [addMessage, audioEnabled, audio, handleNextNode],
   );
 
+  const onError = () => {
+    addAlert('This response is taking longer than expected...', 'error');
+  };
+
+  /*================================ EVENT HANDLERS ==============================*/
+
+  /**
+   * A handler for input changes.
+   * @param e { React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> } - The change event
+   */
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setUserDetails((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: '' }));
+  };
+
+  /**
+   * Handles the start button click.
+   */
+  const handleStart = () => {
+    const newErrors = validateInput(userDetails);
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length === 0) {
+      setScreen('inquiry');
+      handleNextNode();
+    }
+  };
+
+  /**
+   * Handles the finish inquiry button click.
+   */
+  const handleFinishInquiry = () => {
+    if (preview) {
+      window.close();
+    }
+    setScreen('summary');
+  };
+
+  /**
+   * Handles user message submission.
+   * @param e { React.FormEvent } - The form event
+   * @returns { Promise<void> } - A promise that resolves when the message is added
+   */
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (inputMessage.trim() === '' && selectedRatings.length === 0) return;
+    if (state.loading) return;
+    if (isProcessing) return;
+
+    const userMessage = [...selectedRatings, inputMessage.trim()].filter(Boolean).join(' - ');
+
+    handleNextNode({
+      data: {
+        text: inputMessage,
+        ...(selectedRatings.length > 0 && { ratings: selectedRatings }),
+      },
+    });
+
+    await addMessage({
+      type: 'text',
+      content: userMessage,
+      sender: 'user',
+    });
+
+    setInputMessage('');
+    setSelectedRatings([]);
+  };
+
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e);
+    }
+  };
+
   /*================================ RENDER FUNCTIONS ==============================*/
 
   const renderStartScreen = () => {
@@ -271,12 +298,9 @@ export default function UserInquiryPage() {
             />
           )}
         </div>
-        <button
-          onClick={handleStart}
-          className="mt-6 w-full px-6 py-3 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition duration-300 ease-in-out"
-        >
+        <Button onClick={handleStart} className="mt-4 w-full">
           Get Started
-        </button>
+        </Button>
       </div>
     );
   };
@@ -295,8 +319,8 @@ export default function UserInquiryPage() {
           <div
             className={`max-w-[80%] p-3 rounded-3xl ${
               message.sender === 'user'
-                ? 'bg-purple-600 text-white'
-                : 'bg-slate-200 dark:bg-slate-600 text-slate-800 dark:text-white'
+                ? 'bg-blue-600 text-white'
+                : 'bg-white dark:bg-slate-600 text-slate-800 dark:text-white'
             }`}
           >
             {message.type === 'image' ? (
@@ -318,7 +342,7 @@ export default function UserInquiryPage() {
   );
 
   const renderSummary = () => (
-    <div className="bg-white dark:bg-slate-700 p-6 rounded-lg shadow-lg">
+    <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-lg">
       <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white text-center">Thank you!</h2>
       <p className="text-lg text-slate-600 dark:text-slate-300 text-center">Your responses have been recorded.</p>
 
@@ -349,123 +373,119 @@ export default function UserInquiryPage() {
 
   const renderInputArea = () => (
     <div className="w-full p-4 max-w-4xl mx-auto">
-      {currentNode &&
-        !state.loading &&
-        screen !== 'end' &&
-        ((currentNode?.data?.type ?? '') as string).startsWith('rating') && (
-          <RatingInput
-            ratings={currentNode.data.ratings as string[]}
-            isMulti={currentNode.data.type === 'rating-multi'}
-            onRatingChange={setSelectedRatings}
-          />
-        )}
-
       {screen === 'inquiry' && (
-        <form onSubmit={handleSubmit} className="flex flex-col mt-4 relative">
-          <motion.div
-            className="flex"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <div className="flex-grow flex items-center bg-slate-200 dark:bg-slate-700 rounded-full">
-              <button
-                type="button"
-                onClick={handleTranscribe}
-                className="py-3 px-5 bg-slate-300 hover:bg-slate-400 dark:bg-slate-500 rounded-l-full rounded-r-full transition-colors"
-              >
-                <FontAwesomeIcon icon={isTranscribing ? faMicrophone : faMicrophoneSlash} />
-              </button>
-              {/* <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="py-3 px-5 bg-slate-300 hover:bg-slate-400 dark:bg-slate-500 rounded-r-full transition-colors"
-              >
-                <FontAwesomeIcon icon={faImage} />
-              </button> */}
-              <input
-                type="text"
-                value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                placeholder="Type your message here..."
-                className="flex-grow p-3 bg-transparent text-slate-800 dark:text-white border-transparent focus:border-transparent focus:ring-0"
-              />
-              <button
-                type="submit"
-                className="py-3 px-6 text-white bg-purple-600 hover:bg-purple-700 rounded-l-full rounded-r-full transition-colors ml-1"
-              >
-                <FontAwesomeIcon icon={faPaperPlane} />
-              </button>
-            </div>
-            <input ref={fileInputRef} type="file" accept="image/*" className="hidden" />
-          </motion.div>
-          <motion.p
-            className="text-slate-400 text-sm mt-2 text-center"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.2 }}
-          >
-            <i>Occasionally, mistakes may occur during the inquiry. If you notice any, please let us know.</i>
-          </motion.p>
-        </form>
+        <>
+          {currentNode && !state.loading && ((currentNode?.data?.type ?? '') as string).startsWith('rating') && (
+            <RatingInput
+              ratings={currentNode.data.ratings as string[]}
+              isMulti={currentNode.data.type === 'rating-multi'}
+              onRatingChange={setSelectedRatings}
+            />
+          )}
+
+          <form onSubmit={handleSubmit} className="flex flex-col mt-4 relative">
+            <motion.div
+              className="flex"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="relative flex-grow flex items-center">
+                <Textarea
+                  value={inputMessage}
+                  name="message"
+                  onChange={(e) => setInputMessage(e.target.value)}
+                  placeholder="Type your message here..."
+                  onKeyDown={handleInputKeyDown}
+                  rows={1}
+                  className="rounded-3xl resize-none overflow-hidden pb-12"
+                />
+                <Button
+                  type="button"
+                  variant="transparentDark"
+                  className="absolute left-2 bottom-1.5"
+                  onClick={handleTranscribe}
+                >
+                  <FontAwesomeIcon className="" icon={isTranscribing ? faMicrophone : faMicrophoneSlash} />
+                </Button>
+                <Button
+                  type="submit"
+                  className="absolute right-2 bottom-1.5"
+                  disabled={state.loading || (inputMessage.trim() === '' && selectedRatings.length === 0)}
+                >
+                  <FontAwesomeIcon className="" icon={faArrowUp} />
+                </Button>
+              </div>
+              <input ref={fileInputRef} type="file" accept="image/*" className="hidden" />
+            </motion.div>
+            <motion.p
+              className="text-slate-500 text-sm mt-2 text-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.2 }}
+            >
+              <i>
+                Occasionally, mistakes may occur. If you notice any, please let us know at{' '}
+                <a href="mailto:support@magiscribe.com" className="underline">
+                  support@magiscribe.com
+                </a>
+                .
+              </i>
+            </motion.p>
+          </form>
+        </>
       )}
 
       {screen === 'end' && (
-        <div className="flex justify-end mt-4">
-          <button
-            type="button"
-            onClick={handleFinishInquiry}
-            className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-full transition duration-300 ease-in-out"
-          >
-            Finish Inquiry
-            <FontAwesomeIcon icon={faChevronRight} className="ml-2" />
-          </button>
-        </div>
+        <>
+          <div className="h-0.5 w-full bg-slate-300 dark:bg-slate-800" />
+          <div className="flex justify-end mt-4">
+            <Button type="button" onClick={handleFinishInquiry}>
+              Finish
+              <FontAwesomeIcon icon={faChevronRight} className="ml-2" />
+            </Button>
+          </div>
+        </>
       )}
     </div>
   );
 
-  if (state.notFound) {
-    return (
-      <div className="h-full flex items-center justify-center bg-white dark:bg-slate-800 text-slate-800 dark:text-white">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Inquiry Not Found</h2>
-          <p className="text-slate-600 dark:text-slate-400">
-            The inquiry you are looking for does not exist. Please check the URL and try again.
-          </p>
-        </div>
-      </div>
-    );
-  }
+  const renderNotFound = () => (
+    <div className="bg-white dark:bg-slate-700 p-6 rounded-lg shadow-lg">
+      <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white">Inquiry Not Found</h2>
+      <p className="text-slate-600 dark:text-slate-300 mb-6">
+        The inquiry you are looking for does not exist. Please check the URL and try again.
+      </p>
+    </div>
+  );
 
-  if (state.error) {
-    return (
-      <div className="h-full flex items-center justify-center bg-white dark:bg-slate-800 text-slate-800 dark:text-white">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Something went wrong!</h2>
-          <p className="text-slate-600 dark:text-slate-400 mb-4">
-            Looks like something broke on our end. Your previous answers have been recorded.
-          </p>
-          <button
-            onClick={() => navigate(0)}
-            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
-          >
-            Restart Inquiry
-          </button>
-        </div>
-      </div>
-    );
-  }
+  const renderError = () => (
+    <div className="bg-white dark:bg-slate-700 p-6 rounded-lg shadow-lg">
+      <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white">Something Went Wrong</h2>
+      <p className="text-slate-600 dark:text-slate-300 mb-6">
+        An error occurred while loading the inquiry. Please try again later.
+      </p>
+      <p className="text-slate-600 dark:text-slate-300 mb-6">
+        If the problem persists, please contact support at{' '}
+        <a href="mailto:support@magiscribe.com" className="underline">
+          support@magiscribe.com
+        </a>
+        .
+      </p>
+    </div>
+  );
 
   return (
     <>
-      <div className="w-full max-w-4xl flex-grow p-4 overflow-y-auto space-y-4 mx-auto">
+      <div className="w-full max-w-4xl flex-grow p-4 space-y-4 mx-auto">
         {screen === 'start' && renderStartScreen()}
         {(screen === 'inquiry' || screen === 'end') && renderMessages()}
         {screen === 'summary' && renderSummary()}
+        {state.notFound && renderNotFound()}
+        {state.error && renderError()}
         <div ref={messagesEndRef} />
       </div>
-      {currentNode && currentNode.type !== 'end' && screen !== 'start' && renderInputArea()}
+      {(screen === 'inquiry' || screen === 'end') && renderInputArea()}
     </>
   );
 }

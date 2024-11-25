@@ -56,7 +56,7 @@ export default function GraphContextBar() {
         <div>
           <Input
             name="title"
-            value={form.title}
+            value={form.title ?? 'Untitled Inquiry'}
             onChange={(e) => {
               updateForm({ ...form, title: e.target.value });
             }}
@@ -67,19 +67,19 @@ export default function GraphContextBar() {
           </p>
         </div>
         <div className="flex space-x-4">
-          <Button variant="success" iconLeft={faPaperPlane} onClick={handlePublish}>
+          <Button variant="success" icon={faPaperPlane} onClick={handlePublish}>
             Publish
           </Button>
-          <Button variant="primary" iconLeft={faCog} onClick={handleFormat}>
+          <Button variant="primary" icon={faCog} onClick={handleFormat}>
             Format
           </Button>
-          <Button variant="primary" iconLeft={faEye} onClick={() => window.open(previewLink, '_blank')}>
+          <Button variant="primary" icon={faEye} onClick={() => window.open(previewLink, '_blank')}>
             Preview
           </Button>
-          <Button variant="secondary" iconLeft={faRotateLeft} onClick={() => setClearGraphModal(true)}>
+          <Button variant="secondary" icon={faRotateLeft} onClick={() => setClearGraphModal(true)}>
             Clear
           </Button>
-          <Button variant="transparentSecondary" iconLeft={faEllipsisV} onClick={() => setSettingsModalOpen(true)} />
+          <Button variant="transparentSecondary" icon={faEllipsisV} onClick={() => setSettingsModalOpen(true)} />
         </div>
       </div>
 

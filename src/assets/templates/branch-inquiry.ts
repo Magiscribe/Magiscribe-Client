@@ -62,7 +62,7 @@ const templateBranchInquiry: { nodes: Node[]; edges: Edge[] } = {
         y: 300.5,
       },
       data: {
-        text: "If the user's rating in node f7nh is 'Good' or 'Excellent', route to node y8wj. Otherwise, route to node l5rb.",
+        text: "If the user's rating is 'Good' or 'Excellent', route to node y8wj. Otherwise, route to node l5rb.",
       },
       measured: {
         width: 384,

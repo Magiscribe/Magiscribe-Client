@@ -55,7 +55,7 @@ export default function ModalValidationErrors({ open, onClose }: ValidationError
           ))}
         </ul>
         <div className="flex justify-end mt-4">
-          <Button onClick={handleAutoFix} variant="primary" iconLeft={faMagicWandSparkles}>
+          <Button onClick={handleAutoFix} variant="primary" icon={faMagicWandSparkles}>
             Automagically Fix
           </Button>
         </div>

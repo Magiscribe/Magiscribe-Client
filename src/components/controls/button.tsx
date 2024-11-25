@@ -11,12 +11,14 @@ const variantClassNames = {
   light: 'bg-white text-slate-600 dark:bg-slate-700 dark:text-white hover:bg-slate-100 focus:ring-slate-300',
   dark: 'bg-slate-600 text-white dark:bg-white dark:text-slate-600 hover:bg-slate-700 focus:ring-slate-300',
 
-  transparentPrimary: 'text-blue-600 hover:text-blue-700',
-  transparentSecondary: 'text-slate-500 hover:text-slate-500',
-  transparentDanger: 'text-red-600 hover:text-red-700',
-  transparentSuccess: 'text-green-600 hover:text-green-700',
-  transparentLight: 'text-white dark:text-slate-600 hover:text-slate-400 dark:hover:text-white',
-  transparentDark: 'text-slate-600 dark:text-white hover:text-slate-700 dark:hover:text-slate-400',
+  transparentPrimary: 'text-blue-600 hover:text-blue-700 focus:outline-none focus:ring-0 select-none',
+  transparentSecondary: 'text-slate-500 hover:text-slate-500 focus:outline-none focus:ring-0 select-none',
+  transparentDanger: 'text-red-600 hover:text-red-700 focus:outline-none focus:ring-0 select-none',
+  transparentSuccess: 'text-green-600 hover:text-green-700 focus:outline-none focus:ring-0 select-none',
+  transparentLight:
+    'text-white dark:text-slate-600 hover:text-slate-400 dark:hover:text-white focus:outline-none focus:ring-0 select-none',
+  transparentDark:
+    'text-slate-600 dark:text-white hover:text-slate-700 dark:hover:text-slate-400 border-0 focus:outline-none focus:ring-0 select-none',
 
   inversePrimary:
     'bg-transperant text-blue-600 hover:bg-blue-600 hover:text-white focus:ring-red-500 border border-2 border-blue-600',
@@ -53,8 +55,7 @@ type PolymorphicComponentProp<C extends React.ElementType, Props = {}> = React.P
 interface ButtonBaseProps {
   variant?: (typeof variantClassNames)[keyof typeof variantClassNames];
   size?: 'small' | 'medium' | 'large';
-  iconLeft?: IconDefinition;
-  iconRight?: IconDefinition;
+  icon?: IconDefinition;
   className?: string;
 }
 
@@ -84,15 +85,14 @@ const Button = <C extends React.ElementType = 'button'>({
   children,
   variant = 'primary',
   size = 'medium',
-  iconLeft,
-  iconRight,
+  icon,
   className,
   ...props
 }: ButtonProps<C>) => {
   const Component = as || 'button';
 
   const baseClassName =
-    'inline-flex items-center justify-center font-medium rounded-3xl transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
+    'inline-flex items-center justify-center font-medium rounded-2xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed';
 
   const sizeClassNames = {
     regular: {
@@ -110,19 +110,16 @@ const Button = <C extends React.ElementType = 'button'>({
   const buttonClassName = clsx(
     baseClassName,
     variantClassNames[variant as keyof typeof variantClassNames],
-    sizeClassNames[children == null && (iconLeft || iconRight) ? 'icon' : 'regular'][size],
+    sizeClassNames[children == null && icon ? 'icon' : 'regular'][size],
     className,
   );
 
-  const iconClassName = 'inline-block';
-  const iconLeftClassName = clsx(iconClassName, { 'mr-2': children });
-  const iconRightClassName = clsx(iconClassName, { 'ml-2': children });
+  const iconClassName = clsx({ 'inline-block mr-2': children });
 
   return (
     <Component className={buttonClassName} {...props}>
-      {iconLeft && <FontAwesomeIcon icon={iconLeft} className={iconLeftClassName} />}
+      {icon && <FontAwesomeIcon icon={icon} className={iconClassName} />}
       {children}
-      {iconRight && <FontAwesomeIcon icon={iconRight} className={iconRightClassName} />}
     </Component>
   );
 };

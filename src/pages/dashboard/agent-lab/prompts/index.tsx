@@ -121,7 +121,7 @@ export default function PromptDashboard() {
         <Button onClick={() => navigate('edit')}>Add Prompt</Button>
       </div>
       <hr className="my-4" />
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 my-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 my-8">
         {data?.getAllPrompts.map((prompt: Prompt, i: number) => (
           <motion.div
             key={prompt.id}

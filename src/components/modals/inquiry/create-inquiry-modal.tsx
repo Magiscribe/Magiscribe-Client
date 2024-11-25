@@ -126,6 +126,16 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
 
   const { data: voices } = useQuery<GetAllAudioVoicesQuery>(GET_ALL_AUDIO_VOICES);
 
+  /**
+   * Reset the selected template and graph generation state when the modal is closed.
+   */
+  useEffect(() => {
+    if (!open) {
+      setSelectedTemplate(undefined);
+      setEnableGraphGeneration(false);
+    }
+  }, [open]);
+
   useEffect(() => {
     if (generatingGraph) {
       const interval = setInterval(() => {
@@ -155,6 +165,17 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
       updateForm({ ...form, [field]: e.target.value });
     };
+
+  /**
+   * Handle input key down for the form
+   * @param e
+   */
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSave(e);
+    }
+  };
 
   /**
    * Handle select change for the form
@@ -284,6 +305,7 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
                 subLabel="Who are you trying to gain insights from and what type of information are you looking to capture?"
                 value={form.goals}
                 onChange={handleInputChange('goals')}
+                onKeyDown={handleInputKeyDown}
               />
             </motion.div>
           )}
