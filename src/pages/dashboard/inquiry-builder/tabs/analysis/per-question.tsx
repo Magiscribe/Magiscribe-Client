@@ -118,7 +118,7 @@ const PerQuestionTab: React.FC<PerQuestionTabProps> = ({ id }) => {
 
   const generateSummary = useCallback(async () => {
     setIsGeneratingSummary(true);
-    const agentId = await getAgentIdByName('Per Question Summary', client);
+    const agentId = await getAgentIdByName('Summary Generator', client);
 
     if (agentId) {
       const currentNode = questionNodes[currentQuestionIndex];
@@ -148,7 +148,7 @@ const PerQuestionTab: React.FC<PerQuestionTabProps> = ({ id }) => {
         setIsGeneratingSummary(false);
       }
     } else {
-      console.error('Per Question Summary Agent not found');
+      console.error('Summary Generator Agent not found');
       setIsGeneratingSummary(false);
     }
   }, [questionNodes, currentQuestionIndex, groupedResponses, client, addPrediction, subscriptionId]);

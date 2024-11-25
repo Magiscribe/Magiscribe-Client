@@ -2,12 +2,7 @@ import { ADD_PREDICTION } from '@/clients/mutations';
 import { GET_INQUIRIES_RESPONSES, GET_INQUIRY } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import Button from '@/components/controls/button';
-import {
-  AddPredictionMutation,
-  GetInquiryQuery,
-  GetInquiryResponsesQuery,
-  InquiryResponseFilters,
-} from '@/graphql/graphql';
+import { AddPredictionMutation, GetInquiryQuery, GetInquiryResponsesQuery, InquiryResponseFilters } from '@/graphql/graphql';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
 import { NodeVisitAnalysisData } from '@/types/conversation';
 import { GraphNode } from '@/types/conversation';
@@ -139,7 +134,7 @@ const PerResponseTab: React.FC<PerResponseTabProps> = ({ id }) => {
     if (!selectedUser) return;
 
     setIsGeneratingSummary(true);
-    const agentId = await getAgentIdByName('Per Response Summary', client);
+    const agentId = await getAgentIdByName('Summary Generator', client);
 
     if (agentId) {
       const userResponse = inquiryResponseData?.getInquiryResponses?.find((u) => u.id === selectedUser);

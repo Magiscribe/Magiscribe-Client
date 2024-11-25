@@ -56,7 +56,7 @@ export default function GraphContextBar() {
         <div>
           <Input
             name="title"
-            value={form.title}
+            value={form.title ?? 'Untitled Inquiry'}
             onChange={(e) => {
               updateForm({ ...form, title: e.target.value });
             }}

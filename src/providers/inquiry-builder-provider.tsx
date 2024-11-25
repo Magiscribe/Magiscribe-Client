@@ -75,7 +75,10 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const [initialized, setInitialized] = useState(false);
   const [subscriptionId] = useState<string>(uuidv4());
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
-  const [form, updateForm] = useState<InquiryDataForm>({} as InquiryDataForm);
+  const [form, updateForm] = useState<InquiryDataForm>({
+    title: 'Untitled Inquiry',
+    goals: ''
+  } as InquiryDataForm);
   const [metadata, setMetadata] = useState<Metadata>({
     images: [],
     text: '',
@@ -228,11 +231,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const saveForm = async (onSuccess?: (id: string) => void, onError?: () => void) => {
     await save(
       {
-        form: {
-          ...form,
-          // Default title if not provided.
-          title: form.title ?? 'Untitled Inquiry',
-        },
+        form
       },
       ['form'],
       onSuccess,
@@ -311,11 +310,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
         metadata: {
           ...metadata,
         },
-        form: {
-          ...form,
-          // Default title if not provided.
-          title: form.title ?? 'Untitled Inquiry',
-        },
+        form,
         draftGraph: graph,
       },
       ['form', 'draftGraph'],

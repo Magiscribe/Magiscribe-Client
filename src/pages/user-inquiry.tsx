@@ -370,9 +370,10 @@ export default function UserInquiryPage() {
 
   const renderInputArea = () => (
     <div className="w-full p-4 max-w-4xl mx-auto">
+      {screen === 'inquiry' && (
+        <>
       {currentNode &&
         !state.loading &&
-        screen !== 'end' &&
         ((currentNode?.data?.type ?? '') as string).startsWith('rating') && (
           <RatingInput
             ratings={currentNode.data.ratings as string[]}
@@ -381,7 +382,6 @@ export default function UserInquiryPage() {
           />
         )}
 
-      {screen === 'inquiry' && (
         <form onSubmit={handleSubmit} className="flex flex-col mt-4 relative">
           <motion.div
             className="flex"
@@ -423,9 +423,12 @@ export default function UserInquiryPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.2 }}
           >
-            <i>Occasionally, mistakes may occur during the inquiry. If you notice any, please let us know.</i>
+            <i>Occasionally, mistakes may occur. If you notice any, please let us know at <a href="mailto:support@magiscribe.com" className="underline">
+              support@magiscribe.com
+            </a>.</i>
           </motion.p>
         </form>
+        </>
       )}
 
       {screen === 'end' && (
@@ -477,7 +480,7 @@ export default function UserInquiryPage() {
         {state.error && renderError()}
         <div ref={messagesEndRef} />
       </div>
-      {currentNode && currentNode.type !== 'end' && screen !== 'start' && renderInputArea()}
+      {(screen === 'inquiry' || screen === 'end') && renderInputArea()}
     </>
   );
 }
