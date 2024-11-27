@@ -7,23 +7,20 @@ export default function HomeHero() {
     <div className="container px-12 mx-auto flex flex-wrap flex-col md:flex-row items-center">
       <div className="flex flex-col w-full md:w-3/5 justify-center items-start text-left">
         <motion.h1
-          className="my-4 text-4xl md:text-5xl font-bold leading-tight"
+          className="my-4 text-4xl md:text-5xl 2xl:text-6xl font-bold leading-tight"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          Ask the right questions,
-          <br />
-          let magic take care of the rest.
+          Turn Dialogue into Discovery
         </motion.h1>
         <motion.p
-          className="leading-normal text-xl md:text-2xl mb-8"
+          className="leading-normal text-xl md:text-xl 2xl:text-3xl mb-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.25 }}
         >
-          With Magiscribe, you can focus on gathering insights from your users while we create inquiries tailored to
-          their needs.
+          Magiscribe balances the efficency of surveys with the depth of user interviews using the power of AI.
         </motion.p>
         <motion.a
           href="#signup"
@@ -32,7 +29,7 @@ export default function HomeHero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.5 }}
         >
-          Sign Up Now
+          Get Started for Free
         </motion.a>
       </div>
       <motion.div

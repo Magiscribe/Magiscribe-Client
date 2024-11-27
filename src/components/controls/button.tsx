@@ -8,8 +8,9 @@ const variantClassNames = {
   secondary: 'bg-slate-500 text-white hover:bg-slate-600 focus:ring-slate-300',
   danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
   success: 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500',
-  light: 'bg-white text-slate-600 dark:bg-slate-700 dark:text-white hover:bg-slate-100 focus:ring-slate-300',
-  dark: 'bg-slate-600 text-white dark:bg-white dark:text-slate-600 hover:bg-slate-700 focus:ring-slate-300',
+
+  light: 'bg-white text-blue-700 font-bold hover:bg-slate-100 focus:ring-slate-300',
+  dark: 'bg-slate-600 text-white hover:bg-slate-700 focus:ring-slate-300',
 
   transparentPrimary: 'text-blue-600 hover:text-blue-700 focus:outline-none focus:ring-0 select-none',
   transparentSecondary: 'text-slate-500 hover:text-slate-500 focus:outline-none focus:ring-0 select-none',

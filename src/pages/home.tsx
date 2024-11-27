@@ -23,7 +23,7 @@ function AboutSection() {
         transition={{ duration: 0.5, delay: 0.25 }}
         viewport={{ once: true }}
       >
-        What is Magicscribe?
+        What is Magiscribe?
       </motion.h2>
       <div className="w-full mb-4">
         <div className="h-1 mx-auto gradient w-64 opacity-50 my-0 py-0 rounded-t"></div>
@@ -40,8 +40,8 @@ function AboutSection() {
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           ></iframe>
         }
-        title="What is Magicscribe?"
-        description="Learn how Magicscribe can help you create engaging, interactive content that provides valuable insights about your audience. You can checkout our demo video to see how it works."
+        title="Balance Efficiency with Depth"
+        description="Magiscribe helps you combine the efficiency of surveys with the depth of user interviews. Gather quantitative data from many participants while pursuing qualitative insights through targeted follow-up questions."
         reversed={false}
       />
       <ContentSection
@@ -50,8 +50,8 @@ function AboutSection() {
             <PencilShape />
           </div>
         }
-        title="From rough drafts to rich dialogues"
-        description="Transform your initial ideas into flowing conversations with ease. Start with a handful of key questions, and watch as our tool weaves them into an engaging dialogue that you can tweak so that resonate with your audience."
+        title="Understand Your Audience"
+        description="From simple yes-no surveys to in-depth quizzes and free-flowing conversations, our AI-powered platform streamlines audience insights. Magiscribe combines smart technology with artificial intelligence to deliver deeper understanding."
         reversed
       />
       <ContentSection
@@ -60,8 +60,8 @@ function AboutSection() {
             <SandcastleShape />
           </div>
         }
-        title="Tailor-made interactions for every need"
-        description="Whether you need a simple yes-or-no survey, an in-depth quiz, or a free-flowing conversation, our tool has you covered. Create interactive content that's perfectly aligned with your audience and research goals. Gather the insights you need in the format that works best for you and your users."
+        title="From rough drafts to rich dialogues"
+        description="Magiscribe produces semi-structured conversations allowing you to both guarantee particular questions get asked and allow for dynamic follow-up when the respondent says something interesting the same way a skilled interviewer would."
         reversed={false}
       />
     </SectionTemplate>
