@@ -12,36 +12,39 @@ import {
   YAxis,
   Bar,
 } from 'recharts';
+import colors from 'tailwindcss/colors';
 
-// Our color palettes remain the same
-const LIGHT_COLORS = [
-  '#1e40af', // Blue-800
-  '#047857', // Emerald-800
-  '#b45309', // Amber-800
-  '#be123c', // Rose-800
-  '#6b21a8', // Purple-800
-  '#0f766e', // Teal-800
-  '#9f1239', // Red-800
-  '#3730a3', // Indigo-800
-  '#115e59', // Cyan-800
-  '#854d0e', // Yellow-800
-  '#7e22ce', // Violet-800
-  '#166534', // Green-800
+// Type for our color arrays
+type ChartColors = string[];
+
+const LIGHT_COLORS: ChartColors = [
+  colors.blue[600],
+  colors.emerald[600],
+  colors.amber[600],
+  colors.rose[600],
+  colors.purple[600],
+  colors.teal[600],
+  colors.red[600],
+  colors.indigo[600],
+  colors.cyan[600],
+  colors.yellow[600],
+  colors.violet[600],
+  colors.green[600],
 ];
 
-const DARK_COLORS = [
-  '#60a5fa', // Blue-400
-  '#34d399', // Emerald-400
-  '#fcd34d', // Amber-300
-  '#fb7185', // Rose-400
-  '#c084fc', // Purple-400
-  '#2dd4bf', // Teal-400
-  '#f87171', // Red-400
-  '#818cf8', // Indigo-400
-  '#22d3ee', // Cyan-400
-  '#facc15', // Yellow-400
-  '#a78bfa', // Violet-400
-  '#4ade80', // Green-400
+const DARK_COLORS: ChartColors = [
+  colors.blue[400],
+  colors.emerald[400],
+  colors.amber[400],
+  colors.rose[400],
+  colors.purple[400],
+  colors.teal[400],
+  colors.red[400],
+  colors.indigo[400],
+  colors.cyan[400],
+  colors.yellow[400],
+  colors.violet[400],
+  colors.green[400],
 ];
 
 export interface ChartProps {
@@ -52,8 +55,7 @@ export interface ChartProps {
 }
 
 const Chart: React.FC<ChartProps> = ({ title, chartType, data, fullWidth = false }) => {
-  // Add state to track the current theme
-  const [currentColors, setCurrentColors] = useState(LIGHT_COLORS);
+  const [currentColors, setCurrentColors] = useState<ChartColors>(LIGHT_COLORS);
 
   // Function to check if dark mode is active
   const checkDarkMode = () => document.documentElement.classList.contains('dark');
@@ -84,18 +86,27 @@ const Chart: React.FC<ChartProps> = ({ title, chartType, data, fullWidth = false
 
   const tooltipStyle = {
     contentStyle: {
-      backgroundColor: 'rgb(51, 65, 85)',
+      backgroundColor: colors.slate[600],
       border: 'none',
       borderRadius: '6px',
     },
-    itemStyle: { color: '#fff' },
-    labelStyle: { color: '#fff' },
+    itemStyle: { color: colors.white },
+    labelStyle: { color: colors.white },
   };
 
   const renderPieChart = () => (
     <ResponsiveContainer width="100%" height={420}>
       <PieChart>
-        <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} fill="#8884D8" label>
+        <Pie
+          data={data}
+          dataKey="value"
+          nameKey="name"
+          cx="50%"
+          cy="50%"
+          outerRadius={80}
+          fill={colors.slate[400]}
+          label
+        >
           {data.map((_entry, index) => (
             <Cell key={`cell-${index}`} fill={currentColors[index % currentColors.length]} />
           ))}
@@ -112,7 +123,7 @@ const Chart: React.FC<ChartProps> = ({ title, chartType, data, fullWidth = false
         <CartesianGrid strokeDasharray="3 3" className="dark:stroke-slate-600" />
         <XAxis dataKey="name" stroke="currentColor" tick={{ fill: 'currentColor' }} />
         <YAxis stroke="currentColor" tick={{ fill: 'currentColor' }} />
-        <Tooltip {...tooltipStyle} cursor={{ fill: 'rgba(255, 255, 255, 0.1)' }} />
+        <Tooltip {...tooltipStyle} cursor={{ fill: colors.white, opacity: 0.1 }} />
         <Legend />
         <Bar dataKey="value">
           {data.map((_entry, index) => (
