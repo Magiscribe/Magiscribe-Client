@@ -132,7 +132,7 @@ const ViaChatTab: React.FC<ViaChatTabProps> = ({ id }) => {
             agentId,
             input: {
               userMessage: inputMessage,
-              conversationData: JSON.stringify(data),
+              conversationData: JSON.stringify(data.responses),
               numResponses: data.responses?.length ?? 0,
             },
           },
