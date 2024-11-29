@@ -187,8 +187,8 @@ export default function UserInquiryPage() {
     [addMessage, audioEnabled, audio, handleNextNode],
   );
 
-  const onError = () => {
-    addAlert('This response is taking longer than expected...', 'error');
+  const onError = (error: Error) => {
+    addAlert(error.message || 'An error occurred while processing the inquiry. Please try again later.', 'warning');
   };
 
   /*================================ EVENT HANDLERS ==============================*/
@@ -273,7 +273,7 @@ export default function UserInquiryPage() {
     const description = (startNode?.data?.text as string) ?? '';
 
     return (
-      <div className="bg-white dark:bg-slate-700 p-6 rounded-lg shadow-lg">
+      <div className="bg-white dark:bg-slate-700 p-6 rounded-3xl shadow-lg">
         <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white">{form.title}</h2>
         <p className="text-slate-600 dark:text-slate-300 mb-6">{description}</p>
         <div className="space-y-4">
@@ -342,7 +342,7 @@ export default function UserInquiryPage() {
   );
 
   const renderSummary = () => (
-    <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-lg">
+    <div className="bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-lg">
       <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white text-center">Thank you!</h2>
       <p className="text-lg text-slate-600 dark:text-slate-300 text-center">Your responses have been recorded.</p>
 
@@ -451,7 +451,7 @@ export default function UserInquiryPage() {
   );
 
   const renderNotFound = () => (
-    <div className="bg-white dark:bg-slate-700 p-6 rounded-lg shadow-lg">
+    <div className="bg-white dark:bg-slate-700 p-6 rounded-3xl shadow-lg">
       <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white">Inquiry Not Found</h2>
       <p className="text-slate-600 dark:text-slate-300 mb-6">
         The inquiry you are looking for does not exist. Please check the URL and try again.
@@ -460,7 +460,7 @@ export default function UserInquiryPage() {
   );
 
   const renderError = () => (
-    <div className="bg-white dark:bg-slate-700 p-6 rounded-lg shadow-lg">
+    <div className="bg-white dark:bg-slate-700 p-6 rounded-3xl shadow-lg">
       <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white">Something Went Wrong</h2>
       <p className="text-slate-600 dark:text-slate-300 mb-6">
         An error occurred while loading the inquiry. Please try again later.
@@ -485,7 +485,7 @@ export default function UserInquiryPage() {
         {state.error && renderError()}
         <div ref={messagesEndRef} />
       </div>
-      {(screen === 'inquiry' || screen === 'end') && renderInputArea()}
+      {(screen === 'inquiry' || screen === 'end') && !state.error && renderInputArea()}
     </>
   );
 }

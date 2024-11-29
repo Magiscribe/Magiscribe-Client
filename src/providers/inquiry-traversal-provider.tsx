@@ -170,6 +170,9 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
           if (onSubscriptionDataRef.current) {
             onSubscriptionDataRef.current(content);
           }
+        } else if (prediction?.type === PredictionType.Error) {
+          setState((prev) => ({ ...prev, loading: false, error: true }));
+          handleError(new Error(`An error occurred on our end, please try again later.`), false);
         }
       } catch (e) {
         setState((prev) => ({ ...prev, loading: true }));
@@ -249,21 +252,28 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
     }
   }
 
-  async function handleError(error: Error) {
-    // setState((prev) => ({ ...prev, error: true }));
+  /**
+   * Handles an error that occurs during the node traversal process.
+   * Optionally, it can retry the process if the retry flag is set to true.
+   * @param error
+   * @param retry
+   */
+  async function handleError(error: Error, retry = true) {
     if (onNodeErrorRef.current) {
       onNodeErrorRef.current(error);
     }
 
-    await addPrediction({
-      variables: {
-        ...lastPredictionVariablesRef.current,
-        input: {
-          ...(lastPredictionVariablesRef.current?.input ?? {}),
-          errorHandling: error?.message || 'An error occurred,  please identify and resolve the issue.',
+    if (retry) {
+      await addPrediction({
+        variables: {
+          ...lastPredictionVariablesRef.current,
+          input: {
+            ...(lastPredictionVariablesRef.current?.input ?? {}),
+            errorHandling: error?.message || 'An error occurred,  please identify and resolve the issue.',
+          },
         },
-      },
-    });
+      });
+    }
   }
 
   /**
