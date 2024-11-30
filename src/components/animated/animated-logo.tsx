@@ -92,7 +92,7 @@ function WandIcon() {
   );
 }
 
-export function Logo() {
+export function AnimatedLogo() {
   return (
     <div className={`font-display no-underline hover:no-underline font-bold text-2xl lg:text-4xl mt-2`}>
       <WandIcon />

@@ -5,7 +5,7 @@ import Button from '@/components/controls/button';
 import Input from '@/components/controls/input';
 import Textarea from '@/components/controls/textarea';
 import RatingInput from '@/components/graph/rating-input';
-import { ImageLoader } from '@/components/image/image-load';
+import { S3ImageLoader } from '@/components/s3-image-loader';
 import MarkdownCustom from '@/components/markdown-custom';
 import { useTranscribe } from '@/hooks/audio-hook';
 import useElevenLabsAudio from '@/hooks/audio-player';
@@ -324,7 +324,7 @@ export default function UserInquiryPage() {
             }`}
           >
             {message.type === 'image' ? (
-              <ImageLoader images={message.content as ImageMetadata[]} />
+              <S3ImageLoader images={message.content as ImageMetadata[]} />
             ) : (
               <MarkdownCustom>{message.content as string}</MarkdownCustom>
             )}
