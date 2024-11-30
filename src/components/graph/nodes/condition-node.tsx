@@ -17,19 +17,16 @@ export default function ConditionNode({ id, data }: ConditionNodeProps) {
 
   return (
     <NodeContainer title="Condition" faIcon={faCodeBranch} id={id}>
-      <div className="flex flex-col space-y-4 my-4">
-        <Textarea
-          label="Message"
-          subLabel="Instructions to tell an AI how to choose where to go next"
-          name="text"
-          value={data.text}
-          onChange={handleInputChange}
-          placeholder="Enter your text here..."
-          className="resize-none overflow-hidden nodrag"
-          rows={3}
-        />
-      </div>
-
+      <Textarea
+        label="Message"
+        subLabel="Instructions to tell an AI how to choose where to go next"
+        name="text"
+        value={data.text}
+        onChange={handleInputChange}
+        placeholder="Enter your text here..."
+        className="resize-none overflow-hidden nodrag"
+        rows={3}
+      />
       <Handle type="target" position={Position.Left} className="w-4 h-4 !bg-green-500" />
       <Handle type="source" position={Position.Right} className="w-4 h-4 !bg-green-500" />
     </NodeContainer>

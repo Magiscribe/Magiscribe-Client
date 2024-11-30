@@ -8,7 +8,7 @@ type ImageLoaderProps = {
   images: ImageMetadata[];
 };
 
-export function ImageLoader(props: ImageLoaderProps): React.ReactElement {
+export function S3ImageLoader(props: ImageLoaderProps): React.ReactElement {
   const [images, setImages] = useState<string[]>([]);
 
   const [getMediaAsset] = useLazyQuery<GetMediaAssetQuery>(GET_MEDIA_ASSET);

@@ -7,7 +7,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import { useTitle } from '../../hooks/title-hook';
 import Button from '../controls/button';
-import { Logo } from '../logo';
+import { AnimatedLogo } from '../animated/animated-logo';
 
 export function NavBar({ isFixed = true }) {
   const [atTop, setAtTop] = useState(true);
@@ -41,7 +41,7 @@ export function NavBar({ isFixed = true }) {
     >
       <div className="w-full container mx-auto flex flex-wrap items-center justify-between mt-0 py-2">
         <Link to={user ? '/dashboard' : '/'} className="pl-4 flex items-center">
-          <Logo />
+          <AnimatedLogo />
           <AnimatePresence mode="wait">
             {title && (
               <motion.span
