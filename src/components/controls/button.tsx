@@ -20,6 +20,8 @@ const variantClassNames = {
     'text-white dark:text-slate-600 hover:text-slate-400 dark:hover:text-white focus:outline-none focus:ring-0 select-none',
   transparentDark:
     'text-slate-600 dark:text-white hover:text-slate-700 dark:hover:text-slate-400 border-0 focus:outline-none focus:ring-0 select-none',
+  transparentWhite: 'text-white hover:text-white focus:outline-none focus:ring-0 select-none',
+  transparentBlack: 'text-black hover:text-black focus:outline-none focus:ring-0 select-none',
 
   inversePrimary:
     'bg-transperant text-blue-600 hover:bg-blue-600 hover:text-white focus:ring-red-500 border border-2 border-blue-600',

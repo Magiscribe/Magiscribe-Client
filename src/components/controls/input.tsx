@@ -16,6 +16,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   name: string;
   error?: string;
   className?: string;
+  autoSize?: boolean;
 }
 
 /**
@@ -28,7 +29,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 export default function Input({ label, subLabel, name, error, className, ...props }: InputProps): JSX.Element {
   const isCheckbox = props.type === 'checkbox';
 
-  const baseClassName = 'w-full p-2 border rounded-2xl dark:bg-slate-600 bg-white focus:outline-none focus:ring-2';
+  const baseClassName = 'w-auto p-2 border rounded-2xl dark:bg-slate-600 bg-white focus:outline-none focus:ring-2';
 
   const inputStyles = {
     default: clsx(
