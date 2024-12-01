@@ -5,8 +5,8 @@ import Button from '@/components/controls/button';
 import Input from '@/components/controls/input';
 import Textarea from '@/components/controls/textarea';
 import RatingInput from '@/components/graph/rating-input';
-import { S3ImageLoader } from '@/components/s3-image-loader';
 import MarkdownCustom from '@/components/markdown-custom';
+import { S3ImageLoader } from '@/components/s3-image-loader';
 import { useTranscribe } from '@/hooks/audio-hook';
 import useElevenLabsAudio from '@/hooks/audio-player';
 import { useQueue } from '@/hooks/debounce-queue';
@@ -475,16 +475,26 @@ export default function UserInquiryPage() {
     </div>
   );
 
+  const getActiveScreen = () => {
+    if (state.error) return renderError();
+    if (state.notFound) return renderNotFound();
+
+    switch (screen) {
+      case 'start':
+        return renderStartScreen();
+      case 'inquiry':
+      case 'end':
+        return renderMessages();
+      case 'summary':
+        return renderSummary();
+      default:
+        return null;
+    }
+  };
+
   return (
     <>
-      <div className="w-full max-w-4xl flex-grow p-4 space-y-4 mx-auto">
-        {screen === 'start' && renderStartScreen()}
-        {(screen === 'inquiry' || screen === 'end') && renderMessages()}
-        {screen === 'summary' && renderSummary()}
-        {state.notFound && renderNotFound()}
-        {state.error && renderError()}
-        <div ref={messagesEndRef} />
-      </div>
+      <div className="w-full max-w-4xl flex-grow p-4 space-y-4 mx-auto">{getActiveScreen()}</div>
       {(screen === 'inquiry' || screen === 'end') && !state.error && renderInputArea()}
     </>
   );
