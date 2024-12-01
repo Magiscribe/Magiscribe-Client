@@ -10,9 +10,9 @@ const templateOpenEnded: { nodes: Node[]; edges: Edge[] } = {
         y: 529,
       },
       data: {
-        text: 'Welcome to our Inquiry about HVAC co',
-        requireName: false,
-        requireEmail: false,
+        text: 'This is text that will be displayed on the start screen',
+        requireName: true,
+        requireEmail: true,
       },
       measured: {
         width: 384,
@@ -29,7 +29,7 @@ const templateOpenEnded: { nodes: Node[]; edges: Edge[] } = {
         y: 447,
       },
       data: {
-        text: 'Welcome to the conversation about HVAC co! You can answer our questions, or ask questions of your own!',
+        text: 'This will provide introductory information and inform the user that they can answer questions or ask questions of their own!',
       },
       measured: {
         width: 384,
@@ -46,7 +46,7 @@ const templateOpenEnded: { nodes: Node[]; edges: Edge[] } = {
         y: 0,
       },
       data: {
-        text: 'Ask the user a detailed question about HVAC. ',
+        text: 'Ask the user a detailed question about a generic business. ',
         dynamicGeneration: true,
       },
       measured: {
@@ -64,7 +64,7 @@ const templateOpenEnded: { nodes: Node[]; edges: Edge[] } = {
         y: 385,
       },
       data: {
-        text: 'If the user makes a statement that warrants a follow up question go to eh4e OR if the "Bot" has the most recent message in the conversation go to eh4e\n\nIf the user asked us a question that warrants a direct response go to h7eu\n\nOtherwise go to the node t9ki to end the conversation if the user indicates they want to be finished or done',
+        text: 'If the user makes a statement that warrants a follow up question go to eh4e OR if the "Bot" has the most recent message in the conversation go to eh4e\n\nIf the user asked us a question that warrants a direct response go to h7eu\n\nOtherwise go to the node t9ki to end the conversation if the user indicates they want to be finished. \n\nIMPORTANT: Go to t9ki if a total of 10 questions or more have been asked in the conversation history',
       },
       measured: {
         width: 384,
@@ -81,7 +81,7 @@ const templateOpenEnded: { nodes: Node[]; edges: Edge[] } = {
         y: 447,
       },
       data: {
-        text: 'Summarize the conversation, thank the user for their tim',
+        text: 'Summarize the conversation, thank the user for their time',
         dynamicGeneration: true,
       },
       measured: {
@@ -116,7 +116,7 @@ const templateOpenEnded: { nodes: Node[]; edges: Edge[] } = {
         y: 809,
       },
       data: {
-        text: "Answer the user's question provided it is about HVAC. If it is not, politely remind them that this is an HVAC inquiry and the scope of the conversation is limited.",
+        text: "Answer the user's question provided it is about generic business. You can add more information about your business here. If it is unrelated to the topic, politely remind them that this is an inquiry about generic business and the scope of the conversation is limited.",
         dynamicGeneration: true,
       },
       measured: {
@@ -137,9 +137,8 @@ const templateOpenEnded: { nodes: Node[]; edges: Edge[] } = {
         text: 'Why are you taking this inquiry?',
         type: 'rating-multi',
         ratings: [
-          'To learn about HVAC',
-          'For a service issue',
-          'I want to start an HVAC company',
+          'To learn about generic business',
+          'To provide a feedback about generic business',
           'Other (Please Explain)',
         ],
       },

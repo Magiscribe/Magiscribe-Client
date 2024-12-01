@@ -7,9 +7,9 @@ const templateDefault: { nodes: Node[]; edges: Edge[] } = {
       type: 'start',
       position: { x: 0, y: 0 },
       data: {
-        text: '',
-        requireName: false,
-        requireEmail: false,
+        text: 'This is text that will be displayed on the start screen',
+        requireName: true,
+        requireEmail: true,
       },
     },
   ],
