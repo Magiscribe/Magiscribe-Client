@@ -1,4 +1,4 @@
-import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faChevronRight, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   addEdge,
@@ -43,7 +43,9 @@ function Flow({ children, nodes, edges, setNodes, onNodesChange, setEdges, onEdg
   // Hooks
   const { screenToFlowPosition } = useReactFlow();
 
+  // States
   const [addNodeModalOpen, setAddNodeModalOpen] = useState(false);
+  const [isNodeBarVisible, setIsNodeBarVisible] = useState(true);
 
   // New node state
   const connectingNodeId = useRef<string | null>(null);
@@ -123,7 +125,7 @@ function Flow({ children, nodes, edges, setNodes, onNodesChange, setEdges, onEdg
   };
 
   /**
-   * Adds a new node to the graph.
+   * Adds a new node to the graph based on the current new node state.
    * @returns {void} - Nothing
    */
   const addNode = (): void => {
@@ -195,16 +197,33 @@ function Flow({ children, nodes, edges, setNodes, onNodesChange, setEdges, onEdg
   };
 
   const renderNodeButtons = () => (
-    <div className="w-full flex flex-row space-x-4">
+    <>
       {Object.keys(nodeTypesInfo).map((type) => {
         const disabled = !validateNewNode(type);
 
         return (
-          <div key={type} className="w-44 flex items-center z-10">
+          <div key={type} className="w-44 flex items-center">
             <div className="relative w-full text-slate-800 dark:text-white ">
               <button
                 draggable={!disabled}
                 onDragStart={() => (disabled ? null : onDragStart(type))}
+                onClick={(event) => {
+                  const buttonRect = event.currentTarget.getBoundingClientRect();
+
+                  // Adds the new node to the graph directly below the button that was clicked
+                  // to create the new node
+                  newNode.current = {
+                    source: undefined,
+                    target: undefined,
+                    position: screenToFlowPosition({
+                      x: buttonRect.left,
+                      y: buttonRect.bottom + 20,
+                    }),
+                    type,
+                  };
+
+                  addNode();
+                }}
                 disabled={disabled}
                 className="relative w-full max-w-xs px-4 py-2 bg-white dark:bg-slate-700 border-2 border-slate-400 font-semibold text-sm rounded-xl shadow-lg disabled:opacity-50 text-left"
               >
@@ -230,7 +249,7 @@ function Flow({ children, nodes, edges, setNodes, onNodesChange, setEdges, onEdg
           </div>
         );
       })}
-    </div>
+    </>
   );
 
   const renderNodeButtonsMenu = (position?: { x: number; y: number }, source?: string, target?: string) =>
@@ -259,13 +278,21 @@ function Flow({ children, nodes, edges, setNodes, onNodesChange, setEdges, onEdg
   return (
     <>
       <div className="relative w-full h-full text-black">
-        <div className="absolute w-full flex flex-row top-0 left-0 p-4 space-x-4">
-          <h3 className="text-xl font-semibold text-left text-white min-w-44">
-            Nodes
-            <br />
-            <span className="-mt-2 text-xs">Drag and drop to add nodes</span>
-          </h3>
-          {renderNodeButtons()}
+        <div className="absolute flex flex-row top-0 left-0 p-4 space-x-4 z-10">
+          <div className="flex flex-col space-y-2 text-white">
+            <h3 className="text-xl font-semibold text-left">Nodes</h3>
+            {isNodeBarVisible && <p className="-mt-2 text-xs text-nowrap">Drag and drop to add nodes</p>}
+          </div>
+          <div className="w-full flex flex-row space-x-4 m-auto">
+            {isNodeBarVisible && renderNodeButtons()}
+            <Button
+              variant="transparentWhite"
+              onClick={() => setIsNodeBarVisible(!isNodeBarVisible)}
+              className="z-10"
+              size="small"
+              icon={isNodeBarVisible ? faChevronLeft : faChevronRight}
+            />
+          </div>
         </div>
         <div className="w-full h-full text-black" ref={reactFlowWrapper}>
           <ReactFlow

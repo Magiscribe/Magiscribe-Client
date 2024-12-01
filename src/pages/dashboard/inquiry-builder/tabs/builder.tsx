@@ -1,6 +1,6 @@
+import GraphGeneratorMenu from '@/components/cards/generate-menu';
 import Button from '@/components/controls/button';
 import GraphContextBar from '@/components/graph/context-bar';
-import GraphGeneratorMenu from '@/components/cards/generate-menu';
 import GraphInput from '@/components/graph/graph-input';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { faMagicWandSparkles } from '@fortawesome/free-solid-svg-icons';
@@ -107,7 +107,7 @@ export default function InquiryBuilder() {
               >
                 <Button
                   onClick={toggleChat}
-                  className="absolute bottom-4 right-4"
+                  className="absolute top-4 right-4 z-100"
                   variant="primary"
                   icon={faMagicWandSparkles}
                 >

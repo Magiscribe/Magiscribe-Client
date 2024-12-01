@@ -52,15 +52,15 @@ export default function GraphContextBar() {
 
   return (
     <>
-      <div className="flex justify-between items-start">
-        <div>
+      <div className="flex space-x-4 justify-between items-start">
+        <div className="w-full max-w-2xl">
           <Input
             name="title"
             value={form.title ?? 'Untitled Inquiry'}
             onChange={(e) => {
               updateForm({ ...form, title: e.target.value });
             }}
-            className="text-2xl font-bold w-full border-2 border-slate-200 p-2 rounded-lg"
+            className="text-2xl font-bold border-2 border-slate-200 p-2 rounded-lg"
           />
           <p className="text-sm dark:text-slate-400 text-slate-600">
             Last updated {lastUpdated ? new Date(lastUpdated).toLocaleString() : 'Never'}

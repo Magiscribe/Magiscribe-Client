@@ -34,7 +34,7 @@ const NodeContainer = ({ title, faIcon, id, children }: NodeContainerProps) => {
         <h3 className="text-lg font-bold text-slate-800 dark:text-white">{title}</h3>
         <p className="ml-2 text-sm text-slate-400">#{id}</p>
       </div>
-      <div className="space-y-4 my-4">{children}</div>
+      <div className="space-y-4 my-2">{children}</div>
     </div>
   );
 };
