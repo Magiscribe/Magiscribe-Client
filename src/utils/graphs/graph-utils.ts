@@ -274,7 +274,7 @@ export function validateGraph(graph: StrippedGraph): { valid: boolean; errors: s
           );
         }
         // Check if condition node has a condition
-        if (!node.data.text) {
+        if (node.data.conditions.some((cond: { to: string; condition: string }) => cond.condition == '')) {
           errors.push(
             `Condition node "${id}" is missing its decision criteria. Please add a condition to specify how the flow should branch.`,
           );

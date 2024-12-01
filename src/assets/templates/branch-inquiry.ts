@@ -143,7 +143,16 @@ const templateBranchInquiry: { nodes: Node[]; edges: Edge[] } = {
         y: 300.5,
       },
       data: {
-        text: "If 'Customer Service' is selected in node h6td, route to node s4kf. Otherwise, route to node m1vz.",
+        conditions: [
+          {
+            to: "s4kf",
+            condition: "If 'Customer Service' is selected"
+          },
+          {
+            to: "m1vz",
+            condition: "Otherwise"
+          }
+        ]
       },
       measured: {
         width: 384,

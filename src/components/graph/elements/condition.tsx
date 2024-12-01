@@ -4,6 +4,7 @@ import Input from '@/components/controls/input';
 import Button from '@/components/controls/button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import Textarea from '@/components/controls/textarea';
 
 type ConditionProps = {
   to: string;
@@ -45,36 +46,38 @@ const Condition = ({ to, condition, nodeId, onChange, onRemove }: ConditionProps
       <Button className="absolute right-0 bg-red-600 hover:bg-red-800 rounded-full" onClick={onRemove}>
         <FontAwesomeIcon icon={faTrash} title="Remove condition"></FontAwesomeIcon>
       </Button>
-      To:{' '}
-      <select
-        value={to}
-        style={{ backgroundColor: toNodeValid ? toColor : undefined }}
-        className={toNodeValid ? '' : 'bg-red-600'}
-        onChange={({ target }) => onChange({ to: target.value, condition })}
-        onMouseEnter={() => handleMouseEnter(to)}
-        onMouseLeave={() => handleMouseLeave(to)}
-      >
-        {toNodeValid ? null : <option value={to}>{to}</option>}
-        {outgoers.map((dest) => (
-          <option
-            value={dest.id}
-            onMouseEnter={() => handleMouseEnter(dest.id)}
-            onMouseLeave={() => handleMouseLeave(dest.id)}
-          >
-            {dest.id}
-          </option>
-        ))}
-      </select>
-      <br />
-      <Input
-        name="condition"
+      <div className="mb-4">
+        <span className="text-slate-800 dark:text-white">To: </span>
+        <select
+          value={to}
+          style={{ backgroundColor: toNodeValid ? toColor : undefined }}
+          className={toNodeValid ? '' : 'bg-red-600'}
+          onChange={({ target }) => onChange({ to: target.value, condition })}
+          onMouseEnter={() => handleMouseEnter(to)}
+          onMouseLeave={() => handleMouseLeave(to)}
+        >
+          {toNodeValid ? null : <option value={to}>{to}</option>}
+          {outgoers.map((dest) => (
+            <option
+              value={dest.id}
+              onMouseEnter={() => handleMouseEnter(dest.id)}
+              onMouseLeave={() => handleMouseLeave(dest.id)}
+            >
+              {dest.id}
+            </option>
+          ))}
+        </select>
+      </div>
+      <Textarea
         label="Condition"
-        as="textarea"
+        subLabel="Condition to tell the AI when to go to this node"
+        name="condition"
         value={condition}
         onChange={({ target }) => onChange({ to, condition: target.value })}
         placeholder="Enter the condition here..."
         className="resize-none overflow-hidden nodrag"
-      ></Input>
+        rows={3}
+      />
     </div>
   );
 };

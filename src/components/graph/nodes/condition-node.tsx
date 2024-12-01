@@ -44,7 +44,7 @@ export default function ConditionNode({ id, data }: ConditionNodeProps) {
           size="medium"
           iconLeft={faPlus}
           onClick={() => {
-            let conditions = [...data.conditions, { from: '', to: '', condition: '' }];
+            let conditions = [...data.conditions, { to: '', condition: '' }];
             updateNodeData(id, { conditions });
           }}
         >
