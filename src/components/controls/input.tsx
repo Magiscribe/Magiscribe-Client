@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import React from 'react';
+import React, { useId } from 'react';
 
 /**
  * Props for the Input component.
@@ -27,6 +27,9 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
  * @returns {JSX.Element} The rendered Input component.
  */
 export default function Input({ label, subLabel, name, error, className, ...props }: InputProps): JSX.Element {
+  // A React hook that generates a unique ID for the input element to reference the label.
+  const id = useId();
+
   const isCheckbox = props.type === 'checkbox';
 
   const baseClassName = 'w-auto p-2 border rounded-2xl dark:bg-slate-600 bg-white focus:outline-none focus:ring-2';
@@ -64,9 +67,9 @@ export default function Input({ label, subLabel, name, error, className, ...prop
 
   return (
     <div className={inputWrapperClassName}>
-      <input id={name} name={name} className={inputClassName} {...props} />
+      <input id={id} name={name} className={inputClassName} {...props} />
       {label && (
-        <label className={labelClassName} htmlFor={name}>
+        <label className={labelClassName} htmlFor={id}>
           {label}
           {subLabel && (
             <>
