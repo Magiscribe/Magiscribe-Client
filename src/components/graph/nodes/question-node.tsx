@@ -66,7 +66,7 @@ export default function QuestionNode({ id, data }: QuestionNodeProps) {
     <NodeContainer title="Question" faIcon={faQuestionCircle} id={id}>
       <Input
         label="Dynamic Generation"
-        name={`dynamicGeneration-${id}`}
+        name="dynamic-generation"
         type="checkbox"
         checked={data.dynamicGeneration}
         onChange={(e) => handleUpdate({ dynamicGeneration: (e.target as HTMLInputElement).checked })}

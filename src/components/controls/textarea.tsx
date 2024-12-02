@@ -1,6 +1,6 @@
 import useAutoResizeTextareaRef from '@/hooks/auto-resize-textarea';
 import clsx from 'clsx';
-import React from 'react';
+import React, { useId } from 'react';
 
 /**
  * Props for the Textarea component.
@@ -34,6 +34,10 @@ export default function Textarea({
   value,
   ...props
 }: TextareaProps): JSX.Element {
+  // A React hook that generates a unique ID for the input element to reference the label.
+  const id = useId();
+
+  // A hook to autorersize the textarea element based on its content.
   const textareaRef = useAutoResizeTextareaRef(value as string);
 
   const baseClassName =
@@ -54,7 +58,7 @@ export default function Textarea({
   return (
     <div className="dark:text-white text-slate-800 w-full flex flex-col gap-2">
       {label && (
-        <label className={labelClassName} htmlFor={name}>
+        <label className={labelClassName} htmlFor={id}>
           {label}
           {subLabel && (
             <>
@@ -64,7 +68,7 @@ export default function Textarea({
           )}
         </label>
       )}
-      <textarea id={name} name={name} className={textareaClassName} ref={textareaRef} value={value} {...props} />
+      <textarea id={id} name={name} className={textareaClassName} ref={textareaRef} value={value} {...props} />
       {error && <p className="text-red-700 text-sm mt-1">{error}</p>}
     </div>
   );

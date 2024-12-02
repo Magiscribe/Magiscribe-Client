@@ -1,7 +1,7 @@
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import clsx from 'clsx';
-import React from 'react';
+import React, { useId } from 'react';
 
 interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
@@ -13,6 +13,9 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
 }
 
 const Select: React.FC<SelectProps> = ({ label, subLabel, name, error, options, className, ...props }) => {
+  // A React hook that generates a unique ID for the input element to reference the label.
+  const id = useId();
+
   const baseSelectClassName = clsx(
     'w-full p-3 border rounded-2xl focus:outline-none focus:ring-2',
     'relative overflow-hidden appearance-none dark:bg-slate-600 bg-white',
@@ -26,7 +29,7 @@ const Select: React.FC<SelectProps> = ({ label, subLabel, name, error, options, 
   return (
     <div className="flex flex-col gap-2 dark:text-white text-slate-800">
       {label && (
-        <label className="text-sm font-bold" htmlFor={name}>
+        <label className="text-sm font-bold" htmlFor={id}>
           {label}
           {subLabel && (
             <>
@@ -37,7 +40,7 @@ const Select: React.FC<SelectProps> = ({ label, subLabel, name, error, options, 
         </label>
       )}
       <div className="relative">
-        <select id={name} name={name} className={baseSelectClassName} {...props}>
+        <select id={id} name={name} className={baseSelectClassName} {...props}>
           {/* Default */}
           <option value="" disabled hidden>
             Select an option...
