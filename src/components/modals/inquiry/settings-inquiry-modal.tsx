@@ -1,8 +1,9 @@
 import { GET_ALL_AUDIO_VOICES } from '@/clients/queries';
-import { GetAllAudioVoicesQuery } from '@/graphql/graphql';
+import useElevenLabsAudio from '@/hooks/audio-player';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { useQuery } from '@apollo/client';
+import { faPlay, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -10,6 +11,7 @@ import Button from '../../controls/button';
 import Select from '../../controls/select';
 import ConfirmationModal from '../confirm-modal';
 import CustomModal from '../modal';
+import { GetAllAudioVoicesQuery } from '@/graphql/types';
 
 /**
  * Props for the ModalUpsertInquiry component
@@ -24,12 +26,16 @@ interface ModalUpsertInquiryProps {
  * ModalUpsertInquiry component for creating or updating inquiries
  */
 export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUpsertInquiryProps) {
+  // State
   const [deleteModal, setDeleteModal] = useState(false);
 
+  // Hooks
   const { id, form, updateForm, saveForm, deleteInquiry } = useInquiryBuilder();
   const alert = useAddAlert();
   const navigate = useNavigate();
+  const { addSentence, isLoading } = useElevenLabsAudio(form.voice!);
 
+  // Apollo
   const { data: voices } = useQuery<GetAllAudioVoicesQuery>(GET_ALL_AUDIO_VOICES);
 
   /**
@@ -97,6 +103,22 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
             onChange={handleSelectChange('voice')}
             options={voices?.getAllAudioVoices.map((voice) => ({ value: voice.id, label: voice.name })) ?? []}
           />
+          <Button
+            type="button"
+            icon={isLoading ? faSpinner : faPlay}
+            iconSpin={isLoading}
+            onClick={() => {
+              addSentence(
+                `Hello, I am ${form.voice}! ${
+                  ["Let's capture insights!", 'It is nice to meet you!', 'I was programmed to say this!'][
+                    Math.floor(Math.random() * 3)
+                  ]
+                }`,
+              );
+            }}
+          >
+            Preview Voice
+          </Button>
         </form>
       </CustomModal>
 

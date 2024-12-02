@@ -9,6 +9,7 @@ interface QueueItem {
 
 export const useElevenLabsAudio = (voice: string) => {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [generateAudio] = useMutation(GENERATE_AUDIO);
 
   const audioQueueRef = useRef<QueueItem[]>([]);
@@ -65,12 +66,14 @@ export const useElevenLabsAudio = (voice: string) => {
       audioQueueRef.current.push(newItem);
 
       try {
+        setIsLoading(true);
         const audioUrl = await generateAudio({
           variables: {
             text: newItem.text,
             voice,
           },
         });
+        setIsLoading(false);
 
         newItem.audio = new Audio(audioUrl.data.generateAudio);
 
@@ -88,6 +91,7 @@ export const useElevenLabsAudio = (voice: string) => {
   return {
     addSentence,
     isPlaying,
+    isLoading,
     pendingAudioCount: audioQueueRef.current.length,
     clearQueue: useCallback(() => {
       audioQueueRef.current = [];
