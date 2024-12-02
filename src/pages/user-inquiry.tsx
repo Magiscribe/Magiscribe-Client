@@ -377,7 +377,7 @@ export default function UserInquiryPage() {
         <>
           {currentNode && !state.loading && ((currentNode?.data?.type ?? '') as string).startsWith('rating') && (
             <RatingInput
-              ratings={currentNode.data.ratings as string[]}
+              ratings={(currentNode.data.ratings as string[]) ?? []}
               isMulti={currentNode.data.type === 'rating-multi'}
               onRatingChange={setSelectedRatings}
             />
