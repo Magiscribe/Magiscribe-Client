@@ -39,7 +39,7 @@ export default function Input({ label, subLabel, name, error, className, ...prop
       baseClassName,
       'focus:ring-indigo-500',
       {
-        'border-slate-300': !error,
+        'border-slate-400': !error,
         'border-red-700 focus:ring-red-500': error,
       },
       className,

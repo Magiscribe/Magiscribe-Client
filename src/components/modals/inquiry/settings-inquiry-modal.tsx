@@ -1,4 +1,5 @@
 import { GET_ALL_AUDIO_VOICES } from '@/clients/queries';
+import { GetAllAudioVoicesQuery } from '@/graphql/types';
 import useElevenLabsAudio from '@/hooks/audio-player';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
@@ -11,7 +12,7 @@ import Button from '../../controls/button';
 import Select from '../../controls/select';
 import ConfirmationModal from '../confirm-modal';
 import CustomModal from '../modal';
-import { GetAllAudioVoicesQuery } from '@/graphql/types';
+import { VOICE_LINE_SAMPLES } from '@/utils/audio/voice-line-samples';
 
 /**
  * Props for the ModalUpsertInquiry component
@@ -33,10 +34,10 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
   const { id, form, updateForm, saveForm, deleteInquiry } = useInquiryBuilder();
   const alert = useAddAlert();
   const navigate = useNavigate();
-  const { addSentence, isLoading } = useElevenLabsAudio(form.voice!);
 
-  // Apollo
+  // Voice hooks
   const { data: voices } = useQuery<GetAllAudioVoicesQuery>(GET_ALL_AUDIO_VOICES);
+  const { addSentence, isLoading } = useElevenLabsAudio(form.voice!);
 
   /**
    * Handle select change for the form
@@ -65,6 +66,13 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
         alert('Something went wrong!', 'error');
       },
     );
+  };
+
+  /**
+   * Handle previewing the voice with a few random sentences.
+   */
+  const handlePreviewVoice = () => {
+    addSentence(VOICE_LINE_SAMPLES[Math.floor(Math.random() * VOICE_LINE_SAMPLES.length)]);
   };
 
   return (
@@ -101,24 +109,26 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
             subLabel="This will be the voice used to read responses to the user if they have audio enabled"
             value={form.voice ?? ''}
             onChange={handleSelectChange('voice')}
-            options={voices?.getAllAudioVoices.map((voice) => ({ value: voice.id, label: voice.name })) ?? []}
+            options={
+              voices?.getAllAudioVoices.map((voice) => ({
+                value: voice.id,
+                label: `${voice.name} (${voice.tags.join(', ')})`,
+              })) ?? []
+            }
           />
-          <Button
-            type="button"
-            icon={isLoading ? faSpinner : faPlay}
-            iconSpin={isLoading}
-            onClick={() => {
-              addSentence(
-                `Hello, I am ${form.voice}! ${
-                  ["Let's capture insights!", 'It is nice to meet you!', 'I was programmed to say this!'][
-                    Math.floor(Math.random() * 3)
-                  ]
-                }`,
-              );
-            }}
-          >
-            Preview Voice
-          </Button>
+
+          <div className="flex justify-end">
+            <Button
+              type="button"
+              variant="secondary"
+              size="small"
+              icon={isLoading ? faSpinner : faPlay}
+              iconSpin={isLoading}
+              onClick={handlePreviewVoice}
+            >
+              Preview Voice
+            </Button>
+          </div>
         </form>
       </CustomModal>
 

@@ -1,37 +1,23 @@
 import templates, { Template } from '@/assets/templates';
 import { GET_ALL_AUDIO_VOICES } from '@/clients/queries';
+import GenericDisclosure from '@/components/controls/disclosure';
+import GenericRadioGroup from '@/components/controls/radio-button';
+import Select from '@/components/controls/select';
 import { GetAllAudioVoicesQuery } from '@/graphql/graphql';
+import useElevenLabsAudio from '@/hooks/audio-player';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { useQuery } from '@apollo/client';
-import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { faPlay, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Description, Label, Radio, RadioGroup } from '@headlessui/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
 
 import Button from '../../controls/button';
 import Input from '../../controls/input';
-import Select from '../../controls/select';
 import Textarea from '../../controls/textarea';
 import CustomModal from '../modal';
-
-/**
- * Props for the ModalUpsertInquiry component
- */
-interface ModalUpsertInquiryProps {
-  open: boolean;
-  onSave?: (id: string) => void;
-  onClose: () => void;
-}
-
-/**
- * Props for the TemplateSelection component
- */
-interface TemplateSelectionProps {
-  value?: Template;
-  onChange?: (template: Template) => void;
-}
+import { VOICE_LINE_SAMPLES } from '@/utils/audio/voice-line-samples';
 
 /**
  * Array of funny loading quotes
@@ -58,60 +44,21 @@ const conversationGraphLoadingQuotes = [
   'Hiring an exterminator to deal with the bug infestation...',
 ];
 
-/**
- * TemplateSelection component for selecting inquiry templates
- */
-const TemplateSelection: React.FC<TemplateSelectionProps> = ({ value, onChange }) => (
-  <div className="w-full">
-    <RadioGroup value={value} onChange={onChange}>
-      <Label className="block text-sm font-bold mb-2">
-        Options
-        <br />
-        <span className="italic text-slate-500 text-sm font-normal">
-          Select a template to jumpstart your inquiry or start from scratch
-        </span>
-      </Label>
-      <div className="grid grid-cols-2 gap-4">
-        {templates.map((template) => (
-          <Radio
-            key={template.name}
-            value={template}
-            className={({ checked }) =>
-              `${checked ? 'bg-blue-500 text-white' : 'bg-slate-200 dark:bg-slate-600'}
-                relative flex cursor-pointer rounded-lg px-4 py-2 shadow-md focus:outline-none`
-            }
-          >
-            {({ checked }) => (
-              <div className="flex flex-col">
-                <Label
-                  as="span"
-                  className={`text-lg font-bold ${checked ? 'text-white' : ' text-slate-800 dark:text-white'}`}
-                >
-                  {template.name}
-                </Label>
-                <Description
-                  as="span"
-                  className={`text-sm ${checked ? 'text-slate-100' : ' text-slate-800 dark:text-slate-300'}`}
-                >
-                  {template.description}
-                </Description>
-              </div>
-            )}
-          </Radio>
-        ))}
-      </div>
-    </RadioGroup>
-  </div>
-);
+interface ModalUpsertInquiryProps {
+  open: boolean;
+  onSave?: (id: string) => void;
+  onClose: () => void;
+}
 
 /**
  * ModalUpsertInquiry component for creating or updating inquiries
  */
-const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, onClose }) => {
-  const [selectedTemplate, setSelectedTemplate] = useState<Template | undefined>(undefined);
-  const [enableGraphGeneration, setEnableGraphGeneration] = useState(false);
+export default function ModalUpsertInquiry({ open, onSave, onClose }: ModalUpsertInquiryProps) {
+  const [selectedTemplate, setSelectedTemplate] = useState<Template | undefined>(templates[2]);
+  const [enableGraphGeneration, setEnableGraphGeneration] = useState(true);
   const [loadingQuote, setLoadingQuote] = useState(conversationGraphLoadingQuotes[0]);
 
+  // Hooks
   const {
     id,
     form,
@@ -124,18 +71,21 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
   } = useInquiryBuilder();
   const alert = useAddAlert();
 
+  // Voice Hooks
   const { data: voices } = useQuery<GetAllAudioVoicesQuery>(GET_ALL_AUDIO_VOICES);
+  const { addSentence, isLoading: isVoicePreviewLoading } = useElevenLabsAudio(form.voice!);
+
+  /*================================ SIDE EFFECTS ==============================*/
+
+  useEffect(() => {
+    if (selectedTemplate) {
+      updateGraph(selectedTemplate.graph ?? { nodes: [], edges: [] });
+    }
+  }, [selectedTemplate]);
 
   /**
-   * Reset the selected template and graph generation state when the modal is closed.
+   * Randomly change the loading quote every 3 seconds while generating the graph.
    */
-  useEffect(() => {
-    if (!open) {
-      setSelectedTemplate(undefined);
-      setEnableGraphGeneration(false);
-    }
-  }, [open]);
-
   useEffect(() => {
     if (generatingGraph) {
       const interval = setInterval(() => {
@@ -147,7 +97,9 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
     }
   }, [generatingGraph]);
 
-  // Sets the default voice once the voices are loaded.
+  /**
+   * Sets the default voice once the voices are loaded.
+   */
   useEffect(() => {
     if (voices) {
       if (!form.voice) {
@@ -155,6 +107,28 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
       }
     }
   }, [voices, form, updateForm]);
+
+  /**
+   * Save the form and graph once the graph generation is completed
+   */
+  useEffect(() => {
+    if (open) {
+      onGraphGenerationCompleted?.(async () => {
+        alert('Graph generated successfully!', 'success');
+        await saveFormAndGraph(
+          (id) => {
+            alert('Inquiry saved successfully!', 'success');
+            if (onSave) onSave(id as string);
+          },
+          () => {
+            alert('Something went wrong!', 'error');
+          },
+        );
+      });
+    }
+  }, [open, onGraphGenerationCompleted, saveFormAndGraph, alert, onSave]);
+
+  /*================================ EVENT HANDLERS ==============================*/
 
   /**
    * Handle input change for the form
@@ -190,37 +164,11 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
     };
 
   /**
-   * Handle changing the graph template
-   * @param template - The selected template
+   * Handle previewing the voice with a few random sentences.
    */
-  const handleChangeGraphTemplate = (template: Template) => {
-    setSelectedTemplate(template);
-    updateGraph(template.graph ?? { nodes: [], edges: [] });
+  const handlePreviewVoice = () => {
+    addSentence(VOICE_LINE_SAMPLES[Math.floor(Math.random() * VOICE_LINE_SAMPLES.length)]);
   };
-
-  /**
-   * Toggle graph generation
-   */
-  const handleCheckboxChange = () => {
-    setEnableGraphGeneration(!enableGraphGeneration);
-  };
-
-  useEffect(() => {
-    if (open) {
-      onGraphGenerationCompleted?.(async () => {
-        alert('Graph generated successfully!', 'success');
-        await saveFormAndGraph(
-          (id) => {
-            alert('Inquiry saved successfully!', 'success');
-            if (onSave) onSave(id as string);
-          },
-          () => {
-            alert('Something went wrong!', 'error');
-          },
-        );
-      });
-    }
-  }, [open, onGraphGenerationCompleted, saveFormAndGraph, alert, onSave]);
 
   /**
    * Handle saving the inquiry
@@ -249,8 +197,64 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
     );
   };
 
+  /*================================ RENDER ==============================*/
+
+  /**
+   * Render the advanced settings section of the modal.
+   */
+  const renderAdvancedSettings = () => (
+    <GenericDisclosure title="Advanced Settings" className="mt-4">
+      <div className="space-y-4">
+        <GenericRadioGroup<Template>
+          label="Graph Template"
+          subLabel="Select a template to generate a conversation graph"
+          options={templates.map((template) => ({ ...template, value: template }))}
+          value={selectedTemplate}
+          onChange={setSelectedTemplate}
+        />
+
+        <div className="space-y-2">
+          <Select
+            name="voice"
+            label="Voice"
+            subLabel="This will be the voice used to read responses to the user if they have audio enabled"
+            value={form.voice ?? ''}
+            onChange={handleSelectChange('voice')}
+            options={
+              voices?.getAllAudioVoices.map((voice) => ({
+                value: voice.id,
+                label: `${voice.name} (${voice.tags.join(', ')})`,
+              })) ?? []
+            }
+          />
+          <div className="flex justify-end">
+            <Button
+              type="button"
+              variant="secondary"
+              size="small"
+              icon={isVoicePreviewLoading ? faSpinner : faPlay}
+              iconSpin={isVoicePreviewLoading}
+              onClick={handlePreviewVoice}
+            >
+              Preview Voice
+            </Button>
+          </div>
+
+          <Input
+            name="graph-generation"
+            type="checkbox"
+            label="Graph Generation Enabled"
+            subLabel="Using the selected template and goals, we will generate an inquiry for you"
+            checked={enableGraphGeneration}
+            onChange={(e) => setEnableGraphGeneration(e.target.checked)}
+          />
+        </div>
+      </div>
+    </GenericDisclosure>
+  );
+
   return (
-    <CustomModal size="3xl" open={open} onClose={onClose} title={id ? 'Update Inquiry' : 'Create Inquiry'}>
+    <CustomModal size="5xl" open={open} onClose={onClose} title={id ? 'Update Inquiry' : 'Create Inquiry'}>
       <form className="space-y-4" onSubmit={handleSave}>
         <Input
           name="title"
@@ -262,56 +266,21 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
           onChange={handleInputChange('title')}
         />
 
-        <Select
-          name="voice"
-          label="Voice"
-          subLabel="This will be the voice used to read responses to the user if they have audio enabled"
-          value={form.voice ?? undefined}
-          onChange={handleSelectChange('voice')}
-          options={voices?.getAllAudioVoices.map((voice) => ({ value: voice.id, label: voice.name })) ?? []}
+        <Textarea
+          name="goals"
+          label="Goals"
+          subLabel="Who are you trying to gain insights from and what type of information are you looking to capture?"
+          value={form.goals}
+          onChange={handleInputChange('goals')}
+          onKeyDown={handleInputKeyDown}
         />
 
-        <TemplateSelection value={selectedTemplate} onChange={handleChangeGraphTemplate} />
+        <hr className="border-t border-slate-200 dark:border-slate-600" />
 
-        <AnimatePresence mode="sync">
-          {selectedTemplate?.allowGeneration && (
-            <motion.div
-              key="goals-check"
-              initial={{ opacity: 0, y: -25 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.2, type: 'spring', stiffness: 250 }}
-            >
-              <Input
-                name="generateGraph"
-                type="checkbox"
-                label="Customize my template"
-                subLabel="Using the selected template, we will generate a suggested inquiry for you"
-                value={enableGraphGeneration.toString()}
-                onChange={handleCheckboxChange}
-              />
-            </motion.div>
-          )}
+        {renderAdvancedSettings()}
 
-          {selectedTemplate?.allowGeneration && enableGraphGeneration && (
-            <motion.div
-              key="goals"
-              initial={{ opacity: 0, y: -25 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.2, type: 'spring', stiffness: 250 }}
-            >
-              <Textarea
-                name="goals"
-                label="Goals"
-                subLabel="Who are you trying to gain insights from and what type of information are you looking to capture?"
-                value={form.goals}
-                onChange={handleInputChange('goals')}
-                onKeyDown={handleInputKeyDown}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
         <div className="flex justify-end items-center rounded-2xl">
-          <div className="w-full ">
+          <div className="w-full">
             <AnimatePresence mode="wait">
               {generatingGraph && (
                 <motion.p
@@ -343,6 +312,4 @@ const ModalUpsertInquiry: React.FC<ModalUpsertInquiryProps> = ({ open, onSave, o
       </form>
     </CustomModal>
   );
-};
-
-export default ModalUpsertInquiry;
+}

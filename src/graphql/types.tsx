@@ -393,6 +393,7 @@ export type Voice = {
   __typename?: 'Voice';
   id: Scalars['String']['output'];
   name: Scalars['String']['output'];
+  tags: Array<Scalars['String']['output']>;
 };
 
 export type GenerateAudioMutationVariables = Exact<{
@@ -606,7 +607,7 @@ export type GetInquiryResponseCountQuery = { __typename?: 'Query', getInquiryRes
 export type GetAllAudioVoicesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetAllAudioVoicesQuery = { __typename?: 'Query', getAllAudioVoices: Array<{ __typename?: 'Voice', id: string, name: string }> };
+export type GetAllAudioVoicesQuery = { __typename?: 'Query', getAllAudioVoices: Array<{ __typename?: 'Voice', id: string, name: string, tags: Array<string> }> };
 
 export type GetMediaAssetQueryVariables = Exact<{
   id: Scalars['String']['input'];

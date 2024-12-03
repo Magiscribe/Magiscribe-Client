@@ -20,7 +20,7 @@ const Select: React.FC<SelectProps> = ({ label, subLabel, name, error, options, 
     'w-full p-3 border rounded-2xl focus:outline-none focus:ring-2',
     'relative overflow-hidden appearance-none dark:bg-slate-600 bg-white',
     {
-      'border-slate-300': !error,
+      'border-slate-400': !error,
       'border-red-700 focus:ring-red-500': error,
     },
     className,
