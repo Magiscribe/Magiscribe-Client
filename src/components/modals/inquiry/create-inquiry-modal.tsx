@@ -7,6 +7,7 @@ import { GetAllAudioVoicesQuery } from '@/graphql/graphql';
 import useElevenLabsAudio from '@/hooks/audio-player';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
+import { VOICE_LINE_SAMPLES } from '@/utils/audio/voice-line-samples';
 import { useQuery } from '@apollo/client';
 import { faPlay, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -17,7 +18,6 @@ import Button from '../../controls/button';
 import Input from '../../controls/input';
 import Textarea from '../../controls/textarea';
 import CustomModal from '../modal';
-import { VOICE_LINE_SAMPLES } from '@/utils/audio/voice-line-samples';
 
 /**
  * Array of funny loading quotes
@@ -54,8 +54,7 @@ interface ModalUpsertInquiryProps {
  * ModalUpsertInquiry component for creating or updating inquiries
  */
 export default function ModalUpsertInquiry({ open, onSave, onClose }: ModalUpsertInquiryProps) {
-  const [selectedTemplate, setSelectedTemplate] = useState<Template | undefined>(templates[2]);
-  const [enableGraphGeneration, setEnableGraphGeneration] = useState(true);
+  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>();
   const [loadingQuote, setLoadingQuote] = useState(conversationGraphLoadingQuotes[0]);
 
   // Hooks
@@ -176,13 +175,16 @@ export default function ModalUpsertInquiry({ open, onSave, onClose }: ModalUpser
   const handleSave = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
 
-    if (!selectedTemplate) {
-      alert('Please select a template!', 'error');
+    if (form.goals.trim() === '' && !(selectedTemplate && !selectedTemplate?.allowGeneration)) {
+      alert('Please enter some goals for the inquiry', 'error');
       return;
     }
 
-    if (selectedTemplate?.allowGeneration && enableGraphGeneration) {
+    if (selectedTemplate && selectedTemplate?.allowGeneration) {
       generateGraph(true, form.goals);
+      return;
+    } else if (!selectedTemplate) {
+      generateGraph(false, form.goals);
       return;
     }
 
@@ -211,6 +213,7 @@ export default function ModalUpsertInquiry({ open, onSave, onClose }: ModalUpser
           options={templates.map((template) => ({ ...template, value: template }))}
           value={selectedTemplate}
           onChange={setSelectedTemplate}
+          clearable
         />
 
         <div className="space-y-2">
@@ -239,15 +242,6 @@ export default function ModalUpsertInquiry({ open, onSave, onClose }: ModalUpser
               Preview Voice
             </Button>
           </div>
-
-          <Input
-            name="graph-generation"
-            type="checkbox"
-            label="Graph Generation Enabled"
-            subLabel="Using the selected template and goals, we will generate an inquiry for you"
-            checked={enableGraphGeneration}
-            onChange={(e) => setEnableGraphGeneration(e.target.checked)}
-          />
         </div>
       </div>
     </GenericDisclosure>
@@ -289,7 +283,7 @@ export default function ModalUpsertInquiry({ open, onSave, onClose }: ModalUpser
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 25 }}
                   transition={{ duration: 0.3 }}
-                  className="text-sm italic text-slate-600"
+                  className="text-sm italic text-slate-500"
                 >
                   {loadingQuote}
                 </motion.p>
@@ -299,13 +293,7 @@ export default function ModalUpsertInquiry({ open, onSave, onClose }: ModalUpser
           <Button type="button" onClick={onClose} variant="transparentPrimary" size="medium" className="ml-2">
             Cancel
           </Button>
-          <Button
-            disabled={generatingGraph || !selectedTemplate}
-            onClick={handleSave}
-            variant="primary"
-            size="medium"
-            className="ml-2"
-          >
+          <Button disabled={generatingGraph} onClick={handleSave} variant="primary" size="medium" className="ml-2">
             {id ? 'Save' : 'Create'} {generatingGraph && <FontAwesomeIcon icon={faSpinner} className="ml-2" spin />}
           </Button>
         </div>

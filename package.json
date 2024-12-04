@@ -63,5 +63,6 @@
     "typescript": "^5.7.2",
     "vite": "^5.4.11",
     "vite-plugin-graphql-codegen": "^3.4.0"
-  }
+  },
+  "packageManager": "pnpm@9.12.2+sha256.2ef6e547b0b07d841d605240dce4d635677831148cd30f6d564b8f4f928f73d2"
 }
