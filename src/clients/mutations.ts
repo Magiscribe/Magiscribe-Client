@@ -145,6 +145,14 @@ export const UPDATE_INQUIRY_RESPONSE = gql`
   }
 `;
 
+export const DELETE_INQUIRY_RESPONSE = gql`
+  mutation deleteInquiryResponse($id: ID!, $inquiryId: ID!) {
+    deleteInquiryResponse(id: $id, inquiryId: $inquiryId) {
+      id
+    }
+  }
+`;
+
 export const UPSERT_COLLECTION = gql`
   mutation upsertCollection($input: CollectionInput!) {
     upsertCollection(input: $input) {

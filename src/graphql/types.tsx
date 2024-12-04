@@ -165,6 +165,7 @@ export type Mutation = {
   deleteCapability?: Maybe<Capability>;
   deleteCollection?: Maybe<Collection>;
   deleteInquiry?: Maybe<Inquiry>;
+  deleteInquiryResponse?: Maybe<InquiryResponse>;
   deleteMediaAsset?: Maybe<Scalars['Int']['output']>;
   deletePrompt?: Maybe<Prompt>;
   generateAudio?: Maybe<Scalars['String']['output']>;
@@ -202,6 +203,12 @@ export type MutationDeleteCollectionArgs = {
 
 export type MutationDeleteInquiryArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteInquiryResponseArgs = {
+  id: Scalars['ID']['input'];
+  inquiryId: Scalars['ID']['input'];
 };
 
 
@@ -508,6 +515,14 @@ export type UpdateInquiryResponseMutationVariables = Exact<{
 
 
 export type UpdateInquiryResponseMutation = { __typename?: 'Mutation', upsertInquiryResponse: { __typename?: 'InquiryResponse', id: string } };
+
+export type DeleteInquiryResponseMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  inquiryId: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteInquiryResponseMutation = { __typename?: 'Mutation', deleteInquiryResponse?: { __typename?: 'InquiryResponse', id: string } | null };
 
 export type UpsertCollectionMutationVariables = Exact<{
   input: CollectionInput;
