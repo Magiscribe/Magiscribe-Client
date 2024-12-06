@@ -2,7 +2,7 @@ import { applyEdgeChanges, applyNodeChanges, Edge, Node, OnEdgesChange, OnNodesC
 import { createContext, Dispatch, SetStateAction, useCallback, useContext } from 'react';
 import useUndoable from 'use-undoable';
 
-interface GraphContextProps {
+export interface GraphContextProps {
   graph: { nodes: Node[]; edges: Edge[] };
 
   resetInitialState: ({ nodes, edges }: { nodes: Node[]; edges: Edge[] }) => void;
@@ -53,7 +53,7 @@ const GraphProvider = ({ children }: { children: React.ReactNode }) => {
   const onNodesChange: OnNodesChange = useCallback(
     (changes) => {
       // Don't save these changes in the history.
-      const ignore = ['select', 'position', 'dimensions'].includes(changes[0].type);
+      const ignore = ['select', 'position', 'dimensions'].includes(changes[0]?.type);
       triggerUpdate('nodes', applyNodeChanges(changes, graph.nodes), ignore);
     },
     [triggerUpdate, graph.nodes],
@@ -62,7 +62,7 @@ const GraphProvider = ({ children }: { children: React.ReactNode }) => {
   const onEdgesChange: OnEdgesChange = useCallback(
     (changes) => {
       // Don't save these changes in the history.
-      const ignore = ['select'].includes(changes[0].type);
+      const ignore = ['select'].includes(changes[0]?.type);
       triggerUpdate('edges', applyEdgeChanges(changes, graph.edges), ignore);
     },
     [triggerUpdate, graph.edges],

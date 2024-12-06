@@ -53,7 +53,7 @@ interface ModalUpsertInquiryProps {
 /**
  * ModalUpsertInquiry component for creating or updating inquiries
  */
-export default function ModalUpsertInquiry({ open, onSave, onClose }: ModalUpsertInquiryProps) {
+export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpsertInquiryProps) {
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>();
   const [loadingQuote, setLoadingQuote] = useState(conversationGraphLoadingQuotes[0]);
 
@@ -63,7 +63,7 @@ export default function ModalUpsertInquiry({ open, onSave, onClose }: ModalUpser
     form,
     updateForm,
     generateGraph,
-    updateGraph,
+    graphContext,
     onGraphGenerationCompleted,
     saveFormAndGraph,
     generatingGraph,
@@ -78,7 +78,7 @@ export default function ModalUpsertInquiry({ open, onSave, onClose }: ModalUpser
 
   useEffect(() => {
     if (selectedTemplate) {
-      updateGraph(selectedTemplate.graph ?? { nodes: [], edges: [] });
+      graphContext.setGraph(selectedTemplate.graph ?? { nodes: [], edges: [] });
     }
   }, [selectedTemplate]);
 

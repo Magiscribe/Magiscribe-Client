@@ -2,7 +2,6 @@ import GraphGeneratorMenu from '@/components/cards/generate-menu';
 import Button from '@/components/controls/button';
 import GraphContextBar from '@/components/graph/context-bar';
 import GraphInput from '@/components/graph/graph-input';
-import { useGraphContext } from '@/hooks/graph-state';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { faMagicWandSparkles } from '@fortawesome/free-solid-svg-icons';
 import { AnimatePresence } from 'framer-motion';
@@ -23,12 +22,12 @@ export default function InquiryBuilder() {
   const saveDebounce = useRef<NodeJS.Timeout>();
 
   // Hooks
-  const { initialized, form, metadata, saveGraph, saveForm, saveMetadata } = useInquiryBuilder();
+  const { graphContext, initialized, form, metadata, saveGraph, saveForm, saveMetadata } = useInquiryBuilder();
 
-  const { graph, setGraph, canRedo, canUndo, redo, undo, triggerUpdate, onEdgesChange, onNodesChange } =
-    useGraphContext();
-
-  const memoGraph = useMemo(() => ({ nodes: graph.nodes, edges: graph.edges }), [graph.nodes, graph.edges]);
+  const memoGraph = useMemo(
+    () => ({ nodes: graphContext.graph.nodes, edges: graphContext.graph.edges }),
+    [graphContext.graph.nodes, graphContext.graph.edges],
+  );
 
   /**
    * A debounced function to save the graph after a delay.
@@ -82,41 +81,6 @@ export default function InquiryBuilder() {
     setIsChatOpen(!isChatOpen);
   };
 
-  const handleUndo = () => {
-    if (!canUndo) {
-      return;
-    }
-    console.log('undo');
-
-    undo();
-  };
-
-  const handleRedo = () => {
-    if (!canRedo) {
-      return;
-    }
-    console.log('redo');
-
-    redo();
-  };
-
-  // Use Effect to register the undo and redo keyboard shortcuts
-  useEffect(() => {
-    const handleUndoRedo = (event: KeyboardEvent) => {
-      if (event.ctrlKey && event.key === 'z') {
-        handleUndo();
-      } else if ((event.ctrlKey && event.key === 'y') || (event.ctrlKey && event.key === 'Z')) {
-        handleRedo();
-      }
-    };
-
-    document.addEventListener('keydown', handleUndoRedo);
-
-    return () => {
-      document.removeEventListener('keydown', handleUndoRedo);
-    };
-  }, [handleUndo, handleRedo]);
-
   return (
     <>
       <div className="h-[85vh] flex flex-col border-slate-200 dark:border-white border-2 rounded-2xl overflow-hidden">
@@ -126,17 +90,7 @@ export default function InquiryBuilder() {
         <div className="flex-grow">
           {initialized && (
             <>
-              <GraphInput
-                graph={graph}
-                setGraph={setGraph}
-                triggerUpdate={triggerUpdate}
-                onNodesChange={onNodesChange}
-                onEdgesChange={onEdgesChange}
-                canRedo={canRedo}
-                canUndo={canUndo}
-                redo={redo}
-                undo={undo}
-              >
+              <GraphInput>
                 <Button
                   onClick={toggleChat}
                   className="absolute top-4 right-4 z-100"

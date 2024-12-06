@@ -18,7 +18,7 @@ import {
   UpdateInquiryMutation,
 } from '@/graphql/graphql';
 import { InquiryDataForm } from '@/graphql/types';
-import { useGraphContext } from '@/hooks/graph-state';
+import { GraphContextProps, useGraphContext } from '@/hooks/graph-state';
 import { ImageMetadata } from '@/types/conversation';
 import { getAgentIdByName } from '@/utils/agents';
 import { applyGraphChangeset, formatGraph } from '@/utils/graphs/graph-utils';
@@ -73,6 +73,8 @@ interface ContextType {
   onGraphGenerationStarted: (callback: (message: string) => void) => void;
   onGraphGenerationCompleted: (callback: (message: string) => void) => void;
   onGraphGenerationError: (callback: () => void) => void;
+
+  graphContext: GraphContextProps;
 }
 
 const InquiryContext = createContext<ContextType | undefined>(undefined);
@@ -97,7 +99,8 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const [explanation, setExplanation] = useState<string>('');
 
   // Hooks
-  const { graph, setGraph, resetInitialState } = useGraphContext();
+  const graphContext = useGraphContext();
+  const { graph, setGraph, resetInitialState } = graphContext;
 
   // Events
   const onGraphGenerationStartedRef = useRef<(message: string) => void>();
@@ -389,6 +392,8 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     onGraphGenerationError: (callback: () => void) => {
       onGraphGenerationErrorRef.current = callback;
     },
+
+    graphContext,
   };
 
   return <InquiryContext.Provider value={contextValue}>{children}</InquiryContext.Provider>;

@@ -2,18 +2,10 @@ import { ADD_PREDICTION, DELETE_INQUIRY_RESPONSE } from '@/clients/mutations';
 import { GET_INQUIRIES_RESPONSES, GET_INQUIRY } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import Button from '@/components/controls/button';
-import ConfirmationModal from '@/components/modals/confirm-modal';
-import {
-  AddPredictionMutation,
-  DeleteInquiryResponseMutation,
-  GetInquiryQuery,
-  GetInquiryResponsesQuery,
-  InquiryResponseFilters,
-} from '@/graphql/graphql';
+import { AddPredictionMutation, GetInquiryQuery, GetInquiryResponsesQuery, InquiryResponseFilters } from '@/graphql/graphql';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
-import { NodeVisitAnalysisData } from '@/types/conversation';
-import { GraphNode } from '@/types/conversation';
+import { GraphNode, NodeVisitAnalysisData } from '@/types/conversation';
 import { getAgentIdByName } from '@/utils/agents';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
 import { faSpinner, faTrash } from '@fortawesome/free-solid-svg-icons';

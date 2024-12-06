@@ -75,7 +75,7 @@ export default function Inquiries() {
   return (
     <GraphProvider>
       <InquiryBuilderProvider>
-      <CreateInquiry open={createFormModal} onClose={() => setCreateFormModal(false)} onSave={onCreateForm} />
+        <CreateInquiry open={createFormModal} onClose={() => setCreateFormModal(false)} onSave={onCreateForm} />
 
         <GenericHero
           title="Your Inquiries"
