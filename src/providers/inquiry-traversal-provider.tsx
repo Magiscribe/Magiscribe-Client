@@ -307,10 +307,11 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
     if (!currentNode) return;
 
     const agentId = await getAgentIdByName(
-      `Dynamic ${currentNode.type === 'question' ? 'Question' : 'Information'} Generation`,
+      `Dynamic ${currentNode.type === 'question' ? 'Question' : 'Information'} Generation EXPERIMENTAL`,
       client,
     );
-    const mostRecentMessage = inquiryHistoryRef.current[inquiryHistoryRef.current.length - 1];
+
+    console.log(inquiryHistoryRef.current.join('\n\n'));
 
     // TODO: Clean this up
     lastPredictionVariablesRef.current = {
@@ -320,7 +321,6 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
         userMessage: currentNode.data.text,
         userDetails: `Name: ${userDetails.name}`,
         conversationHistory: inquiryHistoryRef.current.join('\n\n'),
-        mostRecentMessage,
       },
     };
     await addPrediction({
@@ -378,26 +378,47 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
    * Converts the node history into a readable conversation format
    * @returns {string} A stringified version of the conversation history
    */
+  // Add this as a ref to track the global message counter
+  const messageCounterRef = useRef<number>(1);
+
   const addNodeToHistory = (node: OptimizedNode) => {
     if (!node.data) return;
 
     const { type, data } = node as { type: string; data: { [key: string]: { [key: string]: string } } };
-    let conversation = '';
+    const messageParts: string[] = [];
 
     if (type === 'information') {
       if (data.text) {
-        conversation = `Bot: ${data.text}`;
+        messageParts.push(`${messageCounterRef.current}. Bot: ${data.text}`);
+        messageCounterRef.current++;
       }
     } else if (type === 'question') {
-      const parts = [
-        data.ratings && `Bot created ratings: ${JSON.stringify(data.ratings)} \n`,
-        data.text && `Bot: ${data.text} \n`,
-        data.response?.ratings && `User selected ratings: ${JSON.stringify(data.response.ratings)} \n`,
-        data.response?.text && `User: ${data.response.text} \n`,
-      ].filter(Boolean);
+      if (data.ratings) {
+        messageParts.push(
+          `${messageCounterRef.current}. Personal Agent created ratings: ${JSON.stringify(data.ratings)}`,
+        );
+        messageCounterRef.current++;
+      }
 
-      conversation = parts.join('\n');
+      if (data.text) {
+        messageParts.push(`${messageCounterRef.current}. Personal Agent: ${data.text}`);
+        messageCounterRef.current++;
+      }
+
+      if (data.response?.ratings) {
+        messageParts.push(
+          `${messageCounterRef.current}. Other Agent selected ratings: ${JSON.stringify(data.response.ratings)}`,
+        );
+        messageCounterRef.current++;
+      }
+
+      if (data.response?.text) {
+        messageParts.push(`${messageCounterRef.current}. Other Agent: ${data.response.text}`);
+        messageCounterRef.current++;
+      }
     }
+
+    const conversation = messageParts.join('\n');
 
     if (conversation) {
       inquiryHistoryRef.current.push(conversation);
