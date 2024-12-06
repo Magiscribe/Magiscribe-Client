@@ -2,8 +2,8 @@ import { ADD_UPDATE_AGENT } from '@/clients/mutations';
 import { GET_AGENT, GET_ALL_CAPABILITIES, GET_ALL_MODELS } from '@/clients/queries';
 import Button from '@/components/controls/button';
 import Input from '@/components/controls/input';
-import Select from '@/components/controls/select';
 import ListBoxMultiple from '@/components/controls/list/ListBoxMultiple';
+import Select from '@/components/controls/select';
 import Textarea from '@/components/controls/textarea';
 import { GetAgentQuery, GetAllCapabilitiesQuery, GetAllModelsQuery, UpsertAgentMutation } from '@/graphql/graphql';
 import { useAddAlert } from '@/hooks/alert-hook';
@@ -81,21 +81,21 @@ export default function AgentEdit() {
     },
   });
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { id, value } = event.target;
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = event.target;
     setForm((prevForm) => ({
       ...prevForm,
-      [id]: value,
+      [name]: value,
     }));
   };
 
   const handleReasoningChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const { id, value } = event.target;
+    const { name, value } = event.target;
     setForm((prevForm) => ({
       ...prevForm,
       reasoning: prevForm.reasoning
-        ? { ...prevForm.reasoning, [id]: value }
-        : { llmModel: null, prompt: null, variablePassThrough: null, [id]: value },
+        ? { ...prevForm.reasoning, [name]: value }
+        : { llmModel: null, prompt: null, variablePassThrough: null, [name]: value },
     }));
   };
 
@@ -139,7 +139,7 @@ export default function AgentEdit() {
         </div>
         <form className="mt-8" onSubmit={handleSave}>
           <div className="mb-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <Input name="name" label="Name" value={form.name} onChange={handleChange} />
+            <Input name="name" label="Name" value={form.name} onChange={handleInputChange} />
             {form.reasoning && (
               <Select
                 label="LLM Model"
@@ -183,7 +183,7 @@ export default function AgentEdit() {
           </div>
 
           <div className="mb-4">
-            <Textarea name="description" label="Description" value={form.description} onChange={handleChange} />
+            <Textarea name="description" label="Description" value={form.description} onChange={handleInputChange} />
           </div>
 
           <div className="mb-4 grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -261,9 +261,14 @@ export default function AgentEdit() {
               name="subscriptionFilter"
               label="Subscription Filter"
               value={form.subscriptionFilter ?? ''}
-              onChange={handleChange}
+              onChange={handleInputChange}
             />
-            <Input name="outputFilter" label="Output Filter" value={form.outputFilter ?? ''} onChange={handleChange} />
+            <Input
+              name="outputFilter"
+              label="Output Filter"
+              value={form.outputFilter ?? ''}
+              onChange={handleInputChange}
+            />
           </div>
 
           <Button>Save</Button>

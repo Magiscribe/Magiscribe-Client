@@ -100,11 +100,12 @@ export default function CapabilityEdit() {
     },
   });
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setForm({
-      ...form,
-      [event.target.id]: event.target.value,
-    });
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = event.target;
+    setForm((prevForm) => ({
+      ...prevForm,
+      [name]: value,
+    }));
   };
 
   const handleDeletePrompt = (promptId: string) => {
@@ -247,10 +248,10 @@ export default function CapabilityEdit() {
         <form className="mt-8" onSubmit={handleFormSave}>
           <div className="mb-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="mb-4">
-              <Input name="name" label="Name" value={form.name} onChange={handleChange} />
+              <Input name="name" label="Name" value={form.name} onChange={handleInputChange} />
             </div>
             <div className="mb-4">
-              <Input name="alias" label="Alias" value={form.alias} onChange={handleChange} />
+              <Input name="alias" label="Alias" value={form.alias} onChange={handleInputChange} />
             </div>
           </div>
 
@@ -267,7 +268,7 @@ export default function CapabilityEdit() {
                     label: model.name,
                   })) ?? []
                 }
-                onChange={handleChange}
+                onChange={handleInputChange}
               />
             </div>
             <div className="mb-4">
@@ -276,7 +277,7 @@ export default function CapabilityEdit() {
                 name="outputMode"
                 label="Output Mode"
                 value={form.outputMode}
-                onChange={handleChange}
+                onChange={handleInputChange}
                 options={OutputReturnMode.map((mode) => ({ value: mode.id, label: mode.name }))}
               >
                 <option value="">Select an output mode</option>
@@ -289,7 +290,7 @@ export default function CapabilityEdit() {
             </div>
           </div>
           <div className="mb-4">
-            <Textarea name="description" label="Description" value={form.description} onChange={handleChange} />
+            <Textarea name="description" label="Description" value={form.description} onChange={handleInputChange} />
           </div>
 
           <div className="mb-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -297,13 +298,13 @@ export default function CapabilityEdit() {
               name="subscriptionFilter"
               label="Subscription Filter (Optional)"
               value={form.subscriptionFilter}
-              onChange={handleChange}
+              onChange={handleInputChange}
             />
             <Input
               name="outputFilter"
               label="Output Filter (Optional)"
               value={form.outputFilter}
-              onChange={handleChange}
+              onChange={handleInputChange}
             />
           </div>
 

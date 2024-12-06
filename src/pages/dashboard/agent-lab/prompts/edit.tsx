@@ -38,11 +38,12 @@ export default function PromptEdit() {
     },
   });
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setForm({
-      ...form,
-      [event.target.id]: event.target.value,
-    });
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = event.target;
+    setForm((prevForm) => ({
+      ...prevForm,
+      [name]: value,
+    }));
   };
 
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -80,10 +81,10 @@ export default function PromptEdit() {
         </div>
         <form className="mt-8" onSubmit={handleSave}>
           <div className="mb-4">
-            <Input name="name" label="Name" value={form.name} onChange={handleChange} />
+            <Input name="name" label="Name" value={form.name} onChange={handleInputChange} />
           </div>
           <div className="mb-4">
-            <Textarea name="text" label="Text" value={form.text} onChange={handleChange} />
+            <Textarea name="text" label="Text" value={form.text} onChange={handleInputChange} />
           </div>
           <Button>Save</Button>
         </form>
