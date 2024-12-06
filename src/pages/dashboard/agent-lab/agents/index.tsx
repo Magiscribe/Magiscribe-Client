@@ -109,6 +109,7 @@ export default function AgentDashboard() {
             name: `${selectedItem.name} Copy ${timeStamp}`,
             description: selectedItem.description,
             capabilities: selectedItem.capabilities.map((capability) => capability.id),
+            logicalCollection: params.collection,
           },
         },
       });
