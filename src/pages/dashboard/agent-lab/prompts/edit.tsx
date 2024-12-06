@@ -5,12 +5,18 @@ import Input from '@/components/controls/input';
 import Textarea from '@/components/controls/textarea';
 import { useAddAlert } from '@/hooks/alert-hook';
 import { useMutation, useQuery } from '@apollo/client';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+
+interface PromptForm {
+  id: string;
+  name: string;
+  text: string;
+}
 
 export default function PromptEdit() {
   // States
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<PromptForm>({
     id: '',
     name: '',
     text: '',
@@ -30,7 +36,9 @@ export default function PromptEdit() {
       promptId: searchParams.get('id'),
     },
     onCompleted: (data) => {
-      setForm({
+      if (!data.getPrompt) return;
+
+      handleUpdate({
         id: data.getPrompt.id,
         name: data.getPrompt.name,
         text: data.getPrompt.text,
@@ -38,12 +46,12 @@ export default function PromptEdit() {
     },
   });
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setForm({
-      ...form,
-      [event.target.id]: event.target.value,
-    });
-  };
+  const handleUpdate = useCallback((updates: Partial<PromptForm>) => {
+    setForm((prevForm) => ({
+      ...prevForm,
+      ...updates,
+    }));
+  }, []);
 
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -80,10 +88,20 @@ export default function PromptEdit() {
         </div>
         <form className="mt-8" onSubmit={handleSave}>
           <div className="mb-4">
-            <Input name="name" label="Name" value={form.name} onChange={handleChange} />
+            <Input
+              name="name"
+              label="Name"
+              value={form.name}
+              onChange={(e) => handleUpdate({ name: e.target.value })}
+            />
           </div>
           <div className="mb-4">
-            <Textarea name="text" label="Text" value={form.text} onChange={handleChange} />
+            <Textarea
+              name="text"
+              label="Text"
+              value={form.text}
+              onChange={(e) => handleUpdate({ text: e.target.value })}
+            />
           </div>
           <Button>Save</Button>
         </form>

@@ -97,6 +97,7 @@ export default function PromptDashboard() {
             id: null,
             name: selectedItem.name + '_Copy_' + timeStamp,
             text: selectedItem.text,
+            logicalCollection: params.collection,
           },
         },
       });

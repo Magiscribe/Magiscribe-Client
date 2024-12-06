@@ -8,7 +8,7 @@ import Textarea from '@/components/controls/textarea';
 import { GetAgentQuery, GetAllCapabilitiesQuery, GetAllModelsQuery, UpsertAgentMutation } from '@/graphql/graphql';
 import { useAddAlert } from '@/hooks/alert-hook';
 import { useMutation, useQuery } from '@apollo/client';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 interface Form {
@@ -81,23 +81,21 @@ export default function AgentEdit() {
     },
   });
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { id, value } = event.target;
+  const handleUpdate = useCallback((updates: Partial<Form>) => {
     setForm((prevForm) => ({
       ...prevForm,
-      [id]: value,
+      ...updates,
     }));
-  };
+  }, []);
 
-  const handleReasoningChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const { id, value } = event.target;
+  const handleReasoningUpdate = useCallback((updates: Partial<NonNullable<Form['reasoning']>>) => {
     setForm((prevForm) => ({
       ...prevForm,
       reasoning: prevForm.reasoning
-        ? { ...prevForm.reasoning, [id]: value }
-        : { llmModel: null, prompt: null, variablePassThrough: null, [id]: value },
+        ? { ...prevForm.reasoning, ...updates }
+        : { llmModel: null, prompt: null, variablePassThrough: null, ...updates },
     }));
-  };
+  }, []);
 
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -139,21 +137,18 @@ export default function AgentEdit() {
         </div>
         <form className="mt-8" onSubmit={handleSave}>
           <div className="mb-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <Input name="name" label="Name" value={form.name} onChange={handleChange} />
+            <Input
+              name="name"
+              label="Name"
+              value={form.name}
+              onChange={(e) => handleUpdate({ name: e.target.value })}
+            />
             {form.reasoning && (
               <Select
                 label="LLM Model"
                 name="llmModel"
                 value={form.reasoning.llmModel ?? ''}
-                onChange={(e) => {
-                  setForm({
-                    ...form,
-                    reasoning: {
-                      ...form.reasoning!,
-                      llmModel: e.target.value,
-                    },
-                  });
-                }}
+                onChange={(e) => handleReasoningUpdate({ llmModel: e.target.value })}
                 options={
                   models?.getAllModels.map((model) => ({
                     value: model.id,
@@ -167,8 +162,7 @@ export default function AgentEdit() {
             <ListBoxMultiple
               label="Capabilities"
               setSelected={(value) =>
-                setForm({
-                  ...form,
+                handleUpdate({
                   capabilities: value.map((capability) => capability.id),
                 })
               }
@@ -183,7 +177,12 @@ export default function AgentEdit() {
           </div>
 
           <div className="mb-4">
-            <Textarea name="description" label="Description" value={form.description} onChange={handleChange} />
+            <Textarea
+              name="description"
+              label="Description"
+              value={form.description}
+              onChange={(e) => handleUpdate({ description: e.target.value })}
+            />
           </div>
 
           <div className="mb-4 grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -192,8 +191,7 @@ export default function AgentEdit() {
               name="reasoning"
               value={form.reasoning ? 'true' : 'false'}
               onChange={(e) => {
-                setForm({
-                  ...form,
+                handleUpdate({
                   reasoning:
                     e.target.value === 'true'
                       ? {
@@ -214,15 +212,11 @@ export default function AgentEdit() {
                 label="Variable Pass Through"
                 name="variablePassThrough"
                 value={form.reasoning.variablePassThrough ? 'true' : 'false'}
-                onChange={(e) => {
-                  setForm({
-                    ...form,
-                    reasoning: {
-                      ...form.reasoning!,
-                      variablePassThrough: e.target.value === 'true',
-                    },
-                  });
-                }}
+                onChange={(e) =>
+                  handleReasoningUpdate({
+                    variablePassThrough: e.target.value === 'true',
+                  })
+                }
                 options={[
                   { value: 'true', label: 'Enabled' },
                   { value: 'false', label: 'Disabled' },
@@ -234,12 +228,11 @@ export default function AgentEdit() {
               label="Memory Enabled"
               name="memoryEnabled"
               value={form.memoryEnabled ? 'true' : 'false'}
-              onChange={(e) => {
-                setForm({
-                  ...form,
+              onChange={(e) =>
+                handleUpdate({
                   memoryEnabled: e.target.value === 'true',
-                });
-              }}
+                })
+              }
               options={[
                 { value: 'true', label: 'Enabled' },
                 { value: 'false', label: 'Disabled' },
@@ -252,7 +245,7 @@ export default function AgentEdit() {
               name="prompt"
               label="Reasoning Prompt"
               value={form.reasoning.prompt ?? ''}
-              onChange={handleReasoningChange}
+              onChange={(e) => handleReasoningUpdate({ prompt: e.target.value })}
             />
           )}
 
@@ -261,9 +254,14 @@ export default function AgentEdit() {
               name="subscriptionFilter"
               label="Subscription Filter"
               value={form.subscriptionFilter ?? ''}
-              onChange={handleChange}
+              onChange={(e) => handleUpdate({ subscriptionFilter: e.target.value })}
             />
-            <Input name="outputFilter" label="Output Filter" value={form.outputFilter ?? ''} onChange={handleChange} />
+            <Input
+              name="outputFilter"
+              label="Output Filter"
+              value={form.outputFilter ?? ''}
+              onChange={(e) => handleUpdate({ outputFilter: e.target.value })}
+            />
           </div>
 
           <Button>Save</Button>
