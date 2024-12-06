@@ -1,6 +1,6 @@
 import { GET_INQUIRIES, GET_INQUIRY_RESPONSE_COUNT } from '@/clients/queries';
 import GenericHero from '@/components/heroes/generic-hero';
-import ModalUpsertInquiry from '@/components/modals/inquiry/create-inquiry-modal';
+import CreateInquiry from '@/components/modals/inquiry/create-inquiry-modal';
 import { GetInquiriesQuery } from '@/graphql/graphql';
 import { Inquiry } from '@/graphql/types';
 import { InquiryBuilderProvider } from '@/providers/inquiry-builder-provider';
@@ -73,7 +73,7 @@ export default function Inquiries() {
 
   return (
     <InquiryBuilderProvider>
-      <ModalUpsertInquiry open={createFormModal} onClose={() => setCreateFormModal(false)} onSave={onCreateForm} />
+      <CreateInquiry open={createFormModal} onClose={() => setCreateFormModal(false)} onSave={onCreateForm} />
 
       <GenericHero
         title="Your Inquiries"

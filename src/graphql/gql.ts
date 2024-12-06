@@ -43,7 +43,7 @@ const documents = {
     "\n  query getInquiries {\n    getInquiries {\n      id\n      userId\n      data\n      createdAt\n      updatedAt\n    }\n  }\n": types.GetInquiriesDocument,
     "\n  query getInquiryResponses($id: ID!, $filters: InquiryResponseFilters) {\n    getInquiryResponses(id: $id, filters: $filters) {\n      id\n      userId\n      data {\n        userDetails\n        history\n      }\n      createdAt\n      updatedAt\n    }\n  }\n": types.GetInquiryResponsesDocument,
     "\n  query getInquiryResponseCount($id: ID!) {\n    getInquiryResponseCount(id: $id)\n  }\n": types.GetInquiryResponseCountDocument,
-    "\n  query getAllAudioVoices {\n    getAllAudioVoices {\n      id\n      name\n    }\n  }\n": types.GetAllAudioVoicesDocument,
+    "\n  query getAllAudioVoices {\n    getAllAudioVoices {\n      id\n      name\n      tags\n    }\n  }\n": types.GetAllAudioVoicesDocument,
     "\n  query getMediaAsset($id: String!) {\n    getMediaAsset(id: $id)\n  }\n": types.GetMediaAssetDocument,
     "\n  query getAllCollections {\n    getAllCollections {\n      id\n      name\n    }\n  }\n": types.GetAllCollectionsDocument,
     "\n  subscription predictionAdded($subscriptionId: ID!) {\n    predictionAdded(subscriptionId: $subscriptionId) {\n      id\n      subscriptionId\n      result\n      type\n    }\n  }\n": types.PredictionAddedDocument,
@@ -182,7 +182,7 @@ export function gql(source: "\n  query getInquiryResponseCount($id: ID!) {\n    
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query getAllAudioVoices {\n    getAllAudioVoices {\n      id\n      name\n    }\n  }\n"): (typeof documents)["\n  query getAllAudioVoices {\n    getAllAudioVoices {\n      id\n      name\n    }\n  }\n"];
+export function gql(source: "\n  query getAllAudioVoices {\n    getAllAudioVoices {\n      id\n      name\n      tags\n    }\n  }\n"): (typeof documents)["\n  query getAllAudioVoices {\n    getAllAudioVoices {\n      id\n      name\n      tags\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

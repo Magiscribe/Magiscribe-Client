@@ -181,6 +181,7 @@ export const GET_ALL_AUDIO_VOICES = gql`
     getAllAudioVoices {
       id
       name
+      tags
     }
   }
 `;

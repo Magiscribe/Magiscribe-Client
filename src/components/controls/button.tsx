@@ -59,6 +59,7 @@ interface ButtonBaseProps {
   variant?: (typeof variantClassNames)[keyof typeof variantClassNames];
   size?: 'small' | 'medium' | 'large';
   icon?: IconDefinition;
+  iconSpin?: boolean;
   className?: string;
 }
 
@@ -89,6 +90,7 @@ const Button = <C extends React.ElementType = 'button'>({
   variant = 'primary',
   size = 'medium',
   icon,
+  iconSpin,
   className,
   ...props
 }: ButtonProps<C>) => {
@@ -121,7 +123,7 @@ const Button = <C extends React.ElementType = 'button'>({
 
   return (
     <Component className={buttonClassName} {...props}>
-      {icon && <FontAwesomeIcon icon={icon} className={iconClassName} />}
+      {icon && <FontAwesomeIcon icon={icon} className={iconClassName} spin={iconSpin} />}
       {children}
     </Component>
   );

@@ -310,7 +310,7 @@ function Flow({ children, nodes, edges, setNodes, onNodesChange, setEdges, onEdg
             onDragOver={onDragOver}
             fitView
             minZoom={0.1}
-            maxZoom={2}
+            maxZoom={1.3}
             panOnScroll={true}
             defaultEdgeOptions={{
               type: 'button',
