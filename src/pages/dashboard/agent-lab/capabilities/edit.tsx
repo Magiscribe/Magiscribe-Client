@@ -9,7 +9,7 @@ import CustomModal from '@/components/modals/modal';
 import { Prompt } from '@/graphql/types';
 import { useAddAlert } from '@/hooks/alert-hook';
 import { useMutation, useQuery } from '@apollo/client';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 const OutputReturnMode = [
@@ -79,16 +79,13 @@ export default function CapabilityEdit() {
     },
   });
   const { data: models } = useQuery(GET_ALL_MODELS);
-
   useQuery(GET_CAPABILITY, {
     skip: !searchParams.has('id'),
     variables: {
       capabilityId: searchParams.get('id'),
     },
     onCompleted: (data) => {
-      if (!data.getCapability) return;
-
-      handleUpdate({
+      setForm({
         id: data.getCapability.id,
         name: data.getCapability.name,
         alias: data.getCapability.alias,
@@ -103,40 +100,27 @@ export default function CapabilityEdit() {
     },
   });
 
-  const handleUpdate = useCallback((updates: Partial<CapabilityEditForm>) => {
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = event.target;
     setForm((prevForm) => ({
       ...prevForm,
-      ...updates,
+      [name]: value,
     }));
-  }, []);
+  };
 
-  const handlePromptUpdate = useCallback((promptId: string, updates: Partial<Prompt>) => {
-    setForm((prevForm) => ({
-      ...prevForm,
-      prompts: prevForm.prompts.map((prompt) => (prompt.id === promptId ? { ...prompt, ...updates } : prompt)),
-    }));
-  }, []);
+  const handleDeletePrompt = (promptId: string) => {
+    setForm({
+      ...form,
+      prompts: form.prompts.filter((p) => p.id !== promptId),
+    });
+  };
 
-  const handleDeletePrompt = useCallback(
-    (promptId: string) => {
-      handleUpdate({
-        prompts: form.prompts.filter((p) => p.id !== promptId),
-      });
-    },
-    [form.prompts],
-  );
-
-  const handlePromptAdd = useCallback(
-    ({ id }: { id: string }) => {
-      const selectedItem = prompts?.getAllPrompts.find((prompt: Prompt) => prompt.id === id);
-      if (selectedItem) {
-        handleUpdate({
-          prompts: [...form.prompts, selectedItem],
-        });
-      }
-    },
-    [form.prompts, prompts?.getAllPrompts],
-  );
+  const handleNewPromptTitleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setForm({
+      ...form,
+      newPromptTitle: event.target.value,
+    });
+  };
 
   const handleNewPromptAdd = async () => {
     try {
@@ -146,7 +130,6 @@ export default function CapabilityEdit() {
             id: '',
             name: form.newPromptTitle,
             text: 'Placeholder prompt text',
-            logicalCollection: collection,
           },
         },
       });
@@ -157,14 +140,29 @@ export default function CapabilityEdit() {
       }
 
       addAlert('New prompt saved successfully', 'success');
-      handleUpdate({
+      setForm({
+        ...form,
         prompts: [...form.prompts, result.data.upsertPrompt],
-        newPromptTitle: '',
       });
       setOpenPromptModal(false);
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const handlePromptAdd = ({ id }: { id: string }) => {
+    const selectedItem = prompts?.getAllPrompts.find((prompt: Prompt) => prompt.id === id);
+    if (selectedItem) {
+      setForm({
+        ...form,
+        prompts: [...form.prompts, selectedItem],
+      });
+    }
+  };
+
+  const handlePromptChange = (promptId: string, field: string, value: string) => {
+    const newPrompts = form.prompts.map((prompt) => (prompt.id === promptId ? { ...prompt, [field]: value } : prompt));
+    setForm({ ...form, prompts: newPrompts });
   };
 
   const handlePromptSave = async (prompt: Prompt, callback: () => void) => {
@@ -211,7 +209,6 @@ export default function CapabilityEdit() {
           }),
         ),
       );
-
       const result = await upsertCapability({
         variables: {
           capability: {
@@ -251,26 +248,17 @@ export default function CapabilityEdit() {
         <form className="mt-8" onSubmit={handleFormSave}>
           <div className="mb-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="mb-4">
-              <Input
-                name="name"
-                label="Name"
-                value={form.name}
-                onChange={(e) => handleUpdate({ name: e.target.value })}
-              />
+              <Input name="name" label="Name" value={form.name} onChange={handleInputChange} />
             </div>
             <div className="mb-4">
-              <Input
-                name="alias"
-                label="Alias"
-                value={form.alias}
-                onChange={(e) => handleUpdate({ alias: e.target.value })}
-              />
+              <Input name="alias" label="Alias" value={form.alias} onChange={handleInputChange} />
             </div>
           </div>
 
           <div className="mb-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="mb-4">
               <Select
+                id="llmModel"
                 name="llmModel"
                 label="LLM Model"
                 value={form.llmModel}
@@ -280,27 +268,29 @@ export default function CapabilityEdit() {
                     label: model.name,
                   })) ?? []
                 }
-                onChange={(e) => handleUpdate({ llmModel: e.target.value })}
+                onChange={handleInputChange}
               />
             </div>
             <div className="mb-4">
               <Select
+                id="outputMode"
                 name="outputMode"
                 label="Output Mode"
                 value={form.outputMode}
-                onChange={(e) => handleUpdate({ outputMode: e.target.value })}
+                onChange={handleInputChange}
                 options={OutputReturnMode.map((mode) => ({ value: mode.id, label: mode.name }))}
-              />
+              >
+                <option value="">Select an output mode</option>
+                {OutputReturnMode.map((mode) => (
+                  <option key={mode.id} value={mode.id}>
+                    {mode.name}
+                  </option>
+                ))}
+              </Select>
             </div>
           </div>
-
           <div className="mb-4">
-            <Textarea
-              name="description"
-              label="Description"
-              value={form.description}
-              onChange={(e) => handleUpdate({ description: e.target.value })}
-            />
+            <Textarea name="description" label="Description" value={form.description} onChange={handleInputChange} />
           </div>
 
           <div className="mb-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -308,13 +298,13 @@ export default function CapabilityEdit() {
               name="subscriptionFilter"
               label="Subscription Filter (Optional)"
               value={form.subscriptionFilter}
-              onChange={(e) => handleUpdate({ subscriptionFilter: e.target.value })}
+              onChange={handleInputChange}
             />
             <Input
               name="outputFilter"
               label="Output Filter (Optional)"
               value={form.outputFilter}
-              onChange={(e) => handleUpdate({ outputFilter: e.target.value })}
+              onChange={handleInputChange}
             />
           </div>
 
@@ -360,12 +350,17 @@ export default function CapabilityEdit() {
                   <Textarea
                     name="text"
                     className="mb-2"
+                    id="text"
                     rows={1}
                     placeholder="Enter title of new prompt"
-                    value={form.newPromptTitle}
-                    onChange={(e) => handleUpdate({ newPromptTitle: e.target.value })}
+                    onChange={handleNewPromptTitleChange}
                   />
-                  <Button type="button" onClick={handleNewPromptAdd}>
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      handleNewPromptAdd();
+                    }}
+                  >
                     Add
                   </Button>
                 </div>
@@ -374,7 +369,10 @@ export default function CapabilityEdit() {
             <ReorderableList
               items={form.prompts.map((prompt) => prompt)}
               onItemsChange={(newItems) => {
-                handleUpdate({ prompts: newItems });
+                setForm({
+                  ...form,
+                  prompts: newItems,
+                });
               }}
               renderItem={(item, isEditing, edit, cancelEdit) => (
                 <div key={item.id}>
@@ -390,13 +388,13 @@ export default function CapabilityEdit() {
                           name="name"
                           type="text"
                           value={item.name}
-                          onChange={(e) => handlePromptUpdate(item.id, { name: e.target.value })}
+                          onChange={(e) => handlePromptChange(item.id, 'name', e.target.value)}
                           className="w-full mb-2 p-1 border rounded-lg"
                         />
                         <Textarea
                           name="prompt"
                           value={item.text}
-                          onChange={(e) => handlePromptUpdate(item.id, { text: e.target.value })}
+                          onChange={(e) => handlePromptChange(item.id, 'text', e.target.value)}
                           className="w-full mb-2 p-1 border rounded-lg no-drag"
                           rows={3}
                         />

@@ -2,13 +2,13 @@ import { ADD_UPDATE_AGENT } from '@/clients/mutations';
 import { GET_AGENT, GET_ALL_CAPABILITIES, GET_ALL_MODELS } from '@/clients/queries';
 import Button from '@/components/controls/button';
 import Input from '@/components/controls/input';
-import Select from '@/components/controls/select';
 import ListBoxMultiple from '@/components/controls/list/ListBoxMultiple';
+import Select from '@/components/controls/select';
 import Textarea from '@/components/controls/textarea';
 import { GetAgentQuery, GetAllCapabilitiesQuery, GetAllModelsQuery, UpsertAgentMutation } from '@/graphql/graphql';
 import { useAddAlert } from '@/hooks/alert-hook';
 import { useMutation, useQuery } from '@apollo/client';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 interface Form {
@@ -81,21 +81,23 @@ export default function AgentEdit() {
     },
   });
 
-  const handleUpdate = useCallback((updates: Partial<Form>) => {
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = event.target;
     setForm((prevForm) => ({
       ...prevForm,
-      ...updates,
+      [name]: value,
     }));
-  }, []);
+  };
 
-  const handleReasoningUpdate = useCallback((updates: Partial<NonNullable<Form['reasoning']>>) => {
+  const handleReasoningChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const { name, value } = event.target;
     setForm((prevForm) => ({
       ...prevForm,
       reasoning: prevForm.reasoning
-        ? { ...prevForm.reasoning, ...updates }
-        : { llmModel: null, prompt: null, variablePassThrough: null, ...updates },
+        ? { ...prevForm.reasoning, [name]: value }
+        : { llmModel: null, prompt: null, variablePassThrough: null, [name]: value },
     }));
-  }, []);
+  };
 
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -137,18 +139,21 @@ export default function AgentEdit() {
         </div>
         <form className="mt-8" onSubmit={handleSave}>
           <div className="mb-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <Input
-              name="name"
-              label="Name"
-              value={form.name}
-              onChange={(e) => handleUpdate({ name: e.target.value })}
-            />
+            <Input name="name" label="Name" value={form.name} onChange={handleInputChange} />
             {form.reasoning && (
               <Select
                 label="LLM Model"
                 name="llmModel"
                 value={form.reasoning.llmModel ?? ''}
-                onChange={(e) => handleReasoningUpdate({ llmModel: e.target.value })}
+                onChange={(e) => {
+                  setForm({
+                    ...form,
+                    reasoning: {
+                      ...form.reasoning!,
+                      llmModel: e.target.value,
+                    },
+                  });
+                }}
                 options={
                   models?.getAllModels.map((model) => ({
                     value: model.id,
@@ -162,7 +167,8 @@ export default function AgentEdit() {
             <ListBoxMultiple
               label="Capabilities"
               setSelected={(value) =>
-                handleUpdate({
+                setForm({
+                  ...form,
                   capabilities: value.map((capability) => capability.id),
                 })
               }
@@ -177,12 +183,7 @@ export default function AgentEdit() {
           </div>
 
           <div className="mb-4">
-            <Textarea
-              name="description"
-              label="Description"
-              value={form.description}
-              onChange={(e) => handleUpdate({ description: e.target.value })}
-            />
+            <Textarea name="description" label="Description" value={form.description} onChange={handleInputChange} />
           </div>
 
           <div className="mb-4 grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -191,7 +192,8 @@ export default function AgentEdit() {
               name="reasoning"
               value={form.reasoning ? 'true' : 'false'}
               onChange={(e) => {
-                handleUpdate({
+                setForm({
+                  ...form,
                   reasoning:
                     e.target.value === 'true'
                       ? {
@@ -212,11 +214,15 @@ export default function AgentEdit() {
                 label="Variable Pass Through"
                 name="variablePassThrough"
                 value={form.reasoning.variablePassThrough ? 'true' : 'false'}
-                onChange={(e) =>
-                  handleReasoningUpdate({
-                    variablePassThrough: e.target.value === 'true',
-                  })
-                }
+                onChange={(e) => {
+                  setForm({
+                    ...form,
+                    reasoning: {
+                      ...form.reasoning!,
+                      variablePassThrough: e.target.value === 'true',
+                    },
+                  });
+                }}
                 options={[
                   { value: 'true', label: 'Enabled' },
                   { value: 'false', label: 'Disabled' },
@@ -228,11 +234,12 @@ export default function AgentEdit() {
               label="Memory Enabled"
               name="memoryEnabled"
               value={form.memoryEnabled ? 'true' : 'false'}
-              onChange={(e) =>
-                handleUpdate({
+              onChange={(e) => {
+                setForm({
+                  ...form,
                   memoryEnabled: e.target.value === 'true',
-                })
-              }
+                });
+              }}
               options={[
                 { value: 'true', label: 'Enabled' },
                 { value: 'false', label: 'Disabled' },
@@ -245,7 +252,7 @@ export default function AgentEdit() {
               name="prompt"
               label="Reasoning Prompt"
               value={form.reasoning.prompt ?? ''}
-              onChange={(e) => handleReasoningUpdate({ prompt: e.target.value })}
+              onChange={handleReasoningChange}
             />
           )}
 
@@ -254,13 +261,13 @@ export default function AgentEdit() {
               name="subscriptionFilter"
               label="Subscription Filter"
               value={form.subscriptionFilter ?? ''}
-              onChange={(e) => handleUpdate({ subscriptionFilter: e.target.value })}
+              onChange={handleInputChange}
             />
             <Input
               name="outputFilter"
               label="Output Filter"
               value={form.outputFilter ?? ''}
-              onChange={(e) => handleUpdate({ outputFilter: e.target.value })}
+              onChange={handleInputChange}
             />
           </div>
 
