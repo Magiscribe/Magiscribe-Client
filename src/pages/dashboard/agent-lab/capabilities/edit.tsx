@@ -7,7 +7,7 @@ import Select from '@/components/controls/select';
 import Textarea from '@/components/controls/textarea';
 import CustomModal from '@/components/modals/modal';
 import { Prompt } from '@/graphql/types';
-import { useAddAlert } from '@/hooks/alert-hook';
+import { useAddAlert } from '@/providers/alert-provider';
 import { useMutation, useQuery } from '@apollo/client';
 import { useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';

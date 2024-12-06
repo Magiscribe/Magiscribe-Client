@@ -3,6 +3,7 @@ import GenericHero from '@/components/heroes/generic-hero';
 import CreateInquiry from '@/components/modals/inquiry/create-inquiry-modal';
 import { GetInquiriesQuery } from '@/graphql/graphql';
 import { Inquiry } from '@/graphql/types';
+import GraphProvider from '@/hooks/graph-state';
 import { InquiryBuilderProvider } from '@/providers/inquiry-builder-provider';
 import { useQuery } from '@apollo/client';
 import { motion } from 'framer-motion';
@@ -72,27 +73,29 @@ export default function Inquiries() {
   };
 
   return (
-    <InquiryBuilderProvider>
+    <GraphProvider>
+      <InquiryBuilderProvider>
       <CreateInquiry open={createFormModal} onClose={() => setCreateFormModal(false)} onSave={onCreateForm} />
 
-      <GenericHero
-        title="Your Inquiries"
-        subtitle="Build and manage inquiries here to start capturing meaningful feedback."
-      />
-      <hr className="my-8" />
-      <h2 className="text-2xl font-semibold text-slate-100 mb-4">Your Inquiries</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-8">
-        {(data?.getInquiries ?? []).map((inquiry) => (
-          <InquiryCard inquiry={inquiry} key={inquiry.id} />
-        ))}
-        <motion.div
-          className="bg-blue-500 p-4 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow flex items-center justify-center"
-          whileHover={{ scale: 1.05 }}
-          onClick={() => setCreateFormModal(true)}
-        >
-          <span className="text-4xl font-bold text-white">+</span>
-        </motion.div>
-      </div>
-    </InquiryBuilderProvider>
+        <GenericHero
+          title="Your Inquiries"
+          subtitle="Build and manage inquiries here to start capturing meaningful feedback."
+        />
+        <hr className="my-8" />
+        <h2 className="text-2xl font-semibold text-slate-100 mb-4">Your Inquiries</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-8">
+          {(data?.getInquiries ?? []).map((inquiry) => (
+            <InquiryCard inquiry={inquiry} key={inquiry.id} />
+          ))}
+          <motion.div
+            className="bg-blue-500 p-4 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow flex items-center justify-center"
+            whileHover={{ scale: 1.05 }}
+            onClick={() => setCreateFormModal(true)}
+          >
+            <span className="text-4xl font-bold text-white">+</span>
+          </motion.div>
+        </div>
+      </InquiryBuilderProvider>
+    </GraphProvider>
   );
 }

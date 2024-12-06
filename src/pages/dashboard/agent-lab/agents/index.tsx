@@ -3,7 +3,7 @@ import { GET_ALL_AGENTS } from '@/clients/queries';
 import Button from '@/components/controls/button';
 import ConfirmationModal from '@/components/modals/confirm-modal';
 import { GetAllAgentsQuery, UpsertAgentMutation } from '@/graphql/graphql';
-import { useAddAlert } from '@/hooks/alert-hook';
+import { useAddAlert } from '@/providers/alert-provider';
 import { useMutation, useQuery } from '@apollo/client';
 import { motion } from 'framer-motion';
 import { useState } from 'react';

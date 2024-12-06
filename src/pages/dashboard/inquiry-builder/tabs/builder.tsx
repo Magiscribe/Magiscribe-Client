@@ -2,10 +2,11 @@ import GraphGeneratorMenu from '@/components/cards/generate-menu';
 import Button from '@/components/controls/button';
 import GraphContextBar from '@/components/graph/context-bar';
 import GraphInput from '@/components/graph/graph-input';
+import { useGraphContext } from '@/hooks/graph-state';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { faMagicWandSparkles } from '@fortawesome/free-solid-svg-icons';
 import { AnimatePresence } from 'framer-motion';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 const DEBOUNCE_DELAY_IN_MS = 1000;
 
@@ -22,19 +23,12 @@ export default function InquiryBuilder() {
   const saveDebounce = useRef<NodeJS.Timeout>();
 
   // Hooks
-  const {
-    initialized,
-    form,
-    metadata,
-    graph,
-    saveGraph,
-    onEdgesChange,
-    onNodesChange,
-    updateGraphEdges,
-    updateGraphNodes,
-    saveForm,
-    saveMetadata,
-  } = useInquiryBuilder();
+  const { initialized, form, metadata, saveGraph, saveForm, saveMetadata } = useInquiryBuilder();
+
+  const { graph, setGraph, canRedo, canUndo, redo, undo, triggerUpdate, onEdgesChange, onNodesChange } =
+    useGraphContext();
+
+  const memoGraph = useMemo(() => ({ nodes: graph.nodes, edges: graph.edges }), [graph.nodes, graph.edges]);
 
   /**
    * A debounced function to save the graph after a delay.
@@ -54,7 +48,7 @@ export default function InquiryBuilder() {
         clearTimeout(saveDebounce.current);
       }
     };
-  }, [graph]);
+  }, [memoGraph]);
 
   /**
    * A debounced function to save the graph after a delay.
@@ -88,6 +82,41 @@ export default function InquiryBuilder() {
     setIsChatOpen(!isChatOpen);
   };
 
+  const handleUndo = () => {
+    if (!canUndo) {
+      return;
+    }
+    console.log('undo');
+
+    undo();
+  };
+
+  const handleRedo = () => {
+    if (!canRedo) {
+      return;
+    }
+    console.log('redo');
+
+    redo();
+  };
+
+  // Use Effect to register the undo and redo keyboard shortcuts
+  useEffect(() => {
+    const handleUndoRedo = (event: KeyboardEvent) => {
+      if (event.ctrlKey && event.key === 'z') {
+        handleUndo();
+      } else if ((event.ctrlKey && event.key === 'y') || (event.ctrlKey && event.key === 'Z')) {
+        handleRedo();
+      }
+    };
+
+    document.addEventListener('keydown', handleUndoRedo);
+
+    return () => {
+      document.removeEventListener('keydown', handleUndoRedo);
+    };
+  }, [handleUndo, handleRedo]);
+
   return (
     <>
       <div className="h-[85vh] flex flex-col border-slate-200 dark:border-white border-2 rounded-2xl overflow-hidden">
@@ -98,12 +127,15 @@ export default function InquiryBuilder() {
           {initialized && (
             <>
               <GraphInput
-                nodes={graph.nodes}
-                edges={graph.edges}
-                setNodes={updateGraphNodes}
-                setEdges={updateGraphEdges}
+                graph={graph}
+                setGraph={setGraph}
+                triggerUpdate={triggerUpdate}
                 onNodesChange={onNodesChange}
                 onEdgesChange={onEdgesChange}
+                canRedo={canRedo}
+                canUndo={canUndo}
+                redo={redo}
+                undo={undo}
               >
                 <Button
                   onClick={toggleChat}

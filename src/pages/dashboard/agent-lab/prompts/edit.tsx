@@ -3,7 +3,7 @@ import { GET_PROMPT } from '@/clients/queries';
 import Button from '@/components/controls/button';
 import Input from '@/components/controls/input';
 import Textarea from '@/components/controls/textarea';
-import { useAddAlert } from '@/hooks/alert-hook';
+import { useAddAlert } from '@/providers/alert-provider';
 import { useMutation, useQuery } from '@apollo/client';
 import { useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';

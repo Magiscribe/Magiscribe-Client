@@ -10,6 +10,7 @@ import Button from '../controls/button';
 import Input from '../controls/input';
 import ModalValidationErrors from '../modals/inquiry/inquiry-validation-errors-modal';
 import ModalSettingsInquiry from '../modals/inquiry/settings-inquiry-modal';
+import { useGraphContext } from '@/hooks/graph-state';
 
 export default function GraphContextBar() {
   // States
@@ -19,7 +20,8 @@ export default function GraphContextBar() {
   const [validationErrorsModalOpen, setValidationErrorsModalOpen] = useState(false);
 
   // Hooks
-  const { id, form, graph, lastUpdated, updateForm, updateGraph, resetGraph, publishGraph } = useInquiryBuilder();
+  const { id, form, lastUpdated, updateForm, publishGraph } = useInquiryBuilder();
+  const { graph, setGraph } = useGraphContext();
   const alert = useAddAlert();
 
   // Misc
@@ -29,8 +31,16 @@ export default function GraphContextBar() {
    * Handle formatting the graph.
    */
   const handleFormat = () => {
-    updateGraph(formatGraph(graph));
+    setGraph(formatGraph(graph));
     alert('Graph formatted successfully!', 'success');
+  };
+
+  /**
+   * Handles resetting the graph.
+   */
+  const handleReset = () => {
+    setGraph({ nodes: [], edges: [] });
+    alert('Graph cleared successfully!', 'success');
   };
 
   /**
@@ -87,9 +97,8 @@ export default function GraphContextBar() {
         isOpen={clearGraphModal}
         onClose={() => setClearGraphModal(false)}
         onConfirm={() => {
-          resetGraph();
+          handleReset();
           setClearGraphModal(false);
-          alert('Graph cleared successfully!', 'success');
         }}
         text="Are you sure you want to clear the graph? This action cannot be undone."
         confirmText="Clear Graph"

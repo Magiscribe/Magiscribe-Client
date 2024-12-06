@@ -10,7 +10,7 @@ import {
   GetInquiryResponsesQuery,
   InquiryResponseFilters,
 } from '@/graphql/graphql';
-import { useAddAlert } from '@/hooks/alert-hook';
+import { useAddAlert } from '@/providers/alert-provider';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
 import { NodeVisitAnalysisData } from '@/types/conversation';
 import { GraphNode } from '@/types/conversation';

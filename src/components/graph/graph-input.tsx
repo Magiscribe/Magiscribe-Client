@@ -1,8 +1,10 @@
-import { faChevronLeft, faChevronRight, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faChevronRight, faQuestionCircle, faRedo, faUndo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   addEdge,
+  applyNodeChanges,
   Background,
+  ControlButton,
   Controls,
   Edge,
   MarkerType,
@@ -27,19 +29,28 @@ import { edgeTypes, nodeTypes, nodeTypesInfo } from './utils';
 
 interface TreeInputProps {
   children?: React.ReactNode;
-  nodes: Node[];
-  setNodes: React.Dispatch<React.SetStateAction<Node[]>>;
+  graph: { nodes: Node[]; edges: Edge[] };
+  triggerUpdate: (t: 'nodes' | 'edges', v: Node[] | Edge[]) => void;
   onNodesChange: OnNodesChange;
-  edges: Edge[];
-  setEdges: React.Dispatch<React.SetStateAction<Edge[]>>;
   onEdgesChange: OnEdgesChange;
+
+  undo: () => void;
+  redo: () => void;
+  canUndo: boolean;
+  canRedo: boolean;
 }
 
-function Flow({ children, nodes, edges, setNodes, onNodesChange, setEdges, onEdgesChange }: TreeInputProps) {
-  // Refs
-  const reactFlowWrapper = useRef<HTMLDivElement>(null);
-  const reactFlow = useRef<HTMLDivElement>(null);
-
+function Flow({
+  children,
+  graph,
+  triggerUpdate,
+  onNodesChange,
+  onEdgesChange,
+  canRedo,
+  canUndo,
+  undo,
+  redo,
+}: TreeInputProps) {
   // Hooks
   const { screenToFlowPosition } = useReactFlow();
 
@@ -57,7 +68,7 @@ function Flow({ children, nodes, edges, setNodes, onNodesChange, setEdges, onEdg
    */
   const onConnect: OnConnect = (params) => {
     connectingNodeId.current = null;
-    setEdges((eds) => addEdge(params, eds));
+    triggerUpdate('edges', addEdge(params, graph.edges));
   };
 
   /**
@@ -117,7 +128,7 @@ function Flow({ children, nodes, edges, setNodes, onNodesChange, setEdges, onEdg
    */
   const validateNewNode = (type?: string) => {
     // If there is more than one start node, don't allow adding another
-    if (type === 'start' && nodes.some((node) => node.type === 'start')) {
+    if (type === 'start' && graph.nodes.some((node) => node.type === 'start')) {
       return false;
     }
 
@@ -139,26 +150,34 @@ function Flow({ children, nodes, edges, setNodes, onNodesChange, setEdges, onEdg
     // Guarantee unique ID
     const newNodeId = Math.random().toString(36).slice(2, 6);
 
-    setNodes((prev) => [
-      ...prev,
-      {
-        id: newNodeId,
-        type: node.type,
-        position: node.position,
-        data: { text: '' },
-      },
-    ]);
-
     const edgeNode = node.source || node.target;
     if (edgeNode) {
-      setEdges((prev) => [
-        ...prev,
-        {
-          id: `${node.source ? edgeNode : newNodeId}-${node.target ? edgeNode : newNodeId}`,
-          source: node.source ? edgeNode : newNodeId,
-          target: node.target ? edgeNode : newNodeId,
-        },
-      ]);
+      triggerUpdate('edges', addEdge({ source: node.source, target: newNodeId } as Edge, graph.edges));
+      triggerUpdate(
+        'nodes',
+        applyNodeChanges(
+          [
+            {
+              item: { id: newNodeId, type: node.type, position: node.position, data: { text: '' } },
+              type: 'add',
+            },
+          ],
+          graph.nodes,
+        ),
+      );
+    } else {
+      triggerUpdate(
+        'nodes',
+        applyNodeChanges(
+          [
+            {
+              item: { id: newNodeId, type: node.type, position: node.position, data: { text: '' } },
+              type: 'add',
+            },
+          ],
+          graph.nodes,
+        ),
+      );
     }
 
     setAddNodeModalOpen(false);
@@ -294,11 +313,10 @@ function Flow({ children, nodes, edges, setNodes, onNodesChange, setEdges, onEdg
             />
           </div>
         </div>
-        <div className="w-full h-full text-black" ref={reactFlowWrapper}>
+        <div className="w-full h-full text-black">
           <ReactFlow
-            ref={reactFlow}
-            nodes={nodes}
-            edges={edges}
+            nodes={graph.nodes}
+            edges={graph.edges}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             nodeTypes={nodeTypes}
@@ -327,7 +345,14 @@ function Flow({ children, nodes, edges, setNodes, onNodesChange, setEdges, onEdg
             proOptions={{ hideAttribution: true }}
           >
             <Background />
-            <Controls position="bottom-left" showInteractive={false} />
+            <Controls position="bottom-left" showInteractive={false}>
+              <ControlButton disabled={!canUndo} onClick={undo}>
+                <FontAwesomeIcon icon={faUndo} />
+              </ControlButton>
+              <ControlButton disabled={!canRedo} onClick={redo}>
+                <FontAwesomeIcon icon={faRedo} />
+              </ControlButton>
+            </Controls>
           </ReactFlow>
         </div>
 
