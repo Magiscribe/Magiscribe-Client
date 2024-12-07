@@ -2,7 +2,12 @@ import { ADD_PREDICTION, DELETE_INQUIRY_RESPONSE } from '@/clients/mutations';
 import { GET_INQUIRIES_RESPONSES, GET_INQUIRY } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import Button from '@/components/controls/button';
-import { AddPredictionMutation, GetInquiryQuery, GetInquiryResponsesQuery, InquiryResponseFilters } from '@/graphql/graphql';
+import {
+  AddPredictionMutation,
+  GetInquiryQuery,
+  GetInquiryResponsesQuery,
+  InquiryResponseFilters,
+} from '@/graphql/graphql';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
 import { GraphNode, NodeVisitAnalysisData } from '@/types/conversation';

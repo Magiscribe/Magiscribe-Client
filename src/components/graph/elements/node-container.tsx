@@ -13,11 +13,16 @@ type NodeContainerProps = {
 };
 
 const NodeContainer = ({ title, faIcon, id, children }: NodeContainerProps) => {
-  const { setNodes, setEdges } = useReactFlow();
+  const { deleteElements } = useReactFlow();
 
   const onNodeClick = () => {
-    setNodes((nodes) => nodes.filter((node) => node.id !== id));
-    setEdges((edges) => edges.filter((edge) => edge.source !== id && edge.target !== id));
+    deleteElements({
+      nodes: [
+        {
+          id,
+        },
+      ],
+    });
   };
 
   return (
