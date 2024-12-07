@@ -1,9 +1,9 @@
 import { Edge, Node } from '@xyflow/react';
 
 import templateBranchInquiry from './branch-inquiry';
-import templateLinearInquiry from './linear-inquiry';
 import templateOpenEnded from './open-ended-inquiry';
 import templateDefault from './scratch';
+import templatePersonalAgent from './personal-agent-inquiry';
 
 export interface Template {
   name: string;
@@ -14,10 +14,10 @@ export interface Template {
 
 const templates: Template[] = [
   {
-    name: 'Linear Inquiry',
-    description: 'Similar to a traditional survey where questions are asked in a fixed, linear order',
+    name: 'Personal Agent EXPERIMENTAL',
+    description: 'Configure a personal agent to handle networking outreach on your behalf chatting with other agents',
     allowGeneration: true,
-    graph: templateLinearInquiry,
+    graph: templatePersonalAgent,
   },
   {
     name: 'Branching Inquiry',

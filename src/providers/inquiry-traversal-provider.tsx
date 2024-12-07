@@ -389,7 +389,7 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
 
     if (type === 'information') {
       if (data.text) {
-        messageParts.push(`${messageCounterRef.current}. Bot: ${data.text}`);
+        messageParts.push(`${messageCounterRef.current}. Personal Agent: ${data.text}`);
         messageCounterRef.current++;
       }
     } else if (type === 'question') {

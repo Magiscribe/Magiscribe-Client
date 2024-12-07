@@ -345,9 +345,9 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
 
     if (templateOverride) {
       userMessage = [
-        `You are generating a graph for <title>${form.title}</title>`,
-        `The user is looking for the following goals to be completed: <goals>${message}</goals>`,
-        `Taking the exact graph structure in <conversationGraph>, adapt the graph to be about the <goals> listed above. Simply upsert all of the existing nodes, do not remove any nodes, add any new nodes or add or remove any edges. Simply return the "nodesToUpsert". Absolutey do NOT include "nodesToDelete", "edgesToAdd" or "edgesToDelete". You will ONLY be using the existing nodes and overriding them.`,
+        `You are generating a graph for ${form.title}`,
+        `The following is personal information about the user <personalInfo>${message}</personalInfo>`,
+        `Taking the exact graph structure in <conversationGraph>, adapt the graph to include the <personalInfo> listed above. Simply upsert information node "provideResponse" and open-ended question node "askQuestion" with as much information about the user as possible. The content should be identical in these two nodes. Note, we are NOT doing the typical thing of providing an instruction, rather we are dumping as much information as possible into the nodes.`,
       ].join('\n');
     } else {
       userMessage = [
