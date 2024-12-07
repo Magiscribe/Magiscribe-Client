@@ -10,9 +10,10 @@
 # Table of Contents <!-- omit in toc -->
 
 - [Overview](#overview)
+  - [Short Demos](#short-demos)
 - [Zero to Hero](#zero-to-hero)
-  - [Pre-requisites](#pre-requisites)
-  - [General Setup](#general-setup)
+    - [Pre-requisites](#pre-requisites)
+    - [General Setup](#general-setup)
 
 # Overview
 
@@ -49,6 +50,7 @@ https://github.com/user-attachments/assets/908ae6d8-e7e9-4fb1-8964-90411095353e
 
 ```bash
 corepack enable pnpm
+corepack use pnpm@latest
 ```
 
 3. Download the repository
