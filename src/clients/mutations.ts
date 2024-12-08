@@ -119,6 +119,17 @@ export const UPDATE_INQUIRY = gql`
   }
 `;
 
+export const UPDATE_INQUIRY_OWNERS = gql`
+  mutation updateInquiryOwners($id: ID!, $owners: [String!]!) {
+    updateInquiryOwners(id: $id, owners: $owners) {
+      id
+      data
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
 export const DELETE_INQUIRY = gql`
   mutation deleteInquiry($id: ID!) {
     deleteInquiry(id: $id) {

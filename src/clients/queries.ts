@@ -136,6 +136,7 @@ export const GET_INQUIRY = gql`
   query getInquiry($id: ID!) {
     getInquiry(id: $id) {
       id
+      userId
       data {
         settings {
           title
@@ -152,6 +153,30 @@ export const GET_INQUIRY = gql`
       }
       createdAt
       updatedAt
+    }
+  }
+`;
+
+export const GET_USERS_BY_ID = gql`
+  query getUsersById($userIds: [String!]!) {
+    getUsersById(userIds: $userIds) {
+       primaryEmailAddress
+       username
+       firstName
+       lastName
+       id
+    }
+  }
+`;
+
+export const GET_USERS_BY_EMAIL = gql`
+  query getUsersByEmail($userEmails: [String!]!) {
+    getUsersByEmail(userEmails: $userEmails) {
+       primaryEmailAddress
+       username
+       firstName
+       lastName
+       id
     }
   }
 `;

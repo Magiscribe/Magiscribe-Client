@@ -4,6 +4,7 @@ import {
   DELETE_INQUIRY,
   DELETE_MEDIA_ASSET,
   UPDATE_INQUIRY,
+  UPDATE_INQUIRY_OWNERS,
 } from '@/clients/mutations';
 import { GET_INQUIRY } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
@@ -16,6 +17,7 @@ import {
   PredictionAddedSubscription,
   PredictionType,
   UpdateInquiryMutation,
+  UpdateInquiryOwnersMutation,
 } from '@/graphql/graphql';
 import { InquirySettings } from '@/graphql/types';
 import { useGraphContext } from '@/hooks/graph-state';
@@ -46,14 +48,17 @@ interface ContextType {
   lastUpdated: Date;
   settings: InquirySettings;
   metadata: Metadata;
+  owners: string[];
   graph: { edges: Edge[]; nodes: Node[] };
 
   deleteInquiry: (onSuccess?: () => void, onError?: () => void) => Promise<void>;
 
   setSettings: (settings: InquirySettings) => void;
   updateMetadata: (metadata: Metadata) => void;
+  updateOwners: (owners: string[]) => void;
   saveMetadata: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
   saveSettings: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
+  saveOwners: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
 
   setGraph: (graph: { edges: Edge[]; nodes: Node[] }) => void;
   saveGraph: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
@@ -92,6 +97,8 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     text: '',
   });
 
+  const [owners, setOwners] = useState<string[]>([]);
+
   // Graph Generation States
   const [generatingGraph, setGeneratingGraph] = useState(false);
   const [pendingGraph, setPendingGraph] = useState(false);
@@ -119,6 +126,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
       if (getInquiry.data.metadata) setMetadata(getInquiry.data.metadata);
       if (getInquiry.data.draftGraph) setGraph(getInquiry.data.draftGraph);
       if (getInquiry.data.draftGraph) resetInitialState(getInquiry.data.draftGraph);
+      if (getInquiry.userId) setOwners(getInquiry.userId);
       setInitialized(true);
     },
   });
@@ -173,6 +181,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const [addPrediction] = useMutation<AddPredictionMutation>(ADD_PREDICTION);
   const [deleteObject] = useMutation<DeleteInquiryMutation>(DELETE_INQUIRY);
   const [deleteMediaAsset] = useMutation<DeleteMediaAssetMutation>(DELETE_MEDIA_ASSET);
+  const [updateInquiryOwners] = useMutation<UpdateInquiryOwnersMutation>(UPDATE_INQUIRY_OWNERS);
 
   /**
    * Deletes the inquiry.
@@ -201,6 +210,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const save = async (
     data: {
       settings?: InquirySettings;
+      userId?: string[];
       metadata?: Metadata;
       graph?: { nodes: Node[]; edges: Edge[] };
       draftGraph?: { nodes: Node[]; edges: Edge[] };
@@ -261,6 +271,19 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
       onSuccess,
       onError,
     );
+  };
+
+  const saveOwners = async (onSuccess?: (id: string) => void, onError?: () => void) => {
+    try {
+      await updateInquiryOwners({
+        variables: {
+          id,
+          owners,
+        },
+      });
+    } catch {
+      if (onError) onError();
+    }
   };
 
   /**
@@ -360,6 +383,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     lastUpdated,
     settings,
     metadata,
+    owners,
     graph,
 
     deleteInquiry,
@@ -371,6 +395,8 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     saveMetadata,
 
     setGraph,
+    updateOwners: setOwners,
+    saveOwners,
     resetGraph,
 
     saveGraph,

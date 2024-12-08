@@ -4,13 +4,14 @@ import { useGraphContext } from '@/hooks/graph-state';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { formatGraph, validateGraph } from '@/utils/graphs/graph-utils';
-import { faCog, faEllipsisV, faEye, faPaperPlane, faRotateLeft } from '@fortawesome/free-solid-svg-icons';
+import { faCog, faEdit, faEllipsisV, faEye, faPaperPlane, faRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
 
 import Button from '../controls/button';
 import Input from '../controls/input';
 import ModalValidationErrors from '../modals/inquiry/inquiry-validation-errors-modal';
 import ModalSettingsInquiry from '../modals/inquiry/settings-inquiry-modal';
+import { ModalEditOwners } from '../modals/inquiry/edit-owners-modal';
 
 export default function GraphContextBar() {
   // States
@@ -18,6 +19,7 @@ export default function GraphContextBar() {
   const [sendModalOpen, setSendModalOpen] = useState(false);
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const [validationErrorsModalOpen, setValidationErrorsModalOpen] = useState(false);
+  const [showEditOwnersModal, setShowEditOwnersModal] = useState(false);
 
   // Hooks
   const { id, settings, lastUpdated, setSettings, publishGraph } = useInquiryBuilder();
@@ -89,6 +91,9 @@ export default function GraphContextBar() {
           <Button variant="secondary" icon={faRotateLeft} onClick={() => setClearGraphModal(true)}>
             Clear
           </Button>
+          <Button variant="success" icon={faEdit} onClick={() => setShowEditOwnersModal(true)}>
+            Update Owners
+          </Button>
           <Button variant="transparentSecondary" icon={faEllipsisV} onClick={() => setSettingsModalOpen(true)} />
         </div>
       </div>
@@ -113,6 +118,8 @@ export default function GraphContextBar() {
       <ModalSendInquiry open={sendModalOpen} onClose={() => setSendModalOpen(false)} />
 
       <ModalValidationErrors open={validationErrorsModalOpen} onClose={() => setValidationErrorsModalOpen(false)} />
+        
+      <ModalEditOwners open={showEditOwnersModal} onClose={() => setShowEditOwnersModal(false)} />
     </>
   );
 }

@@ -22,7 +22,7 @@ export default function InquiryBuilder() {
   const saveDebounce = useRef<NodeJS.Timeout>(null);
 
   // Hooks
-  const { graph, initialized, settings, metadata, saveGraph, saveSettings, saveMetadata } = useInquiryBuilder();
+  const { graph, initialized, settings, metadata, saveGraph, saveSettings, saveMetadata, saveOwners, owners } = useInquiryBuilder();
 
   const memoGraph = useMemo(() => ({ nodes: graph.nodes, edges: graph.edges }), [graph.nodes, graph.edges]);
 
@@ -73,6 +73,12 @@ export default function InquiryBuilder() {
       saveMetadata();
     }
   }, [metadata]);
+
+  useEffect(() => {
+    if (owners.length > 0) {
+      saveOwners();
+    }
+  }, [owners]);
 
   const toggleChat = () => {
     setIsChatOpen(!isChatOpen);
