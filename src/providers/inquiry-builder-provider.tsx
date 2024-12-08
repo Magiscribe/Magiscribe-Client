@@ -18,7 +18,7 @@ import {
   UpdateInquiryMutation,
 } from '@/graphql/graphql';
 import { InquiryDataForm } from '@/graphql/types';
-import { GraphContextProps, useGraphContext } from '@/hooks/graph-state';
+import { useGraphContext } from '@/hooks/graph-state';
 import { ImageMetadata } from '@/types/conversation';
 import { getAgentIdByName } from '@/utils/agents';
 import { applyGraphChangeset, formatGraph } from '@/utils/graphs/graph-utils';
@@ -50,11 +50,12 @@ interface ContextType {
 
   deleteInquiry: (onSuccess?: () => void, onError?: () => void) => Promise<void>;
 
-  updateForm: (form: InquiryDataForm) => void;
+  setForm: (form: InquiryDataForm) => void;
   updateMetadata: (metadata: Metadata) => void;
   saveMetadata: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
   saveForm: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
 
+  setGraph: (graph: { edges: Edge[]; nodes: Node[] }) => void;
   saveGraph: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
   publishGraph: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
 
@@ -73,8 +74,6 @@ interface ContextType {
   onGraphGenerationStarted: (callback: (message: string) => void) => void;
   onGraphGenerationCompleted: (callback: (message: string) => void) => void;
   onGraphGenerationError: (callback: () => void) => void;
-
-  graphContext: GraphContextProps;
 }
 
 const InquiryContext = createContext<ContextType | undefined>(undefined);
@@ -84,7 +83,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const [initialized, setInitialized] = useState(false);
   const [subscriptionId] = useState<string>(uuidv4());
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
-  const [form, updateForm] = useState<InquiryDataForm>({
+  const [form, setForm] = useState<InquiryDataForm>({
     title: 'Untitled Inquiry',
     goals: '',
   } as InquiryDataForm);
@@ -116,7 +115,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     onCompleted: ({ getInquiry }) => {
       if (!getInquiry) return;
       setLastUpdated(new Date(getInquiry.updatedAt));
-      if (getInquiry.data.form) updateForm(getInquiry.data.form);
+      if (getInquiry.data.form) setForm(getInquiry.data.form);
       if (getInquiry.data.metadata) setMetadata(getInquiry.data.metadata);
       if (getInquiry.data.draftGraph) setGraph(getInquiry.data.draftGraph);
       if (getInquiry.data.draftGraph) resetInitialState(getInquiry.data.draftGraph);
@@ -365,7 +364,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
 
     deleteInquiry,
 
-    updateForm,
+    setForm,
     saveForm,
 
     updateMetadata: setMetadata,
@@ -392,8 +391,6 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     onGraphGenerationError: (callback: () => void) => {
       onGraphGenerationErrorRef.current = callback;
     },
-
-    graphContext,
   };
 
   return <InquiryContext.Provider value={contextValue}>{children}</InquiryContext.Provider>;

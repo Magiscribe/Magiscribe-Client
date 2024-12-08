@@ -1,7 +1,21 @@
 import { useGraphContext } from '@/hooks/graph-state';
 import { faChevronLeft, faChevronRight, faQuestionCircle, faRedo, faUndo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { addEdge, applyNodeChanges, Background, ControlButton, Controls, MarkerType, OnConnect, OnConnectEnd, OnConnectStart, ReactFlow, ReactFlowProvider, useReactFlow, XYPosition } from '@xyflow/react';
+import {
+  addEdge,
+  applyNodeChanges,
+  Background,
+  ControlButton,
+  Controls,
+  MarkerType,
+  OnConnect,
+  OnConnectEnd,
+  OnConnectStart,
+  ReactFlow,
+  ReactFlowProvider,
+  useReactFlow,
+  XYPosition,
+} from '@xyflow/react';
 import React, { DragEvent, useEffect, useRef, useState } from 'react';
 import colors from 'tailwindcss/colors';
 

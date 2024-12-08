@@ -19,7 +19,7 @@ export interface GraphContextProps {
   canRedo: boolean;
 }
 
-export const GraphContext = createContext<GraphContextProps | undefined>(undefined);
+const GraphContext = createContext<GraphContextProps | undefined>(undefined);
 
 const GraphProvider = ({ children }: { children: React.ReactNode }) => {
   const [graph, setGraph, { undo, redo, canUndo, canRedo, resetInitialState }] = useUndoable<{
@@ -35,8 +35,6 @@ const GraphProvider = ({ children }: { children: React.ReactNode }) => {
       historyLimit: 'infinity',
     },
   );
-
-  console.log(graph);
 
   const triggerUpdate = useCallback(
     (t: string, v: Node[] | Edge[], ignore = false) => {

@@ -1,5 +1,6 @@
 import ConfirmationModal from '@/components/modals/confirm-modal';
 import ModalSendInquiry from '@/components/modals/inquiry/send-inquiry-modal';
+import { useGraphContext } from '@/hooks/graph-state';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { formatGraph, validateGraph } from '@/utils/graphs/graph-utils';
@@ -10,7 +11,6 @@ import Button from '../controls/button';
 import Input from '../controls/input';
 import ModalValidationErrors from '../modals/inquiry/inquiry-validation-errors-modal';
 import ModalSettingsInquiry from '../modals/inquiry/settings-inquiry-modal';
-import { useGraphContext } from '@/hooks/graph-state';
 
 export default function GraphContextBar() {
   // States
@@ -20,7 +20,7 @@ export default function GraphContextBar() {
   const [validationErrorsModalOpen, setValidationErrorsModalOpen] = useState(false);
 
   // Hooks
-  const { id, form, lastUpdated, updateForm, publishGraph } = useInquiryBuilder();
+  const { id, form, lastUpdated, setForm, publishGraph } = useInquiryBuilder();
   const { graph, setGraph } = useGraphContext();
   const alert = useAddAlert();
 
@@ -68,7 +68,7 @@ export default function GraphContextBar() {
             name="title"
             value={form.title ?? 'Untitled Inquiry'}
             onChange={(e) => {
-              updateForm({ ...form, title: e.target.value });
+              setForm({ ...form, title: e.target.value });
             }}
             className="text-2xl font-bold border-2 border-slate-200 p-2 rounded-lg"
           />

@@ -58,16 +58,8 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
   const [loadingQuote, setLoadingQuote] = useState(conversationGraphLoadingQuotes[0]);
 
   // Hooks
-  const {
-    id,
-    form,
-    updateForm,
-    generateGraph,
-    graphContext,
-    onGraphGenerationCompleted,
-    saveFormAndGraph,
-    generatingGraph,
-  } = useInquiryBuilder();
+  const { id, form, setForm, generateGraph, setGraph, onGraphGenerationCompleted, saveFormAndGraph, generatingGraph } =
+    useInquiryBuilder();
   const alert = useAddAlert();
 
   // Voice Hooks
@@ -78,7 +70,7 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
 
   useEffect(() => {
     if (selectedTemplate) {
-      graphContext.setGraph(selectedTemplate.graph ?? { nodes: [], edges: [] });
+      setGraph(selectedTemplate.graph ?? { nodes: [], edges: [] });
     }
   }, [selectedTemplate]);
 
@@ -102,10 +94,10 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
   useEffect(() => {
     if (voices) {
       if (!form.voice) {
-        updateForm({ ...form, voice: voices.getAllAudioVoices[0].id });
+        setForm({ ...form, voice: voices.getAllAudioVoices[0].id });
       }
     }
-  }, [voices, form, updateForm]);
+  }, [voices, form, setForm]);
 
   /**
    * Save the form and graph once the graph generation is completed
@@ -136,7 +128,7 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
   const handleInputChange =
     (field: string) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
-      updateForm({ ...form, [field]: e.target.value });
+      setForm({ ...form, [field]: e.target.value });
     };
 
   /**
@@ -159,7 +151,7 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
   const handleSelectChange =
     (field: string) =>
     (e: React.ChangeEvent<HTMLSelectElement>): void => {
-      updateForm({ ...form, [field]: e.target.value });
+      setForm({ ...form, [field]: e.target.value });
     };
 
   /**

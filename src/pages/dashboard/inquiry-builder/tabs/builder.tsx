@@ -22,12 +22,9 @@ export default function InquiryBuilder() {
   const saveDebounce = useRef<NodeJS.Timeout>();
 
   // Hooks
-  const { graphContext, initialized, form, metadata, saveGraph, saveForm, saveMetadata } = useInquiryBuilder();
+  const { graph, initialized, form, metadata, saveGraph, saveForm, saveMetadata } = useInquiryBuilder();
 
-  const memoGraph = useMemo(
-    () => ({ nodes: graphContext.graph.nodes, edges: graphContext.graph.edges }),
-    [graphContext.graph.nodes, graphContext.graph.edges],
-  );
+  const memoGraph = useMemo(() => ({ nodes: graph.nodes, edges: graph.edges }), [graph.nodes, graph.edges]);
 
   /**
    * A debounced function to save the graph after a delay.
