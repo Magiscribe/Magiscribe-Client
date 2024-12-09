@@ -21,7 +21,7 @@ export default function HomeHero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.25 }}
         >
-          Magiscribe balances the efficency of surveys with the depth of user interviews using the power of AI.
+          Magiscribe balances the efficiency of surveys with the depth of user interviews using the power of AI.
         </motion.p>
         <SignUpButton signInForceRedirectUrl="/dashboard" forceRedirectUrl="/dashboard">
           <motion.button
