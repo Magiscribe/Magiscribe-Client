@@ -1,3 +1,4 @@
+import { SignUpButton } from '@clerk/clerk-react';
 import { motion } from 'framer-motion';
 
 import WizardShape from '../shapes/wizard';
@@ -22,15 +23,16 @@ export default function HomeHero() {
         >
           Magiscribe balances the efficency of surveys with the depth of user interviews using the power of AI.
         </motion.p>
-        <motion.a
-          href="#signup"
-          className="border-2 border-white rounded-full my-6 py-4 px-8 text-white font-bold hover:bg-white hover:text-black transition duration-300"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-        >
-          Get Started for Free
-        </motion.a>
+        <SignUpButton signInForceRedirectUrl="/dashboard" forceRedirectUrl="/dashboard">
+          <motion.button
+            className="border-2 border-white rounded-full my-6 py-4 px-8 text-white font-bold hover:bg-white hover:text-black transition duration-300"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+          >
+            Get Started for Free
+          </motion.button>
+        </SignUpButton>
       </div>
       <motion.div
         className="w-full md:w-2/5 max-w-lg py-6 mb-12 text-center ml-auto"
