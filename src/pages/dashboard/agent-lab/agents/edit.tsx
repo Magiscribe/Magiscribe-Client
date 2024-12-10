@@ -6,7 +6,7 @@ import ListBoxMultiple from '@/components/controls/list/ListBoxMultiple';
 import Select from '@/components/controls/select';
 import Textarea from '@/components/controls/textarea';
 import { GetAgentQuery, GetAllCapabilitiesQuery, GetAllModelsQuery, UpsertAgentMutation } from '@/graphql/graphql';
-import { useAddAlert } from '@/hooks/alert-hook';
+import { useAddAlert } from '@/providers/alert-provider';
 import { useMutation, useQuery } from '@apollo/client';
 import { useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';

@@ -13,11 +13,16 @@ type NodeContainerProps = {
 };
 
 const NodeContainer = ({ title, faIcon, id, children }: NodeContainerProps) => {
-  const { setNodes, setEdges } = useReactFlow();
+  const { deleteElements } = useReactFlow();
 
   const onNodeClick = () => {
-    setNodes((nodes) => nodes.filter((node) => node.id !== id));
-    setEdges((edges) => edges.filter((edge) => edge.source !== id && edge.target !== id));
+    deleteElements({
+      nodes: [
+        {
+          id,
+        },
+      ],
+    });
   };
 
   return (
@@ -29,7 +34,7 @@ const NodeContainer = ({ title, faIcon, id, children }: NodeContainerProps) => {
           variant="transparentSecondary"
           size="small"
           icon={faTimesCircle}
-          className="absolute right-3 top-3 flex items-center justify-center"
+          className="absolute right-3 top-3 flex items-center justify-center hover:text-red-500"
         />
         <h3 className="text-lg font-bold text-slate-800 dark:text-white">{title}</h3>
         <p className="ml-2 text-sm text-slate-400">#{id}</p>

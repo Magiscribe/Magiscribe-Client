@@ -1,5 +1,6 @@
 import ConfirmationModal from '@/components/modals/confirm-modal';
 import ModalSendInquiry from '@/components/modals/inquiry/send-inquiry-modal';
+import { useGraphContext } from '@/hooks/graph-state';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { formatGraph, validateGraph } from '@/utils/graphs/graph-utils';
@@ -19,7 +20,8 @@ export default function GraphContextBar() {
   const [validationErrorsModalOpen, setValidationErrorsModalOpen] = useState(false);
 
   // Hooks
-  const { id, form, graph, lastUpdated, updateForm, updateGraph, resetGraph, publishGraph } = useInquiryBuilder();
+  const { id, form, lastUpdated, setForm, publishGraph } = useInquiryBuilder();
+  const { graph, setGraph } = useGraphContext();
   const alert = useAddAlert();
 
   // Misc
@@ -29,8 +31,16 @@ export default function GraphContextBar() {
    * Handle formatting the graph.
    */
   const handleFormat = () => {
-    updateGraph(formatGraph(graph));
+    setGraph(formatGraph(graph));
     alert('Graph formatted successfully!', 'success');
+  };
+
+  /**
+   * Handles resetting the graph.
+   */
+  const handleReset = () => {
+    setGraph({ nodes: [], edges: [] });
+    alert('Graph cleared successfully!', 'success');
   };
 
   /**
@@ -58,7 +68,7 @@ export default function GraphContextBar() {
             name="title"
             value={form.title ?? 'Untitled Inquiry'}
             onChange={(e) => {
-              updateForm({ ...form, title: e.target.value });
+              setForm({ ...form, title: e.target.value });
             }}
             className="text-2xl font-bold border-2 border-slate-200 p-2 rounded-lg"
           />
@@ -87,9 +97,8 @@ export default function GraphContextBar() {
         isOpen={clearGraphModal}
         onClose={() => setClearGraphModal(false)}
         onConfirm={() => {
-          resetGraph();
+          handleReset();
           setClearGraphModal(false);
-          alert('Graph cleared successfully!', 'success');
         }}
         text="Are you sure you want to clear the graph? This action cannot be undone."
         confirmText="Clear Graph"

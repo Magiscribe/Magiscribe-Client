@@ -5,7 +5,7 @@ import GraphInput from '@/components/graph/graph-input';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { faMagicWandSparkles } from '@fortawesome/free-solid-svg-icons';
 import { AnimatePresence } from 'framer-motion';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 const DEBOUNCE_DELAY_IN_MS = 1000;
 
@@ -22,19 +22,9 @@ export default function InquiryBuilder() {
   const saveDebounce = useRef<NodeJS.Timeout>();
 
   // Hooks
-  const {
-    initialized,
-    form,
-    metadata,
-    graph,
-    saveGraph,
-    onEdgesChange,
-    onNodesChange,
-    updateGraphEdges,
-    updateGraphNodes,
-    saveForm,
-    saveMetadata,
-  } = useInquiryBuilder();
+  const { graph, initialized, form, metadata, saveGraph, saveForm, saveMetadata } = useInquiryBuilder();
+
+  const memoGraph = useMemo(() => ({ nodes: graph.nodes, edges: graph.edges }), [graph.nodes, graph.edges]);
 
   /**
    * A debounced function to save the graph after a delay.
@@ -54,7 +44,7 @@ export default function InquiryBuilder() {
         clearTimeout(saveDebounce.current);
       }
     };
-  }, [graph]);
+  }, [memoGraph]);
 
   /**
    * A debounced function to save the graph after a delay.
@@ -97,14 +87,7 @@ export default function InquiryBuilder() {
         <div className="flex-grow">
           {initialized && (
             <>
-              <GraphInput
-                nodes={graph.nodes}
-                edges={graph.edges}
-                setNodes={updateGraphNodes}
-                setEdges={updateGraphEdges}
-                onNodesChange={onNodesChange}
-                onEdgesChange={onEdgesChange}
-              >
+              <GraphInput>
                 <Button
                   onClick={toggleChat}
                   className="absolute top-4 right-4 z-100"

@@ -18,14 +18,15 @@ import {
   UpdateInquiryMutation,
 } from '@/graphql/graphql';
 import { InquiryDataForm } from '@/graphql/types';
+import { useGraphContext } from '@/hooks/graph-state';
 import { ImageMetadata } from '@/types/conversation';
 import { getAgentIdByName } from '@/utils/agents';
 import { applyGraphChangeset, formatGraph } from '@/utils/graphs/graph-utils';
 import { parseCodeBlocks } from '@/utils/markdown';
 import { removeDeletedImagesFromS3 } from '@/utils/s3';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
-import { Edge, Node, OnEdgesChange, OnNodesChange, useEdgesState, useNodesState } from '@xyflow/react';
-import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { Edge, Node } from '@xyflow/react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 interface InquiryProviderProps {
@@ -49,20 +50,12 @@ interface ContextType {
 
   deleteInquiry: (onSuccess?: () => void, onError?: () => void) => Promise<void>;
 
-  updateForm: (form: InquiryDataForm) => void;
+  setForm: (form: InquiryDataForm) => void;
   updateMetadata: (metadata: Metadata) => void;
   saveMetadata: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
   saveForm: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
 
-  updateGraph: (graph: { nodes: Node[]; edges: Edge[] }) => void;
-  updateGraphNodes: React.Dispatch<React.SetStateAction<Node[]>>;
-  updateGraphEdges: React.Dispatch<React.SetStateAction<Edge[]>>;
-
-  resetGraph: () => void;
-
-  onNodesChange: OnNodesChange;
-  onEdgesChange: OnEdgesChange;
-
+  setGraph: (graph: { edges: Edge[]; nodes: Node[] }) => void;
   saveGraph: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
   publishGraph: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
 
@@ -90,7 +83,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const [initialized, setInitialized] = useState(false);
   const [subscriptionId] = useState<string>(uuidv4());
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
-  const [form, updateForm] = useState<InquiryDataForm>({
+  const [form, setForm] = useState<InquiryDataForm>({
     title: 'Untitled Inquiry',
     goals: '',
   } as InquiryDataForm);
@@ -105,11 +98,8 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const [explanation, setExplanation] = useState<string>('');
 
   // Hooks
-  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
-
-  // Memoized graph object
-  const graph = useMemo(() => ({ nodes, edges }), [nodes, edges]);
+  const graphContext = useGraphContext();
+  const { graph, setGraph, resetInitialState } = graphContext;
 
   // Events
   const onGraphGenerationStartedRef = useRef<(message: string) => void>();
@@ -125,9 +115,10 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     onCompleted: ({ getInquiry }) => {
       if (!getInquiry) return;
       setLastUpdated(new Date(getInquiry.updatedAt));
-      if (getInquiry.data.form) updateForm(getInquiry.data.form);
+      if (getInquiry.data.form) setForm(getInquiry.data.form);
       if (getInquiry.data.metadata) setMetadata(getInquiry.data.metadata);
-      if (getInquiry.data.draftGraph) updateGraph(getInquiry.data.draftGraph);
+      if (getInquiry.data.draftGraph) setGraph(getInquiry.data.draftGraph);
+      if (getInquiry.data.draftGraph) resetInitialState(getInquiry.data.draftGraph);
       setInitialized(true);
     },
   });
@@ -149,7 +140,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
           const newGraph = applyGraphChangeset(graph, changeset);
 
           setExplanation(matches['markdown'] as string);
-          updateGraph(formatGraph(newGraph));
+          setGraph(formatGraph(newGraph));
 
           setGeneratingGraph(false);
           setPendingGraph(true);
@@ -273,19 +264,10 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   };
 
   /**
-   * Updates the graph of the inquiry.
-   * @param graph {Object} The graph object to update.
-   */
-  const updateGraph = ({ nodes, edges }: { nodes: Node[]; edges: Edge[] }) => {
-    setNodes(nodes);
-    setEdges(edges);
-  };
-
-  /**
    * Clears the graph and initializes it with a start node.
    */
   const resetGraph = () => {
-    updateGraph({ nodes: [{ id: '0', type: 'start', position: { x: 0, y: 0 }, data: {} }], edges: [] });
+    setGraph({ nodes: [{ id: '0', type: 'start', position: { x: 0, y: 0 }, data: {} }], edges: [] });
   };
 
   /**
@@ -382,20 +364,15 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
 
     deleteInquiry,
 
-    updateForm,
+    setForm,
     saveForm,
 
     updateMetadata: setMetadata,
     saveMetadata,
 
-    updateGraph,
-    updateGraphNodes: setNodes,
-    updateGraphEdges: setEdges,
-
+    setGraph,
     resetGraph,
 
-    onNodesChange,
-    onEdgesChange,
     saveGraph,
     publishGraph,
 

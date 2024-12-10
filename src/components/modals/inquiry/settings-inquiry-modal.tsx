@@ -31,7 +31,7 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
   const [deleteModal, setDeleteModal] = useState(false);
 
   // Hooks
-  const { id, form, updateForm, saveForm, deleteInquiry } = useInquiryBuilder();
+  const { id, form, setForm, saveForm, deleteInquiry } = useInquiryBuilder();
   const alert = useAddAlert();
   const navigate = useNavigate();
 
@@ -48,7 +48,7 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
   const handleSelectChange =
     (field: string) =>
     (e: React.ChangeEvent<HTMLSelectElement>): void => {
-      updateForm({ ...form, [field]: e.target.value !== '' ? e.target.value : null });
+      setForm({ ...form, [field]: e.target.value !== '' ? e.target.value : null });
     };
 
   /**

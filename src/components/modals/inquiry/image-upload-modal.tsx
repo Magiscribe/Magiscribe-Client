@@ -1,4 +1,4 @@
-import { useAddAlert } from '@/hooks/alert-hook';
+import { useAddAlert } from '@/providers/alert-provider';
 import { canvasPreview } from '@/utils/images/canvas-preview';
 import { faUpload } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useRef, useState } from 'react';

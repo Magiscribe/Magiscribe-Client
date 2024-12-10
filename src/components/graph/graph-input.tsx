@@ -1,23 +1,22 @@
-import { faChevronLeft, faChevronRight, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
+import { useGraphContext } from '@/hooks/graph-state';
+import { faChevronLeft, faChevronRight, faQuestionCircle, faRedo, faUndo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   addEdge,
+  applyNodeChanges,
   Background,
+  ControlButton,
   Controls,
-  Edge,
   MarkerType,
-  Node,
   OnConnect,
   OnConnectEnd,
   OnConnectStart,
-  OnEdgesChange,
-  OnNodesChange,
   ReactFlow,
   ReactFlowProvider,
   useReactFlow,
   XYPosition,
 } from '@xyflow/react';
-import React, { DragEvent, useRef, useState } from 'react';
+import React, { DragEvent, useEffect, useRef, useState } from 'react';
 import colors from 'tailwindcss/colors';
 
 import Button from '../controls/button';
@@ -27,21 +26,13 @@ import { edgeTypes, nodeTypes, nodeTypesInfo } from './utils';
 
 interface TreeInputProps {
   children?: React.ReactNode;
-  nodes: Node[];
-  setNodes: React.Dispatch<React.SetStateAction<Node[]>>;
-  onNodesChange: OnNodesChange;
-  edges: Edge[];
-  setEdges: React.Dispatch<React.SetStateAction<Edge[]>>;
-  onEdgesChange: OnEdgesChange;
 }
 
-function Flow({ children, nodes, edges, setNodes, onNodesChange, setEdges, onEdgesChange }: TreeInputProps) {
-  // Refs
-  const reactFlowWrapper = useRef<HTMLDivElement>(null);
-  const reactFlow = useRef<HTMLDivElement>(null);
-
+function Flow({ children }: TreeInputProps) {
   // Hooks
   const { screenToFlowPosition } = useReactFlow();
+  const { graph, setGraph, triggerUpdate, canRedo, canUndo, onEdgesChange, onNodesChange, redo, undo } =
+    useGraphContext();
 
   // States
   const [addNodeModalOpen, setAddNodeModalOpen] = useState(false);
@@ -57,7 +48,7 @@ function Flow({ children, nodes, edges, setNodes, onNodesChange, setEdges, onEdg
    */
   const onConnect: OnConnect = (params) => {
     connectingNodeId.current = null;
-    setEdges((eds) => addEdge(params, eds));
+    triggerUpdate('edges', addEdge(params, graph.edges));
   };
 
   /**
@@ -117,7 +108,7 @@ function Flow({ children, nodes, edges, setNodes, onNodesChange, setEdges, onEdg
    */
   const validateNewNode = (type?: string) => {
     // If there is more than one start node, don't allow adding another
-    if (type === 'start' && nodes.some((node) => node.type === 'start')) {
+    if (type === 'start' && graph.nodes.some((node) => node.type === 'start')) {
       return false;
     }
 
@@ -139,26 +130,27 @@ function Flow({ children, nodes, edges, setNodes, onNodesChange, setEdges, onEdg
     // Guarantee unique ID
     const newNodeId = Math.random().toString(36).slice(2, 6);
 
-    setNodes((prev) => [
-      ...prev,
-      {
-        id: newNodeId,
-        type: node.type,
-        position: node.position,
-        data: { text: '' },
-      },
-    ]);
-
     const edgeNode = node.source || node.target;
     if (edgeNode) {
-      setEdges((prev) => [
-        ...prev,
-        {
-          id: `${node.source ? edgeNode : newNodeId}-${node.target ? edgeNode : newNodeId}`,
-          source: node.source ? edgeNode : newNodeId,
-          target: node.target ? edgeNode : newNodeId,
-        },
-      ]);
+      // Since we are setting both the nodes and edges at the same time, we use the setGraph function
+      // to do this in a single render cycle so that the undo/redo history captures both changes as a single action.
+      setGraph((prev) => ({
+        nodes: [...prev.nodes, { id: newNodeId, type: node.type, position: node.position, data: { text: '' } }],
+        edges: [...prev.edges, { id: `${edgeNode}-${newNodeId}`, source: edgeNode, target: newNodeId }],
+      }));
+    } else {
+      triggerUpdate(
+        'nodes',
+        applyNodeChanges(
+          [
+            {
+              item: { id: newNodeId, type: node.type, position: node.position, data: { text: '' } },
+              type: 'add',
+            },
+          ],
+          graph.nodes,
+        ),
+      );
     }
 
     setAddNodeModalOpen(false);
@@ -195,6 +187,39 @@ function Flow({ children, nodes, edges, setNodes, onNodesChange, setEdges, onEdg
 
     addNode();
   };
+
+  const handleUndo = () => {
+    if (!canUndo) {
+      return;
+    }
+
+    undo();
+  };
+
+  const handleRedo = () => {
+    if (!canRedo) {
+      return;
+    }
+
+    redo();
+  };
+
+  // Use Effect to register the undo and redo keyboard shortcuts
+  useEffect(() => {
+    const handleUndoRedo = (event: KeyboardEvent) => {
+      if (event.ctrlKey && event.key === 'z') {
+        handleUndo();
+      } else if ((event.ctrlKey && event.key === 'y') || (event.ctrlKey && event.key === 'Z')) {
+        handleRedo();
+      }
+    };
+
+    document.addEventListener('keydown', handleUndoRedo);
+
+    return () => {
+      document.removeEventListener('keydown', handleUndoRedo);
+    };
+  }, [handleUndo, handleRedo]);
 
   const renderNodeButtons = () => (
     <>
@@ -294,11 +319,10 @@ function Flow({ children, nodes, edges, setNodes, onNodesChange, setEdges, onEdg
             />
           </div>
         </div>
-        <div className="w-full h-full text-black" ref={reactFlowWrapper}>
+        <div className="w-full h-full text-black">
           <ReactFlow
-            ref={reactFlow}
-            nodes={nodes}
-            edges={edges}
+            nodes={graph.nodes}
+            edges={graph.edges}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             nodeTypes={nodeTypes}
@@ -327,7 +351,14 @@ function Flow({ children, nodes, edges, setNodes, onNodesChange, setEdges, onEdg
             proOptions={{ hideAttribution: true }}
           >
             <Background />
-            <Controls position="bottom-left" showInteractive={false} />
+            <Controls position="bottom-left" showInteractive={false}>
+              <ControlButton disabled={!canRedo} onClick={redo} aria-label="redo action" title="redo action">
+                <FontAwesomeIcon icon={faRedo} />
+              </ControlButton>
+              <ControlButton disabled={!canUndo} onClick={undo} aria-label="undo action" title="undo action">
+                <FontAwesomeIcon icon={faUndo} />
+              </ControlButton>
+            </Controls>
           </ReactFlow>
         </div>
 
