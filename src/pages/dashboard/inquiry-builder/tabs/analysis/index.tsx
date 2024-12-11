@@ -3,7 +3,7 @@ import { GET_INQUIRIES_RESPONSES } from '@/clients/queries';
 import { GetInquiryResponsesQuery } from '@/graphql/graphql';
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import clsx from 'clsx';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import PerQuestionTab from './per-question';
 import PerResponseTab from './per-response';
 import ViaChatTab from './via-chat';

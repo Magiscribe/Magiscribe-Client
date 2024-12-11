@@ -6,7 +6,7 @@ import { Inquiry } from '@/graphql/types';
 import GraphProvider from '@/hooks/graph-state';
 import { InquiryBuilderProvider } from '@/providers/inquiry-builder-provider';
 import { useQuery } from '@apollo/client';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 

@@ -1,7 +1,7 @@
 import { faArrowDown, faArrowUp, faGripVertical } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import clsx from 'clsx';
-import { AnimatePresence, Reorder, useDragControls } from 'framer-motion';
+import { AnimatePresence, Reorder, useDragControls } from 'motion/react';
 import React, { useCallback, useRef, useState } from 'react';
 
 /**

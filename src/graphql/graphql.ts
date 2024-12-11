@@ -293,7 +293,7 @@ export type GetInquiryQuery = { __typename?: 'Query', getInquiry?: { __typename?
 export type GetInquiriesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetInquiriesQuery = { __typename?: 'Query', getInquiries?: Array<{ __typename?: 'Inquiry', id: string, userId: string, data: any, createdAt: number, updatedAt: number }> | null };
+export type GetInquiriesQuery = { __typename?: 'Query', getInquiries?: Array<{ __typename?: 'Inquiry', id: string, userId?: Array<string> | null, data: any, createdAt: number, updatedAt: number }> | null };
 
 export type GetInquiryResponsesQueryVariables = Exact<{
   id: Scalars['ID']['input'];

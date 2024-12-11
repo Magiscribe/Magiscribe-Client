@@ -112,7 +112,7 @@ export type Inquiry = {
   id: Scalars['ID']['output'];
   responses?: Maybe<Array<InquiryResponse>>;
   updatedAt: Scalars['Float']['output'];
-  userId: Scalars['ID']['output'];
+  userId?: Maybe<Array<Scalars['ID']['output']>>;
 };
 
 export type InquiryData = {
@@ -169,6 +169,7 @@ export type Mutation = {
   deleteMediaAsset?: Maybe<Scalars['Int']['output']>;
   deletePrompt?: Maybe<Prompt>;
   generateAudio?: Maybe<Scalars['String']['output']>;
+  updateInquiryOwners: Inquiry;
   upsertAgent?: Maybe<Agent>;
   upsertCapability?: Maybe<Capability>;
   upsertCollection?: Maybe<Collection>;
@@ -225,6 +226,12 @@ export type MutationDeletePromptArgs = {
 export type MutationGenerateAudioArgs = {
   text: Scalars['String']['input'];
   voice: Scalars['String']['input'];
+};
+
+
+export type MutationUpdateInquiryOwnersArgs = {
+  id: Scalars['ID']['input'];
+  owners: Array<Scalars['String']['input']>;
 };
 
 
@@ -310,6 +317,8 @@ export type Query = {
   getInquiryResponses?: Maybe<Array<InquiryResponse>>;
   getMediaAsset?: Maybe<Scalars['String']['output']>;
   getPrompt?: Maybe<Prompt>;
+  getUsersByEmail?: Maybe<Array<Maybe<UserData>>>;
+  getUsersById?: Maybe<Array<UserData>>;
 };
 
 
@@ -373,6 +382,16 @@ export type QueryGetPromptArgs = {
   promptId: Scalars['ID']['input'];
 };
 
+
+export type QueryGetUsersByEmailArgs = {
+  userEmails: Array<Scalars['String']['input']>;
+};
+
+
+export type QueryGetUsersByIdArgs = {
+  userIds: Array<Scalars['String']['input']>;
+};
+
 export enum Role {
   Admin = 'admin',
   Default = 'default',
@@ -394,6 +413,15 @@ export type Subscription = {
 
 export type SubscriptionPredictionAddedArgs = {
   subscriptionId: Scalars['ID']['input'];
+};
+
+export type UserData = {
+  __typename?: 'UserData';
+  firstName?: Maybe<Scalars['String']['output']>;
+  id: Scalars['String']['output'];
+  lastName?: Maybe<Scalars['String']['output']>;
+  primaryEmailAddress: Scalars['String']['output'];
+  username: Scalars['String']['output'];
 };
 
 export type Voice = {
@@ -602,7 +630,7 @@ export type GetInquiryQuery = { __typename?: 'Query', getInquiry?: { __typename?
 export type GetInquiriesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetInquiriesQuery = { __typename?: 'Query', getInquiries?: Array<{ __typename?: 'Inquiry', id: string, userId: string, data: any, createdAt: number, updatedAt: number }> | null };
+export type GetInquiriesQuery = { __typename?: 'Query', getInquiries?: Array<{ __typename?: 'Inquiry', id: string, userId?: Array<string> | null, data: any, createdAt: number, updatedAt: number }> | null };
 
 export type GetInquiryResponsesQueryVariables = Exact<{
   id: Scalars['ID']['input'];
