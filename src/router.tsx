@@ -1,5 +1,4 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-
 import DashboardPage from './pages/dashboard';
 import AgentDashboard from './pages/dashboard/agent-lab/agents';
 import AgentEdit from './pages/dashboard/agent-lab/agents/edit';
@@ -8,8 +7,8 @@ import CapabilityEdit from './pages/dashboard/agent-lab/capabilities/edit';
 import PlaygroundDashboard from './pages/dashboard/agent-lab/playground';
 import PromptDashboard from './pages/dashboard/agent-lab/prompts';
 import PromptEdit from './pages/dashboard/agent-lab/prompts/edit';
-import Contact from './pages/dashboard/contact';
-import FAQPage from './pages/dashboard/faq';
+import Contact from './pages/contact';
+import FAQPage from './pages/faq';
 import InquiriesBuilderPage from './pages/dashboard/inquiry-builder/inquiries';
 import InquiryBuilderPage from './pages/dashboard/inquiry-builder/inquiry';
 import HomeHero from './pages/home';
@@ -19,6 +18,8 @@ import DashboardTemplate from './templates/dashboard';
 import InquiryBuilderTemplate from './templates/inquiry-builder';
 import InquiryUserTemplate from './templates/inquiry-user';
 import Main from './templates/main';
+import TermsPage from './pages/terms';
+import PrivacyPage from './pages/privacy';
 
 const router = createBrowserRouter([
   {
@@ -28,6 +29,22 @@ const router = createBrowserRouter([
       {
         path: '',
         element: <HomeHero />,
+      },
+      {
+        path: 'contact',
+        element: <Contact />,
+      },
+      {
+        path: 'faq',
+        element: <FAQPage />,
+      },
+      {
+        path: 'terms',
+        element: <TermsPage />,
+      },
+      {
+        path: 'privacy',
+        element: <PrivacyPage />,
       },
       {
         path: '*',
@@ -42,14 +59,6 @@ const router = createBrowserRouter([
       {
         path: '',
         element: <DashboardPage />,
-      },
-      {
-        path: 'contact',
-        element: <Contact />,
-      },
-      {
-        path: 'faq',
-        element: <FAQPage />,
       },
       {
         path: 'agent-lab/:collection?',

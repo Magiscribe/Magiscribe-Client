@@ -2,6 +2,8 @@ import blocksImage from '@/assets/imgs/cards/blocks.webp';
 import bondImage from '@/assets/imgs/cards/bond.webp';
 import booksImage from '@/assets/imgs/cards/books.webp';
 import yellImage from '@/assets/imgs/cards/yell.webp';
+import folderImage from '@/assets/imgs/cards/folder.webp';
+import privacyImage from '@/assets/imgs/cards/privacy.webp';
 import LinkCard from '@/components/cards/card';
 import GenericHero from '@/components/heroes/generic-hero';
 import { useSetTitle } from '@/hooks/title-hook';
@@ -9,22 +11,6 @@ import { useSession } from '@clerk/clerk-react';
 import clsx from 'clsx';
 
 const cardData = [
-  {
-    title: 'Contact Us',
-    description: 'Run into any issues? Contact us for help.',
-    to: '/dashboard/contact',
-    gradient: 'emerald',
-    adminOnly: false,
-    backgroundImage: yellImage,
-  },
-  {
-    title: 'FAQ',
-    description: 'Frequently asked questions about Magiscribe.',
-    to: '/dashboard/faq',
-    gradient: 'sky',
-    adminOnly: false,
-    backgroundImage: booksImage,
-  },
   {
     title: 'Inquiry Builder',
     description: 'Create complex conversational flows to capture user feedback.',
@@ -41,7 +27,38 @@ const cardData = [
     gradient: 'orange',
     adminOnly: true,
     backgroundImage: bondImage,
-    cssOverrides: 'col-span-2',
+  },
+  {
+    title: 'Contact Us',
+    description: 'Run into any issues? Contact us for help.',
+    to: '/contact',
+    gradient: 'emerald',
+    adminOnly: false,
+    backgroundImage: yellImage,
+  },
+  {
+    title: 'FAQ',
+    description: 'Frequently asked questions about Magiscribe.',
+    to: '/faq',
+    gradient: 'sky',
+    adminOnly: false,
+    backgroundImage: booksImage,
+  },
+  {
+    title: 'Terms and Conditions',
+    description: 'Read our terms and conditions.',
+    to: '/terms',
+    gradient: 'amber',
+    adminOnly: false,
+    backgroundImage: folderImage,
+  },
+  {
+    title: 'Privacy Policy',
+    description: 'Read our privacy policy.',
+    to: '/privacy',
+    gradient: 'red',
+    adminOnly: false,
+    backgroundImage: privacyImage,
   },
 ];
 
