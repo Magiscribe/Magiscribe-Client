@@ -73,9 +73,13 @@ export default function PrivacyPage() {
           <h3>Data Sharing</h3>
           <p>We share your information with:</p>
           <ul>
-            <li>Anthropic (for AI processing through Claude)</li>
+            <li>AWS Bedrock (for AI processing through Claude)</li>
             <li>Clerk (for authentication services)</li>
           </ul>
+          <p>
+            Amazon Bedrock doesn't store or log your prompts and completions. Amazon Bedrock doesn't use your prompts
+            and completions to train any AWS models and doesn't distribute them to third parties.
+          </p>
 
           <h3>Data Security</h3>
           <p>

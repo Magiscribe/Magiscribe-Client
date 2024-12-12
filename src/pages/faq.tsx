@@ -1,70 +1,40 @@
+import React from 'react';
+import { motion } from 'framer-motion';
 import GenericHero from '@/components/heroes/generic-hero';
 import { useSetTitle } from '@/hooks/title-hook';
-import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { motion } from 'framer-motion';
-import React from 'react';
+import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 
 const faqs = [
   {
-    question: 'What are inquiries?',
+    question: 'What is Magiscribe?',
     answer:
-      "Magiscribe inquiries are structured conversations about a particular topic that allow for dynamic follow-up. Imagine you are interviewing a customer about your product. You'd probably have a certain set of questions that you want to make sure you ask them, as well as potentially coming up with dynamic follow-up questions on the fly if your interviewee says something interesting. Our inquiries allow you to configure a structured, yet nuanced discussion that you can distribute to stakeholders at scale.",
+      "Magiscribe is a user-friendly tool that revolutionizes how organizations gather insights from their audience. Unlike traditional surveys or time-intensive interviews, we offer dynamic, interactive conversations that adapt to each respondent, delivering deeper insights while saving you valuable time. Whether you're conducting market research, gathering customer feedback, or collecting stakeholder input, Magiscribe makes it effortless to create engaging, personalized interactions at scale.",
   },
   {
-    question: 'Who would want to create an inquiry?',
+    question: 'How is Magiscribe different from traditional surveys?',
     answer:
-      'Anyone that wants to receive feedback from a large number of people. If you want more depth than surveys and less time than interviews, an inquiry could be perfect for you to collect stakeholder insights.',
+      "While traditional surveys are static and often miss crucial context, Magiscribe creates dynamic conversations that adapt based on your respondents' answers. Our platform combines the depth of personal interviews with the scalability of surveys, allowing you to capture nuanced feedback without the time investment of individual interviews. Plus, our smart follow-up system ensures you never miss important insights, automatically exploring interesting responses in greater detail.",
   },
   {
-    question: 'How do I create an inquiry?',
+    question: 'Who is Magiscribe for?',
     answer:
-      'To create an inquiry you hit the big blue plus button on the dashboard. From there a modal will pop up and allow you to choose a template or start from scratch. If you choose a template, you\'ll have the opportunity to let an AI customize the template to your use case (recommended). From there, further modifications to the conversation graph can be done manually or with the "Graph Editor" chat window on the right side of the "Builder". ',
+      "Magiscribe is perfect for anyone who needs meaningful insights from their audience, including market researchers, product managers, customer experience teams, and business strategists. Our platform is particularly valuable for organizations that want to scale their research efforts without sacrificing depth and quality. Whether you're a startup gathering customer feedback or an enterprise conducting large-scale market research, Magiscribe adapts to your needs.",
   },
   {
-    question: 'How do I achieve structure in my inquiries?',
+    question: 'What kinds of insights can I gather with Magiscribe?',
     answer:
-      'Magiscribe Inquiries are modeled using a directed conversation graph. As you may know, graphs consist of nodes and edges. There are five types of nodes: Start, Information, Question, Condition, and End. The conversation must progress from a Start node to an End node. In between, paths through the graph represent the different possible conversation flows that a user could have.',
+      'Magiscribe is incredibly versatile. You can use it for customer feedback, product research, market analysis, user experience studies, employee feedback, and much more. Our platform excels at uncovering the "why" behind responses through intelligent follow-up questions, helping you gather both quantitative data and qualitative insights in a single interaction.',
   },
   {
-    question: 'What does it mean when a question node or an information node has "Dynamic Generation" enabled?',
+    question: 'How easy is it to get started?',
     answer:
-      'When "Dynamic Generation" is enabled, this indicates that the text in the node will serve as an instruction to an LLM to generate content on the fly based on that instruction and the entire conversation history. If "Dynamic Generation" is not selected then the text in the textarea will be displayed directly to the user.',
+      'Getting started with Magiscribe is simple. Our platform offers ready-to-use templates for common use cases, which you can customize to your specific needs with just a few clicks. We also provide AI-powered assistance to help you craft the perfect questions and conversation flows. You can create your first inquiry in minutes and start gathering insights right away.',
   },
   {
-    question: 'What are the different types of questions that can be asked?',
+    question: 'How does Magiscribe ensure quality responses?',
     answer:
-      'Questions can either be open-ended, rating-single, or rating-multi. Open-ended questions allow the user to provide text response. Rating-single gives the respondent a list of options and lets them pick exactly one. Rating-multi allows the respondent to choose all that apply amongst a list of options.',
-  },
-  {
-    question: 'What do each of the node types do?',
-    answer:
-      "The start node represents the beginning of the conversation flow. The information node provides information to the user without requiring a response. The question node represents a point where the user is asked a question. The condition node allows for the conversation to take a different path based on the user's response. The end node represents the end of the conversation flow.",
-  },
-  {
-    question: 'What do the edges do?',
-    answer:
-      'The edges link nodes together in a directed fashion. If the user is at question node "A" and there exists an edge between node "A" and information node "B", once they answer the question they\'ll be routed to node "B". ',
-  },
-  {
-    question: 'What are the graph rules? ',
-    answer:
-      'There can only be one start node and there must be at least one end node. Every other type of node must have at least one incoming and outgoing edge. There must be at least one question node. Information nodes and question nodes can have multiple incoming edges, but only one outgoing edge. Condition nodes can have multiple incoming edges and must have multiple outgoing edges.',
-  },
-  {
-    question: 'How do I distribute my inquiry?',
-    answer:
-      'We will only allow you to distribute inquiries with valid conversation graphs. To attempt to do this, click "Publish" on the "Builder" tab of your inquiry. If your graph is valid, you\'ll get a link to send out to people. Anyone who has that link will be able to respond directly to your inquiry. If your graph is not valid, a list of errors will be displayed. You can attempt to let the AI "Automagically Fix" the errors and then try publishing it again.',
-  },
-  {
-    question: 'What if I change my graph after publishing it?',
-    answer:
-      'We will save any changes you make in the graph builder to a "draft Graph". We will only update the public inquiry that people receive when you hit "Publish" and all validation checks pass. Our system is flexible enough to allow you to add or remove questions and be backwards compatible with previous versions of your graph!',
-  },
-  {
-    question: 'Are inquiries anonymous?',
-    answer:
-      'Currently, every inquiry puts the choice as to whether or not to be identified in the hands of the respondent. Before starting the inquiry itself, a respondent will have the choice to optionally fill in their name and email. If these are left blank the responses will be recorded anonymously.',
+      "Our dynamic conversation approach naturally encourages more thoughtful and detailed responses. By adapting to each respondent's answers and asking relevant follow-up questions, we create an engaging experience that yields higher quality insights.",
   },
 ];
 
@@ -100,8 +70,8 @@ export default function FAQPage() {
 
   return (
     <>
-      <GenericHero title="Frequently Asked Questions" subtitle="Find answers to common questions about Magiscribe." />
-      <div className="container mx-auto mt-12">
+      <GenericHero title="FAQ" subtitle="Learn how Magiscribe can turn dialogue into discovery" />
+      <div className="container mx-auto max-w-4xl px-4 mt-12">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
           {faqs.map((faq, index) => (
             <FAQItem key={index} question={faq.question} answer={faq.answer} />

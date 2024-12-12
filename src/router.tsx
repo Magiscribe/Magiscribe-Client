@@ -20,6 +20,7 @@ import InquiryUserTemplate from './templates/inquiry-user';
 import Main from './templates/main';
 import TermsPage from './pages/terms';
 import PrivacyPage from './pages/privacy';
+import UserGuidePage from './pages/dashboard/user-guide';
 
 const router = createBrowserRouter([
   {
@@ -59,6 +60,10 @@ const router = createBrowserRouter([
       {
         path: '',
         element: <DashboardPage />,
+      },
+      {
+        path: 'user-guide',
+        element: <UserGuidePage />,
       },
       {
         path: 'agent-lab/:collection?',
