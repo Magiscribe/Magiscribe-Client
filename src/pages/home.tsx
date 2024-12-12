@@ -1,10 +1,9 @@
-import Button from '@/components/controls/button';
 import { SignupForm } from '@/components/forms/alpha';
 import { useUser } from '@clerk/clerk-react';
 import { motion } from 'framer-motion';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import { Link } from 'react-router-dom';
 import ContentSection from '../components/content-section';
 import HomeHero from '../components/heroes/home-hero';
 import SandcastleShape from '../components/shapes/beach';
@@ -105,9 +104,7 @@ function Home() {
           <br />
           Reach out to us!
         </h3>
-        <Button as={'a'} size="large" variant="white" href="mailto:management@magiscribe.com">
-          Contact Us
-        </Button>
+        <Link to="/contact">Contact Us</Link>
       </section>
     </>
   );

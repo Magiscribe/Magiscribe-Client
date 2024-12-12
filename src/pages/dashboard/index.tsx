@@ -2,6 +2,9 @@ import blocksImage from '@/assets/imgs/cards/blocks.webp';
 import bondImage from '@/assets/imgs/cards/bond.webp';
 import booksImage from '@/assets/imgs/cards/books.webp';
 import yellImage from '@/assets/imgs/cards/yell.webp';
+import folderImage from '@/assets/imgs/cards/folder.webp';
+import privacyImage from '@/assets/imgs/cards/privacy.webp';
+import roadImage from '@/assets/imgs/cards/road.webp';
 import LinkCard from '@/components/cards/card';
 import GenericHero from '@/components/heroes/generic-hero';
 import { useSetTitle } from '@/hooks/title-hook';
@@ -10,29 +13,20 @@ import clsx from 'clsx';
 
 const cardData = [
   {
-    title: 'Contact Us',
-    description: 'Run into any issues? Contact us for help.',
-    to: '/dashboard/contact',
-    gradient: 'emerald',
-    adminOnly: false,
-    backgroundImage: yellImage,
-  },
-  {
-    title: 'FAQ',
-    description: 'Frequently asked questions about Magiscribe.',
-    to: '/dashboard/faq',
-    gradient: 'sky',
-    adminOnly: false,
-    backgroundImage: booksImage,
-  },
-  {
     title: 'Inquiry Builder',
     description: 'Create complex conversational flows to capture user feedback.',
     to: '/dashboard/inquiry-builder',
-    gradient: 'purple',
+    gradient: 'indigo',
     adminOnly: false,
     backgroundImage: blocksImage,
-    cssOverrides: 'col-span-2',
+  },
+  {
+    title: 'User Guide',
+    description: 'Learn about the structure of the conversation graphs that define an inquiry',
+    to: '/dashboard/user-guide',
+    gradient: 'purple',
+    adminOnly: false,
+    backgroundImage: roadImage,
   },
   {
     title: 'Agent Lab',
@@ -41,7 +35,38 @@ const cardData = [
     gradient: 'orange',
     adminOnly: true,
     backgroundImage: bondImage,
-    cssOverrides: 'col-span-2',
+  },
+  {
+    title: 'Contact Us',
+    description: 'Run into any issues? Contact us for help.',
+    to: '/contact',
+    gradient: 'blue',
+    adminOnly: false,
+    backgroundImage: yellImage,
+  },
+  {
+    title: 'FAQ',
+    description: 'Frequently asked questions about Magiscribe.',
+    to: '/faq',
+    gradient: 'green',
+    adminOnly: false,
+    backgroundImage: booksImage,
+  },
+  {
+    title: 'Terms and Conditions',
+    description: 'Read our terms and conditions.',
+    to: '/terms',
+    gradient: 'amber',
+    adminOnly: false,
+    backgroundImage: folderImage,
+  },
+  {
+    title: 'Privacy Policy',
+    description: 'Read our privacy policy.',
+    to: '/privacy',
+    gradient: 'red',
+    adminOnly: false,
+    backgroundImage: privacyImage,
   },
 ];
 
@@ -65,7 +90,7 @@ export default function DashboardPage() {
           className={clsx('grid grid-cols-1 gap-4', visibleCards.length === 1 ? 'md:grid-cols-1' : 'md:grid-cols-2')}
         >
           {visibleCards.map((card) => (
-            <div key={card.title} className={clsx('col-span-1', card.cssOverrides)}>
+            <div key={card.title} className={clsx('col-span-1')}>
               <LinkCard
                 title={card.title}
                 description={card.description}

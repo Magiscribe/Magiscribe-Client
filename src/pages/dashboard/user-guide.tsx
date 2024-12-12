@@ -5,17 +5,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { motion } from 'framer-motion';
 import React from 'react';
 
-const faqs = [
+const userGuide = [
   {
     question: 'What are inquiries?',
     answer:
       "Magiscribe inquiries are structured conversations about a particular topic that allow for dynamic follow-up. Imagine you are interviewing a customer about your product. You'd probably have a certain set of questions that you want to make sure you ask them, as well as potentially coming up with dynamic follow-up questions on the fly if your interviewee says something interesting. Our inquiries allow you to configure a structured, yet nuanced discussion that you can distribute to stakeholders at scale.",
   },
-  {
-    question: 'Who would want to create an inquiry?',
-    answer:
-      'Anyone that wants to receive feedback from a large number of people. If you want more depth than surveys and less time than interviews, an inquiry could be perfect for you to collect stakeholder insights.',
-  },
+
   {
     question: 'How do I create an inquiry?',
     answer:
@@ -59,12 +55,12 @@ const faqs = [
   {
     question: 'What if I change my graph after publishing it?',
     answer:
-      'We will save any changes you make in the graph builder to a "draft Graph". We will only update the public inquiry that people receive when you hit "Publish" and all validation checks pass. Our system is flexible enough to allow you to add or remove questions and be backwards compatible with previous versions of your graph!',
+      'We will save any changes you make in the graph builder to a "Draft Graph". We will only update the public inquiry that people receive when you hit "Publish" and all validation checks pass. Our system is flexible enough to allow you to add or remove questions and be backwards compatible with previous versions of your graph!',
   },
   {
     question: 'Are inquiries anonymous?',
     answer:
-      'Currently, every inquiry puts the choice as to whether or not to be identified in the hands of the respondent. Before starting the inquiry itself, a respondent will have the choice to optionally fill in their name and email. If these are left blank the responses will be recorded anonymously.',
+      'Currently, every inquiry puts the choice as to whether or not to have respondents be identified in the hands of the admin. You can check the "Require Email" and "Require Name" checkboxes in the start node to gurantee you receive this important demographic information.',
   },
 ];
 
@@ -95,15 +91,18 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
   );
 }
 
-export default function FAQPage() {
-  useSetTitle()('Frequently Asked Questions');
+export default function UserGuidePage() {
+  useSetTitle()('User Guide');
 
   return (
     <>
-      <GenericHero title="Frequently Asked Questions" subtitle="Find answers to common questions about Magiscribe." />
-      <div className="container mx-auto mt-12">
+      <GenericHero
+        title="User Guide"
+        subtitle="Learn about the structure of the conversation graphs that define an inquiry"
+      />
+      <div className="container mx-auto max-w-4xl px-4 mt-12">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-          {faqs.map((faq, index) => (
+          {userGuide.map((faq, index) => (
             <FAQItem key={index} question={faq.question} answer={faq.answer} />
           ))}
         </motion.div>
