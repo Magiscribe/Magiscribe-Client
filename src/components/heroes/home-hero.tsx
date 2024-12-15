@@ -1,5 +1,5 @@
 import { SignUpButton } from '@clerk/clerk-react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 
 import WizardShape from '../shapes/wizard';
 

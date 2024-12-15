@@ -13,7 +13,7 @@ import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo
 import { faPaperPlane, faSpinner, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import clsx from 'clsx';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import React, { useEffect, useRef, useState } from 'react';
 
 interface Message {

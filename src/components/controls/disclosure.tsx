@@ -2,7 +2,7 @@ import { faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
 import clsx from 'clsx';
-import { AnimatePresence, easeOut, motion } from 'framer-motion';
+import { AnimatePresence, easeOut, motion } from 'motion/react';
 import React, { Fragment } from 'react';
 
 interface GenericDisclosureProps {

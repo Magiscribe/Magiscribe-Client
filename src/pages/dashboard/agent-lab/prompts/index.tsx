@@ -5,7 +5,7 @@ import ConfirmationModal from '@/components/modals/confirm-modal';
 import { Prompt } from '@/graphql/types';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useMutation, useQuery } from '@apollo/client';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 

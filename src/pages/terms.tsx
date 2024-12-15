@@ -1,6 +1,6 @@
 import GenericHero from '@/components/heroes/generic-hero';
 import { useSetTitle } from '@/hooks/title-hook';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
 
 export default function TermsPage() {

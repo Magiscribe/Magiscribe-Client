@@ -1,7 +1,7 @@
 import { useDarkMode } from '@/hooks/dark-mode';
 import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton, useUser } from '@clerk/clerk-react';
 import { faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 

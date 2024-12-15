@@ -4,7 +4,7 @@ import GraphContextBar from '@/components/graph/context-bar';
 import GraphInput from '@/components/graph/graph-input';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { faMagicWandSparkles } from '@fortawesome/free-solid-svg-icons';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'motion/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 const DEBOUNCE_DELAY_IN_MS = 1000;

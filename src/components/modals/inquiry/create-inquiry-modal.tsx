@@ -11,7 +11,7 @@ import { VOICE_LINE_SAMPLES } from '@/utils/audio/voice-line-samples';
 import { useQuery } from '@apollo/client';
 import { faPlay, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'motion/react';
 import React, { useEffect, useState } from 'react';
 
 import Button from '../../controls/button';

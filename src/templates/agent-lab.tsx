@@ -6,7 +6,7 @@ import ModalUpsertCollection from '@/components/modals/agents/create-collection-
 import ConfirmationModal from '@/components/modals/confirm-modal';
 import { GetAllCollectionsQuery } from '@/graphql/graphql';
 import { useMutation, useQuery } from '@apollo/client';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { useState } from 'react';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 

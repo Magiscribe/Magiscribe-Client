@@ -1,5 +1,5 @@
 import { Popover, PopoverButton, PopoverPanel, Transition } from '@headlessui/react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import React, { Fragment, useCallback, useState } from 'react';
 import { usePopper } from 'react-popper';
 

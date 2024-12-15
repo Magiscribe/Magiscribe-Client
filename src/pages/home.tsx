@@ -1,6 +1,6 @@
 import { SignupForm } from '@/components/forms/alpha';
 import { useUser } from '@clerk/clerk-react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';

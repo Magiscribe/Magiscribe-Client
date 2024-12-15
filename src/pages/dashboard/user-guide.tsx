@@ -2,7 +2,7 @@ import GenericHero from '@/components/heroes/generic-hero';
 import { useSetTitle } from '@/hooks/title-hook';
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import React from 'react';
 
 const userGuide = [

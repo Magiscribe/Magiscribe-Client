@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'motion/react';
 import React, { createContext, useState } from 'react';
 import { AlertComponent } from '../components/alerts/Alert';
 import { useContext } from 'react';
