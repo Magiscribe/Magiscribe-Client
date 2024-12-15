@@ -8,7 +8,7 @@ import {
   PredictionType,
   UpdateInquiryResponseMutation,
 } from '@/graphql/graphql';
-import { InquiryResponseStatus } from '@/graphql/types';
+import { InquiryResponseStatus, InquiryResponseUserDetails } from '@/graphql/types';
 import { getAgentIdByName } from '@/utils/agents';
 import { NodeData, OptimizedNode } from '@/utils/graphs/graph';
 import { GraphManager } from '@/utils/graphs/graph-manager';
@@ -67,8 +67,8 @@ interface InquiryContextType {
   onNodeUpdate: (callback: (node: OptimizedNode) => void) => void;
   onNodeError: (callback: (error: Error) => void) => void;
 
-  userDetails: { [key: string]: string };
-  setUserDetails: React.Dispatch<React.SetStateAction<{ [key: string]: string }>>;
+  userDetails: InquiryResponseUserDetails;
+  setUserDetails: React.Dispatch<React.SetStateAction<InquiryResponseUserDetails>>;
 
   form: { [key: string]: string };
   state: State;
@@ -93,7 +93,7 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
   const lastPredictionVariablesRef = useRef<any>(null);
 
   // States
-  const [userDetails, setUserDetails] = useState<{ [key: string]: string }>({});
+  const [userDetails, setUserDetails] = useState<InquiryResponseUserDetails>({});
   const [state, setState] = useState<State>({
     loading: false,
     initialized: false,
@@ -212,7 +212,7 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
 
       const validNode = await graphRef.current.goToNextNode(nextNodeId);
 
-      // Case: If the condition node hallucinates, we will handle the error by passing it back to the 
+      // Case: If the condition node hallucinates, we will handle the error by passing it back to the
       //      backend to resolve the error and find the correct node to go to next.
       if (!validNode) {
         handleError(

@@ -173,7 +173,11 @@ export const GET_INQUIRIES_RESPONSES = gql`
       id
       userId
       data {
-        userDetails
+        userDetails {
+          name
+          email
+          recieveEmails
+        }
         history
       }
       createdAt

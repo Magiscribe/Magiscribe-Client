@@ -10,24 +10,15 @@ const Footer: React.FC = () => {
             © {new Date().getFullYear()} Magiscribe. All rights reserved.
           </p>
           <div className="flex gap-4 mt-2 text-sm text-white/80">
-            <Link 
-              to="/privacy-policy" 
-              className="hover:text-white transition-colors"
-            >
+            <Link to="/privacy-policy" className="hover:text-white transition-colors">
               Privacy Policy
             </Link>
             <span>•</span>
-            <Link 
-              to="/terms" 
-              className="hover:text-white transition-colors"
-            >
+            <Link to="/terms" className="hover:text-white transition-colors">
               Terms & Conditions
             </Link>
             <span>•</span>
-            <Link 
-              to="/faq" 
-              className="hover:text-white transition-colors"
-            >
+            <Link to="/faq" className="hover:text-white transition-colors">
               FAQ
             </Link>
           </div>

@@ -1,4 +1,3 @@
-import GenericHero from '@/components/heroes/generic-hero';
 import { useSetTitle } from '@/hooks/title-hook';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
@@ -8,7 +7,6 @@ export default function PrivacyPage() {
 
   return (
     <>
-      <GenericHero title="Privacy Policy" subtitle="How we collect and use your information" />
       <div className="container mx-auto mt-12 pb-16">
         <motion.div
           className="max-w-2xl mx-auto prose prose-invert"
@@ -16,13 +14,14 @@ export default function PrivacyPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
+          <h1 className="text-4xl font-bold">Privacy Policy</h1>
           <p>
             This privacy policy governs how we, Magiscribe ("we", "our" or "us"), use Personal Information that we
             collect, receive and store about individuals in connection with the use of our website and services
             (collectively referred to as the "Services").
           </p>
 
-          <h3>Introduction</h3>
+          <h2>Introduction</h2>
           <p>
             We have implemented this Privacy Policy because your privacy, and the privacy of other users, is important
             to us. This Privacy Policy explains our online information practices and the choices you can make about the
@@ -31,7 +30,7 @@ export default function PrivacyPage() {
             names, email addresses, and other contact information.
           </p>
 
-          <h3>Terms of Use</h3>
+          <h2>Terms of Use</h2>
           <p>
             This Privacy Policy forms part of our{' '}
             <Link to="/terms" className="text-blue-400 hover:text-blue-300">
@@ -40,7 +39,7 @@ export default function PrivacyPage() {
             .
           </p>
 
-          <h3>Information We Collect</h3>
+          <h2>Information We Collect</h2>
           <p>We collect Personal Information in the following ways:</p>
 
           <h4>Account Information</h4>
@@ -61,7 +60,7 @@ export default function PrivacyPage() {
             information through cookies and similar technologies.
           </p>
 
-          <h3>How We Use Your Information</h3>
+          <h2>How We Use Your Information</h2>
           <p>We use your Personal Information to:</p>
           <ul>
             <li>Provide and improve our Services</li>
@@ -70,7 +69,7 @@ export default function PrivacyPage() {
             <li>Ensure security and prevent fraud</li>
           </ul>
 
-          <h3>Data Sharing</h3>
+          <h2>Data Sharing</h2>
           <p>We share your information with:</p>
           <ul>
             <li>AWS Bedrock (for AI processing through Claude)</li>
@@ -81,13 +80,13 @@ export default function PrivacyPage() {
             and completions to train any AWS models and doesn't distribute them to third parties.
           </p>
 
-          <h3>Data Security</h3>
+          <h2>Data Security</h2>
           <p>
             We implement appropriate technical and organizational measures to protect your Personal Information.
             However, no method of transmission over the Internet is 100% secure.
           </p>
 
-          <h3>Your Rights</h3>
+          <h2>Your Rights</h2>
           <p>You have the right to:</p>
           <ul>
             <li>Access your Personal Information</li>
@@ -96,13 +95,13 @@ export default function PrivacyPage() {
             <li>Opt out of certain data collection</li>
           </ul>
 
-          <h3>Changes to This Policy</h3>
+          <h2>Changes to This Policy</h2>
           <p>
             We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new
             policy on this page.
           </p>
 
-          <h3>Contact Us</h3>
+          <h2>Contact Us</h2>
           <p>
             If you have any questions about this Privacy Policy, please{' '}
             <Link to="/contact" className="text-blue-400 hover:text-blue-300">
@@ -111,7 +110,7 @@ export default function PrivacyPage() {
             .
           </p>
 
-          <h3>Last Updated</h3>
+          <h2>Last Updated</h2>
           <p>December 10th, 2024</p>
         </motion.div>
       </div>

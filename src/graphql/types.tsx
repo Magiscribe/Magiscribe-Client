@@ -142,7 +142,7 @@ export type InquiryResponseData = {
   __typename?: 'InquiryResponseData';
   history: Array<Scalars['JSONObject']['output']>;
   status: InquiryResponseStatus;
-  userDetails?: Maybe<Scalars['JSONObject']['output']>;
+  userDetails?: Maybe<InquiryResponseUserDetails>;
 };
 
 export type InquiryResponseFilters = {
@@ -156,6 +156,13 @@ export enum InquiryResponseStatus {
   InProgress = 'IN_PROGRESS',
   Pending = 'PENDING'
 }
+
+export type InquiryResponseUserDetails = {
+  __typename?: 'InquiryResponseUserDetails';
+  email?: Maybe<Scalars['String']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  recieveEmails?: Maybe<Scalars['Boolean']['output']>;
+};
 
 export type Model = {
   __typename?: 'Model';
@@ -645,7 +652,7 @@ export type GetInquiryResponsesQueryVariables = Exact<{
 }>;
 
 
-export type GetInquiryResponsesQuery = { __typename?: 'Query', getInquiryResponses?: Array<{ __typename?: 'InquiryResponse', id: string, userId?: string | null, createdAt: number, updatedAt: number, data: { __typename?: 'InquiryResponseData', userDetails?: any | null, history: Array<any> } }> | null };
+export type GetInquiryResponsesQuery = { __typename?: 'Query', getInquiryResponses?: Array<{ __typename?: 'InquiryResponse', id: string, userId?: string | null, createdAt: number, updatedAt: number, data: { __typename?: 'InquiryResponseData', history: Array<any>, userDetails?: { __typename?: 'InquiryResponseUserDetails', name?: string | null, email?: string | null, recieveEmails?: boolean | null } | null } }> | null };
 
 export type GetInquiryResponseCountQueryVariables = Exact<{
   id: Scalars['ID']['input'];
