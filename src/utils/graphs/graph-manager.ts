@@ -129,7 +129,10 @@ export class GraphManager {
    * @returns {StrippedNode[]} The node history
    */
   getNodeHistory(): StrippedNode[] {
-    return this.nodeHistory;
+    return [
+      ...this.nodeHistory,
+      ...(this.currentNode ? [this.currentNode] : []),
+    ];
   }
 
   /**

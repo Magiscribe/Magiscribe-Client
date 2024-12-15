@@ -8,6 +8,7 @@ import {
   PredictionType,
   UpdateInquiryResponseMutation,
 } from '@/graphql/graphql';
+import { InquiryResponseStatus } from '@/graphql/types';
 import { getAgentIdByName } from '@/utils/agents';
 import { NodeData, OptimizedNode } from '@/utils/graphs/graph';
 import { GraphManager } from '@/utils/graphs/graph-manager';
@@ -41,6 +42,7 @@ interface HandleNextNodeProps {
 interface State {
   loading: boolean;
   initialized: boolean;
+  finished: boolean;
   notFound: boolean;
   error: boolean;
 }
@@ -48,6 +50,7 @@ interface State {
 const INITIAL_STATE: State = {
   loading: false,
   initialized: false,
+  finished: false,
   notFound: false,
   error: false,
 };
@@ -87,13 +90,14 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
   // Note: This is used to store the last prediction variables so that we can use them in the.
   //       We have to ignore the ESLint rule here because we can be storing any type of data.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const lastPredictionVariablesRef = useRef<any>();
+  const lastPredictionVariablesRef = useRef<any>(null);
 
   // States
   const [userDetails, setUserDetails] = useState<{ [key: string]: string }>({});
   const [state, setState] = useState<State>({
     loading: false,
     initialized: false,
+    finished: false,
     notFound: false,
     error: false,
   });
@@ -208,6 +212,8 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
 
       const validNode = await graphRef.current.goToNextNode(nextNodeId);
 
+      // Case: If the condition node hallucinates, we will handle the error by passing it back to the 
+      //      backend to resolve the error and find the correct node to go to next.
       if (!validNode) {
         handleError(
           new Error(
@@ -227,11 +233,18 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
         return;
       }
 
+      const isEndNode = graphRef.current.getCurrentNode()?.type === 'end';
+      console.log('isEndNode:', isEndNode);
+      if (isEndNode) {
+        setState((prev) => ({ ...prev, finished: true }));
+      }
+
       if (!inquiryResponseIdRef.current) {
         const result = await createResponse({
           variables: {
             inquiryId: id,
             data: {
+              status: InquiryResponseStatus.Pending,
               userDetails,
               history: graphRef.current.getNodeHistory(),
             },
@@ -244,9 +257,9 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
             id: inquiryResponseIdRef.current,
             inquiryId: id,
             data: {
+              status: isEndNode ? InquiryResponseStatus.Completed : InquiryResponseStatus.InProgress,
               history: graphRef.current.getNodeHistory(),
             },
-            fields: ['history'],
           },
         });
       }

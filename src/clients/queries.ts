@@ -136,7 +136,15 @@ export const GET_INQUIRY = gql`
   query getInquiry($id: ID!) {
     getInquiry(id: $id) {
       id
-      data
+      data {
+        form {
+          title
+          goals
+          voice
+        }
+        graph
+        draftGraph
+      }
       createdAt
       updatedAt
     }
@@ -148,7 +156,11 @@ export const GET_INQUIRIES = gql`
     getInquiries {
       id
       userId
-      data
+      data {
+        form {
+          title
+        }
+      }
       createdAt
       updatedAt
     }
