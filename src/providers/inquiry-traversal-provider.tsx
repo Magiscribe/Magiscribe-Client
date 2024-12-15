@@ -327,12 +327,14 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
       client,
     );
 
+    const globalContext = settingsRef.current.context ? settingsRef.current.context + " . " : "";
     // TODO: Clean this up
     lastPredictionVariablesRef.current = {
       subscriptionId,
       agentId,
       input: {
         userMessage: currentNode.data.text,
+        context: globalContext,
         userDetails: `Name: ${userDetails.name}`,
         conversationHistory: inquiryHistoryRef.current.join('\n\n'),
       },

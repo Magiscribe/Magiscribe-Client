@@ -14,6 +14,7 @@ import ConfirmationModal from '../confirm-modal';
 import CustomModal from '../modal';
 import { VOICE_LINE_SAMPLES } from '@/utils/audio/voice-line-samples';
 import Input from '@/components/controls/input';
+import Textarea from '@/components/controls/textarea';
 
 /**
  * Props for the ModalUpsertInquiry component
@@ -51,6 +52,16 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
     (e: React.ChangeEvent<HTMLSelectElement>): void => {
       setSettings({ ...settings, [field]: e.target.value !== '' ? e.target.value : null });
     };
+
+      /**
+   * Handle input change for the form
+   * @param field - The field to update
+   */
+  const handleInputChange =
+  (field: string) =>
+  (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
+    setSettings({ ...settings, [field]: e.target.value });
+  };
 
   /**
    * Handle saving the inquiry
@@ -117,6 +128,13 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
               })) ?? []
             }
           />
+         <Textarea
+          name="globalContext"
+          label="Context (optional)"
+          subLabel="Provide any additional background information.  This helps Magiscribe to provide each survey respondent with relevant questions."
+          value={settings.context ?? ""}
+          onChange={handleInputChange('context')}
+        />
 
           <div className="flex justify-end">
             <Button
