@@ -305,7 +305,7 @@ export default function UserInquiryPage() {
               label="Recieve copy of your responses via email?"
               name="recieveEmails"
               type="checkbox"
-              value={userDetails.recieveEmails ?? 'false'}
+              value={String(userDetails.recieveEmails ?? 'false')}
               onChange={handleChange}
             />
           )}

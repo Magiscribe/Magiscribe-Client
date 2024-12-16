@@ -7,7 +7,7 @@ interface QueueItem {
   audio?: HTMLAudioElement;
 }
 
-export const useElevenLabsAudio = (voice: string) => {
+export const useElevenLabsAudio = (voice?: string | null) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [generateAudio] = useMutation(GENERATE_AUDIO);

@@ -8,7 +8,7 @@ import {
   PredictionType,
   UpdateInquiryResponseMutation,
 } from '@/graphql/graphql';
-import { InquiryResponseStatus, InquiryResponseUserDetails } from '@/graphql/types';
+import { InquiryDataForm, InquiryResponseStatus, InquiryResponseUserDetails } from '@/graphql/types';
 import { getAgentIdByName } from '@/utils/agents';
 import { NodeData, OptimizedNode } from '@/utils/graphs/graph';
 import { GraphManager } from '@/utils/graphs/graph-manager';
@@ -70,7 +70,7 @@ interface InquiryContextType {
   userDetails: InquiryResponseUserDetails;
   setUserDetails: React.Dispatch<React.SetStateAction<InquiryResponseUserDetails>>;
 
-  form: { [key: string]: string };
+  form: InquiryDataForm;
   state: State;
 }
 
@@ -78,7 +78,7 @@ const InquiryContext = createContext<InquiryContextType | undefined>(undefined);
 
 function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProps) {
   // Refs
-  const formRef = useRef<{ [key: string]: string }>({});
+  const formRef = useRef<InquiryDataForm>({} as InquiryDataForm);
   const graphRef = useRef<GraphManager | null>(null);
   const inquiryResponseIdRef = useRef<string | undefined>(undefined);
   // List of bot+user messages and responses
