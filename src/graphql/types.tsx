@@ -118,15 +118,9 @@ export type Inquiry = {
 export type InquiryData = {
   __typename?: 'InquiryData';
   draftGraph?: Maybe<Scalars['JSONObject']['output']>;
-  form: InquiryDataForm;
   graph?: Maybe<Scalars['JSONObject']['output']>;
-};
-
-export type InquiryDataForm = {
-  __typename?: 'InquiryDataForm';
-  goals: Scalars['String']['output'];
-  title: Scalars['String']['output'];
-  voice?: Maybe<Scalars['String']['output']>;
+  metadata?: Maybe<Scalars['JSONObject']['output']>;
+  settings: InquirySettings;
 };
 
 export type InquiryResponse = {
@@ -162,6 +156,19 @@ export type InquiryResponseUserDetails = {
   email?: Maybe<Scalars['String']['output']>;
   name?: Maybe<Scalars['String']['output']>;
   recieveEmails?: Maybe<Scalars['Boolean']['output']>;
+};
+
+export type InquirySettings = {
+  __typename?: 'InquirySettings';
+  goals: Scalars['String']['output'];
+  notifications?: Maybe<InquirySettingsNotifications>;
+  title: Scalars['String']['output'];
+  voice?: Maybe<Scalars['String']['output']>;
+};
+
+export type InquirySettingsNotifications = {
+  __typename?: 'InquirySettingsNotifications';
+  recieveEmailOnResponse?: Maybe<Scalars['Boolean']['output']>;
 };
 
 export type Model = {
@@ -639,12 +646,12 @@ export type GetInquiryQueryVariables = Exact<{
 }>;
 
 
-export type GetInquiryQuery = { __typename?: 'Query', getInquiry?: { __typename?: 'Inquiry', id: string, createdAt: number, updatedAt: number, data: { __typename?: 'InquiryData', graph?: any | null, draftGraph?: any | null, form: { __typename?: 'InquiryDataForm', title: string, goals: string, voice?: string | null } } } | null };
+export type GetInquiryQuery = { __typename?: 'Query', getInquiry?: { __typename?: 'Inquiry', id: string, createdAt: number, updatedAt: number, data: { __typename?: 'InquiryData', metadata?: any | null, graph?: any | null, draftGraph?: any | null, settings: { __typename?: 'InquirySettings', title: string, goals: string, voice?: string | null } } } | null };
 
 export type GetInquiriesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetInquiriesQuery = { __typename?: 'Query', getInquiries?: Array<{ __typename?: 'Inquiry', id: string, userId?: Array<string> | null, createdAt: number, updatedAt: number, data: { __typename?: 'InquiryData', form: { __typename?: 'InquiryDataForm', title: string } } }> | null };
+export type GetInquiriesQuery = { __typename?: 'Query', getInquiries?: Array<{ __typename?: 'Inquiry', id: string, userId?: Array<string> | null, createdAt: number, updatedAt: number, data: { __typename?: 'InquiryData', settings: { __typename?: 'InquirySettings', title: string } } }> | null };
 
 export type GetInquiryResponsesQueryVariables = Exact<{
   id: Scalars['ID']['input'];

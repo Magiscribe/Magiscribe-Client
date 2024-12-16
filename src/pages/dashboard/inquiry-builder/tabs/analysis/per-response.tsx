@@ -57,7 +57,7 @@ const PerResponseTab: React.FC<PerResponseTabProps> = ({ id }) => {
   const [addPrediction] = useMutation<AddPredictionMutation>(ADD_PREDICTION);
   const [deleteInquiryResponse] = useMutation<DeleteInquiryResponseMutation>(DELETE_INQUIRY_RESPONSE);
 
-  // Query for form and graph data
+  // Query for settings and graph data
   const {
     loading: graphLoading,
     data: inquiryData,

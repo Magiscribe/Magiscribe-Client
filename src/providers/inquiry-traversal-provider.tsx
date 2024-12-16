@@ -8,7 +8,7 @@ import {
   PredictionType,
   UpdateInquiryResponseMutation,
 } from '@/graphql/graphql';
-import { InquiryDataForm, InquiryResponseStatus, InquiryResponseUserDetails } from '@/graphql/types';
+import { InquirySettings, InquiryResponseStatus, InquiryResponseUserDetails } from '@/graphql/types';
 import { getAgentIdByName } from '@/utils/agents';
 import { NodeData, OptimizedNode } from '@/utils/graphs/graph';
 import { GraphManager } from '@/utils/graphs/graph-manager';
@@ -70,7 +70,7 @@ interface InquiryContextType {
   userDetails: InquiryResponseUserDetails;
   setUserDetails: React.Dispatch<React.SetStateAction<InquiryResponseUserDetails>>;
 
-  form: InquiryDataForm;
+  settings: InquirySettings;
   state: State;
 }
 
@@ -78,7 +78,7 @@ const InquiryContext = createContext<InquiryContextType | undefined>(undefined);
 
 function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProps) {
   // Refs
-  const formRef = useRef<InquiryDataForm>({} as InquiryDataForm);
+  const settingsRef = useRef<InquirySettings>({} as InquirySettings);
   const graphRef = useRef<GraphManager | null>(null);
   const inquiryResponseIdRef = useRef<string | undefined>(undefined);
   // List of bot+user messages and responses
@@ -143,11 +143,11 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
         return;
       }
 
-      const { graph, draftGraph, form } = getInquiry.data;
+      const { graph, draftGraph, settings } = getInquiry.data;
       const usedGraph = preview ? draftGraph : graph;
 
       if (usedGraph) {
-        formRef.current = form;
+        settingsRef.current = settings;
         graphRef.current = new GraphManager(usedGraph);
         setState({ ...INITIAL_STATE, initialized: true });
       } else {
@@ -461,7 +461,7 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
     userDetails,
     setUserDetails,
 
-    form: formRef.current,
+    settings: settingsRef.current,
     state,
   };
 

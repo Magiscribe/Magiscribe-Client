@@ -16,11 +16,11 @@ export default function GraphContextBar() {
   // States
   const [clearGraphModal, setClearGraphModal] = useState(false);
   const [sendModalOpen, setSendModalOpen] = useState(false);
-  const [settingsModalOpen, setSettingsModalOpen] = useState(false);
+const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const [validationErrorsModalOpen, setValidationErrorsModalOpen] = useState(false);
 
   // Hooks
-  const { id, form, lastUpdated, setForm, publishGraph } = useInquiryBuilder();
+  const { id, settings, lastUpdated, setSettings, publishGraph } = useInquiryBuilder();
   const { graph, setGraph } = useGraphContext();
   const alert = useAddAlert();
 
@@ -66,9 +66,9 @@ export default function GraphContextBar() {
         <div className="w-full max-w-2xl">
           <Input
             name="title"
-            value={form.title ?? 'Untitled Inquiry'}
+            value={settings.title ?? 'Untitled Inquiry'}
             onChange={(e) => {
-              setForm({ ...form, title: e.target.value });
+              setSettings({ ...settings, title: e.target.value });
             }}
             className="text-2xl font-bold border-2 border-slate-200 p-2 rounded-lg"
           />

@@ -73,18 +73,18 @@ export default function UserInquiryPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Graph Hooks
-  const { graph, preview, handleNextNode, form, state, onNodeUpdate, onNodeError, userDetails, setUserDetails } =
+  const { graph, preview, handleNextNode, settings, state, onNodeUpdate, onNodeError, userDetails, setUserDetails } =
     useInquiry();
 
   // Audio Hooks
-  const audio = useElevenLabsAudio(form.voice);
+  const audio = useElevenLabsAudio(settings.voice);
   const audioEnabled = useAudioEnabled();
   const { isTranscribing, transcript, handleTranscribe } = useTranscribe();
 
   // Alerts
   const addAlert = useAddAlert();
 
-  useSetTitle()(form?.title);
+  useSetTitle()(settings?.title);
 
   /*================================ SIDE EFFECTS ==============================*/
 
@@ -277,7 +277,7 @@ export default function UserInquiryPage() {
 
     return (
       <div className="bg-white dark:bg-slate-700 p-6 rounded-3xl shadow-lg">
-        <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white">{form.title}</h2>
+        <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white">{settings.title}</h2>
         <p className="text-slate-600 dark:text-slate-300 mb-6">{description}</p>
         <div className="space-y-4">
           {requireNameCapture && (

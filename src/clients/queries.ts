@@ -137,11 +137,12 @@ export const GET_INQUIRY = gql`
     getInquiry(id: $id) {
       id
       data {
-        form {
+        settings {
           title
           goals
           voice
         }
+        metadata
         graph
         draftGraph
       }
@@ -157,7 +158,7 @@ export const GET_INQUIRIES = gql`
       id
       userId
       data {
-        form {
+        settings {
           title
         }
       }

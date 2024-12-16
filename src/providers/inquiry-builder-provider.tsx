@@ -17,7 +17,7 @@ import {
   PredictionType,
   UpdateInquiryMutation,
 } from '@/graphql/graphql';
-import { InquiryDataForm } from '@/graphql/types';
+import { InquirySettings } from '@/graphql/types';
 import { useGraphContext } from '@/hooks/graph-state';
 import { ImageMetadata } from '@/types/conversation';
 import { getAgentIdByName } from '@/utils/agents';
@@ -44,29 +44,29 @@ interface ContextType {
 
   id?: string;
   lastUpdated: Date;
-  form: InquiryDataForm;
+  settings: InquirySettings;
   metadata: Metadata;
   graph: { edges: Edge[]; nodes: Node[] };
 
   deleteInquiry: (onSuccess?: () => void, onError?: () => void) => Promise<void>;
 
-  setForm: (form: InquiryDataForm) => void;
+  setSettings: (settings: InquirySettings) => void;
   updateMetadata: (metadata: Metadata) => void;
   saveMetadata: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
-  saveForm: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
+  saveSettings: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
 
   setGraph: (graph: { edges: Edge[]; nodes: Node[] }) => void;
   saveGraph: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
   publishGraph: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
 
   save: (
-    data: { form?: InquiryDataForm; metadata?: Metadata; graph?: { nodes: Node[]; edges: Edge[] } },
+    data: { settings?: InquirySettings; metadata?: Metadata; graph?: { nodes: Node[]; edges: Edge[] } },
     fields: string[],
     onSuccess?: (id: string) => void,
     onError?: () => void,
   ) => Promise<void>;
 
-  saveFormAndGraph: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
+  saveSettingsAndGraph: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
 
   generatingGraph: boolean;
   generateGraph: (templateOverride: boolean, message: string) => void;
@@ -83,10 +83,10 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const [initialized, setInitialized] = useState(false);
   const [subscriptionId] = useState<string>(uuidv4());
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
-  const [form, setForm] = useState<InquiryDataForm>({
+  const [settings, setSettings] = useState<InquirySettings>({
     title: 'Untitled Inquiry',
     goals: '',
-  } as InquiryDataForm);
+  } as InquirySettings);
   const [metadata, setMetadata] = useState<Metadata>({
     images: [],
     text: '',
@@ -102,9 +102,9 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const { graph, setGraph, resetInitialState } = graphContext;
 
   // Events
-  const onGraphGenerationStartedRef = useRef<(message: string) => void>();
-  const onGraphGenerationCompletedRef = useRef<(message: string) => void>();
-  const onGraphGenerationErrorRef = useRef<() => void>();
+  const onGraphGenerationStartedRef = useRef<(message: string) => void>(() => {});
+  const onGraphGenerationCompletedRef = useRef<(message: string) => void>(() => {});
+  const onGraphGenerationErrorRef = useRef<() => void>(() => {});
 
   /**
    * Fetches the inquiry data from the server.
@@ -115,7 +115,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     onCompleted: ({ getInquiry }) => {
       if (!getInquiry) return;
       setLastUpdated(new Date(getInquiry.updatedAt));
-      if (getInquiry.data.form) setForm(getInquiry.data.form);
+      if (getInquiry.data.settings) setSettings(getInquiry.data.settings);
       if (getInquiry.data.metadata) setMetadata(getInquiry.data.metadata);
       if (getInquiry.data.draftGraph) setGraph(getInquiry.data.draftGraph);
       if (getInquiry.data.draftGraph) resetInitialState(getInquiry.data.draftGraph);
@@ -168,8 +168,8 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
 
   // Mutations
   const client = useApolloClient();
-  const [createFormMutation] = useMutation<CreateInquiryMutation>(CREATE_INQUIRY);
-  const [updateFormMutation] = useMutation<UpdateInquiryMutation>(UPDATE_INQUIRY);
+  const [createSettingsMutation] = useMutation<CreateInquiryMutation>(CREATE_INQUIRY);
+  const [updateSettingsMutation] = useMutation<UpdateInquiryMutation>(UPDATE_INQUIRY);
   const [addPrediction] = useMutation<AddPredictionMutation>(ADD_PREDICTION);
   const [deleteObject] = useMutation<DeleteInquiryMutation>(DELETE_INQUIRY);
   const [deleteMediaAsset] = useMutation<DeleteMediaAssetMutation>(DELETE_MEDIA_ASSET);
@@ -192,15 +192,15 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   };
 
   /**
-   * Generic save function that can save both form and graph.
-   * @param data {Object} The data to save (either form or graph).
+   * Generic save function that can save both settings and graph.
+   * @param data {Object} The data to save (either settings or graph).
    * @param fields {string[]} The fields to update.
    * @param onSuccess {Function} The function to call on success.
    * @param onError {Function} The function to call on error.
    */
   const save = async (
     data: {
-      form?: InquiryDataForm;
+      settings?: InquirySettings;
       metadata?: Metadata;
       graph?: { nodes: Node[]; edges: Edge[] };
       draftGraph?: { nodes: Node[]; edges: Edge[] };
@@ -209,13 +209,13 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     onSuccess?: (id: string) => void,
     onError?: () => void,
   ) => {
-    if (!initialized && !data.form) {
+    if (!initialized && !data.settings) {
       if (onError) onError();
       return;
     }
 
     try {
-      const func = id ? updateFormMutation : createFormMutation;
+      const func = id ? updateSettingsMutation : createSettingsMutation;
       const result = await func({ variables: { id, data, fields } });
 
       if (result.data) {
@@ -230,23 +230,23 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   };
 
   /**
-   * Saves the form of the inquiry.
+   * Saves the settings of the inquiry.
    * @param onSuccess {Function} The function to call on success.
    * @param onError {Function} The function to call on error.
    */
-  const saveForm = async (onSuccess?: (id: string) => void, onError?: () => void) => {
+  const saveSettings = async (onSuccess?: (id: string) => void, onError?: () => void) => {
     await save(
       {
-        form,
+        settings,
       },
-      ['form'],
+      ['settings'],
       onSuccess,
       onError,
     );
   };
 
   /**
-   * Saves the form of the inquiry.
+   * Saves the settings of the inquiry.
    * @param onSuccess {Function} The function to call on success.
    * @param onError {Function} The function to call on error.
    */
@@ -297,7 +297,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   };
 
   /**
-   * Saves both the form and graph of the inquiry.
+   * Saves both the settings and graph of the inquiry.
    * @param onSuccess {Function} The function to call on success.
    * @param onError {Function} The function to call on error.
    */
@@ -307,10 +307,10 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
         metadata: {
           ...metadata,
         },
-        form,
+        settings,
         draftGraph: graph,
       },
-      ['form', 'draftGraph'],
+      ['settings', 'draftGraph'],
       onSuccess,
       onError,
     );
@@ -327,13 +327,13 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
 
     if (templateOverride) {
       userMessage = [
-        `You are generating a graph for <title>${form.title}</title>`,
+        `You are generating a graph for <title>${settings.title}</title>`,
         `The user is looking for the following goals to be completed: <goals>${message}</goals>`,
         `Taking the exact graph structure in <conversationGraph>, adapt the graph to be about the <goals> listed above. Simply upsert all of the existing nodes, do not remove any nodes, add any new nodes or add or remove any edges. Simply return the "nodesToUpsert". Absolutey do NOT include "nodesToDelete", "edgesToAdd" or "edgesToDelete". You will ONLY be using the existing nodes and overriding them.`,
       ].join('\n');
     } else {
       userMessage = [
-        `You are updating a graph for <title>${form.title}</title>`,
+        `You are updating a graph for <title>${settings.title}</title>`,
         `The user is looking for the following goals to be completed in this update: <goals>${message}</goals>`,
         `Ensure the updates or new structure aligns with the user's goals, is relevant to the content in <conversationGraph>, and adheres to the <graphRules>.`,
       ].join('\n');
@@ -358,14 +358,14 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
 
     id,
     lastUpdated,
-    form,
+    settings,
     metadata,
     graph,
 
     deleteInquiry,
 
-    setForm,
-    saveForm,
+    setSettings,
+    saveSettings,
 
     updateMetadata: setMetadata,
     saveMetadata,
@@ -377,7 +377,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     publishGraph,
 
     save,
-    saveFormAndGraph: saveAll,
+    saveSettingsAndGraph: saveAll,
 
     generatingGraph,
 

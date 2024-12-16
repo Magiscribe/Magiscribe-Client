@@ -58,13 +58,13 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
   const [loadingQuote, setLoadingQuote] = useState(conversationGraphLoadingQuotes[0]);
 
   // Hooks
-  const { id, form, setForm, generateGraph, setGraph, onGraphGenerationCompleted, saveFormAndGraph, generatingGraph } =
+  const { id, settings, setSettings, generateGraph, setGraph, onGraphGenerationCompleted, saveSettingsAndGraph, generatingGraph } =
     useInquiryBuilder();
   const alert = useAddAlert();
 
   // Voice Hooks
   const { data: voices } = useQuery<GetAllAudioVoicesQuery>(GET_ALL_AUDIO_VOICES);
-  const { addSentence, isLoading: isVoicePreviewLoading } = useElevenLabsAudio(form.voice!);
+  const { addSentence, isLoading: isVoicePreviewLoading } = useElevenLabsAudio(settings.voice!);
 
   /*================================ SIDE EFFECTS ==============================*/
 
@@ -93,20 +93,20 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
    */
   useEffect(() => {
     if (voices) {
-      if (!form.voice) {
-        setForm({ ...form, voice: voices.getAllAudioVoices[0].id });
+      if (!settings.voice) {
+        setSettings({ ...settings, voice: voices.getAllAudioVoices[0].id });
       }
     }
-  }, [voices, form, setForm]);
+  }, [voices, settings, setSettings]);
 
   /**
-   * Save the form and graph once the graph generation is completed
+   * Save the settings and graph once the graph generation is completed
    */
   useEffect(() => {
     if (open) {
       onGraphGenerationCompleted?.(async () => {
         alert('Graph generated successfully!', 'success');
-        await saveFormAndGraph(
+        await saveSettingsAndGraph(
           (id) => {
             alert('Inquiry saved successfully!', 'success');
             if (onSave) onSave(id as string);
@@ -117,22 +117,22 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
         );
       });
     }
-  }, [open, onGraphGenerationCompleted, saveFormAndGraph, alert, onSave]);
+  }, [open, onGraphGenerationCompleted, saveSettingsAndGraph, alert, onSave]);
 
   /*================================ EVENT HANDLERS ==============================*/
 
   /**
-   * Handle input change for the form
+   * Handle input change for the settings
    * @param field - The field to update
    */
   const handleInputChange =
     (field: string) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
-      setForm({ ...form, [field]: e.target.value });
+      setSettings({ ...settings, [field]: e.target.value });
     };
 
   /**
-   * Handle input key down for the form
+   * Handle input key down for the settings
    * @param e
    */
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -143,7 +143,7 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
   };
 
   /**
-   * Handle select change for the form
+   * Handle select change for the settings
    * @param field - The field to update
    * @param e - The change event
    * @returns void
@@ -151,7 +151,7 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
   const handleSelectChange =
     (field: string) =>
     (e: React.ChangeEvent<HTMLSelectElement>): void => {
-      setForm({ ...form, [field]: e.target.value });
+      setSettings({ ...settings, [field]: e.target.value });
     };
 
   /**
@@ -167,20 +167,20 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
   const handleSave = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
 
-    if (form.goals.trim() === '' && !(selectedTemplate && !selectedTemplate?.allowGeneration)) {
+    if (settings.goals.trim() === '' && !(selectedTemplate && !selectedTemplate?.allowGeneration)) {
       alert('Please enter some goals for the inquiry', 'error');
       return;
     }
 
     if (selectedTemplate && selectedTemplate?.allowGeneration) {
-      generateGraph(true, form.goals);
+      generateGraph(true, settings.goals);
       return;
     } else if (!selectedTemplate) {
-      generateGraph(false, form.goals);
+      generateGraph(false, settings.goals);
       return;
     }
 
-    await saveFormAndGraph(
+    await saveSettingsAndGraph(
       (id) => {
         alert('Inquiry saved successfully!', 'success');
         if (onSave) onSave(id as string);
@@ -213,7 +213,7 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
             name="voice"
             label="Voice"
             subLabel="This will be the voice used to read responses to the user if they have audio enabled"
-            value={form.voice ?? ''}
+            value={settings.voice ?? ''}
             onChange={handleSelectChange('voice')}
             options={
               voices?.getAllAudioVoices.map((voice) => ({
@@ -248,7 +248,7 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
           placeholder="Inquiry title"
           autoFocus
           subLabel="This will be displayed to the people you are sending the inquiry to"
-          value={form.title}
+          value={settings.title}
           onChange={handleInputChange('title')}
         />
 
@@ -256,7 +256,7 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
           name="goals"
           label="Goals"
           subLabel="Who are you trying to gain insights from and what type of information are you looking to capture?"
-          value={form.goals}
+          value={settings.goals}
           onChange={handleInputChange('goals')}
           onKeyDown={handleInputKeyDown}
         />
