@@ -167,7 +167,12 @@ function Flow({ children }: TreeInputProps) {
         applyNodeChanges(
           [
             {
-              item: { id: newNodeId, type: node.type, position: node.position, data: { text: '' } },
+              item: {
+                id: newNodeId,
+                type: node.type,
+                position: node.position,
+                data: getDefaultNodeData(node.type as keyof typeof nodeTypesInfo),
+              },
               type: 'add',
             },
           ],
