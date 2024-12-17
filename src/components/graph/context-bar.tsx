@@ -16,7 +16,7 @@ export default function GraphContextBar() {
   // States
   const [clearGraphModal, setClearGraphModal] = useState(false);
   const [sendModalOpen, setSendModalOpen] = useState(false);
-const [settingsModalOpen, setSettingsModalOpen] = useState(false);
+  const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const [validationErrorsModalOpen, setValidationErrorsModalOpen] = useState(false);
 
   // Hooks

@@ -13,6 +13,7 @@ import Select from '../../controls/select';
 import ConfirmationModal from '../confirm-modal';
 import CustomModal from '../modal';
 import { VOICE_LINE_SAMPLES } from '@/utils/audio/voice-line-samples';
+import Input from '@/components/controls/input';
 
 /**
  * Props for the ModalUpsertInquiry component
@@ -129,6 +130,17 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
               Preview Voice
             </Button>
           </div>
+
+          <Input
+            name="email"
+            label="Recieve Email On Response"
+            type="checkbox"
+            subLabel="This will be displayed to the people you are sending the inquiry to"
+            value={String(settings.notifications?.recieveEmailOnResponse)}
+            onChange={(e) => {
+              setSettings({ ...settings, notifications: { recieveEmailOnResponse: e.target.checked } });
+            }}
+          />
         </form>
       </CustomModal>
 

@@ -40,9 +40,10 @@ const documents = {
     "\n  query getCapability($capabilityId: ID!) {\n    getCapability(capabilityId: $capabilityId) {\n      id\n      llmModel\n      prompts {\n        name\n        id\n        text\n      }\n      alias\n      name\n      description\n      outputMode\n      subscriptionFilter\n      outputFilter\n    }\n  }\n": types.GetCapabilityDocument,
     "\n  query getAllPrompts($logicalCollection: String) {\n    getAllPrompts(logicalCollection: $logicalCollection) {\n      id\n      name\n      text\n    }\n  }\n": types.GetAllPromptsDocument,
     "\n  query getPrompt($promptId: ID!) {\n    getPrompt(promptId: $promptId) {\n      id\n      name\n      text\n    }\n  }\n": types.GetPromptDocument,
-    "\n  query getInquiry($id: ID!) {\n    getInquiry(id: $id) {\n      id\n      data {\n        settings {\n          title\n          goals\n          voice\n        }\n        metadata\n        graph\n        draftGraph\n      }\n      createdAt\n      updatedAt\n    }\n  }\n": types.GetInquiryDocument,
+    "\n  query getInquiry($id: ID!) {\n    getInquiry(id: $id) {\n      id\n      data {\n        settings {\n          title\n          goals\n          voice\n          notifications {\n            recieveEmailOnResponse\n          }\n        }\n        metadata\n        graph\n        draftGraph\n      }\n      createdAt\n      updatedAt\n    }\n  }\n": types.GetInquiryDocument,
     "\n  query getInquiries {\n    getInquiries {\n      id\n      userId\n      data {\n        settings {\n          title\n        }\n      }\n      createdAt\n      updatedAt\n    }\n  }\n": types.GetInquiriesDocument,
     "\n  query getInquiryResponses($id: ID!, $filters: InquiryResponseFilters) {\n    getInquiryResponses(id: $id, filters: $filters) {\n      id\n      userId\n      data {\n        userDetails {\n          name\n          email\n          recieveEmails\n        }\n        history\n      }\n      createdAt\n      updatedAt\n    }\n  }\n": types.GetInquiryResponsesDocument,
+    "\n  query getInquiryResponse($id: ID!) {\n    getInquiryResponse(id: $id) {\n      id\n      userId\n      data {\n        userDetails {\n          name\n          email\n          recieveEmails\n        }\n        history\n      }\n      createdAt\n      updatedAt\n    }\n  }\n": types.GetInquiryResponseDocument,
     "\n  query getInquiryResponseCount($id: ID!) {\n    getInquiryResponseCount(id: $id)\n  }\n": types.GetInquiryResponseCountDocument,
     "\n  query getAllAudioVoices {\n    getAllAudioVoices {\n      id\n      name\n      tags\n    }\n  }\n": types.GetAllAudioVoicesDocument,
     "\n  query getMediaAsset($id: String!) {\n    getMediaAsset(id: $id)\n  }\n": types.GetMediaAssetDocument,
@@ -171,7 +172,7 @@ export function gql(source: "\n  query getPrompt($promptId: ID!) {\n    getPromp
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query getInquiry($id: ID!) {\n    getInquiry(id: $id) {\n      id\n      data {\n        settings {\n          title\n          goals\n          voice\n        }\n        metadata\n        graph\n        draftGraph\n      }\n      createdAt\n      updatedAt\n    }\n  }\n"): (typeof documents)["\n  query getInquiry($id: ID!) {\n    getInquiry(id: $id) {\n      id\n      data {\n        settings {\n          title\n          goals\n          voice\n        }\n        metadata\n        graph\n        draftGraph\n      }\n      createdAt\n      updatedAt\n    }\n  }\n"];
+export function gql(source: "\n  query getInquiry($id: ID!) {\n    getInquiry(id: $id) {\n      id\n      data {\n        settings {\n          title\n          goals\n          voice\n          notifications {\n            recieveEmailOnResponse\n          }\n        }\n        metadata\n        graph\n        draftGraph\n      }\n      createdAt\n      updatedAt\n    }\n  }\n"): (typeof documents)["\n  query getInquiry($id: ID!) {\n    getInquiry(id: $id) {\n      id\n      data {\n        settings {\n          title\n          goals\n          voice\n          notifications {\n            recieveEmailOnResponse\n          }\n        }\n        metadata\n        graph\n        draftGraph\n      }\n      createdAt\n      updatedAt\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -180,6 +181,10 @@ export function gql(source: "\n  query getInquiries {\n    getInquiries {\n     
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  query getInquiryResponses($id: ID!, $filters: InquiryResponseFilters) {\n    getInquiryResponses(id: $id, filters: $filters) {\n      id\n      userId\n      data {\n        userDetails {\n          name\n          email\n          recieveEmails\n        }\n        history\n      }\n      createdAt\n      updatedAt\n    }\n  }\n"): (typeof documents)["\n  query getInquiryResponses($id: ID!, $filters: InquiryResponseFilters) {\n    getInquiryResponses(id: $id, filters: $filters) {\n      id\n      userId\n      data {\n        userDetails {\n          name\n          email\n          recieveEmails\n        }\n        history\n      }\n      createdAt\n      updatedAt\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query getInquiryResponse($id: ID!) {\n    getInquiryResponse(id: $id) {\n      id\n      userId\n      data {\n        userDetails {\n          name\n          email\n          recieveEmails\n        }\n        history\n      }\n      createdAt\n      updatedAt\n    }\n  }\n"): (typeof documents)["\n  query getInquiryResponse($id: ID!) {\n    getInquiryResponse(id: $id) {\n      id\n      userId\n      data {\n        userDetails {\n          name\n          email\n          recieveEmails\n        }\n        history\n      }\n      createdAt\n      updatedAt\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

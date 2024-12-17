@@ -168,8 +168,8 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
 
   // Mutations
   const client = useApolloClient();
-  const [createSettingsMutation] = useMutation<CreateInquiryMutation>(CREATE_INQUIRY);
-  const [updateSettingsMutation] = useMutation<UpdateInquiryMutation>(UPDATE_INQUIRY);
+  const [createInquiryMutation] = useMutation<CreateInquiryMutation>(CREATE_INQUIRY);
+  const [updateInquiryMutation] = useMutation<UpdateInquiryMutation>(UPDATE_INQUIRY);
   const [addPrediction] = useMutation<AddPredictionMutation>(ADD_PREDICTION);
   const [deleteObject] = useMutation<DeleteInquiryMutation>(DELETE_INQUIRY);
   const [deleteMediaAsset] = useMutation<DeleteMediaAssetMutation>(DELETE_MEDIA_ASSET);
@@ -215,7 +215,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     }
 
     try {
-      const func = id ? updateSettingsMutation : createSettingsMutation;
+      const func = id ? updateInquiryMutation : createInquiryMutation;
       const result = await func({ variables: { id, data, fields } });
 
       if (result.data) {

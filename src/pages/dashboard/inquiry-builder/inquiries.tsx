@@ -11,7 +11,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 function InquiryCard({ inquiry }: { inquiry: Inquiry }) {
-  const form = inquiry.data.form;
+  const settings = inquiry.data.settings;
 
   // Add the response count query
   const { data: responseCountData } = useQuery(GET_INQUIRY_RESPONSE_COUNT, {
@@ -39,7 +39,7 @@ function InquiryCard({ inquiry }: { inquiry: Inquiry }) {
         className="bg-white dark:bg-slate-600 p-4 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow"
         whileHover={{ scale: 1.05 }}
       >
-        <h3 className="text-lg text-slate-900 dark:text-slate-100 font-semibold">{form.title}</h3>
+        <h3 className="text-lg text-slate-900 dark:text-slate-100 font-semibold">{settings.title}</h3>
         <div className="flex justify-between items-center mt-2">
           <p className="text-sm text-slate-500 dark:text-slate-400">Updated: {formattedUpdateDate}</p>
           <div className="bg-blue-100 dark:bg-blue-900 px-2 py-1 rounded-full">

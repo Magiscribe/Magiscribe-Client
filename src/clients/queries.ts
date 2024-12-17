@@ -141,6 +141,9 @@ export const GET_INQUIRY = gql`
           title
           goals
           voice
+          notifications {
+            recieveEmailOnResponse
+          }
         }
         metadata
         graph
@@ -171,6 +174,25 @@ export const GET_INQUIRIES = gql`
 export const GET_INQUIRIES_RESPONSES = gql`
   query getInquiryResponses($id: ID!, $filters: InquiryResponseFilters) {
     getInquiryResponses(id: $id, filters: $filters) {
+      id
+      userId
+      data {
+        userDetails {
+          name
+          email
+          recieveEmails
+        }
+        history
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const GET_INQUIRY_RESPONSE = gql`
+  query getInquiryResponse($id: ID!) {
+    getInquiryResponse(id: $id) {
       id
       userId
       data {

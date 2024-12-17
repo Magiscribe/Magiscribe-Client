@@ -58,8 +58,16 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
   const [loadingQuote, setLoadingQuote] = useState(conversationGraphLoadingQuotes[0]);
 
   // Hooks
-  const { id, settings, setSettings, generateGraph, setGraph, onGraphGenerationCompleted, saveSettingsAndGraph, generatingGraph } =
-    useInquiryBuilder();
+  const {
+    id,
+    settings,
+    setSettings,
+    generateGraph,
+    setGraph,
+    onGraphGenerationCompleted,
+    saveSettingsAndGraph,
+    generatingGraph,
+  } = useInquiryBuilder();
   const alert = useAddAlert();
 
   // Voice Hooks
@@ -128,7 +136,9 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
   const handleInputChange =
     (field: string) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
-      setSettings({ ...settings, [field]: e.target.value });
+      const { type, checked, value } = e.target as HTMLInputElement;
+      const inputValue = type === 'checkbox' ? checked : value;
+      setSettings({ ...settings, [field]: inputValue });
     };
 
   /**
@@ -259,6 +269,17 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
           value={settings.goals}
           onChange={handleInputChange('goals')}
           onKeyDown={handleInputKeyDown}
+        />
+
+        <Input
+          name="email"
+          label="Recieve Email On Response"
+          type="checkbox"
+          subLabel="This will be displayed to the people you are sending the inquiry to"
+          value={String(settings.notifications?.recieveEmailOnResponse)}
+          onChange={(e) => {
+            setSettings({ ...settings, notifications: { recieveEmailOnResponse: e.target.checked } });
+          }}
         />
 
         <hr className="border-t border-slate-200 dark:border-slate-600" />
