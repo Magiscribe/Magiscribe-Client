@@ -87,7 +87,7 @@ const Condition = ({ to, condition, nodeId, onChange, onRemove }: ConditionProps
         name="condition"
         value={condition}
         onChange={({ target }) => onChange({ to, condition: target.value })}
-        placeholder="Enter the condition here..."
+        placeholder='e.g. "If the response is positive", "If the user likes ice cream", "Otherwise"...'
         className="resize-none overflow-hidden nodrag"
         rows={3}
       />
