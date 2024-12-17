@@ -5,6 +5,7 @@ import Button from '@/components/controls/button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import Textarea from '@/components/controls/textarea';
+import Select from '@/components/controls/select';
 
 type ConditionProps = {
   to: string;
@@ -41,32 +42,43 @@ const Condition = ({ to, condition, nodeId, onChange, onRemove }: ConditionProps
     }
   }
 
+  const options = [];
+  if (!toNodeValid) {
+    options.push({ label: to, value: to });
+  }
+  options.push(
+    ...outgoers.map((dest) => ({
+      label: dest.id,
+      value: dest.id,
+    })),
+  );
+  // Calculate relative luminance of bg color and determine text color
+  let darkText = true;
+  if (toColor) {
+    const hex = toColor.substring(1);
+    const [r, g, b] = [hex.substring(0, 2), hex.substring(2, 4), hex.substring(4)].map((n) => parseInt(n, 16) / 255);
+    const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    darkText = luminance > 0.5;
+  }
+
   return (
     <div className="relative">
       <Button className="absolute right-0 bg-red-600 hover:bg-red-800 rounded-full" onClick={onRemove}>
         <FontAwesomeIcon icon={faTrash} title="Remove condition"></FontAwesomeIcon>
       </Button>
       <div className="mb-4">
-        <span className="text-slate-800 dark:text-white">To: </span>
-        <select
+        <Select
           value={to}
+          label="To"
+          subLabel="The ID of the node this condition should route to"
+          name="toNode"
           style={{ backgroundColor: toNodeValid ? toColor : undefined }}
-          className={toNodeValid ? '' : 'bg-red-600'}
+          className={[toNodeValid ? '' : 'bg-red-600', darkText ? 'text-black' : 'text-white'].join(' ')}
           onChange={({ target }) => onChange({ to: target.value, condition })}
           onMouseEnter={() => handleMouseEnter(to)}
           onMouseLeave={() => handleMouseLeave(to)}
-        >
-          {toNodeValid ? null : <option value={to}>{to}</option>}
-          {outgoers.map((dest) => (
-            <option
-              value={dest.id}
-              onMouseEnter={() => handleMouseEnter(dest.id)}
-              onMouseLeave={() => handleMouseLeave(dest.id)}
-            >
-              {dest.id}
-            </option>
-          ))}
-        </select>
+          options={options}
+        ></Select>
       </div>
       <Textarea
         label="Condition"
