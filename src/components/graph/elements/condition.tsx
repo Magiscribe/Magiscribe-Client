@@ -73,11 +73,12 @@ const Condition = ({ to, condition, nodeId, onChange, onRemove }: ConditionProps
           subLabel="The ID of the node this condition should route to"
           name="toNode"
           style={{ backgroundColor: toNodeValid ? toColor : undefined }}
-          className={[toNodeValid ? '' : 'bg-red-600', darkText ? 'text-black' : 'text-white'].join(' ')}
+          className={[toNodeValid ? '' : '!bg-red-700', darkText ? 'text-black' : 'text-white'].join(' ')}
           onChange={({ target }) => onChange({ to: target.value, condition })}
           onMouseEnter={() => handleMouseEnter(to)}
           onMouseLeave={() => handleMouseLeave(to)}
           options={options}
+          error={toNodeValid ? undefined : 'This node is not connected to the condition node'}
         ></Select>
       </div>
       <Textarea
