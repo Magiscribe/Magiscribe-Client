@@ -1,11 +1,11 @@
 import { Popover, PopoverButton, PopoverPanel, Transition } from '@headlessui/react';
 import { motion } from 'motion/react';
-import React, { Fragment, useCallback, useState } from 'react';
+import React, { Fragment, JSX, useCallback, useState } from 'react';
 import { usePopper } from 'react-popper';
 
 interface CustomTooltipProps {
   children: React.ReactNode;
-  render: (props: { open: boolean }) => React.ReactNode;
+  render: (props: { open: boolean }) => JSX.Element;
   placement?:
     | 'top'
     | 'bottom'

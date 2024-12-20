@@ -124,12 +124,9 @@ const router = createBrowserRouter([
     ],
   },
   {
-    path: '/dashboard/inquiry-builder/:id',
+    path: '/dashboard/inquiry-builder/:id/:view?',
     element: <InquiryBuilderTemplate />,
-    children: [
-      { path: '', element: <InquiryBuilderPage /> },
-      { path: ':view', element: <InquiryBuilderPage /> },
-    ],
+    children: [{ path: '', element: <InquiryBuilderPage /> }],
   },
 ]);
 

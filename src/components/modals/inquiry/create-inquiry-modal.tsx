@@ -275,7 +275,7 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
           name="email"
           label="Recieve Email On Response"
           type="checkbox"
-          subLabel="This will be displayed to the people you are sending the inquiry to"
+          subLabel="Be alerted via email when someone finishes your inquiry."
           value={String(settings.notifications?.recieveEmailOnResponse)}
           onChange={(e) => {
             setSettings({ ...settings, notifications: { recieveEmailOnResponse: e.target.checked } });

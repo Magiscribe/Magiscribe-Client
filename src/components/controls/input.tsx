@@ -24,7 +24,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
  * with dynamically positioned labels.
  *
  * @param {InputProps} props - The props for the Input component.
- * @returns {React.ReactNode} The rendered Input component.
+ * @returns {JSX.Element} The rendered Input component.
  */
 export default function Input({ label, subLabel, name, error, className, ...props }: InputProps) {
   // A React hook that generates a unique ID for the input element to reference the label.

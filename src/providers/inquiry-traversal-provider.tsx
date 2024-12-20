@@ -234,7 +234,6 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
       }
 
       const isEndNode = graphRef.current.getCurrentNode()?.type === 'end';
-      console.log('isEndNode:', isEndNode);
       if (isEndNode) {
         setState((prev) => ({ ...prev, finished: true }));
       }

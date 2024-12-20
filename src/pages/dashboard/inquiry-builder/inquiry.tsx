@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import clsx from 'clsx';
 import { motion } from 'motion/react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import AnalysisTab from './tabs/analysis';
 import InquiryBuilder from './tabs/builder';
@@ -14,6 +14,7 @@ export default function InquiryPage() {
   const { id, view } = useParams<{ id: string; view: string }>();
 
   const tabs = ['Builder', 'Analysis'];
+  const navigate = useNavigate();
 
   if (!id) {
     return <></>;
@@ -32,11 +33,10 @@ export default function InquiryPage() {
           </Link>
         </div>
         <TabGroup
-          manual
-          defaultIndex={view ? tabs.indexOf(view) : 0}
+          selectedIndex={tabs.findIndex((tab) => tab.toLowerCase() === view) ?? 0}
           onChange={(index) => {
             const tab = tabs[index];
-            window.history.replaceState(null, '', `/dashboard/inquiry-builder/${id}/${tab.toLowerCase()}`);
+            navigate(`/dashboard/inquiry-builder/${id}/${tab.toLowerCase()}`);
           }}
         >
           <TabList className="flex space-x-1 rounded-xl border-2 border-white mb-4">

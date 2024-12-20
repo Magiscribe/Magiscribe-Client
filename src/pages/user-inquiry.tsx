@@ -300,7 +300,7 @@ export default function UserInquiryPage() {
               error={errors.email}
             />
           )}
-          {userDetails.email && (
+          {requireEmailCapture && (
             <Input
               label="Recieve copy of your responses via email?"
               name="recieveEmails"

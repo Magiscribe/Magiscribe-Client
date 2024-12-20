@@ -20,24 +20,6 @@ export default defineConfig({
       output: {
         // https://rollupjs.org/configuration-options/#output-compact
         compact: true,
-
-        // https://rollupjs.org/configuration-options/#output-dynamicimportincjs
-        dynamicImportInCjs: true,
-
-        // https://rollupjs.org/guide/en/#outputmanualchunks
-        manualChunks(id: string) {
-          if (id.includes('node_modules')) {
-            const parts = id.split('node_modules/')[1].split('/');
-            const firstPart = parts[0];
-
-            if (firstPart !== '.pnpm') {
-              return firstPart;
-            }
-
-            const secondPart = parts[1];
-            return secondPart.startsWith('@') ? secondPart.split('@')[1] : secondPart;
-          }
-        },
       },
     },
   },

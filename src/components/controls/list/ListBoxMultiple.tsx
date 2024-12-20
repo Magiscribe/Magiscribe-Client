@@ -33,7 +33,7 @@ interface ListBoxMultipleProps {
  * with support for multiple selections, customizable options, labels, and error handling.
  *
  * @param {ListBoxMultipleProps} props - The props for the ListBoxMultiple component.
- * @returns {React.ReactNode} The rendered ListBoxMultiple component.
+ * @returns {JSX.Element} The rendered ListBoxMultiple component.
  */
 export default function ListBoxMultiple({
   selected,
