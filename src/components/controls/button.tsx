@@ -82,7 +82,7 @@ type ButtonProps<C extends React.ElementType> = PolymorphicComponentProp<C, Butt
  * <Button as={Link} to="/path" variant="primary">Router Link</Button>
  *
  * @param {ButtonProps<C>} props - The props for the Button component
- * @returns {JSX.Element} The rendered Button component
+ * @returns {React.ReactNode} The rendered Button component
  */
 const Button = <C extends React.ElementType = 'button'>({
   as,

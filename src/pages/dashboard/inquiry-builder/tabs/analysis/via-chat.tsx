@@ -121,7 +121,7 @@ const ViaChatTab: React.FC<ViaChatTabProps> = ({ id }) => {
       try {
         const data = {
           id,
-          form: inquiryData?.getInquiry?.data?.form,
+          settings: inquiryData?.getInquiry?.data?.settings,
           graph: inquiryData?.getInquiry?.data?.graph ?? inquiryData?.getInquiry?.data?.draftGraph,
           responses: inquiryResponseData?.getInquiryResponses ?? [],
         };

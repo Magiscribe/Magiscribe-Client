@@ -51,7 +51,7 @@ interface ReorderableListProps<T extends BaseListItem> {
  *
  * @template T
  * @param {ReorderableListProps<T>} props - The props for the ReorderableList component
- * @returns {JSX.Element} The rendered ReorderableList component
+ * @returns {React.ReactNode} The rendered ReorderableList component
  */
 const ReorderableList = <T extends BaseListItem>({
   items,

@@ -36,7 +36,7 @@ const PerQuestionTab: React.FC<PerQuestionTabProps> = ({ id }) => {
   const client = useApolloClient();
   const [addPrediction] = useMutation<AddPredictionMutation>(ADD_PREDICTION);
 
-  // Query for form and graph data
+  // Query for settings and graph data
   const {
     loading: graphLoading,
     data: inquiryData,

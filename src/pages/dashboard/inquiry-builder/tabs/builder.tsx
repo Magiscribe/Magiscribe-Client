@@ -19,10 +19,10 @@ export default function InquiryBuilder() {
   const [isChatOpen, setIsChatOpen] = useState(false);
 
   // Refs
-  const saveDebounce = useRef<NodeJS.Timeout>();
+  const saveDebounce = useRef<NodeJS.Timeout>(null);
 
   // Hooks
-  const { graph, initialized, form, metadata, saveGraph, saveForm, saveMetadata } = useInquiryBuilder();
+  const { graph, initialized, settings, metadata, saveGraph, saveSettings, saveMetadata } = useInquiryBuilder();
 
   const memoGraph = useMemo(() => ({ nodes: graph.nodes, edges: graph.edges }), [graph.nodes, graph.edges]);
 
@@ -55,7 +55,7 @@ export default function InquiryBuilder() {
     }
 
     saveDebounce.current = setTimeout(() => {
-      saveForm();
+      saveSettings();
     }, DEBOUNCE_DELAY_IN_MS);
 
     // Cleanup function to clear the timeout if the component unmounts or the effect re-runs
@@ -64,7 +64,7 @@ export default function InquiryBuilder() {
         clearTimeout(saveDebounce.current);
       }
     };
-  }, [form]);
+  }, [settings]);
 
   useEffect(() => {
     // Todo: Investigate how to add debouncing for inquiry metadata.  Adding debouncing for ImageMetadata

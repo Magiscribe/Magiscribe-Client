@@ -7,6 +7,7 @@ import Textarea from '@/components/controls/textarea';
 import RatingInput from '@/components/graph/rating-input';
 import MarkdownCustom from '@/components/markdown-custom';
 import { S3ImageLoader } from '@/components/s3-image-loader';
+import { InquiryResponseUserDetails } from '@/graphql/types';
 import { useTranscribe } from '@/hooks/audio-hook';
 import useElevenLabsAudio from '@/hooks/audio-player';
 import { useQueue } from '@/hooks/debounce-queue';
@@ -72,18 +73,18 @@ export default function UserInquiryPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Graph Hooks
-  const { graph, preview, handleNextNode, form, state, onNodeUpdate, onNodeError, userDetails, setUserDetails } =
+  const { graph, preview, handleNextNode, settings, state, onNodeUpdate, onNodeError, userDetails, setUserDetails } =
     useInquiry();
 
   // Audio Hooks
-  const audio = useElevenLabsAudio(form.voice);
+  const audio = useElevenLabsAudio(settings.voice);
   const audioEnabled = useAudioEnabled();
   const { isTranscribing, transcript, handleTranscribe } = useTranscribe();
 
   // Alerts
   const addAlert = useAddAlert();
 
-  useSetTitle()(form?.title);
+  useSetTitle()(settings?.title);
 
   /*================================ SIDE EFFECTS ==============================*/
 
@@ -123,7 +124,7 @@ export default function UserInquiryPage() {
    * @param input { [key: string]: string } - The input object to validate
    * @returns { [key: string]: string } - An object containing the errors for each field
    */
-  const validateInput = (input: { [key: string]: string }) => {
+  const validateInput = (input: InquiryResponseUserDetails) => {
     const startNode = graph?.getCurrentNode();
 
     if (!startNode) return {};
@@ -198,8 +199,10 @@ export default function UserInquiryPage() {
    * @param e { React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> } - The change event
    */
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setUserDetails((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target as HTMLInputElement;
+    const inputValue = type === 'checkbox' ? checked : value;
+
+    setUserDetails((prev) => ({ ...prev, [name]: inputValue }));
     setErrors((prev) => ({ ...prev, [name]: '' }));
   };
 
@@ -274,7 +277,7 @@ export default function UserInquiryPage() {
 
     return (
       <div className="bg-white dark:bg-slate-700 p-6 rounded-3xl shadow-lg">
-        <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white">{form.title}</h2>
+        <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white">{settings.title}</h2>
         <p className="text-slate-600 dark:text-slate-300 mb-6">{description}</p>
         <div className="space-y-4">
           {requireNameCapture && (
@@ -282,7 +285,7 @@ export default function UserInquiryPage() {
               label="Name"
               name="name"
               placeholder="Your name"
-              value={userDetails.name}
+              value={userDetails.name ?? ''}
               onChange={handleChange}
               error={errors.name}
             />
@@ -292,9 +295,18 @@ export default function UserInquiryPage() {
               label="Email"
               name="email"
               placeholder="Your email address"
-              value={userDetails.email}
+              value={userDetails.email ?? ''}
               onChange={handleChange}
               error={errors.email}
+            />
+          )}
+          {userDetails.email && (
+            <Input
+              label="Recieve copy of your responses via email?"
+              name="recieveEmails"
+              type="checkbox"
+              value={String(userDetails.recieveEmails ?? 'false')}
+              onChange={handleChange}
             />
           )}
         </div>

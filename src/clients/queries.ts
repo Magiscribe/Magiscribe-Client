@@ -136,7 +136,19 @@ export const GET_INQUIRY = gql`
   query getInquiry($id: ID!) {
     getInquiry(id: $id) {
       id
-      data
+      data {
+        settings {
+          title
+          goals
+          voice
+          notifications {
+            recieveEmailOnResponse
+          }
+        }
+        metadata
+        graph
+        draftGraph
+      }
       createdAt
       updatedAt
     }
@@ -148,7 +160,11 @@ export const GET_INQUIRIES = gql`
     getInquiries {
       id
       userId
-      data
+      data {
+        settings {
+          title
+        }
+      }
       createdAt
       updatedAt
     }
@@ -161,7 +177,30 @@ export const GET_INQUIRIES_RESPONSES = gql`
       id
       userId
       data {
-        userDetails
+        userDetails {
+          name
+          email
+          recieveEmails
+        }
+        history
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const GET_INQUIRY_RESPONSE = gql`
+  query getInquiryResponse($id: ID!) {
+    getInquiryResponse(id: $id) {
+      id
+      userId
+      data {
+        userDetails {
+          name
+          email
+          recieveEmails
+        }
         history
       }
       createdAt

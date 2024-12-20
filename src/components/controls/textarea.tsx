@@ -23,7 +23,7 @@ interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement
  * A flexible input component that can render as a textarea .
  *
  * @param {InputProps} props - The props for the Textarea component.
- * @returns {JSX.Element} The rendered Textarea component.
+ * @returns {React.ReactNode} The rendered Textarea component.
  */
 export default function Textarea({
   label,
@@ -33,7 +33,7 @@ export default function Textarea({
   className,
   value,
   ...props
-}: TextareaProps): JSX.Element {
+}: TextareaProps): React.ReactNode {
   // A React hook that generates a unique ID for the input element to reference the label.
   const id = useId();
 

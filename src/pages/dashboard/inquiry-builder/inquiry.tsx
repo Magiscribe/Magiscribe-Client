@@ -11,7 +11,7 @@ import AnalysisTab from './tabs/analysis';
 import InquiryBuilder from './tabs/builder';
 
 export default function InquiryPage() {
-  const { id } = useParams<{ id: string }>();
+  const { id, view } = useParams<{ id: string; view: string }>();
 
   const tabs = ['Builder', 'Analysis'];
 
@@ -31,7 +31,14 @@ export default function InquiryPage() {
             Back
           </Link>
         </div>
-        <TabGroup>
+        <TabGroup
+          manual
+          defaultIndex={view ? tabs.indexOf(view) : 0}
+          onChange={(index) => {
+            const tab = tabs[index];
+            window.history.replaceState(null, '', `/dashboard/inquiry-builder/${id}/${tab.toLowerCase()}`);
+          }}
+        >
           <TabList className="flex space-x-1 rounded-xl border-2 border-white mb-4">
             {tabs.map((category) => (
               <Tab

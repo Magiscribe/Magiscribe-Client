@@ -108,7 +108,7 @@ export type FloatFilter = {
 export type Inquiry = {
   __typename?: 'Inquiry';
   createdAt: Scalars['Float']['output'];
-  data: Scalars['JSONObject']['output'];
+  data: InquiryData;
   id: Scalars['ID']['output'];
   responses?: Maybe<Array<InquiryResponse>>;
   updatedAt: Scalars['Float']['output'];
@@ -118,15 +118,9 @@ export type Inquiry = {
 export type InquiryData = {
   __typename?: 'InquiryData';
   draftGraph?: Maybe<Scalars['JSONObject']['output']>;
-  form: InquiryDataForm;
   graph?: Maybe<Scalars['JSONObject']['output']>;
-};
-
-export type InquiryDataForm = {
-  __typename?: 'InquiryDataForm';
-  goals: Scalars['String']['output'];
-  title: Scalars['String']['output'];
-  voice?: Maybe<Scalars['String']['output']>;
+  metadata?: Maybe<Scalars['JSONObject']['output']>;
+  settings: InquirySettings;
 };
 
 export type InquiryResponse = {
@@ -141,13 +135,40 @@ export type InquiryResponse = {
 export type InquiryResponseData = {
   __typename?: 'InquiryResponseData';
   history: Array<Scalars['JSONObject']['output']>;
-  userDetails?: Maybe<Scalars['JSONObject']['output']>;
+  status: InquiryResponseStatus;
+  userDetails?: Maybe<InquiryResponseUserDetails>;
 };
 
 export type InquiryResponseFilters = {
   createdAt?: InputMaybe<FloatFilter>;
   email?: InputMaybe<StringFilter>;
   name?: InputMaybe<StringFilter>;
+};
+
+export enum InquiryResponseStatus {
+  Completed = 'COMPLETED',
+  InProgress = 'IN_PROGRESS',
+  Pending = 'PENDING'
+}
+
+export type InquiryResponseUserDetails = {
+  __typename?: 'InquiryResponseUserDetails';
+  email?: Maybe<Scalars['String']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  recieveEmails?: Maybe<Scalars['Boolean']['output']>;
+};
+
+export type InquirySettings = {
+  __typename?: 'InquirySettings';
+  goals: Scalars['String']['output'];
+  notifications?: Maybe<InquirySettingsNotifications>;
+  title: Scalars['String']['output'];
+  voice?: Maybe<Scalars['String']['output']>;
+};
+
+export type InquirySettingsNotifications = {
+  __typename?: 'InquirySettingsNotifications';
+  recieveEmailOnResponse?: Maybe<Scalars['Boolean']['output']>;
 };
 
 export type Model = {
@@ -313,6 +334,7 @@ export type Query = {
   getCollection?: Maybe<Collection>;
   getInquiries?: Maybe<Array<Inquiry>>;
   getInquiry?: Maybe<Inquiry>;
+  getInquiryResponse?: Maybe<InquiryResponse>;
   getInquiryResponseCount: Scalars['Int']['output'];
   getInquiryResponses?: Maybe<Array<InquiryResponse>>;
   getMediaAsset?: Maybe<Scalars['String']['output']>;
@@ -358,6 +380,11 @@ export type QueryGetCollectionArgs = {
 
 
 export type QueryGetInquiryArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryGetInquiryResponseArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -508,7 +535,7 @@ export type CreateInquiryMutationVariables = Exact<{
 }>;
 
 
-export type CreateInquiryMutation = { __typename?: 'Mutation', upsertInquiry: { __typename?: 'Inquiry', id: string, data: any, createdAt: number, updatedAt: number } };
+export type CreateInquiryMutation = { __typename?: 'Mutation', upsertInquiry: { __typename?: 'Inquiry', id: string, createdAt: number, updatedAt: number } };
 
 export type UpdateInquiryMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -517,7 +544,7 @@ export type UpdateInquiryMutationVariables = Exact<{
 }>;
 
 
-export type UpdateInquiryMutation = { __typename?: 'Mutation', upsertInquiry: { __typename?: 'Inquiry', id: string, data: any, createdAt: number, updatedAt: number } };
+export type UpdateInquiryMutation = { __typename?: 'Mutation', upsertInquiry: { __typename?: 'Inquiry', id: string, createdAt: number, updatedAt: number } };
 
 export type DeleteInquiryMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -625,12 +652,12 @@ export type GetInquiryQueryVariables = Exact<{
 }>;
 
 
-export type GetInquiryQuery = { __typename?: 'Query', getInquiry?: { __typename?: 'Inquiry', id: string, data: any, createdAt: number, updatedAt: number } | null };
+export type GetInquiryQuery = { __typename?: 'Query', getInquiry?: { __typename?: 'Inquiry', id: string, createdAt: number, updatedAt: number, data: { __typename?: 'InquiryData', metadata?: any | null, graph?: any | null, draftGraph?: any | null, settings: { __typename?: 'InquirySettings', title: string, goals: string, voice?: string | null, notifications?: { __typename?: 'InquirySettingsNotifications', recieveEmailOnResponse?: boolean | null } | null } } } | null };
 
 export type GetInquiriesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetInquiriesQuery = { __typename?: 'Query', getInquiries?: Array<{ __typename?: 'Inquiry', id: string, userId?: Array<string> | null, data: any, createdAt: number, updatedAt: number }> | null };
+export type GetInquiriesQuery = { __typename?: 'Query', getInquiries?: Array<{ __typename?: 'Inquiry', id: string, userId?: Array<string> | null, createdAt: number, updatedAt: number, data: { __typename?: 'InquiryData', settings: { __typename?: 'InquirySettings', title: string } } }> | null };
 
 export type GetInquiryResponsesQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -638,7 +665,14 @@ export type GetInquiryResponsesQueryVariables = Exact<{
 }>;
 
 
-export type GetInquiryResponsesQuery = { __typename?: 'Query', getInquiryResponses?: Array<{ __typename?: 'InquiryResponse', id: string, userId?: string | null, createdAt: number, updatedAt: number, data: { __typename?: 'InquiryResponseData', userDetails?: any | null, history: Array<any> } }> | null };
+export type GetInquiryResponsesQuery = { __typename?: 'Query', getInquiryResponses?: Array<{ __typename?: 'InquiryResponse', id: string, userId?: string | null, createdAt: number, updatedAt: number, data: { __typename?: 'InquiryResponseData', history: Array<any>, userDetails?: { __typename?: 'InquiryResponseUserDetails', name?: string | null, email?: string | null, recieveEmails?: boolean | null } | null } }> | null };
+
+export type GetInquiryResponseQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type GetInquiryResponseQuery = { __typename?: 'Query', getInquiryResponse?: { __typename?: 'InquiryResponse', id: string, userId?: string | null, createdAt: number, updatedAt: number, data: { __typename?: 'InquiryResponseData', history: Array<any>, userDetails?: { __typename?: 'InquiryResponseUserDetails', name?: string | null, email?: string | null, recieveEmails?: boolean | null } | null } } | null };
 
 export type GetInquiryResponseCountQueryVariables = Exact<{
   id: Scalars['ID']['input'];

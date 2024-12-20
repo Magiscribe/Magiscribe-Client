@@ -103,7 +103,6 @@ export const CREATE_INQUIRY = gql`
   mutation createInquiry($data: JSONObject!) {
     upsertInquiry(data: $data) {
       id
-      data
       createdAt
       updatedAt
     }
@@ -114,7 +113,6 @@ export const UPDATE_INQUIRY = gql`
   mutation updateInquiry($id: ID!, $data: JSONObject!, $fields: [String!]) {
     upsertInquiry(id: $id, data: $data, fields: $fields) {
       id
-      data
       createdAt
       updatedAt
     }

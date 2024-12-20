@@ -12,17 +12,18 @@ import {
 } from '@/graphql/graphql';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
 import { useAddAlert } from '@/providers/alert-provider';
-import { GraphNode, NodeVisitAnalysisData } from '@/types/conversation';
 import { getAgentIdByName } from '@/utils/agents';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
 import { faSpinner, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 
+import UserResponses from '@/components/analysis/user-responses';
 import FilterControls from './filter-controls';
 
 interface PerResponseTabProps {
   id: string;
+  defaultSelect: string | null;
 }
 
 type ResponseSummary = {
@@ -32,8 +33,8 @@ type ResponseSummary = {
   };
 };
 
-const PerResponseTab: React.FC<PerResponseTabProps> = ({ id }) => {
-  const [seletedResponse, setSelectedUser] = useState<string | null>(null);
+const PerResponseTab: React.FC<PerResponseTabProps> = ({ id, defaultSelect }) => {
+  const [seletedResponse, setSelectedUser] = useState<string | null>(defaultSelect);
   const [currentPage, setCurrentPage] = useState(0);
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
   const [subscriptionId] = useState<string>(`per_response_summary_${Date.now()}`);
@@ -57,7 +58,7 @@ const PerResponseTab: React.FC<PerResponseTabProps> = ({ id }) => {
   const [addPrediction] = useMutation<AddPredictionMutation>(ADD_PREDICTION);
   const [deleteInquiryResponse] = useMutation<DeleteInquiryResponseMutation>(DELETE_INQUIRY_RESPONSE);
 
-  // Query for form and graph data
+  // Query for settings and graph data
   const {
     loading: graphLoading,
     data: inquiryData,
@@ -163,12 +164,6 @@ const PerResponseTab: React.FC<PerResponseTabProps> = ({ id }) => {
 
   const responses = inquiryResponseData?.getInquiryResponses ?? [];
 
-  const nodesMap = useMemo(
-    () =>
-      Object.fromEntries((inquiryData?.getInquiry?.data?.graph?.nodes || []).map((node: GraphNode) => [node.id, node])),
-    [inquiryData?.getInquiry?.data?.graph?.nodes],
-  );
-
   const usersPerPage = 40;
   const totalPages = Math.ceil(responses.length / usersPerPage);
   const displayedUsers = responses.slice(currentPage * usersPerPage, (currentPage + 1) * usersPerPage);
@@ -219,32 +214,6 @@ const PerResponseTab: React.FC<PerResponseTabProps> = ({ id }) => {
   };
 
   /*================================ RENDERING ==============================*/
-
-  const renderNodeContent = (node: NodeVisitAnalysisData) => {
-    const nodeText = node?.data?.text;
-    if (node?.data?.response) {
-      const responseText = node.data.response.text;
-      const ratings = node.data.response.ratings;
-
-      return (
-        <>
-          <p className="font-semibold text-slate-700 dark:text-white">{nodeText}</p>
-          <hr className="my-2 border-slate-300 dark:border-slate-600" />
-          <p className="text-slate-700 dark:text-white">
-            {responseText && <span>{responseText}</span>}
-            {ratings?.length && ratings?.length > 0 && (
-              <span>
-                {responseText ? ' - ' : ''}
-                {ratings.join(', ')}
-              </span>
-            )}
-          </p>
-        </>
-      );
-    } else {
-      return <p className="font-semibold text-slate-700 dark:text-white">{nodeText}</p>;
-    }
-  };
 
   if (graphLoading || dataLoading) return <p className="text-slate-700 dark:text-white">Loading...</p>;
   if (graphError || dataError) return <p className="text-slate-700 dark:text-white">Error loading data</p>;
@@ -337,17 +306,7 @@ const PerResponseTab: React.FC<PerResponseTabProps> = ({ id }) => {
                 </Button>
               </div>
 
-              {userData.map((node, i) => {
-                const graphNode = nodesMap[node.id];
-                if (graphNode?.type === 'question' || graphNode?.type === 'information') {
-                  return (
-                    <div key={i} className="mb-4 p-4 bg-slate-200 dark:bg-slate-600 rounded-2xl">
-                      {renderNodeContent(node)}
-                    </div>
-                  );
-                }
-                return null;
-              })}
+              <UserResponses inquiryData={inquiryData} userData={userData} />
             </>
           )}
         </div>

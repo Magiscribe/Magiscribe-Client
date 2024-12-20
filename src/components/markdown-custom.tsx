@@ -4,9 +4,9 @@ import Markdown from 'react-markdown';
  * A custom markdown component that takes in a string and returns a markdown component
  * using Tailwind CSS classes.
  * @param {children.string} children - The markdown content to render
- * @returns {JSX.Element} The rendered markdown component
+ * @returns {React.ReactNode} The rendered markdown component
  */
-export default function MarkdownCustom({ children }: { children: string | null | undefined }): JSX.Element {
+export default function MarkdownCustom({ children }: { children: string | null | undefined }): React.ReactNode {
   return (
     <Markdown
       components={{

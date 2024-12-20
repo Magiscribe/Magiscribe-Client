@@ -5,7 +5,7 @@ import { usePopper } from 'react-popper';
 
 interface CustomTooltipProps {
   children: React.ReactNode;
-  render: (props: { open: boolean }) => JSX.Element;
+  render: (props: { open: boolean }) => React.ReactNode;
   placement?:
     | 'top'
     | 'bottom'

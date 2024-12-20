@@ -13,6 +13,7 @@ import Select from '../../controls/select';
 import ConfirmationModal from '../confirm-modal';
 import CustomModal from '../modal';
 import { VOICE_LINE_SAMPLES } from '@/utils/audio/voice-line-samples';
+import Input from '@/components/controls/input';
 
 /**
  * Props for the ModalUpsertInquiry component
@@ -31,13 +32,13 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
   const [deleteModal, setDeleteModal] = useState(false);
 
   // Hooks
-  const { id, form, setForm, saveForm, deleteInquiry } = useInquiryBuilder();
+  const { id, setSettings, settings, saveSettings, deleteInquiry } = useInquiryBuilder();
   const alert = useAddAlert();
   const navigate = useNavigate();
 
   // Voice hooks
   const { data: voices } = useQuery<GetAllAudioVoicesQuery>(GET_ALL_AUDIO_VOICES);
-  const { addSentence, isLoading } = useElevenLabsAudio(form.voice!);
+  const { addSentence, isLoading } = useElevenLabsAudio(settings.voice);
 
   /**
    * Handle select change for the form
@@ -48,7 +49,7 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
   const handleSelectChange =
     (field: string) =>
     (e: React.ChangeEvent<HTMLSelectElement>): void => {
-      setForm({ ...form, [field]: e.target.value !== '' ? e.target.value : null });
+      setSettings({ ...settings, [field]: e.target.value !== '' ? e.target.value : null });
     };
 
   /**
@@ -57,7 +58,7 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
   const handleSave = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
 
-    await saveForm(
+    await saveSettings(
       (id) => {
         alert('Inquiry saved successfully!', 'success');
         if (onSave) onSave(id as string);
@@ -107,7 +108,7 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
             name="voice"
             label="Voice"
             subLabel="This will be the voice used to read responses to the user if they have audio enabled"
-            value={form.voice ?? ''}
+            value={settings.voice ?? ''}
             onChange={handleSelectChange('voice')}
             options={
               voices?.getAllAudioVoices.map((voice) => ({
@@ -129,6 +130,17 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
               Preview Voice
             </Button>
           </div>
+
+          <Input
+            name="email"
+            label="Recieve Email On Response"
+            type="checkbox"
+            subLabel="This will be displayed to the people you are sending the inquiry to"
+            value={String(settings.notifications?.recieveEmailOnResponse)}
+            onChange={(e) => {
+              setSettings({ ...settings, notifications: { recieveEmailOnResponse: e.target.checked } });
+            }}
+          />
         </form>
       </CustomModal>
 

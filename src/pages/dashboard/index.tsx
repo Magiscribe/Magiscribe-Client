@@ -1,10 +1,7 @@
 import blocksImage from '@/assets/imgs/cards/blocks.webp';
 import bondImage from '@/assets/imgs/cards/bond.webp';
-import booksImage from '@/assets/imgs/cards/books.webp';
-import yellImage from '@/assets/imgs/cards/yell.webp';
-import folderImage from '@/assets/imgs/cards/folder.webp';
-import privacyImage from '@/assets/imgs/cards/privacy.webp';
 import roadImage from '@/assets/imgs/cards/road.webp';
+import yellImage from '@/assets/imgs/cards/yell.webp';
 import LinkCard from '@/components/cards/card';
 import GenericHero from '@/components/heroes/generic-hero';
 import { useSetTitle } from '@/hooks/title-hook';
@@ -43,30 +40,6 @@ const cardData = [
     gradient: 'blue',
     adminOnly: false,
     backgroundImage: yellImage,
-  },
-  {
-    title: 'FAQ',
-    description: 'Frequently asked questions about Magiscribe.',
-    to: '/faq',
-    gradient: 'green',
-    adminOnly: false,
-    backgroundImage: booksImage,
-  },
-  {
-    title: 'Terms and Conditions',
-    description: 'Read our terms and conditions.',
-    to: '/terms',
-    gradient: 'amber',
-    adminOnly: false,
-    backgroundImage: folderImage,
-  },
-  {
-    title: 'Privacy Policy',
-    description: 'Read our privacy policy.',
-    to: '/privacy',
-    gradient: 'red',
-    adminOnly: false,
-    backgroundImage: privacyImage,
   },
 ];
 
