@@ -1,9 +1,8 @@
-import React from 'react';
-import { motion } from 'motion/react';
-import GenericHero from '@/components/heroes/generic-hero';
 import { useSetTitle } from '@/hooks/title-hook';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { motion } from 'motion/react';
+import React from 'react';
 
 const faqs = [
   {
@@ -70,12 +69,20 @@ export default function FAQPage() {
 
   return (
     <>
-      <GenericHero title="FAQ" subtitle="Learn how Magiscribe can turn dialogue into discovery" />
-      <div className="container mx-auto max-w-4xl px-4 mt-12">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-          {faqs.map((faq, index) => (
-            <FAQItem key={index} question={faq.question} answer={faq.answer} />
-          ))}
+      <div className="container mx-auto mt-12 pb-16">
+        <motion.div
+          className="max-w-2xl mx-auto prose prose-invert"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <h1 className="text-4xl font-bold">FAQ</h1>
+          <p className="mt-4">Learn how Magiscribe can turn dialogue into discovery</p>
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+            {faqs.map((faq, index) => (
+              <FAQItem key={index} question={faq.question} answer={faq.answer} />
+            ))}
+          </motion.div>
         </motion.div>
       </div>
     </>
