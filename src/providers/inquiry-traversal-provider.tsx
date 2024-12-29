@@ -8,7 +8,7 @@ import {
   PredictionType,
   UpdateInquiryResponseMutation,
 } from '@/graphql/graphql';
-import { InquirySettings, InquiryResponseStatus, InquiryResponseUserDetails } from '@/graphql/types';
+import { InquiryResponseStatus, InquiryResponseUserDetails, InquirySettings } from '@/graphql/types';
 import { getAgentIdByName } from '@/utils/agents';
 import { NodeData, OptimizedNode } from '@/utils/graphs/graph';
 import { GraphManager } from '@/utils/graphs/graph-manager';
