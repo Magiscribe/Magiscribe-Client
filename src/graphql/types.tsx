@@ -191,6 +191,7 @@ export type Mutation = {
   deleteMediaAsset?: Maybe<Scalars['Int']['output']>;
   deletePrompt?: Maybe<Prompt>;
   generateAudio?: Maybe<Scalars['String']['output']>;
+  registerUser: Scalars['Boolean']['output'];
   updateInquiryOwners: Inquiry;
   upsertAgent?: Maybe<Agent>;
   upsertCapability?: Maybe<Capability>;
@@ -342,6 +343,7 @@ export type Query = {
   getPrompt?: Maybe<Prompt>;
   getUsersByEmail?: Maybe<Array<Maybe<UserData>>>;
   getUsersById?: Maybe<Array<UserData>>;
+  isUserRegistered: Scalars['Boolean']['output'];
 };
 
 
@@ -594,6 +596,11 @@ export type DeleteCollectionMutationVariables = Exact<{
 
 export type DeleteCollectionMutation = { __typename?: 'Mutation', deleteCollection?: { __typename?: 'Collection', id: string } | null };
 
+export type RegisterUserMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type RegisterUserMutation = { __typename?: 'Mutation', registerUser: boolean };
+
 export type GetAllModelsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -653,7 +660,7 @@ export type GetInquiryQueryVariables = Exact<{
 }>;
 
 
-export type GetInquiryQuery = { __typename?: 'Query', getInquiry?: { __typename?: 'Inquiry', id: string, createdAt: number, updatedAt: number, data: { __typename?: 'InquiryData', metadata?: any | null, graph?: any | null, draftGraph?: any | null, settings: { __typename?: 'InquirySettings', title: string, goals: string, voice?: string | null, notifications?: { __typename?: 'InquirySettingsNotifications', recieveEmailOnResponse?: boolean | null } | null } } } | null };
+export type GetInquiryQuery = { __typename?: 'Query', getInquiry?: { __typename?: 'Inquiry', id: string, createdAt: number, updatedAt: number, data: { __typename?: 'InquiryData', metadata?: any | null, graph?: any | null, draftGraph?: any | null, settings: { __typename?: 'InquirySettings', title: string, goals: string, voice?: string | null, context?: string | null, notifications?: { __typename?: 'InquirySettingsNotifications', recieveEmailOnResponse?: boolean | null } | null } } } | null };
 
 export type GetInquiriesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -698,6 +705,11 @@ export type GetAllCollectionsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetAllCollectionsQuery = { __typename?: 'Query', getAllCollections: Array<{ __typename?: 'Collection', id: string, name: string }> };
+
+export type IsUserRegisteredQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type IsUserRegisteredQuery = { __typename?: 'Query', isUserRegistered: boolean };
 
 export type PredictionAddedSubscriptionVariables = Exact<{
   subscriptionId: Scalars['ID']['input'];

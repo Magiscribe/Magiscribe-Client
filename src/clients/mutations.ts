@@ -167,3 +167,9 @@ export const DELETE_COLLECTION = gql`
     }
   }
 `;
+
+export const REGISTER_USER = gql`
+  mutation registerUser {
+    registerUser
+  }
+`;

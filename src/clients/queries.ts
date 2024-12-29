@@ -240,3 +240,9 @@ export const GET_ALL_COLLECTIONS = gql`
     }
   }
 `;
+
+export const IS_USER_REGISTERED = gql`
+  query isUserRegistered {
+    isUserRegistered
+  }
+`;

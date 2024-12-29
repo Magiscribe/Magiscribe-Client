@@ -33,7 +33,11 @@ export default function InquiryPage() {
           </Link>
         </div>
         <TabGroup
-          selectedIndex={tabs.findIndex((tab) => tab.toLowerCase() === view) ?? 0}
+          selectedIndex={
+            tabs.findIndex((tab) => tab.toLowerCase() === view) > -1
+              ? tabs.findIndex((tab) => tab.toLowerCase() === view)
+              : 0
+          }
           onChange={(index) => {
             const tab = tabs[index];
             navigate(`/dashboard/inquiry-builder/${id}/${tab.toLowerCase()}`);
