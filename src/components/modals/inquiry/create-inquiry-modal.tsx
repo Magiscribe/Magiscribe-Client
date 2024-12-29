@@ -282,6 +282,15 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
           }}
         />
 
+        <Textarea
+          name="globalContext"
+          label="Context (optional)"
+          subLabel="Provide any additional background information.  This helps Magiscribe to provide each survey respondent with relevant questions."
+          value={settings.context ?? ''}
+          onChange={handleInputChange('context')}
+          onKeyDown={handleInputKeyDown}
+        />
+
         <hr className="border-t border-slate-200 dark:border-slate-600" />
 
         {renderAdvancedSettings()}

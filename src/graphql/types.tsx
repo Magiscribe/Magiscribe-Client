@@ -160,6 +160,7 @@ export type InquiryResponseUserDetails = {
 
 export type InquirySettings = {
   __typename?: 'InquirySettings';
+  context?: Maybe<Scalars['String']['output']>;
   goals: Scalars['String']['output'];
   notifications?: Maybe<InquirySettingsNotifications>;
   title: Scalars['String']['output'];

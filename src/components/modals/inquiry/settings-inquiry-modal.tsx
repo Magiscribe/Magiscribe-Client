@@ -1,8 +1,11 @@
 import { GET_ALL_AUDIO_VOICES } from '@/clients/queries';
+import Input from '@/components/controls/input';
+import Textarea from '@/components/controls/textarea';
 import { GetAllAudioVoicesQuery } from '@/graphql/types';
 import useElevenLabsAudio from '@/hooks/audio-player';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
+import { VOICE_LINE_SAMPLES } from '@/utils/audio/voice-line-samples';
 import { useQuery } from '@apollo/client';
 import { faPlay, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import React, { useState } from 'react';
@@ -12,8 +15,6 @@ import Button from '../../controls/button';
 import Select from '../../controls/select';
 import ConfirmationModal from '../confirm-modal';
 import CustomModal from '../modal';
-import { VOICE_LINE_SAMPLES } from '@/utils/audio/voice-line-samples';
-import Input from '@/components/controls/input';
 
 /**
  * Props for the ModalUpsertInquiry component
@@ -50,6 +51,16 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
     (field: string) =>
     (e: React.ChangeEvent<HTMLSelectElement>): void => {
       setSettings({ ...settings, [field]: e.target.value !== '' ? e.target.value : null });
+    };
+
+  /**
+   * Handle input change for the form
+   * @param field - The field to update
+   */
+  const handleInputChange =
+    (field: string) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
+      setSettings({ ...settings, [field]: e.target.value });
     };
 
   /**
@@ -117,7 +128,6 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
               })) ?? []
             }
           />
-
           <div className="flex justify-end">
             <Button
               type="button"
@@ -130,6 +140,14 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
               Preview Voice
             </Button>
           </div>
+
+          <Textarea
+            name="globalContext"
+            label="Context (optional)"
+            subLabel="Provide any additional background information.  This helps Magiscribe to provide each survey respondent with relevant questions."
+            value={settings.context ?? ''}
+            onChange={handleInputChange('context')}
+          />
 
           <Input
             name="email"

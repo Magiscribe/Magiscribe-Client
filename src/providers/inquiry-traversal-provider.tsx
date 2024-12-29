@@ -333,6 +333,7 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
       agentId,
       input: {
         userMessage: currentNode.data.text,
+        context: settingsRef.current.context,
         userDetails: `Name: ${userDetails.name}`,
         conversationHistory: inquiryHistoryRef.current.join('\n\n'),
       },

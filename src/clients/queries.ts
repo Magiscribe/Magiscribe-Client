@@ -141,6 +141,7 @@ export const GET_INQUIRY = gql`
           title
           goals
           voice
+          context
           notifications {
             recieveEmailOnResponse
           }
