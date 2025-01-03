@@ -245,7 +245,6 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
             data: {
               status: InquiryResponseStatus.Pending,
               userDetails,
-              history: graphRef.current.getNodeHistory(),
             },
           },
         });
@@ -257,7 +256,6 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
             inquiryId: id,
             data: {
               status: isEndNode ? InquiryResponseStatus.Completed : InquiryResponseStatus.InProgress,
-              history: graphRef.current.getNodeHistory(),
             },
           },
         });

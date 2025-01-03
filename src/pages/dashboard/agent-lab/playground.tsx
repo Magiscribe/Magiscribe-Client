@@ -4,7 +4,7 @@ import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import Button from '@/components/controls/button';
 import Input from '@/components/controls/input';
 import Select from '@/components/controls/select';
-import { CustomInputSection, CustomInput } from '@/components/custom-variables';
+import { CustomInput, CustomInputSection } from '@/components/custom-variables';
 import { AddPredictionMutation } from '@/graphql/graphql';
 import { Agent } from '@/graphql/types';
 import useElevenLabsAudio from '@/hooks/audio-player';
@@ -110,7 +110,7 @@ export default function PlaygroundDashboard() {
         variables: {
           subscriptionId: form.subscriptionId,
           agentId: form.agent,
-          variables: input,
+          input: input,
           attachments: base64Images.map((image) => ({
             type: 'image_url',
             image_url: {

@@ -60,31 +60,37 @@ export const CustomInputSection: React.FC<CustomInputSectionProps> = ({
     },
   });
 
+  /**
+   * Extracts and processes custom prompt variables from agent capabilities and reasoning.
+   *
+   * @returns {CustomInput[]} Array of unique custom input variables with empty values
+   * @remarks
+   * - Extracts variables from all capability prompts
+   * - Includes variables from reasoning prompt if present
+   * - Removes duplicates and formats as CustomInput objects
+   * - Returns empty array if agent data is not available
+   */
   const customPromptVariables = useMemo(() => {
-    if (!agent || !agent.getAgentWithPrompts) return [];
-    console.log('Agent', agent);
-    let variables = agent.getAgentWithPrompts.capabilities
-      .map((capability) => capability?.prompts?.map((prompt) => ExtractPromptVariables(prompt.text)))
-      .flat(Infinity);
+    if (!agent?.getAgentWithPrompts) return [];
 
-    console.log('Variables before', variables);
-    // Extract variables from reasoning prompt
-    if (agent.getAgentWithPrompts.reasoning) {
-      const reasoningVariables = ExtractPromptVariables(agent.getAgentWithPrompts.reasoning.prompt);
-      variables = [...variables, ...reasoningVariables];
-    }
+    const { capabilities, reasoning } = agent.getAgentWithPrompts;
 
-    // Remove duplicates
-    const flattenedVariables = [...new Set(variables)] as string[];
+    // Collect variables from capability prompts
+    const capabilityVariables = capabilities.flatMap(
+      (capability) => capability?.prompts?.flatMap((prompt) => ExtractPromptVariables(prompt.text)) ?? [],
+    );
 
-    const customInput: CustomInput[] = flattenedVariables.map((variable) => {
-      const customVariable: CustomInput = {
-        key: variable,
-        value: '',
-      };
-      return customVariable;
-    });
-    return customInput;
+    // Collect variables from reasoning prompt
+    const reasoningVariables = reasoning?.prompt ? ExtractPromptVariables(reasoning.prompt) : [];
+
+    // Combine and deduplicate variables
+    const uniqueVariables = [...new Set([...capabilityVariables, ...reasoningVariables])];
+
+    // Transform into CustomInput format
+    return uniqueVariables.map((variable) => ({
+      key: variable,
+      value: '',
+    }));
   }, [agent]);
 
   useEffect(() => {

@@ -130,6 +130,7 @@ export default function CapabilityEdit() {
             id: '',
             name: form.newPromptTitle,
             text: 'Placeholder prompt text',
+            logicalCollection: collection,
           },
         },
       });
