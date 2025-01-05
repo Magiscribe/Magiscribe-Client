@@ -1,8 +1,11 @@
 import { faCodeBranch, faPlus } from '@fortawesome/free-solid-svg-icons';
-import { Handle, NodeProps, Position, useReactFlow } from '@xyflow/react';
+import { getOutgoers, Handle, NodeProps, Position, useEdges, useNodes, useReactFlow } from '@xyflow/react';
 import NodeContainer from '../elements/node-container';
 import Button from '@/components/controls/button';
 import Condition from '../elements/condition';
+import colors from 'tailwindcss/colors';
+import { DefaultColors } from 'tailwindcss/types/generated/colors';
+import { useEffect, useState } from 'react';
 
 type ConditionNodeProps = NodeProps & {
   data: {
@@ -13,8 +16,36 @@ type ConditionNodeProps = NodeProps & {
   };
 };
 
+const nodeColorNames = [
+  'red',
+  'orange',
+  'lime',
+  'green',
+  'teal',
+  'cyan',
+  'blue',
+  'violet',
+  'fuchsia',
+  'pink',
+  'rose',
+] as const;
+
+const nodeColors = ([400, 500, 600] as const).flatMap((level) => nodeColorNames.map((name) => colors[name][level]));
+
 export default function ConditionNode({ id, data }: ConditionNodeProps) {
-  const { updateNodeData } = useReactFlow();
+  const { updateNodeData, updateEdgeData } = useReactFlow();
+  const nodes = useNodes();
+  const edges = useEdges();
+  let nodeColorMap: Record<string, string> = {};
+  let nodeColorIndex = 0;
+  getOutgoers({ id }, nodes, edges).forEach((node) => {
+    if (node.id in nodeColorMap) {
+      return;
+    }
+    nodeColorMap[node.id] = nodeColors[nodeColorIndex++ % nodeColors.length];
+    const edge = edges.find((edge) => edge.source === id && edge.target === node.id)!;
+    updateEdgeData(edge.id, { color: nodeColorMap[node.id] });
+  });
 
   return (
     <NodeContainer title="Condition" faIcon={faCodeBranch} id={id}>
@@ -23,6 +54,7 @@ export default function ConditionNode({ id, data }: ConditionNodeProps) {
           <Condition
             {...cond}
             nodeId={id}
+            nodeColor={nodeColorMap[cond.to] || colors.slate[200]}
             onChange={({ to, condition }) => {
               let conditions = [...data.conditions];
               conditions[index] = { to, condition };
@@ -42,7 +74,7 @@ export default function ConditionNode({ id, data }: ConditionNodeProps) {
           title="Add new condition"
           variant="primary"
           size="medium"
-          iconLeft={faPlus}
+          icon={faPlus}
           onClick={() => {
             let conditions = [...data.conditions, { to: '', condition: '' }];
             updateNodeData(id, { conditions });

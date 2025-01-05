@@ -25,8 +25,7 @@ import colors from 'tailwindcss/colors';
 import Button from '../controls/button';
 import CustomTooltip from '../controls/custom-tooltip';
 import CustomModal from '../modals/modal';
-import ContextMenu from './context-menu';
-import { edgeTypes, generateRandomColorHex, getDefaultNodeData, nodeTypes, nodeTypesInfo } from './utils';
+import { edgeTypes, getDefaultNodeData, nodeTypes, nodeTypesInfo } from './utils';
 
 interface TreeInputProps {
   children?: React.ReactNode;
@@ -46,17 +45,6 @@ function Flow({ children }: TreeInputProps) {
   const connectingNodeId = useRef<string | null>(null);
   const connectingHandleType = useRef<'source' | 'target' | null>(null);
   const newNode = useRef<{ position: XYPosition; source?: string; target?: string; type: string } | null>(null);
-
-  /**
-   * Handles graph initialization, including assigning node colors if needed.
-   */
-  const onInit: OnInit = (reactFlow) => {
-    reactFlow.getNodes().forEach((node) => {
-      if (node.data.nodeColor === undefined) {
-        node.data.nodeColor = generateRandomColorHex();
-      }
-    });
-  };
 
   /**
    * Handles the start of connecting two nodes.
@@ -351,7 +339,6 @@ function Flow({ children }: TreeInputProps) {
           <ReactFlow
             nodes={graph.nodes}
             edges={graph.edges}
-            onInit={onInit}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             nodeTypes={nodeTypes}
