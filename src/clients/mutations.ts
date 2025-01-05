@@ -123,7 +123,6 @@ export const UPDATE_INQUIRY_OWNERS = gql`
   mutation updateInquiryOwners($id: ID!, $owners: [String!]!) {
     updateInquiryOwners(id: $id, owners: $owners) {
       id
-      data
       createdAt
       updatedAt
     }
