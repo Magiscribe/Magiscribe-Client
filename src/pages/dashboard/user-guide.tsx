@@ -1,4 +1,4 @@
-import GenericHero from '@/components/heroes/generic-hero';
+import ContentSection from '@/components/content-section';
 import { useSetTitle } from '@/hooks/title-hook';
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -96,15 +96,34 @@ export default function UserGuidePage() {
 
   return (
     <>
-      <GenericHero
-        title="User Guide"
-        subtitle="Learn about the structure of the conversation graphs that define an inquiry"
-      />
-      <div className="container mx-auto max-w-4xl px-4 mt-12">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-          {userGuide.map((faq, index) => (
-            <FAQItem key={index} question={faq.question} answer={faq.answer} />
-          ))}
+      <div className="container mx-auto mt-12 pb-16">
+        <motion.div
+          className="max-w-6xl mx-auto prose prose-invert"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <h1>User Guide</h1>
+          <ContentSection
+            content={
+              <iframe
+                className="w-full h-full aspect-video bg-indigo-700 flex flex-row rounded-2xl"
+                width="560"
+                height="315"
+                src="https://www.youtube.com/embed/45l_kHRTmdY?si=DQZnYOwZOL1qih1N"
+                title="YouTube video player"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              ></iframe>
+            }
+            title="Quick Start Video"
+            description="Magiscribe allows you to create complex inquiries to collect high-quality data. Watch this video to get started."
+            reversed={false}
+          />
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+            {userGuide.map((faq, index) => (
+              <FAQItem key={index} question={faq.question} answer={faq.answer} />
+            ))}
+          </motion.div>
         </motion.div>
       </div>
     </>

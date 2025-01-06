@@ -1,11 +1,12 @@
 import { ADD_PREDICTION } from '@/clients/mutations';
 import { GET_ALL_AGENTS } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
+import Container from '@/components/container';
 import Button from '@/components/controls/button';
 import Input from '@/components/controls/input';
 import Select from '@/components/controls/select';
 import { CustomInput, CustomInputSection } from '@/components/custom-variables';
-import { AddPredictionMutation } from '@/graphql/graphql';
+import { AddPredictionMutation } from '@/graphql/types';
 import { Agent } from '@/graphql/types';
 import useElevenLabsAudio from '@/hooks/audio-player';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
@@ -192,7 +193,7 @@ export default function PlaygroundDashboard() {
 
   return (
     <>
-      <div className="bg-white dark:bg-slate-700 text-slate-700 dark:text-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl">
+      <Container>
         <h1 className="text-3xl font-bold">Playground</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-8">
           <form onSubmit={handleSubmit}>
@@ -285,7 +286,7 @@ export default function PlaygroundDashboard() {
             </code>
           </div>
         </div>
-      </div>
+      </Container>
     </>
   );
 }

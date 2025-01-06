@@ -97,6 +97,18 @@ export type CollectionInput = {
   name: Scalars['String']['input'];
 };
 
+export type ContactInput = {
+  email: Scalars['String']['input'];
+  message: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+};
+
+export type ContactResponse = {
+  __typename?: 'ContactResponse';
+  messageId?: Maybe<Scalars['String']['output']>;
+  success: Scalars['Boolean']['output'];
+};
+
 export type FloatFilter = {
   eq?: InputMaybe<Scalars['Float']['input']>;
   gt?: InputMaybe<Scalars['Float']['input']>;
@@ -183,6 +195,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   addMediaAsset?: Maybe<AddMediaAssetResponse>;
   addPrediction?: Maybe<Scalars['String']['output']>;
+  contact: ContactResponse;
   deleteAgent?: Maybe<Agent>;
   deleteCapability?: Maybe<Capability>;
   deleteCollection?: Maybe<Collection>;
@@ -207,6 +220,11 @@ export type MutationAddPredictionArgs = {
   attachments?: InputMaybe<Array<Scalars['JSONObject']['input']>>;
   subscriptionId: Scalars['ID']['input'];
   variables?: InputMaybe<Scalars['JSONObject']['input']>;
+};
+
+
+export type MutationContactArgs = {
+  input: ContactInput;
 };
 
 
@@ -285,6 +303,7 @@ export type MutationUpsertInquiryResponseArgs = {
   fields?: InputMaybe<Array<Scalars['String']['input']>>;
   id?: InputMaybe<Scalars['ID']['input']>;
   inquiryId: Scalars['ID']['input'];
+  threadId: Scalars['ID']['input'];
 };
 
 
@@ -339,6 +358,7 @@ export type Query = {
   getInquiryResponse?: Maybe<InquiryResponse>;
   getInquiryResponseCount: Scalars['Int']['output'];
   getInquiryResponses?: Maybe<Array<InquiryResponse>>;
+  getInquiryTemplates: Array<Scalars['JSONObject']['output']>;
   getMediaAsset?: Maybe<Scalars['String']['output']>;
   getPrompt?: Maybe<Prompt>;
   getUsersByEmail?: Maybe<Array<Maybe<UserData>>>;
@@ -558,6 +578,7 @@ export type DeleteInquiryMutation = { __typename?: 'Mutation', deleteInquiry?: {
 
 export type CreateInquiryResponseMutationVariables = Exact<{
   inquiryId: Scalars['ID']['input'];
+  threadId: Scalars['ID']['input'];
   data: Scalars['JSONObject']['input'];
 }>;
 
@@ -567,6 +588,7 @@ export type CreateInquiryResponseMutation = { __typename?: 'Mutation', upsertInq
 export type UpdateInquiryResponseMutationVariables = Exact<{
   id?: InputMaybe<Scalars['ID']['input']>;
   inquiryId: Scalars['ID']['input'];
+  threadId: Scalars['ID']['input'];
   data: Scalars['JSONObject']['input'];
   fields?: InputMaybe<Array<Scalars['String']['input']> | Scalars['String']['input']>;
 }>;
@@ -600,6 +622,13 @@ export type RegisterUserMutationVariables = Exact<{ [key: string]: never; }>;
 
 
 export type RegisterUserMutation = { __typename?: 'Mutation', registerUser: boolean };
+
+export type SendContactMutationVariables = Exact<{
+  input: ContactInput;
+}>;
+
+
+export type SendContactMutation = { __typename?: 'Mutation', contact: { __typename?: 'ContactResponse', success: boolean, messageId?: string | null } };
 
 export type GetAllModelsQueryVariables = Exact<{ [key: string]: never; }>;
 

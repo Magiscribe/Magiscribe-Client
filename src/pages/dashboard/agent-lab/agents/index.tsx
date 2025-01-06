@@ -1,5 +1,6 @@
 import { ADD_UPDATE_AGENT, DELETE_AGENT } from '@/clients/mutations';
 import { GET_ALL_AGENTS } from '@/clients/queries';
+import Container from '@/components/container';
 import Button from '@/components/controls/button';
 import ConfirmationModal from '@/components/modals/confirm-modal';
 import { GetAllAgentsQuery, UpsertAgentMutation } from '@/graphql/graphql';
@@ -128,7 +129,7 @@ export default function AgentDashboard() {
   };
 
   return (
-    <div className="bg-white dark:bg-slate-700 text-slate-700 dark:text-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl">
+    <Container>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Agents</h1>
         <Button as={Link} to="edit">
@@ -148,6 +149,6 @@ export default function AgentDashboard() {
           </motion.div>
         ))}
       </div>
-    </div>
+    </Container>
   );
 }
