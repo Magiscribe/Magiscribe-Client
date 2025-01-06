@@ -1,5 +1,5 @@
 import { GraphNode, NodeVisitAnalysisData } from '@/types/conversation';
-import { useMemo, type FC } from 'react';
+import { FC, useMemo } from 'react';
 
 interface UserResponsesProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -12,7 +12,7 @@ interface UserResponsesProps {
  */
 const ResponseContent: FC<{
   responseText?: string;
-  ratings?: number[];
+  ratings?: string[];
 }> = ({ responseText, ratings = [] }) => (
   <p className="text-slate-700 dark:text-white">
     {responseText && <span>{responseText}</span>}
@@ -34,7 +34,7 @@ const NodeContent: FC<{ node: NodeVisitAnalysisData }> = ({ node }) => (
     {node?.data?.response && (
       <>
         <hr className="my-2 border-slate-300 dark:border-slate-600" />
-        <ResponseContent responseText={node.data.response.text} ratings={node.data.response.ratings?.map(Number)} />
+        <ResponseContent responseText={node.data.response.text} ratings={node.data.response.ratings} />
       </>
     )}
   </>
