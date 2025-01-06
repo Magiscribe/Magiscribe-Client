@@ -242,9 +242,11 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
         const result = await createResponse({
           variables: {
             inquiryId: id,
+            subscriptionId,
             data: {
               status: InquiryResponseStatus.Pending,
               userDetails,
+              history: graphRef.current.getNodeHistory(),
             },
           },
         });
@@ -253,9 +255,11 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
         await updateResponse({
           variables: {
             id: inquiryResponseIdRef.current,
+            subscriptionId,
             inquiryId: id,
             data: {
               status: isEndNode ? InquiryResponseStatus.Completed : InquiryResponseStatus.InProgress,
+              history: graphRef.current.getNodeHistory(),
             },
           },
         });

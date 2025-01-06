@@ -27,8 +27,8 @@ const documents = {
     "\n  mutation createInquiry($data: JSONObject!) {\n    upsertInquiry(data: $data) {\n      id\n      createdAt\n      updatedAt\n    }\n  }\n": types.CreateInquiryDocument,
     "\n  mutation updateInquiry($id: ID!, $data: JSONObject!, $fields: [String!]) {\n    upsertInquiry(id: $id, data: $data, fields: $fields) {\n      id\n      createdAt\n      updatedAt\n    }\n  }\n": types.UpdateInquiryDocument,
     "\n  mutation deleteInquiry($id: ID!) {\n    deleteInquiry(id: $id) {\n      id\n    }\n  }\n": types.DeleteInquiryDocument,
-    "\n  mutation createInquiryResponse($inquiryId: ID!, $threadId: ID!, $data: JSONObject!) {\n    upsertInquiryResponse(inquiryId: $inquiryId, threadId: $threadId, data: $data) {\n      id\n    }\n  }\n": types.CreateInquiryResponseDocument,
-    "\n  mutation updateInquiryResponse($id: ID, $inquiryId: ID!, $threadId: ID!, $data: JSONObject!, $fields: [String!]) {\n    upsertInquiryResponse(id: $id, inquiryId: $inquiryId, threadId: $threadId, data: $data, fields: $fields) {\n      id\n    }\n  }\n": types.UpdateInquiryResponseDocument,
+    "\n  mutation createInquiryResponse($inquiryId: ID!, $subscriptionId: ID!, $data: JSONObject!) {\n    upsertInquiryResponse(inquiryId: $inquiryId, subscriptionId: $subscriptionId, data: $data) {\n      id\n    }\n  }\n": types.CreateInquiryResponseDocument,
+    "\n  mutation updateInquiryResponse($id: ID, $inquiryId: ID!, $subscriptionId: ID!, $data: JSONObject!, $fields: [String!]) {\n    upsertInquiryResponse(id: $id, inquiryId: $inquiryId, subscriptionId: $subscriptionId, data: $data, fields: $fields) {\n      id\n    }\n  }\n": types.UpdateInquiryResponseDocument,
     "\n  mutation deleteInquiryResponse($id: ID!, $inquiryId: ID!) {\n    deleteInquiryResponse(id: $id, inquiryId: $inquiryId) {\n      id\n    }\n  }\n": types.DeleteInquiryResponseDocument,
     "\n  mutation upsertCollection($input: CollectionInput!) {\n    upsertCollection(input: $input) {\n      id\n      name\n    }\n  }\n": types.UpsertCollectionDocument,
     "\n  mutation deleteCollection($collectionId: ID!) {\n    deleteCollection(collectionId: $collectionId) {\n      id\n    }\n  }\n": types.DeleteCollectionDocument,
@@ -123,11 +123,11 @@ export function gql(source: "\n  mutation deleteInquiry($id: ID!) {\n    deleteI
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  mutation createInquiryResponse($inquiryId: ID!, $threadId: ID!, $data: JSONObject!) {\n    upsertInquiryResponse(inquiryId: $inquiryId, threadId: $threadId, data: $data) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation createInquiryResponse($inquiryId: ID!, $threadId: ID!, $data: JSONObject!) {\n    upsertInquiryResponse(inquiryId: $inquiryId, threadId: $threadId, data: $data) {\n      id\n    }\n  }\n"];
+export function gql(source: "\n  mutation createInquiryResponse($inquiryId: ID!, $subscriptionId: ID!, $data: JSONObject!) {\n    upsertInquiryResponse(inquiryId: $inquiryId, subscriptionId: $subscriptionId, data: $data) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation createInquiryResponse($inquiryId: ID!, $subscriptionId: ID!, $data: JSONObject!) {\n    upsertInquiryResponse(inquiryId: $inquiryId, subscriptionId: $subscriptionId, data: $data) {\n      id\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  mutation updateInquiryResponse($id: ID, $inquiryId: ID!, $threadId: ID!, $data: JSONObject!, $fields: [String!]) {\n    upsertInquiryResponse(id: $id, inquiryId: $inquiryId, threadId: $threadId, data: $data, fields: $fields) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation updateInquiryResponse($id: ID, $inquiryId: ID!, $threadId: ID!, $data: JSONObject!, $fields: [String!]) {\n    upsertInquiryResponse(id: $id, inquiryId: $inquiryId, threadId: $threadId, data: $data, fields: $fields) {\n      id\n    }\n  }\n"];
+export function gql(source: "\n  mutation updateInquiryResponse($id: ID, $inquiryId: ID!, $subscriptionId: ID!, $data: JSONObject!, $fields: [String!]) {\n    upsertInquiryResponse(id: $id, inquiryId: $inquiryId, subscriptionId: $subscriptionId, data: $data, fields: $fields) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation updateInquiryResponse($id: ID, $inquiryId: ID!, $subscriptionId: ID!, $data: JSONObject!, $fields: [String!]) {\n    upsertInquiryResponse(id: $id, inquiryId: $inquiryId, subscriptionId: $subscriptionId, data: $data, fields: $fields) {\n      id\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

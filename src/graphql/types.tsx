@@ -303,7 +303,7 @@ export type MutationUpsertInquiryResponseArgs = {
   fields?: InputMaybe<Array<Scalars['String']['input']>>;
   id?: InputMaybe<Scalars['ID']['input']>;
   inquiryId: Scalars['ID']['input'];
-  threadId: Scalars['ID']['input'];
+  subscriptionId: Scalars['ID']['input'];
 };
 
 
@@ -578,7 +578,7 @@ export type DeleteInquiryMutation = { __typename?: 'Mutation', deleteInquiry?: {
 
 export type CreateInquiryResponseMutationVariables = Exact<{
   inquiryId: Scalars['ID']['input'];
-  threadId: Scalars['ID']['input'];
+  subscriptionId: Scalars['ID']['input'];
   data: Scalars['JSONObject']['input'];
 }>;
 
@@ -588,7 +588,7 @@ export type CreateInquiryResponseMutation = { __typename?: 'Mutation', upsertInq
 export type UpdateInquiryResponseMutationVariables = Exact<{
   id?: InputMaybe<Scalars['ID']['input']>;
   inquiryId: Scalars['ID']['input'];
-  threadId: Scalars['ID']['input'];
+  subscriptionId: Scalars['ID']['input'];
   data: Scalars['JSONObject']['input'];
   fields?: InputMaybe<Array<Scalars['String']['input']> | Scalars['String']['input']>;
 }>;
