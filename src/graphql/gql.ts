@@ -51,6 +51,7 @@ const documents = {
     "\n  query getMediaAsset($id: String!) {\n    getMediaAsset(id: $id)\n  }\n": types.GetMediaAssetDocument,
     "\n  query getAllCollections {\n    getAllCollections {\n      id\n      name\n    }\n  }\n": types.GetAllCollectionsDocument,
     "\n  query isUserRegistered {\n    isUserRegistered\n  }\n": types.IsUserRegisteredDocument,
+    "\n  query getInquiryTemplates {\n    getInquiryTemplates\n  }\n": types.GetInquiryTemplatesDocument,
     "\n  subscription predictionAdded($subscriptionId: ID!) {\n    predictionAdded(subscriptionId: $subscriptionId) {\n      id\n      subscriptionId\n      result\n      type\n    }\n  }\n": types.PredictionAddedDocument,
 };
 
@@ -216,6 +217,10 @@ export function gql(source: "\n  query getAllCollections {\n    getAllCollection
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  query isUserRegistered {\n    isUserRegistered\n  }\n"): (typeof documents)["\n  query isUserRegistered {\n    isUserRegistered\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query getInquiryTemplates {\n    getInquiryTemplates\n  }\n"): (typeof documents)["\n  query getInquiryTemplates {\n    getInquiryTemplates\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

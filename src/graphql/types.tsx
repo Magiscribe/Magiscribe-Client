@@ -740,6 +740,11 @@ export type IsUserRegisteredQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type IsUserRegisteredQuery = { __typename?: 'Query', isUserRegistered: boolean };
 
+export type GetInquiryTemplatesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetInquiryTemplatesQuery = { __typename?: 'Query', getInquiryTemplates: Array<any> };
+
 export type PredictionAddedSubscriptionVariables = Exact<{
   subscriptionId: Scalars['ID']['input'];
 }>;
