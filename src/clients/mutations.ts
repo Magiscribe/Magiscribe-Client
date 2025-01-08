@@ -128,16 +128,28 @@ export const DELETE_INQUIRY = gql`
 `;
 
 export const CREATE_INQUIRY_RESPONSE = gql`
-  mutation createInquiryResponse($inquiryId: ID!, $data: JSONObject!) {
-    upsertInquiryResponse(inquiryId: $inquiryId, data: $data) {
+  mutation createInquiryResponse($inquiryId: ID!, $subscriptionId: ID!, $data: JSONObject!) {
+    upsertInquiryResponse(inquiryId: $inquiryId, subscriptionId: $subscriptionId, data: $data) {
       id
     }
   }
 `;
 
 export const UPDATE_INQUIRY_RESPONSE = gql`
-  mutation updateInquiryResponse($id: ID, $inquiryId: ID!, $data: JSONObject!, $fields: [String!]) {
-    upsertInquiryResponse(id: $id, inquiryId: $inquiryId, data: $data, fields: $fields) {
+  mutation updateInquiryResponse(
+    $id: ID
+    $inquiryId: ID!
+    $subscriptionId: ID!
+    $data: JSONObject!
+    $fields: [String!]
+  ) {
+    upsertInquiryResponse(
+      id: $id
+      inquiryId: $inquiryId
+      subscriptionId: $subscriptionId
+      data: $data
+      fields: $fields
+    ) {
       id
     }
   }
@@ -171,5 +183,14 @@ export const DELETE_COLLECTION = gql`
 export const REGISTER_USER = gql`
   mutation registerUser {
     registerUser
+  }
+`;
+
+export const SEND_CONTACT = gql`
+  mutation sendContact($input: ContactInput!) {
+    contact(input: $input) {
+      success
+      messageId
+    }
   }
 `;

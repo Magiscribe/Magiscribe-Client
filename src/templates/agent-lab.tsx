@@ -12,6 +12,7 @@ import { Outlet, useNavigate, useParams } from 'react-router-dom';
 
 import LinkCard from '../components/cards/card';
 import { useSetTitle } from '../hooks/title-hook';
+import Container from '@/components/container';
 
 export default function AgentLabTemplate() {
   useSetTitle()('Agent Lab');
@@ -87,7 +88,7 @@ export default function AgentLabTemplate() {
           />
         </motion.div>
       )}
-      <div className="my-8 bg-white dark:bg-slate-700 p-6 rounded-2xl flex flex-col gap-4">
+      <Container>
         <Select
           label="Collection"
           subLabel="A collection is a logical grouping of agents, capabilities, and prompts."
@@ -105,7 +106,7 @@ export default function AgentLabTemplate() {
             Delete Collection
           </Button>
         </div>
-      </div>
+      </Container>
       <Outlet />
 
       <ModalUpsertCollection open={createCollectionModalOpen} onClose={() => setCreateCollectionModalOpen(false)} />

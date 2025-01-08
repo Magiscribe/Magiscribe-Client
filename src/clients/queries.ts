@@ -246,3 +246,9 @@ export const IS_USER_REGISTERED = gql`
     isUserRegistered
   }
 `;
+
+export const GET_TEMPLATES = gql`
+  query getInquiryTemplates {
+    getInquiryTemplates
+  }
+`;

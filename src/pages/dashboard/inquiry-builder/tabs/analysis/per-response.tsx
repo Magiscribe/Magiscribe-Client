@@ -1,6 +1,7 @@
 import { ADD_PREDICTION, DELETE_INQUIRY_RESPONSE } from '@/clients/mutations';
 import { GET_INQUIRIES_RESPONSES, GET_INQUIRY } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
+import UserResponses from '@/components/analysis/user-responses';
 import Button from '@/components/controls/button';
 import ConfirmationModal from '@/components/modals/confirm-modal';
 import {
@@ -18,7 +19,6 @@ import { faSpinner, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useState } from 'react';
 
-import UserResponses from '@/components/analysis/user-responses';
 import FilterControls from './filter-controls';
 
 interface PerResponseTabProps {

@@ -1,9 +1,8 @@
-import templates, { Template } from '@/assets/templates';
-import { GET_ALL_AUDIO_VOICES } from '@/clients/queries';
+import { GET_ALL_AUDIO_VOICES, GET_TEMPLATES } from '@/clients/queries';
 import GenericDisclosure from '@/components/controls/disclosure';
 import GenericRadioGroup from '@/components/controls/radio-button';
 import Select from '@/components/controls/select';
-import { GetAllAudioVoicesQuery } from '@/graphql/graphql';
+import { GetAllAudioVoicesQuery, GetInquiryTemplatesQuery } from '@/graphql/graphql';
 import useElevenLabsAudio from '@/hooks/audio-player';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
@@ -11,6 +10,7 @@ import { VOICE_LINE_SAMPLES } from '@/utils/audio/voice-line-samples';
 import { useQuery } from '@apollo/client';
 import { faPlay, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Edge, Node } from '@xyflow/react';
 import { AnimatePresence, motion } from 'motion/react';
 import React, { useEffect, useState } from 'react';
 
@@ -18,6 +18,13 @@ import Button from '../../controls/button';
 import Input from '../../controls/input';
 import Textarea from '../../controls/textarea';
 import CustomModal from '../modal';
+
+interface Template {
+  name: string;
+  description: string;
+  allowGeneration: boolean;
+  graph?: { nodes: Node[]; edges: Edge[] };
+}
 
 /**
  * Array of funny loading quotes
@@ -69,6 +76,9 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
     generatingGraph,
   } = useInquiryBuilder();
   const alert = useAddAlert();
+
+  // Templates Hook
+  const { data: templates } = useQuery<GetInquiryTemplatesQuery>(GET_TEMPLATES);
 
   // Voice Hooks
   const { data: voices } = useQuery<GetAllAudioVoicesQuery>(GET_ALL_AUDIO_VOICES);
@@ -212,7 +222,7 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
         <GenericRadioGroup<Template>
           label="Graph Template"
           subLabel="Select a template to generate a conversation graph"
-          options={templates.map((template) => ({ ...template, value: template }))}
+          options={(templates?.getInquiryTemplates ?? []).map((template) => ({ ...template, value: template }))}
           value={selectedTemplate}
           onChange={setSelectedTemplate}
           clearable

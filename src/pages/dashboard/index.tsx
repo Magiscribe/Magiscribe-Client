@@ -13,41 +13,6 @@ import { useSession } from '@clerk/clerk-react';
 import clsx from 'clsx';
 import { useEffect, useState } from 'react';
 
-const cardData = [
-  {
-    title: 'Inquiry Builder',
-    description: 'Create complex conversational flows to capture user feedback.',
-    to: '/dashboard/inquiry-builder',
-    gradient: 'indigo',
-    adminOnly: false,
-    backgroundImage: blocksImage,
-  },
-  {
-    title: 'User Guide',
-    description: 'Learn about the structure of the conversation graphs that define an inquiry',
-    to: '/dashboard/user-guide',
-    gradient: 'purple',
-    adminOnly: false,
-    backgroundImage: roadImage,
-  },
-  {
-    title: 'Agent Lab',
-    description: 'Build and manage AI agents.',
-    to: '/dashboard/agent-lab',
-    gradient: 'orange',
-    adminOnly: true,
-    backgroundImage: bondImage,
-  },
-  {
-    title: 'Contact Us',
-    description: 'Run into any issues? Contact us for help.',
-    to: '/contact',
-    gradient: 'blue',
-    adminOnly: false,
-    backgroundImage: yellImage,
-  },
-];
-
 export default function DashboardPage() {
   useSetTitle()('Dashboard');
 
@@ -57,7 +22,46 @@ export default function DashboardPage() {
   const { session } = useSession();
   const isAdmin = session?.user.organizationMemberships[0]?.role === 'org:admin';
 
-  const visibleCards = cardData.filter((card) => !card.adminOnly || isAdmin);
+  const cardData = [
+    {
+      title: 'Get Started Guide',
+      description: 'Learn how to get started with Magiscribe and build your first inquiry.',
+      to: '/dashboard/user-guide',
+      gradient: 'green',
+      visible: !isAdmin,
+      backgroundImage: roadImage,
+      span: 1,
+    },
+    {
+      title: 'Contact Us',
+      description: 'Run into any issues? Contact us for help.',
+      to: '/contact',
+      gradient: 'purple',
+      visible: !isAdmin,
+      backgroundImage: yellImage,
+      span: 1,
+    },
+    {
+      title: 'Inquiry Builder',
+      description: 'Create complex conversational flows to capture user feedback.',
+      to: '/dashboard/inquiry-builder',
+      gradient: 'blue',
+      visible: true,
+      backgroundImage: blocksImage,
+      span: 2,
+    },
+    {
+      title: 'Agent Lab',
+      description: 'Build and manage AI agents.',
+      to: '/dashboard/agent-lab',
+      gradient: 'orange',
+      visible: isAdmin,
+      backgroundImage: bondImage,
+      span: 2,
+    },
+  ];
+
+  const visibleCards = cardData.filter((card) => card.visible);
 
   useEffect(() => {
     if (registrationData && !registrationData.isUserRegistered) {
@@ -82,7 +86,7 @@ export default function DashboardPage() {
           className={clsx('grid grid-cols-1 gap-4', visibleCards.length === 1 ? 'md:grid-cols-1' : 'md:grid-cols-2')}
         >
           {visibleCards.map((card) => (
-            <div key={card.title} className={clsx('col-span-1')}>
+            <div key={card.title} className={clsx('col-span-1', card.span == 2 && 'md:col-span-2')}>
               <LinkCard
                 title={card.title}
                 description={card.description}

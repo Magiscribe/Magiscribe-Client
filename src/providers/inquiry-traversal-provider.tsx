@@ -242,6 +242,7 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
         const result = await createResponse({
           variables: {
             inquiryId: id,
+            subscriptionId,
             data: {
               status: InquiryResponseStatus.Pending,
               userDetails,
@@ -254,6 +255,7 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
         await updateResponse({
           variables: {
             id: inquiryResponseIdRef.current,
+            subscriptionId,
             inquiryId: id,
             data: {
               status: isEndNode ? InquiryResponseStatus.Completed : InquiryResponseStatus.InProgress,
