@@ -1,20 +1,22 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { GET_INQUIRIES_RESPONSES } from '@/clients/queries';
 import { GetInquiryResponsesQuery } from '@/graphql/graphql';
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import clsx from 'clsx';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import PerQuestionTab from './per-question';
 import PerResponseTab from './per-response';
 import ViaChatTab from './via-chat';
 import ExportButton from './export-button';
 import { useQuery } from '@apollo/client';
+import { useSearchParams } from 'react-router-dom';
 
 interface AnalysisTabProps {
   id: string;
 }
 
 const AnalysisTab: React.FC<AnalysisTabProps> = ({ id }) => {
+  const [searchParams] = useSearchParams();
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
 
   // Keep only the unfiltered query for export functionality
@@ -24,6 +26,12 @@ const AnalysisTab: React.FC<AnalysisTabProps> = ({ id }) => {
   });
 
   const tabs = ['Per Response', 'Per Question', 'Via Chat'];
+
+  useEffect(() => {
+    if (searchParams.has('id')) {
+      setSelectedTabIndex(tabs.indexOf('Per Response'));
+    }
+  }, [searchParams, tabs]);
 
   return (
     <div className="mt-8 rounded-2xl">
@@ -58,7 +66,7 @@ const AnalysisTab: React.FC<AnalysisTabProps> = ({ id }) => {
         <TabPanels className="mt-2">
           <TabPanel>
             <motion.div initial={{ opacity: 0, x: -100 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 100 }}>
-              <PerResponseTab id={id} />
+              <PerResponseTab id={id} defaultSelect={searchParams.get('id')} />
             </motion.div>
           </TabPanel>
           <TabPanel>

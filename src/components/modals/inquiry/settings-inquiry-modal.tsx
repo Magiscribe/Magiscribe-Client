@@ -1,8 +1,11 @@
 import { GET_ALL_AUDIO_VOICES } from '@/clients/queries';
+import Input from '@/components/controls/input';
+import Textarea from '@/components/controls/textarea';
 import { GetAllAudioVoicesQuery } from '@/graphql/types';
 import useElevenLabsAudio from '@/hooks/audio-player';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
+import { VOICE_LINE_SAMPLES } from '@/utils/audio/voice-line-samples';
 import { useQuery } from '@apollo/client';
 import { faPlay, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import React, { useState } from 'react';
@@ -12,7 +15,6 @@ import Button from '../../controls/button';
 import Select from '../../controls/select';
 import ConfirmationModal from '../confirm-modal';
 import CustomModal from '../modal';
-import { VOICE_LINE_SAMPLES } from '@/utils/audio/voice-line-samples';
 
 /**
  * Props for the ModalUpsertInquiry component
@@ -31,13 +33,13 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
   const [deleteModal, setDeleteModal] = useState(false);
 
   // Hooks
-  const { id, form, setForm, saveForm, deleteInquiry } = useInquiryBuilder();
+  const { id, setSettings, settings, saveSettings, deleteInquiry } = useInquiryBuilder();
   const alert = useAddAlert();
   const navigate = useNavigate();
 
   // Voice hooks
   const { data: voices } = useQuery<GetAllAudioVoicesQuery>(GET_ALL_AUDIO_VOICES);
-  const { addSentence, isLoading } = useElevenLabsAudio(form.voice!);
+  const { addSentence, isLoading } = useElevenLabsAudio(settings.voice);
 
   /**
    * Handle select change for the form
@@ -48,7 +50,17 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
   const handleSelectChange =
     (field: string) =>
     (e: React.ChangeEvent<HTMLSelectElement>): void => {
-      setForm({ ...form, [field]: e.target.value !== '' ? e.target.value : null });
+      setSettings({ ...settings, [field]: e.target.value !== '' ? e.target.value : null });
+    };
+
+  /**
+   * Handle input change for the form
+   * @param field - The field to update
+   */
+  const handleInputChange =
+    (field: string) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
+      setSettings({ ...settings, [field]: e.target.value });
     };
 
   /**
@@ -57,7 +69,7 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
   const handleSave = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
 
-    await saveForm(
+    await saveSettings(
       (id) => {
         alert('Inquiry saved successfully!', 'success');
         if (onSave) onSave(id as string);
@@ -107,7 +119,7 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
             name="voice"
             label="Voice"
             subLabel="This will be the voice used to read responses to the user if they have audio enabled"
-            value={form.voice ?? ''}
+            value={settings.voice ?? ''}
             onChange={handleSelectChange('voice')}
             options={
               voices?.getAllAudioVoices.map((voice) => ({
@@ -116,7 +128,6 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
               })) ?? []
             }
           />
-
           <div className="flex justify-end">
             <Button
               type="button"
@@ -129,6 +140,25 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
               Preview Voice
             </Button>
           </div>
+
+          <Textarea
+            name="globalContext"
+            label="Context (optional)"
+            subLabel="Provide any additional background information.  This helps Magiscribe to provide each survey respondent with relevant questions."
+            value={settings.context ?? ''}
+            onChange={handleInputChange('context')}
+          />
+
+          <Input
+            name="email"
+            label="Recieve Email On Response"
+            type="checkbox"
+            subLabel="Be alerted via email when someone finishes your inquiry."
+            value={String(settings.notifications?.recieveEmailOnResponse)}
+            onChange={(e) => {
+              setSettings({ ...settings, notifications: { recieveEmailOnResponse: e.target.checked } });
+            }}
+          />
         </form>
       </CustomModal>
 

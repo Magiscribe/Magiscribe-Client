@@ -1,3 +1,6 @@
+import typography from '@tailwindcss/typography';
+import forms from '@tailwindcss/forms';
+
 /** @type {import('tailwindcss').Config} */
 export default {
   darkMode: 'selector',
@@ -9,5 +12,5 @@ export default {
       display: ['Quicksand', 'sans-serif'],
     },
   },
-  plugins: [require('@tailwindcss/typography'), require('@tailwindcss/forms')],
+  plugins: [typography, forms],
 };

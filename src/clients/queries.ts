@@ -136,7 +136,20 @@ export const GET_INQUIRY = gql`
   query getInquiry($id: ID!) {
     getInquiry(id: $id) {
       id
-      data
+      data {
+        settings {
+          title
+          goals
+          voice
+          context
+          notifications {
+            recieveEmailOnResponse
+          }
+        }
+        metadata
+        graph
+        draftGraph
+      }
       createdAt
       updatedAt
     }
@@ -148,7 +161,11 @@ export const GET_INQUIRIES = gql`
     getInquiries {
       id
       userId
-      data
+      data {
+        settings {
+          title
+        }
+      }
       createdAt
       updatedAt
     }
@@ -161,7 +178,30 @@ export const GET_INQUIRIES_RESPONSES = gql`
       id
       userId
       data {
-        userDetails
+        userDetails {
+          name
+          email
+          recieveEmails
+        }
+        history
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const GET_INQUIRY_RESPONSE = gql`
+  query getInquiryResponse($id: ID!) {
+    getInquiryResponse(id: $id) {
+      id
+      userId
+      data {
+        userDetails {
+          name
+          email
+          recieveEmails
+        }
         history
       }
       createdAt
@@ -198,5 +238,17 @@ export const GET_ALL_COLLECTIONS = gql`
       id
       name
     }
+  }
+`;
+
+export const IS_USER_REGISTERED = gql`
+  query isUserRegistered {
+    isUserRegistered
+  }
+`;
+
+export const GET_TEMPLATES = gql`
+  query getInquiryTemplates {
+    getInquiryTemplates
   }
 `;

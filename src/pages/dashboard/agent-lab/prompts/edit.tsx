@@ -1,5 +1,6 @@
 import { ADD_UPDATE_PROMPT } from '@/clients/mutations';
 import { GET_PROMPT } from '@/clients/queries';
+import Container from '@/components/container';
 import Button from '@/components/controls/button';
 import Input from '@/components/controls/input';
 import Textarea from '@/components/controls/textarea';
@@ -75,7 +76,7 @@ export default function PromptEdit() {
 
   return (
     <>
-      <div className="bg-white dark:bg-slate-700 text-slate-700 dark:text-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl">
+      <Container>
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">{form.id ? 'Edit' : 'Add'} Prompt</h1>
         </div>
@@ -88,7 +89,7 @@ export default function PromptEdit() {
           </div>
           <Button>Save</Button>
         </form>
-      </div>
+      </Container>
     </>
   );
 }

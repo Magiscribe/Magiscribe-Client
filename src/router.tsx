@@ -21,6 +21,7 @@ import Main from './templates/main';
 import TermsPage from './pages/terms';
 import PrivacyPage from './pages/privacy';
 import UserGuidePage from './pages/dashboard/user-guide';
+import UserResponsePage from './pages/user-response';
 
 const router = createBrowserRouter([
   {
@@ -117,10 +118,13 @@ const router = createBrowserRouter([
   {
     path: 'inquiry',
     element: <InquiryUserTemplate />,
-    children: [{ path: ':id', element: <UserInquiryPage /> }],
+    children: [
+      { path: ':id', element: <UserInquiryPage /> },
+      { path: 'response/:id', element: <UserResponsePage /> },
+    ],
   },
   {
-    path: '/dashboard/inquiry-builder/:id',
+    path: '/dashboard/inquiry-builder/:id/:view?',
     element: <InquiryBuilderTemplate />,
     children: [{ path: '', element: <InquiryBuilderPage /> }],
   },

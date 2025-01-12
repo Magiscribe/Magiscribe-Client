@@ -1,9 +1,7 @@
 import { SignupForm } from '@/components/forms/alpha';
-import { useUser } from '@clerk/clerk-react';
-import { motion } from 'framer-motion';
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
+
 import ContentSection from '../components/content-section';
 import HomeHero from '../components/heroes/home-hero';
 import SandcastleShape from '../components/shapes/beach';
@@ -68,16 +66,7 @@ function AboutSection() {
 }
 
 function Home() {
-  const { isSignedIn } = useUser();
-  const navigate = useNavigate();
-
   useSetTitle()('');
-
-  useEffect(() => {
-    if (isSignedIn) {
-      navigate('/dashboard');
-    }
-  }, [isSignedIn]);
 
   return (
     <>

@@ -1,6 +1,6 @@
 import { Popover, PopoverButton, PopoverPanel, Transition } from '@headlessui/react';
-import { motion } from 'framer-motion';
-import React, { Fragment, useCallback, useState } from 'react';
+import { motion } from 'motion/react';
+import React, { Fragment, JSX, useCallback, useState } from 'react';
 import { usePopper } from 'react-popper';
 
 interface CustomTooltipProps {

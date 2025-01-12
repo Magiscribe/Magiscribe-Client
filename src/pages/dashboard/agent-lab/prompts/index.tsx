@@ -1,11 +1,12 @@
 import { ADD_UPDATE_PROMPT, DELETE_PROMPT } from '@/clients/mutations';
 import { GET_ALL_PROMPTS } from '@/clients/queries';
+import Container from '@/components/container';
 import Button from '@/components/controls/button';
 import ConfirmationModal from '@/components/modals/confirm-modal';
 import { Prompt } from '@/graphql/types';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useMutation, useQuery } from '@apollo/client';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -116,7 +117,7 @@ export default function PromptDashboard() {
   };
 
   return (
-    <div className="bg-white dark:bg-slate-700 text-slate-700 dark:text-white container max-w-12xl mx-auto px-4 py-8 rounded-2xl shadow-xl">
+    <Container>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Prompts</h1>
         <Button onClick={() => navigate('edit')}>Add Prompt</Button>
@@ -134,6 +135,6 @@ export default function PromptDashboard() {
           </motion.div>
         ))}
       </div>
-    </div>
+    </Container>
   );
 }

@@ -1,6 +1,6 @@
 import useAutoResizeTextareaRef from '@/hooks/auto-resize-textarea';
 import clsx from 'clsx';
-import React, { useId } from 'react';
+import React, { JSX, useId } from 'react';
 
 /**
  * Props for the Textarea component.

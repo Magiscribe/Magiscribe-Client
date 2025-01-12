@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Footer: React.FC = () => {
   return (
@@ -8,6 +9,23 @@ const Footer: React.FC = () => {
           <p className="text-sm text-white text-center md:text-left mt-4 md:mt-0">
             © {new Date().getFullYear()} Magiscribe. All rights reserved.
           </p>
+          <div className="flex gap-4 mt-2 text-sm text-white/80">
+            <Link to="/privacy" className="hover:text-white transition-colors">
+              Privacy Policy
+            </Link>
+            <span>•</span>
+            <Link to="/terms" className="hover:text-white transition-colors">
+              Terms & Conditions
+            </Link>
+            <span>•</span>
+            <Link to="/faq" className="hover:text-white transition-colors">
+              FAQ
+            </Link>
+            <span>•</span>
+            <Link to="/contact" className="hover:text-white transition-colors">
+              Contact Us
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

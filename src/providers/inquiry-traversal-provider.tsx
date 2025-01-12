@@ -8,6 +8,7 @@ import {
   PredictionType,
   UpdateInquiryResponseMutation,
 } from '@/graphql/graphql';
+import { InquiryResponseStatus, InquiryResponseUserDetails, InquirySettings } from '@/graphql/types';
 import { getAgentIdByName } from '@/utils/agents';
 import { NodeData, OptimizedNode } from '@/utils/graphs/graph';
 import { GraphManager } from '@/utils/graphs/graph-manager';
@@ -41,6 +42,7 @@ interface HandleNextNodeProps {
 interface State {
   loading: boolean;
   initialized: boolean;
+  finished: boolean;
   notFound: boolean;
   error: boolean;
 }
@@ -48,6 +50,7 @@ interface State {
 const INITIAL_STATE: State = {
   loading: false,
   initialized: false,
+  finished: false,
   notFound: false,
   error: false,
 };
@@ -64,10 +67,10 @@ interface InquiryContextType {
   onNodeUpdate: (callback: (node: OptimizedNode) => void) => void;
   onNodeError: (callback: (error: Error) => void) => void;
 
-  userDetails: { [key: string]: string };
-  setUserDetails: React.Dispatch<React.SetStateAction<{ [key: string]: string }>>;
+  userDetails: InquiryResponseUserDetails;
+  setUserDetails: React.Dispatch<React.SetStateAction<InquiryResponseUserDetails>>;
 
-  form: { [key: string]: string };
+  settings: InquirySettings;
   state: State;
 }
 
@@ -75,21 +78,26 @@ const InquiryContext = createContext<InquiryContextType | undefined>(undefined);
 
 function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProps) {
   // Refs
-  const formRef = useRef<{ [key: string]: string }>({});
+  const settingsRef = useRef<InquirySettings>({} as InquirySettings);
   const graphRef = useRef<GraphManager | null>(null);
   const inquiryResponseIdRef = useRef<string | undefined>(undefined);
+  // List of bot+user messages and responses
   const inquiryHistoryRef = useRef<string[]>([]);
+  // Just the most recent response
+  const mostRecentMessageRef = useRef<string>('');
+  // We need two refs so that we can store the whole conversation, and extract the relevant last message
 
   // Note: This is used to store the last prediction variables so that we can use them in the.
   //       We have to ignore the ESLint rule here because we can be storing any type of data.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const lastPredictionVariablesRef = useRef<any>();
+  const lastPredictionVariablesRef = useRef<any>(null);
 
   // States
-  const [userDetails, setUserDetails] = useState<{ [key: string]: string }>({});
+  const [userDetails, setUserDetails] = useState<InquiryResponseUserDetails>({});
   const [state, setState] = useState<State>({
     loading: false,
     initialized: false,
+    finished: false,
     notFound: false,
     error: false,
   });
@@ -135,11 +143,11 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
         return;
       }
 
-      const { graph, draftGraph, form } = getInquiry.data;
+      const { graph, draftGraph, settings } = getInquiry.data;
       const usedGraph = preview ? draftGraph : graph;
 
       if (usedGraph) {
-        formRef.current = form;
+        settingsRef.current = settings;
         graphRef.current = new GraphManager(usedGraph);
         setState({ ...INITIAL_STATE, initialized: true });
       } else {
@@ -204,6 +212,8 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
 
       const validNode = await graphRef.current.goToNextNode(nextNodeId);
 
+      // Case: If the condition node hallucinates, we will handle the error by passing it back to the
+      //      backend to resolve the error and find the correct node to go to next.
       if (!validNode) {
         handleError(
           new Error(
@@ -223,11 +233,18 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
         return;
       }
 
+      const isEndNode = graphRef.current.getCurrentNode()?.type === 'end';
+      if (isEndNode) {
+        setState((prev) => ({ ...prev, finished: true }));
+      }
+
       if (!inquiryResponseIdRef.current) {
         const result = await createResponse({
           variables: {
             inquiryId: id,
+            subscriptionId,
             data: {
+              status: InquiryResponseStatus.Pending,
               userDetails,
               history: graphRef.current.getNodeHistory(),
             },
@@ -238,11 +255,12 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
         await updateResponse({
           variables: {
             id: inquiryResponseIdRef.current,
+            subscriptionId,
             inquiryId: id,
             data: {
+              status: isEndNode ? InquiryResponseStatus.Completed : InquiryResponseStatus.InProgress,
               history: graphRef.current.getNodeHistory(),
             },
-            fields: ['history'],
           },
         });
       }
@@ -310,7 +328,6 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
       `Dynamic ${currentNode.type === 'question' ? 'Question' : 'Information'} Generation`,
       client,
     );
-    const mostRecentMessage = inquiryHistoryRef.current[inquiryHistoryRef.current.length - 1];
 
     // TODO: Clean this up
     lastPredictionVariablesRef.current = {
@@ -318,9 +335,9 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
       agentId,
       input: {
         userMessage: currentNode.data.text,
+        context: settingsRef.current.context,
         userDetails: `Name: ${userDetails.name}`,
         conversationHistory: inquiryHistoryRef.current.join('\n\n'),
-        mostRecentMessage,
       },
     };
     await addPrediction({
@@ -342,7 +359,6 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
     if (!graphRef.current) return;
 
     const agentId = await getAgentIdByName('Condition Node', client);
-    const mostRecentMessage = inquiryHistoryRef.current[inquiryHistoryRef.current.length - 1] || '';
 
     // TODO: Clean this up
     lastPredictionVariablesRef.current = {
@@ -359,7 +375,7 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
             .join(', ')}`,
         ].join('\n\n'),
         conversationHistory: inquiryHistoryRef.current.join('\n\n'),
-        mostRecentMessage,
+        mostRecentMessage: mostRecentMessageRef.current,
       },
     };
     await addPrediction({
@@ -374,6 +390,7 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
     };
   };
 
+  const messageCounterRef = useRef<number>(1);
   /**
    * Converts the node history into a readable conversation format
    * @returns {string} A stringified version of the conversation history
@@ -382,22 +399,41 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
     if (!node.data) return;
 
     const { type, data } = node as { type: string; data: { [key: string]: { [key: string]: string } } };
-    let conversation = '';
+    const messageParts: string[] = [];
 
+    // Process conversion data, number the messages and prepend "Bot:" and "User:"
+    // to messages to help future LLM calls distinguish between them
+    // Helps with conditions such as "If the bot has the most recent message, go to abcd" which prevents doom loops
     if (type === 'information') {
       if (data.text) {
-        conversation = `Bot: ${data.text}`;
+        const message = `${messageCounterRef.current}. Bot: ${data.text}`;
+        messageParts.push(message);
+        mostRecentMessageRef.current = message;
+        messageCounterRef.current++;
       }
     } else if (type === 'question') {
-      const parts = [
-        data.ratings && `Bot created ratings: ${JSON.stringify(data.ratings)} \n`,
-        data.text && `Bot: ${data.text} \n`,
-        data.response?.ratings && `User selected ratings: ${JSON.stringify(data.response.ratings)} \n`,
-        data.response?.text && `User: ${data.response.text} \n`,
-      ].filter(Boolean);
+      // Group bot message and ratings together
+      let botMessage = `${messageCounterRef.current}. Bot: ${data.text || ''}`;
+      if (data.ratings) {
+        botMessage += ` Bot created ratings: ${JSON.stringify(data.ratings)}`;
+      }
+      messageParts.push(botMessage);
+      mostRecentMessageRef.current = botMessage;
+      messageCounterRef.current++;
 
-      conversation = parts.join('\n');
+      // Group user message and ratings together if they exist
+      if (data.response?.text || data.response?.ratings) {
+        let userMessage = `${messageCounterRef.current}. User: ${data.response.text || ''}`;
+        if (data.response.ratings) {
+          userMessage += ` User selected ratings: ${JSON.stringify(data.response.ratings)}`;
+        }
+        messageParts.push(userMessage);
+        mostRecentMessageRef.current = userMessage;
+        messageCounterRef.current++;
+      }
     }
+
+    const conversation = messageParts.join('\n');
 
     if (conversation) {
       inquiryHistoryRef.current.push(conversation);
@@ -427,7 +463,7 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
     userDetails,
     setUserDetails,
 
-    form: formRef.current,
+    settings: settingsRef.current,
     state,
   };
 

@@ -6,7 +6,7 @@ import { faMoon, faSun, faVolumeMute, faVolumeUp } from '@fortawesome/free-solid
 import { Outlet, useParams, useSearchParams } from 'react-router-dom';
 
 function Header() {
-  const { form } = useInquiry();
+  const { settings } = useInquiry();
 
   const { isDark, toggle: toggleDarkMode } = useDarkMode();
   const { isAudioEnabled, toggleAudio } = useAudioContext();
@@ -15,11 +15,11 @@ function Header() {
     <header className="fixed w-full bg-white dark:bg-slate-800 flex items-center justify-between shadow-md">
       <div className="relative flex w-full p-4 max-w-4xl min-h-16 mx-auto items-center">
         <div className="flex items-center absolute left-4">
-          <h1 className="text-xl font-bold mx-auto text-slate-800 dark:text-white">{form.title}</h1>
+          <h1 className="text-xl font-bold mx-auto text-slate-800 dark:text-white">{settings.title}</h1>
         </div>
 
         <div className="flex items-center absolute right-4 space-x-4">
-          {form.voice && (
+          {settings.voice && (
             <Button
               onClick={toggleAudio}
               variant="transparentDark"

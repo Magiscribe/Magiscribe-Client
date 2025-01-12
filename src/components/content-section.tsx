@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 
 export default function ContentSection({
   content,
@@ -19,7 +19,7 @@ export default function ContentSection({
       viewport={{ once: true }}
       className={`flex flex-wrap ${content && reversed ? 'flex-col-reverse sm:flex-row' : ''}`}
     >
-      <div className={`w-full sm:w-3/5 p-6 mt-6 ${content && reversed ? 'order-2 sm:order-1' : ''}`}>
+      <div className={`w-full sm:w-3/5 py-6 mt-6 ${content && reversed ? 'order-2 sm:order-1' : ''}`}>
         <div className="object-cover object-center w-full h-full">{content}</div>
       </div>
       <div className={`w-${content ? 'full sm:w-2/5' : '5/6 sm:w-1/2'} p-6 ${content ? 'mt-6' : ''}`}>

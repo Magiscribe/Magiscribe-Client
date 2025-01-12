@@ -25,7 +25,7 @@ export const useQueue = <T extends object>(options: {
   const [items, setItems] = useState<T[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const queueRef = useRef<QueueItem<T>[]>([]);
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<NodeJS.Timeout>(null);
   const processingRef = useRef(false);
 
   const calculateDelay = useCallback(

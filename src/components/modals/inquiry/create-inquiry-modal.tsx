@@ -1,9 +1,8 @@
-import templates, { Template } from '@/assets/templates';
-import { GET_ALL_AUDIO_VOICES } from '@/clients/queries';
+import { GET_ALL_AUDIO_VOICES, GET_TEMPLATES } from '@/clients/queries';
 import GenericDisclosure from '@/components/controls/disclosure';
 import GenericRadioGroup from '@/components/controls/radio-button';
 import Select from '@/components/controls/select';
-import { GetAllAudioVoicesQuery } from '@/graphql/graphql';
+import { GetAllAudioVoicesQuery, GetInquiryTemplatesQuery } from '@/graphql/graphql';
 import useElevenLabsAudio from '@/hooks/audio-player';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
@@ -11,13 +10,21 @@ import { VOICE_LINE_SAMPLES } from '@/utils/audio/voice-line-samples';
 import { useQuery } from '@apollo/client';
 import { faPlay, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { AnimatePresence, motion } from 'framer-motion';
+import { Edge, Node } from '@xyflow/react';
+import { AnimatePresence, motion } from 'motion/react';
 import React, { useEffect, useState } from 'react';
 
 import Button from '../../controls/button';
 import Input from '../../controls/input';
 import Textarea from '../../controls/textarea';
 import CustomModal from '../modal';
+
+interface Template {
+  name: string;
+  description: string;
+  allowGeneration: boolean;
+  graph?: { nodes: Node[]; edges: Edge[] };
+}
 
 /**
  * Array of funny loading quotes
@@ -58,13 +65,24 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
   const [loadingQuote, setLoadingQuote] = useState(conversationGraphLoadingQuotes[0]);
 
   // Hooks
-  const { id, form, setForm, generateGraph, setGraph, onGraphGenerationCompleted, saveFormAndGraph, generatingGraph } =
-    useInquiryBuilder();
+  const {
+    id,
+    settings,
+    setSettings,
+    generateGraph,
+    setGraph,
+    onGraphGenerationCompleted,
+    saveSettingsAndGraph,
+    generatingGraph,
+  } = useInquiryBuilder();
   const alert = useAddAlert();
+
+  // Templates Hook
+  const { data: templates } = useQuery<GetInquiryTemplatesQuery>(GET_TEMPLATES);
 
   // Voice Hooks
   const { data: voices } = useQuery<GetAllAudioVoicesQuery>(GET_ALL_AUDIO_VOICES);
-  const { addSentence, isLoading: isVoicePreviewLoading } = useElevenLabsAudio(form.voice!);
+  const { addSentence, isLoading: isVoicePreviewLoading } = useElevenLabsAudio(settings.voice!);
 
   /*================================ SIDE EFFECTS ==============================*/
 
@@ -93,20 +111,20 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
    */
   useEffect(() => {
     if (voices) {
-      if (!form.voice) {
-        setForm({ ...form, voice: voices.getAllAudioVoices[0].id });
+      if (!settings.voice) {
+        setSettings({ ...settings, voice: voices.getAllAudioVoices[0].id });
       }
     }
-  }, [voices, form, setForm]);
+  }, [voices, settings, setSettings]);
 
   /**
-   * Save the form and graph once the graph generation is completed
+   * Save the settings and graph once the graph generation is completed
    */
   useEffect(() => {
     if (open) {
       onGraphGenerationCompleted?.(async () => {
         alert('Graph generated successfully!', 'success');
-        await saveFormAndGraph(
+        await saveSettingsAndGraph(
           (id) => {
             alert('Inquiry saved successfully!', 'success');
             if (onSave) onSave(id as string);
@@ -117,22 +135,24 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
         );
       });
     }
-  }, [open, onGraphGenerationCompleted, saveFormAndGraph, alert, onSave]);
+  }, [open, onGraphGenerationCompleted, saveSettingsAndGraph, alert, onSave]);
 
   /*================================ EVENT HANDLERS ==============================*/
 
   /**
-   * Handle input change for the form
+   * Handle input change for the settings
    * @param field - The field to update
    */
   const handleInputChange =
     (field: string) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
-      setForm({ ...form, [field]: e.target.value });
+      const { type, checked, value } = e.target as HTMLInputElement;
+      const inputValue = type === 'checkbox' ? checked : value;
+      setSettings({ ...settings, [field]: inputValue });
     };
 
   /**
-   * Handle input key down for the form
+   * Handle input key down for the settings
    * @param e
    */
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -143,7 +163,7 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
   };
 
   /**
-   * Handle select change for the form
+   * Handle select change for the settings
    * @param field - The field to update
    * @param e - The change event
    * @returns void
@@ -151,7 +171,7 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
   const handleSelectChange =
     (field: string) =>
     (e: React.ChangeEvent<HTMLSelectElement>): void => {
-      setForm({ ...form, [field]: e.target.value });
+      setSettings({ ...settings, [field]: e.target.value });
     };
 
   /**
@@ -167,20 +187,20 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
   const handleSave = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
 
-    if (form.goals.trim() === '' && !(selectedTemplate && !selectedTemplate?.allowGeneration)) {
+    if (settings.goals.trim() === '' && !(selectedTemplate && !selectedTemplate?.allowGeneration)) {
       alert('Please enter some goals for the inquiry', 'error');
       return;
     }
 
     if (selectedTemplate && selectedTemplate?.allowGeneration) {
-      generateGraph(true, form.goals);
+      generateGraph(true, settings.goals);
       return;
     } else if (!selectedTemplate) {
-      generateGraph(false, form.goals);
+      generateGraph(false, settings.goals);
       return;
     }
 
-    await saveFormAndGraph(
+    await saveSettingsAndGraph(
       (id) => {
         alert('Inquiry saved successfully!', 'success');
         if (onSave) onSave(id as string);
@@ -202,7 +222,7 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
         <GenericRadioGroup<Template>
           label="Graph Template"
           subLabel="Select a template to generate a conversation graph"
-          options={templates.map((template) => ({ ...template, value: template }))}
+          options={(templates?.getInquiryTemplates ?? []).map((template) => ({ ...template, value: template }))}
           value={selectedTemplate}
           onChange={setSelectedTemplate}
           clearable
@@ -213,7 +233,7 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
             name="voice"
             label="Voice"
             subLabel="This will be the voice used to read responses to the user if they have audio enabled"
-            value={form.voice ?? ''}
+            value={settings.voice ?? ''}
             onChange={handleSelectChange('voice')}
             options={
               voices?.getAllAudioVoices.map((voice) => ({
@@ -248,7 +268,7 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
           placeholder="Inquiry title"
           autoFocus
           subLabel="This will be displayed to the people you are sending the inquiry to"
-          value={form.title}
+          value={settings.title}
           onChange={handleInputChange('title')}
         />
 
@@ -256,8 +276,28 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
           name="goals"
           label="Goals"
           subLabel="Who are you trying to gain insights from and what type of information are you looking to capture?"
-          value={form.goals}
+          value={settings.goals}
           onChange={handleInputChange('goals')}
+          onKeyDown={handleInputKeyDown}
+        />
+
+        <Input
+          name="email"
+          label="Recieve Email On Response"
+          type="checkbox"
+          subLabel="Be alerted via email when someone finishes your inquiry."
+          value={String(settings.notifications?.recieveEmailOnResponse)}
+          onChange={(e) => {
+            setSettings({ ...settings, notifications: { recieveEmailOnResponse: e.target.checked } });
+          }}
+        />
+
+        <Textarea
+          name="globalContext"
+          label="Context (optional)"
+          subLabel="Provide any additional background information.  This helps Magiscribe to provide each survey respondent with relevant questions."
+          value={settings.context ?? ''}
+          onChange={handleInputChange('context')}
           onKeyDown={handleInputKeyDown}
         />
 
