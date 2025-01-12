@@ -15,6 +15,7 @@ import Button from '../../controls/button';
 import Select from '../../controls/select';
 import ConfirmationModal from '../confirm-modal';
 import CustomModal from '../modal';
+import { ModalEditOwners } from './edit-owners-modal';
 
 /**
  * Props for the ModalUpsertInquiry component
@@ -31,6 +32,8 @@ interface ModalUpsertInquiryProps {
 export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUpsertInquiryProps) {
   // State
   const [deleteModal, setDeleteModal] = useState(false);
+  const [showEditOwnersModal, setShowEditOwnersModal] = useState(false);
+  const [isConfirmDeleteOwnerModalOpen, setIsConfirmDeleteOwnerModalOpen] = useState<boolean>(false);
 
   // Hooks
   const { id, setSettings, settings, saveSettings, deleteInquiry } = useInquiryBuilder();
@@ -115,6 +118,17 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
         }
       >
         <form className="space-y-4" onSubmit={handleSave}>
+          {/* Update graph owners */}
+          <Button
+            type="button"
+            onClick={() => setShowEditOwnersModal(true)}
+            variant="secondary"
+            size="small"
+            className="w-full"
+          >
+            Edit Owners
+          </Button>
+
           <Select
             name="voice"
             label="Voice"
@@ -178,6 +192,13 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
         }}
         text="Are you sure you want to delete the inquiry?"
         confirmText="Delete Inquiry"
+      />
+
+      <ModalEditOwners
+        open={showEditOwnersModal}
+        onClose={() => setShowEditOwnersModal(false)}
+        isConfirmDeleteModalOpen={isConfirmDeleteOwnerModalOpen}
+        onDeleteOwner={() => setIsConfirmDeleteOwnerModalOpen(true)}
       />
     </>
   );

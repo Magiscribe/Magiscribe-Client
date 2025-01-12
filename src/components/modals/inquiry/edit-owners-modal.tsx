@@ -1,0 +1,149 @@
+import { GET_USERS_BY_EMAIL, GET_USERS_BY_ID } from '@/clients/queries';
+import Button from '@/components/controls/button';
+import Input from '@/components/controls/input';
+import { GetUsersByEmailQuery, GetUsersByIdQuery } from '@/graphql/graphql';
+import { UserData } from '@/graphql/types';
+import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
+import { useLazyQuery } from '@apollo/client';
+import React from 'react';
+
+import ConfirmationModal from '../confirm-modal';
+import CustomModal from '../modal';
+
+interface ModalEditOwnersProps {
+  open: boolean;
+  isConfirmDeleteModalOpen: boolean;
+  onDeleteOwner: () => void;
+  onClose: () => void;
+}
+
+const INVALID_EMAIL_INPUT_ERROR = 'Please enter a valid user email';
+const EMAIL_DOES_NOT_CORRESPOND_TO_A_VALID_USER_ERROR = 'No Magiscribe users with this email address were found.';
+
+export function ModalEditOwners(props: ModalEditOwnersProps) {
+  const [ownerDetails, setOwnerDetails] = React.useState<UserData[]>([]);
+  const [ownerEmailInput, setOwnerEmailInput] = React.useState<string>('');
+  const [getUsersById] = useLazyQuery<GetUsersByIdQuery>(GET_USERS_BY_ID);
+  const [getUsersByEmail] = useLazyQuery<GetUsersByEmailQuery>(GET_USERS_BY_EMAIL);
+  const [ownerEmailInputError, setOwnerEmailInputError] = React.useState<string>('');
+  const [ownerToDelete, setOwnerToDelete] = React.useState<string>('');
+
+  const { owners, updateOwners } = useInquiryBuilder();
+
+  React.useEffect(() => {
+    if (ownerEmailInput && !isValidOwnerEmailInput(ownerEmailInput, ownerDetails)) {
+      setOwnerEmailInputError(INVALID_EMAIL_INPUT_ERROR);
+    } else {
+      setOwnerEmailInputError('');
+    }
+  }, [ownerEmailInput]);
+
+  const onConfirmDelete = React.useCallback(() => {
+    updateOwners(owners.filter((owner) => owner !== ownerToDelete));
+    setOwnerToDelete('');
+    props.onClose();
+  }, [ownerToDelete]);
+
+  const onAddClick = React.useCallback(
+    async (ownerEmailInput: string) => {
+      const userDetails = await getUsersByEmail({
+        variables: {
+          userEmails: [ownerEmailInput],
+        },
+      });
+      const userId = userDetails?.data?.getUsersByEmail?.shift()?.id;
+      if (userId) {
+        setOwnerEmailInputError('');
+        updateOwners(owners.concat([userId]));
+      } else {
+        setOwnerEmailInputError(EMAIL_DOES_NOT_CORRESPOND_TO_A_VALID_USER_ERROR);
+      }
+    },
+    [ownerDetails],
+  );
+
+  // Fetch the email corresponding to each graph owner to disply in the edit owners UI.
+  React.useEffect(() => {
+    if (owners?.length > 0) {
+      (async () => {
+        const graphOwnerDetails = await getUsersById({
+          variables: {
+            userIds: owners,
+          },
+        });
+        setOwnerDetails(graphOwnerDetails?.data?.getUsersById as UserData[]);
+      })();
+    }
+  }, [owners]);
+
+  return (
+    <>
+      <CustomModal
+        size="3xl"
+        open={props.open}
+        onClose={props.onClose}
+        title={'Edit Owners'}
+        buttons={
+          <>
+            <Button onClick={props.onClose} variant="primary" size="medium">
+              Done
+            </Button>
+          </>
+        }
+      >
+        <p className="mb-4">Owners have full access to this inquiry and can edit, delete, and share it.</p>
+        {ownerDetails?.map((item, index) => {
+          return (
+            <div className="grid grid-cols-1" key={index}>
+              <div className="w-full flex items-center space-x-2 mb-4">
+                <Input name={item.primaryEmailAddress} value={item.primaryEmailAddress} disabled={true} />
+                <Button
+                  type="button"
+                  onClick={() => {
+                    setOwnerToDelete(item.id);
+                    props.onDeleteOwner();
+                  }}
+                  variant="inverseDanger"
+                  disabled={ownerDetails.length === 1}
+                >
+                  Remove
+                </Button>
+              </div>
+            </div>
+          );
+        })}
+        <hr className="my-4" />
+        <div className="w-full flex items-center space-x-2 mb-4">
+          <Input
+            label="Add Owner"
+            subLabel="Enter the email address of the user you would like to add as an owner"
+            name="addOwner"
+            placeholder="Your name"
+            value={ownerEmailInput}
+            onChange={(e) => {
+              setOwnerEmailInput(e.target.value);
+            }}
+            error={ownerEmailInputError}
+          />
+          <Button type="button" onClick={() => onAddClick(ownerEmailInput)} className="mt-14">
+            Add
+          </Button>
+        </div>
+      </CustomModal>
+      <ConfirmationModal
+        isOpen={props.isConfirmDeleteModalOpen}
+        onClose={props.onClose}
+        onConfirm={onConfirmDelete}
+        text="Are you sure you want to remove the inquiry owner?"
+      />
+    </>
+  );
+}
+
+// Validate the input email format and verify that the input email does not correspond to an existing owner.
+function isValidOwnerEmailInput(ownerEmailInput: string, existingOwners: UserData[]) {
+  const ownerAlreadyInList = existingOwners.find((ownerData) => ownerData.primaryEmailAddress === ownerEmailInput);
+  return (
+    ownerEmailInput !== '' && ownerEmailInput.includes('@') && ownerEmailInput.includes('.') && !ownerAlreadyInList
+  );
+}
