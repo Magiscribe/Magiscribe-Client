@@ -1,19 +1,18 @@
 import { GET_USERS_BY_EMAIL, GET_USERS_BY_ID } from '@/clients/queries';
+import Button from '@/components/controls/button';
+import Input from '@/components/controls/input';
 import { GetUsersByEmailQuery, GetUsersByIdQuery } from '@/graphql/graphql';
 import { UserData } from '@/graphql/types';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { useLazyQuery } from '@apollo/client';
 import React from 'react';
-import CustomModal from '../modal';
-import Textarea from '@/components/controls/textarea';
-import Button from '@/components/controls/button';
-import Input from '@/components/controls/input';
+
 import ConfirmationModal from '../confirm-modal';
+import CustomModal from '../modal';
 
 interface ModalEditOwnersProps {
   open: boolean;
   isConfirmDeleteModalOpen: boolean;
-  onCloseDeleteOwnerModal: () => void;
   onDeleteOwner: () => void;
   onClose: () => void;
 }
@@ -41,7 +40,7 @@ export function ModalEditOwners(props: ModalEditOwnersProps) {
   const onConfirmDelete = React.useCallback(() => {
     updateOwners(owners.filter((owner) => owner !== ownerToDelete));
     setOwnerToDelete('');
-    props.onCloseDeleteOwnerModal();
+    props.onClose();
   }, [ownerToDelete]);
 
   const onAddClick = React.useCallback(
@@ -77,35 +76,46 @@ export function ModalEditOwners(props: ModalEditOwnersProps) {
   }, [owners]);
 
   return (
-    <div>
-      <CustomModal size="3xl" open={props.open} onClose={props.onClose} title={'Edit owners'}>
+    <>
+      <CustomModal
+        size="3xl"
+        open={props.open}
+        onClose={props.onClose}
+        title={'Edit Owners'}
+        buttons={
+          <>
+            <Button onClick={props.onClose} variant="primary" size="medium">
+              Done
+            </Button>
+          </>
+        }
+      >
+        <p className="mb-4">Owners have full access to this inquiry and can edit, delete, and share it.</p>
         {ownerDetails?.map((item, index) => {
           return (
-            <div className="flex items-center space-x-2">
-              <Textarea
-                name={`graphOwner_${index}`}
-                value={item.primaryEmailAddress}
-                disabled={true}
-                className="w-full mb-2 p-1 border rounded-lg no-drag"
-                rows={1}
-              />
-              <Button
-                type="button"
-                onClick={() => {
-                  setOwnerToDelete(item.id);
-                  props.onDeleteOwner();
-                }}
-                variant="inverseDanger"
-                disabled={ownerDetails.length === 1}
-              >
-                Remove
-              </Button>
+            <div className="grid grid-cols-1" key={index}>
+              <div className="w-full flex items-center space-x-2 mb-4">
+                <Input name={item.primaryEmailAddress} value={item.primaryEmailAddress} disabled={true} />
+                <Button
+                  type="button"
+                  onClick={() => {
+                    setOwnerToDelete(item.id);
+                    props.onDeleteOwner();
+                  }}
+                  variant="inverseDanger"
+                  disabled={ownerDetails.length === 1}
+                >
+                  Remove
+                </Button>
+              </div>
             </div>
           );
         })}
-        <div>
+        <hr className="my-4" />
+        <div className="w-full flex items-center space-x-2 mb-4">
           <Input
             label="Add Owner"
+            subLabel="Enter the email address of the user you would like to add as an owner"
             name="addOwner"
             placeholder="Your name"
             value={ownerEmailInput}
@@ -114,18 +124,18 @@ export function ModalEditOwners(props: ModalEditOwnersProps) {
             }}
             error={ownerEmailInputError}
           />
-          <Button type="button" onClick={() => onAddClick(ownerEmailInput)} className="mt-4 w-full">
+          <Button type="button" onClick={() => onAddClick(ownerEmailInput)} className="mt-14">
             Add
           </Button>
         </div>
       </CustomModal>
       <ConfirmationModal
         isOpen={props.isConfirmDeleteModalOpen}
-        onClose={props.onCloseDeleteOwnerModal}
+        onClose={props.onClose}
         onConfirm={onConfirmDelete}
         text="Are you sure you want to remove the inquiry owner?"
       />
-    </div>
+    </>
   );
 }
 

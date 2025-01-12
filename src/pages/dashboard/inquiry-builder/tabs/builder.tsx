@@ -22,7 +22,8 @@ export default function InquiryBuilder() {
   const saveDebounce = useRef<NodeJS.Timeout>(null);
 
   // Hooks
-  const { graph, initialized, settings, metadata, saveGraph, saveSettings, saveMetadata, saveOwners, owners } = useInquiryBuilder();
+  const { graph, initialized, settings, metadata, saveGraph, saveSettings, saveMetadata, saveOwners, owners } =
+    useInquiryBuilder();
 
   const memoGraph = useMemo(() => ({ nodes: graph.nodes, edges: graph.edges }), [graph.nodes, graph.edges]);
 

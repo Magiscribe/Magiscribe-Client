@@ -71,7 +71,11 @@ export default function CustomModal(props: Props) {
                   </button>
                 </DialogTitle>
                 <div className="mt-2 dark:text-slate-200">{props.children}</div>
-                <div className="mt-4 flex justify-between">{props.buttons}</div>
+                <div
+                  className={`mt-4 flex ${Array.isArray(props.buttons) && props.buttons.length > 1 ? 'justify-between' : 'justify-end'}`}
+                >
+                  {props.buttons}
+                </div>
               </DialogPanel>
             </TransitionChild>
           </div>
