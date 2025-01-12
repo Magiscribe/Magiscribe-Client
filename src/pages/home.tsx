@@ -1,6 +1,5 @@
-import { SignupForm } from '@/components/forms/alpha';
+import ContactForm from '@/components/forms/contact-form';
 import { motion } from 'motion/react';
-import { Link } from 'react-router-dom';
 
 import ContentSection from '../components/content-section';
 import HomeHero from '../components/heroes/home-hero';
@@ -65,6 +64,37 @@ function AboutSection() {
   );
 }
 
+function ContactSection() {
+  return (
+    <SectionTemplate>
+      <motion.h2
+        className="w-full my-2 text-5xl font-bold leading-tight text-center"
+        initial={{ opacity: 0, x: 20 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5, delay: 0.25 }}
+        viewport={{ once: true }}
+      >
+        Get in Touch
+      </motion.h2>
+      <div className="w-full mb-4">
+        <div className="h-1 mx-auto gradient w-64 opacity-50 my-0 py-0 rounded-t"></div>
+      </div>
+      <motion.h3
+        className="w-full  my-4 text-2xl leading-tight pb-4 text-center"
+        initial={{ opacity: 0, x: 20 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5, delay: 0.25 }}
+        viewport={{ once: true }}
+      >
+        Have a question, want to schedule a demo, or learn how Magiscribe can help you? Reach out to us and we'll get
+        back to you as soon as possible!
+      </motion.h3>
+
+      <ContactForm />
+    </SectionTemplate>
+  );
+}
+
 function Home() {
   useSetTitle()('');
 
@@ -77,24 +107,9 @@ function Home() {
       </div>
 
       <AboutSection />
-
-      <a id="signup" style={{ position: 'relative', top: '-100px' }}></a>
-      <SignupForm />
+      <ContactSection />
 
       <GradientWaveBottom />
-
-      <section className="container mx-auto text-center py-6 mb-12">
-        <h2 className="w-full my-2 text-5xl font-bold leading-tight text-center text-white">Reach out to us!</h2>
-        <div className="w-full mb-4">
-          <div className="h-1 mx-auto bg-white w-1/6 opacity-50 my-0 py-0 rounded-t"></div>
-        </div>
-        <h3 className="my-4 text-2xl leading-tight pb-4">
-          Looking to learn more about Magiscribe, have a question, or just want to say hi?
-          <br />
-          Reach out to us!
-        </h3>
-        <Link to="/contact">Contact Us</Link>
-      </section>
     </>
   );
 }
