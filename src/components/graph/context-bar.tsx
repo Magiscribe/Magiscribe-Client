@@ -20,6 +20,7 @@ export default function GraphContextBar() {
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const [validationErrorsModalOpen, setValidationErrorsModalOpen] = useState(false);
   const [showEditOwnersModal, setShowEditOwnersModal] = useState(false);
+  const [isConfirmDeleteOwnerModalOpen, setIsConfirmDeleteOwnerModalOpen] = useState<boolean>(false);
 
   // Hooks
   const { id, settings, lastUpdated, setSettings, publishGraph } = useInquiryBuilder();
@@ -118,8 +119,14 @@ export default function GraphContextBar() {
       <ModalSendInquiry open={sendModalOpen} onClose={() => setSendModalOpen(false)} />
 
       <ModalValidationErrors open={validationErrorsModalOpen} onClose={() => setValidationErrorsModalOpen(false)} />
-        
-      <ModalEditOwners open={showEditOwnersModal} onClose={() => setShowEditOwnersModal(false)} />
+
+      <ModalEditOwners
+        open={showEditOwnersModal}
+        onClose={() => setShowEditOwnersModal(false)}
+        isConfirmDeleteModalOpen={isConfirmDeleteOwnerModalOpen}
+        onCloseDeleteOwnerModal={() => setIsConfirmDeleteOwnerModalOpen(false)}
+        onDeleteOwner={() => setIsConfirmDeleteOwnerModalOpen(true)}
+      />
     </>
   );
 }

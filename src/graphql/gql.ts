@@ -26,6 +26,7 @@ const documents = {
     "\n  mutation deletePrompt($promptId: ID!) {\n    deletePrompt(promptId: $promptId) {\n      id\n    }\n  }\n": types.DeletePromptDocument,
     "\n  mutation createInquiry($data: JSONObject!) {\n    upsertInquiry(data: $data) {\n      id\n      createdAt\n      updatedAt\n    }\n  }\n": types.CreateInquiryDocument,
     "\n  mutation updateInquiry($id: ID!, $data: JSONObject!, $fields: [String!]) {\n    upsertInquiry(id: $id, data: $data, fields: $fields) {\n      id\n      createdAt\n      updatedAt\n    }\n  }\n": types.UpdateInquiryDocument,
+    "\n  mutation updateInquiryOwners($id: ID!, $owners: [String!]!) {\n    updateInquiryOwners(id: $id, owners: $owners) {\n      id\n      createdAt\n      updatedAt\n    }\n  }\n": types.UpdateInquiryOwnersDocument,
     "\n  mutation deleteInquiry($id: ID!) {\n    deleteInquiry(id: $id) {\n      id\n    }\n  }\n": types.DeleteInquiryDocument,
     "\n  mutation createInquiryResponse($inquiryId: ID!, $subscriptionId: ID!, $data: JSONObject!) {\n    upsertInquiryResponse(inquiryId: $inquiryId, subscriptionId: $subscriptionId, data: $data) {\n      id\n    }\n  }\n": types.CreateInquiryResponseDocument,
     "\n  mutation updateInquiryResponse(\n    $id: ID\n    $inquiryId: ID!\n    $subscriptionId: ID!\n    $data: JSONObject!\n    $fields: [String!]\n  ) {\n    upsertInquiryResponse(\n      id: $id\n      inquiryId: $inquiryId\n      subscriptionId: $subscriptionId\n      data: $data\n      fields: $fields\n    ) {\n      id\n    }\n  }\n": types.UpdateInquiryResponseDocument,
@@ -42,7 +43,9 @@ const documents = {
     "\n  query getCapability($capabilityId: ID!) {\n    getCapability(capabilityId: $capabilityId) {\n      id\n      llmModel\n      prompts {\n        name\n        id\n        text\n      }\n      alias\n      name\n      description\n      outputMode\n      subscriptionFilter\n      outputFilter\n    }\n  }\n": types.GetCapabilityDocument,
     "\n  query getAllPrompts($logicalCollection: String) {\n    getAllPrompts(logicalCollection: $logicalCollection) {\n      id\n      name\n      text\n    }\n  }\n": types.GetAllPromptsDocument,
     "\n  query getPrompt($promptId: ID!) {\n    getPrompt(promptId: $promptId) {\n      id\n      name\n      text\n    }\n  }\n": types.GetPromptDocument,
-    "\n  query getInquiry($id: ID!) {\n    getInquiry(id: $id) {\n      id\n      data {\n        settings {\n          title\n          goals\n          voice\n          context\n          notifications {\n            recieveEmailOnResponse\n          }\n        }\n        metadata\n        graph\n        draftGraph\n      }\n      createdAt\n      updatedAt\n    }\n  }\n": types.GetInquiryDocument,
+    "\n  query getInquiry($id: ID!) {\n    getInquiry(id: $id) {\n      id\n      userId\n      data {\n        settings {\n          title\n          goals\n          voice\n          context\n          notifications {\n            recieveEmailOnResponse\n          }\n        }\n        metadata\n        graph\n        draftGraph\n      }\n      createdAt\n      updatedAt\n    }\n  }\n": types.GetInquiryDocument,
+    "\n  query getUsersById($userIds: [String!]!) {\n    getUsersById(userIds: $userIds) {\n       primaryEmailAddress\n       username\n       firstName\n       lastName\n       id\n    }\n  }\n": types.GetUsersByIdDocument,
+    "\n  query getUsersByEmail($userEmails: [String!]!) {\n    getUsersByEmail(userEmails: $userEmails) {\n       primaryEmailAddress\n       username\n       firstName\n       lastName\n       id\n    }\n  }\n": types.GetUsersByEmailDocument,
     "\n  query getInquiries {\n    getInquiries {\n      id\n      userId\n      data {\n        settings {\n          title\n        }\n      }\n      createdAt\n      updatedAt\n    }\n  }\n": types.GetInquiriesDocument,
     "\n  query getInquiryResponses($id: ID!, $filters: InquiryResponseFilters) {\n    getInquiryResponses(id: $id, filters: $filters) {\n      id\n      userId\n      data {\n        userDetails {\n          name\n          email\n          recieveEmails\n        }\n        history\n      }\n      createdAt\n      updatedAt\n    }\n  }\n": types.GetInquiryResponsesDocument,
     "\n  query getInquiryResponse($id: ID!) {\n    getInquiryResponse(id: $id) {\n      id\n      userId\n      data {\n        userDetails {\n          name\n          email\n          recieveEmails\n        }\n        history\n      }\n      createdAt\n      updatedAt\n    }\n  }\n": types.GetInquiryResponseDocument,
@@ -120,6 +123,10 @@ export function gql(source: "\n  mutation updateInquiry($id: ID!, $data: JSONObj
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "\n  mutation updateInquiryOwners($id: ID!, $owners: [String!]!) {\n    updateInquiryOwners(id: $id, owners: $owners) {\n      id\n      createdAt\n      updatedAt\n    }\n  }\n"): (typeof documents)["\n  mutation updateInquiryOwners($id: ID!, $owners: [String!]!) {\n    updateInquiryOwners(id: $id, owners: $owners) {\n      id\n      createdAt\n      updatedAt\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "\n  mutation deleteInquiry($id: ID!) {\n    deleteInquiry(id: $id) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation deleteInquiry($id: ID!) {\n    deleteInquiry(id: $id) {\n      id\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -184,7 +191,15 @@ export function gql(source: "\n  query getPrompt($promptId: ID!) {\n    getPromp
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query getInquiry($id: ID!) {\n    getInquiry(id: $id) {\n      id\n      data {\n        settings {\n          title\n          goals\n          voice\n          context\n          notifications {\n            recieveEmailOnResponse\n          }\n        }\n        metadata\n        graph\n        draftGraph\n      }\n      createdAt\n      updatedAt\n    }\n  }\n"): (typeof documents)["\n  query getInquiry($id: ID!) {\n    getInquiry(id: $id) {\n      id\n      data {\n        settings {\n          title\n          goals\n          voice\n          context\n          notifications {\n            recieveEmailOnResponse\n          }\n        }\n        metadata\n        graph\n        draftGraph\n      }\n      createdAt\n      updatedAt\n    }\n  }\n"];
+export function gql(source: "\n  query getInquiry($id: ID!) {\n    getInquiry(id: $id) {\n      id\n      userId\n      data {\n        settings {\n          title\n          goals\n          voice\n          context\n          notifications {\n            recieveEmailOnResponse\n          }\n        }\n        metadata\n        graph\n        draftGraph\n      }\n      createdAt\n      updatedAt\n    }\n  }\n"): (typeof documents)["\n  query getInquiry($id: ID!) {\n    getInquiry(id: $id) {\n      id\n      userId\n      data {\n        settings {\n          title\n          goals\n          voice\n          context\n          notifications {\n            recieveEmailOnResponse\n          }\n        }\n        metadata\n        graph\n        draftGraph\n      }\n      createdAt\n      updatedAt\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query getUsersById($userIds: [String!]!) {\n    getUsersById(userIds: $userIds) {\n       primaryEmailAddress\n       username\n       firstName\n       lastName\n       id\n    }\n  }\n"): (typeof documents)["\n  query getUsersById($userIds: [String!]!) {\n    getUsersById(userIds: $userIds) {\n       primaryEmailAddress\n       username\n       firstName\n       lastName\n       id\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query getUsersByEmail($userEmails: [String!]!) {\n    getUsersByEmail(userEmails: $userEmails) {\n       primaryEmailAddress\n       username\n       firstName\n       lastName\n       id\n    }\n  }\n"): (typeof documents)["\n  query getUsersByEmail($userEmails: [String!]!) {\n    getUsersByEmail(userEmails: $userEmails) {\n       primaryEmailAddress\n       username\n       firstName\n       lastName\n       id\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

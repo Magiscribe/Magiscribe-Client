@@ -8,10 +8,13 @@ import CustomModal from '../modal';
 import Textarea from '@/components/controls/textarea';
 import Button from '@/components/controls/button';
 import Input from '@/components/controls/input';
-import { ModalConfirmDeleteOwner } from './confirm-delete-owner-modal';
+import ConfirmationModal from '../confirm-modal';
 
 interface ModalEditOwnersProps {
   open: boolean;
+  isConfirmDeleteModalOpen: boolean;
+  onCloseDeleteOwnerModal: () => void;
+  onDeleteOwner: () => void;
   onClose: () => void;
 }
 
@@ -25,8 +28,6 @@ export function ModalEditOwners(props: ModalEditOwnersProps) {
   const [getUsersById] = useLazyQuery<GetUsersByIdQuery>(GET_USERS_BY_ID);
   const [getUsersByEmail] = useLazyQuery<GetUsersByEmailQuery>(GET_USERS_BY_EMAIL);
   const [ownerEmailInputError, setOwnerEmailInputError] = React.useState<string>('');
-
-  const [isConfirmDeleteOwnerModalOpen, setIsConfirmDeleteOwnerModalOpen] = React.useState<boolean>(false);
   const [ownerToDelete, setOwnerToDelete] = React.useState<string>('');
 
   React.useEffect(() => {
@@ -40,7 +41,7 @@ export function ModalEditOwners(props: ModalEditOwnersProps) {
   const onConfirmDelete = React.useCallback(() => {
     updateOwners(owners.filter((owner) => owner !== ownerToDelete));
     setOwnerToDelete('');
-    setIsConfirmDeleteOwnerModalOpen(false);
+    props.onCloseDeleteOwnerModal();
   }, [ownerToDelete]);
 
   const onAddClick = React.useCallback(
@@ -75,13 +76,6 @@ export function ModalEditOwners(props: ModalEditOwnersProps) {
     }
   }, [owners]);
 
-  /*
-    TODO:
-    1. Don't allow deleting the current user or the original graph owner
-    2. Confirmation before deleting user?
-    3. Migration script; Is this needed?
-    4. Send an invite if user isn't already in magiscribe
-  */
   return (
     <div>
       <CustomModal size="3xl" open={props.open} onClose={props.onClose} title={'Edit owners'}>
@@ -99,7 +93,7 @@ export function ModalEditOwners(props: ModalEditOwnersProps) {
                 type="button"
                 onClick={() => {
                   setOwnerToDelete(item.id);
-                  setIsConfirmDeleteOwnerModalOpen(true);
+                  props.onDeleteOwner();
                 }}
                 variant="inverseDanger"
                 disabled={ownerDetails.length === 1}
@@ -125,12 +119,11 @@ export function ModalEditOwners(props: ModalEditOwnersProps) {
           </Button>
         </div>
       </CustomModal>
-      <ModalConfirmDeleteOwner
-        onConfirmDelete={onConfirmDelete}
-        onClose={() => {
-          setIsConfirmDeleteOwnerModalOpen(false);
-        }}
-        open={isConfirmDeleteOwnerModalOpen}
+      <ConfirmationModal
+        isOpen={props.isConfirmDeleteModalOpen}
+        onClose={props.onCloseDeleteOwnerModal}
+        onConfirm={onConfirmDelete}
+        text="Are you sure you want to remove the inquiry owner?"
       />
     </div>
   );
