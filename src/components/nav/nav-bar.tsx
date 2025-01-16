@@ -66,7 +66,7 @@ export function NavBar({ isFixed = true }) {
             variant={isDark ? 'transparentWhiteFixed' : atTop ? 'transparentWhite' : 'transparentPrimary'}
             size="small"
             className="mr-4"
-            icon={isDark ? faSun : faMoon}
+            icon={isDark ? faMoon : faSun}
           />
           <SignedOut>
             <SignUpButton signInForceRedirectUrl="/dashboard" forceRedirectUrl="/dashboard">
