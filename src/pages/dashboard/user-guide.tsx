@@ -107,7 +107,7 @@ export default function UserGuidePage() {
           <ContentSection
             content={
               <iframe
-                className="w-full h-full aspect-video bg-indigo-700 flex flex-row rounded-2xl"
+                className="w-full h-full aspect-video bg-indigo-700 flex flex-row rounded-2xl -mt-8"
                 width="560"
                 height="315"
                 src="https://www.youtube.com/embed/45l_kHRTmdY?si=DQZnYOwZOL1qih1N"

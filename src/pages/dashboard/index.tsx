@@ -30,8 +30,8 @@ export default function DashboardPage() {
 
   const cardData = [
     {
-      title: 'Get Started Guide',
-      description: 'Learn how to get started with Magiscribe and build your first inquiry.',
+      title: 'Getting Started Guide',
+      description: "Learn how to get started with Magiscribe's Inquiry Builder and start uncovering insights.",
       to: '/dashboard/user-guide',
       gradient: 'green',
       visible: !isAdmin,
@@ -42,7 +42,7 @@ export default function DashboardPage() {
       title: 'Contact Us',
       description: 'Run into any issues? Contact us for help.',
       to: '/contact',
-      gradient: 'purple',
+      gradient: 'blue',
       visible: !isAdmin,
       backgroundImage: yellImage,
       span: 1,
@@ -51,7 +51,7 @@ export default function DashboardPage() {
       title: 'Inquiry Builder',
       description: 'Create complex conversational flows to capture user feedback.',
       to: '/dashboard/inquiry-builder',
-      gradient: 'blue',
+      gradient: 'purple',
       visible: true,
       backgroundImage: blocksImage,
       span: 2,
@@ -82,11 +82,14 @@ export default function DashboardPage() {
 
   return (
     <>
-      <GenericHero title={user ? `${user.firstName}, welcome to Magiscribe!` : 'Welcome to Magiscribe!'} />
+      <GenericHero
+        title={user ? `${user.firstName}, welcome to Magiscribe!` : 'Welcome to Magiscribe!'}
+        subtitle="Get started turning dialogue into discoveries."
+      />
       <hr className="my-8" />
       <div className="space-y-4">
         <div
-          className={clsx('grid grid-cols-1 gap-4', visibleCards.length === 1 ? 'md:grid-cols-1' : 'md:grid-cols-2')}
+          className={clsx('grid grid-cols-1 gap-6', visibleCards.length === 1 ? 'md:grid-cols-1' : 'md:grid-cols-2')}
         >
           {visibleCards.map((card) => (
             <div key={card.title} className={clsx('col-span-1', card.span == 2 && 'md:col-span-2')}>
