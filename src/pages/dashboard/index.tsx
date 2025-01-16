@@ -9,18 +9,24 @@ import GenericHero from '@/components/heroes/generic-hero';
 import WelcomeModal from '@/components/modals/welcome-modal';
 import { useSetTitle } from '@/hooks/title-hook';
 import { useMutation, useQuery } from '@apollo/client';
-import { useSession } from '@clerk/clerk-react';
+import { useUser } from '@clerk/clerk-react';
 import clsx from 'clsx';
 import { useEffect, useState } from 'react';
 
 export default function DashboardPage() {
   useSetTitle()('Dashboard');
 
+  // States
+  const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false);
+
+  // Queries and mutations
   const { data: registrationData } = useQuery(IS_USER_REGISTERED);
   const [registerUser] = useMutation(REGISTER_USER);
-  const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false);
-  const { session } = useSession();
-  const isAdmin = session?.user.organizationMemberships[0]?.role === 'org:admin';
+
+  // Hooks
+  const { user } = useUser();
+
+  const isAdmin = user?.organizationMemberships[0]?.role === 'org:admin';
 
   const cardData = [
     {
@@ -76,10 +82,7 @@ export default function DashboardPage() {
 
   return (
     <>
-      <GenericHero
-        title="Welcome to Magiscribe!"
-        subtitle="We are excited to have you here. We appreciate your patience and understanding as we actively develop this project to best meet your needs."
-      />
+      <GenericHero title={user ? `${user.firstName}, welcome to Magiscribe!` : 'Welcome to Magiscribe!'} />
       <hr className="my-8" />
       <div className="space-y-4">
         <div

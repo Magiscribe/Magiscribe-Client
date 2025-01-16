@@ -2,7 +2,7 @@ import { motion } from 'motion/react';
 
 interface GenericHeroProps {
   title: string;
-  subtitle: string;
+  subtitle?: string;
 }
 
 export default function GenericHero({ title, subtitle }: GenericHeroProps) {
@@ -17,14 +17,16 @@ export default function GenericHero({ title, subtitle }: GenericHeroProps) {
         >
           {title}
         </motion.h1>
-        <motion.p
-          className="leading-normal text-xl md:text-2xl mb-4"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.25 }}
-        >
-          {subtitle}
-        </motion.p>
+        {subtitle && (
+          <motion.p
+            className="leading-normal text-xl md:text-2xl mb-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.25 }}
+          >
+            {subtitle}
+          </motion.p>
+        )}
       </div>
     </div>
   );
