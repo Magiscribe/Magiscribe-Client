@@ -22,13 +22,14 @@ const sanitizeText = (text: string): string => {
  * @param response {{ text: string; ratings?: string[] | null }} - The response object containing text and optional ratings
  * @returns {string} - A formatted string combining ratings and text
  */
-const formatRatingResponse = (response: { text: string; ratings?: string[] | null }): string => {
-  if (!response.ratings || response.ratings.length === 0) {
-    return sanitizeText(response.text);
-  }
+const formatRatingResponse = (response?: { text: string; ratings?: string[] | null }): string => {
+  if (!response) return '';
 
-  const textPart = sanitizeText(response.text);
-  const ratingPart = response.ratings.join(' - ');
+  const text = response.text || '';
+  const ratings = response.ratings || [];
+
+  const textPart = sanitizeText(text);
+  const ratingPart = ratings.join(' - ');
 
   if (textPart) {
     return `${ratingPart} - ${textPart}`;
