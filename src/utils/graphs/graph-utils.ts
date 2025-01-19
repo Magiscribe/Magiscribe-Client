@@ -273,8 +273,15 @@ export function validateGraph(graph: StrippedGraph): { valid: boolean; errors: s
             `Condition node "${id}" needs at least two paths to choose from. Make sure all nodes mentioned in this condition's text exist. You can fix this by adding another connection, creating a new node to connect to, or removing this condition if it's not needed.`,
           );
         }
-        // Check if condition node has a condition
-        if (!node.data.text) {
+
+        // Check if condition node has a condition.
+        // Note: We have to as any here because the type of node.data.conditions is not inferred correctly on account
+        //       of the library we are using for the graph editor.
+        if (
+          (node.data.conditions as { to: string; condition: string }[]).some(
+            (cond: { to: string; condition: string }) => cond.condition == '',
+          )
+        ) {
           errors.push(
             `Condition node "${id}" is missing its decision criteria. Please add a condition to specify how the flow should branch.`,
           );

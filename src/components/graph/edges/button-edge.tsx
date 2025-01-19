@@ -12,6 +12,9 @@ interface EdgeProps {
   sourcePosition: Position;
   targetPosition: Position;
   markerEnd?: string;
+  data?: {
+    color?: string;
+  };
 }
 
 export default function ButtonEdge({
@@ -23,6 +26,7 @@ export default function ButtonEdge({
   sourcePosition,
   targetPosition,
   markerEnd,
+  data,
 }: EdgeProps) {
   const { setEdges } = useReactFlow();
 
@@ -48,7 +52,7 @@ export default function ButtonEdge({
         style={{
           strokeWidth: 4,
           strokeLinecap: 'butt',
-          stroke: colors.slate[200],
+          stroke: data?.color ? data.color : colors.slate[200],
         }}
       />
       <EdgeLabelRenderer>
