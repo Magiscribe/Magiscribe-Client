@@ -1,4 +1,5 @@
 import { GET_USERS_BY_EMAIL, GET_USERS_BY_ID } from '@/clients/queries';
+import { useNavigate } from "react-router-dom";
 import Button from '@/components/controls/button';
 import Input from '@/components/controls/input';
 import { GetUsersByEmailQuery, GetUsersByIdQuery } from '@/graphql/graphql';
@@ -9,39 +10,57 @@ import React from 'react';
 
 import ConfirmationModal from '../confirm-modal';
 import CustomModal from '../modal';
+import { useUser } from '@clerk/clerk-react';
 
 interface ModalEditOwnersProps {
   open: boolean;
   isConfirmDeleteModalOpen: boolean;
   onDeleteOwner: () => void;
   onClose: () => void;
+  onCloseConfirmDeleteOwnerModal: () => void;
 }
 
-const INVALID_EMAIL_INPUT_ERROR = 'Please enter a valid user email';
-const EMAIL_DOES_NOT_CORRESPOND_TO_A_VALID_USER_ERROR = 'No Magiscribe users with this email address were found.';
+const EMAIL_VALIDATION_ERRORS = {
+  INVALID_EMAIL_INPUT_ERROR: 'Please enter a valid user email',
+  DUPLICATE_USER_ERROR: 'The user you entered already has access to this inquiry.',
+  EMAIL_DOES_NOT_CORRESPOND_TO_A_VALID_USER_ERROR: 'No Magiscribe users with this email address were found.',
+}
+
+const REMOVE_SELF_FROM_INQUIRY_CONFIRMATION = "You are about to remove yourself from the owners list of this inquiry.  You will no longer have access to edit this inquiry.  Are you sure you want to continue?"
 
 export function ModalEditOwners(props: ModalEditOwnersProps) {
+  const navigate = useNavigate();
+  // Get the current Clerk user
+  const currentUser = useUser();
   const [ownerDetails, setOwnerDetails] = React.useState<UserData[]>([]);
   const [ownerEmailInput, setOwnerEmailInput] = React.useState<string>('');
   const [getUsersById] = useLazyQuery<GetUsersByIdQuery>(GET_USERS_BY_ID);
   const [getUsersByEmail] = useLazyQuery<GetUsersByEmailQuery>(GET_USERS_BY_EMAIL);
   const [ownerEmailInputError, setOwnerEmailInputError] = React.useState<string>('');
-  const [ownerToDelete, setOwnerToDelete] = React.useState<string>('');
+  const [ownerToDelete, setOwnerToDelete] = React.useState<UserData>();
 
   const { owners, updateOwners } = useInquiryBuilder();
 
   React.useEffect(() => {
-    if (ownerEmailInput && !isValidOwnerEmailInput(ownerEmailInput, ownerDetails)) {
-      setOwnerEmailInputError(INVALID_EMAIL_INPUT_ERROR);
-    } else {
-      setOwnerEmailInputError('');
+    setOwnerEmailInputError('');
+    if (!!ownerEmailInput) {
+      if (!isValidEmailFormat(ownerEmailInput)) {
+        setOwnerEmailInputError(EMAIL_VALIDATION_ERRORS.INVALID_EMAIL_INPUT_ERROR);
+      }
+      else if (isInputEmailInExistingOwners(ownerEmailInput, ownerDetails)) {
+        setOwnerEmailInputError(EMAIL_VALIDATION_ERRORS.DUPLICATE_USER_ERROR);
+      }
     }
-  }, [ownerEmailInput]);
+  }, [ownerEmailInput, ownerDetails]);
 
   const onConfirmDelete = React.useCallback(() => {
-    updateOwners(owners.filter((owner) => owner !== ownerToDelete));
-    setOwnerToDelete('');
-    props.onClose();
+    updateOwners(owners.filter((owner) => owner !== ownerToDelete?.id));
+    if (currentUser?.user?.id === ownerToDelete?.id) {
+      // Navigate to the dashboard page since the current user no longer has access to the inquiry.
+      navigate('/dashboard');
+    }
+    setOwnerToDelete({ id: "", primaryEmailAddress: "" });
+    props.onCloseConfirmDeleteOwnerModal();
   }, [ownerToDelete]);
 
   const onAddClick = React.useCallback(
@@ -55,8 +74,9 @@ export function ModalEditOwners(props: ModalEditOwnersProps) {
       if (userId) {
         setOwnerEmailInputError('');
         updateOwners(owners.concat([userId]));
+        setOwnerEmailInput('');
       } else {
-        setOwnerEmailInputError(EMAIL_DOES_NOT_CORRESPOND_TO_A_VALID_USER_ERROR);
+        setOwnerEmailInputError(EMAIL_VALIDATION_ERRORS.EMAIL_DOES_NOT_CORRESPOND_TO_A_VALID_USER_ERROR);
       }
     },
     [ownerDetails],
@@ -100,7 +120,7 @@ export function ModalEditOwners(props: ModalEditOwnersProps) {
                 <Button
                   type="button"
                   onClick={() => {
-                    setOwnerToDelete(item.id);
+                    setOwnerToDelete(item);
                     props.onDeleteOwner();
                   }}
                   variant="inverseDanger"
@@ -125,25 +145,26 @@ export function ModalEditOwners(props: ModalEditOwnersProps) {
             }}
             error={ownerEmailInputError}
           />
-          <Button type="button" onClick={() => onAddClick(ownerEmailInput)} className="mt-14">
+          <Button type="button" onClick={() => onAddClick(ownerEmailInput)} disabled={!!ownerEmailInputError} className="mt-14">
             Add
           </Button>
         </div>
       </CustomModal>
       <ConfirmationModal
         isOpen={props.isConfirmDeleteModalOpen}
-        onClose={props.onClose}
+        onClose={props.onCloseConfirmDeleteOwnerModal}
         onConfirm={onConfirmDelete}
-        text="Are you sure you want to remove the inquiry owner?"
+        text={currentUser?.user?.id === ownerToDelete?.id ? REMOVE_SELF_FROM_INQUIRY_CONFIRMATION : `Are you sure you want to remove the inquiry owner with email ${ownerToDelete?.primaryEmailAddress}?`}
       />
     </>
   );
 }
 
 // Validate the input email format and verify that the input email does not correspond to an existing owner.
-function isValidOwnerEmailInput(ownerEmailInput: string, existingOwners: UserData[]) {
-  const ownerAlreadyInList = existingOwners.find((ownerData) => ownerData.primaryEmailAddress === ownerEmailInput);
-  return (
-    ownerEmailInput !== '' && ownerEmailInput.includes('@') && ownerEmailInput.includes('.') && !ownerAlreadyInList
-  );
+function isInputEmailInExistingOwners(ownerEmailInput: string, existingOwners: UserData[]) {
+  return existingOwners.find((ownerData) => ownerData.primaryEmailAddress === ownerEmailInput);
+}
+
+function isValidEmailFormat(ownerEmailInput: string) {
+  return !!ownerEmailInput && ownerEmailInput.includes('@') && ownerEmailInput.includes('.');
 }

@@ -199,6 +199,7 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
         onClose={() => setShowEditOwnersModal(false)}
         isConfirmDeleteModalOpen={isConfirmDeleteOwnerModalOpen}
         onDeleteOwner={() => setIsConfirmDeleteOwnerModalOpen(true)}
+        onCloseConfirmDeleteOwnerModal={() => setIsConfirmDeleteOwnerModalOpen(false)}
       />
     </>
   );
