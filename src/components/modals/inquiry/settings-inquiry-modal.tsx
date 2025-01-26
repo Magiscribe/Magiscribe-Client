@@ -119,13 +119,7 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
       >
         <form className="space-y-4" onSubmit={handleSave}>
           {/* Update graph owners */}
-          <Button
-            type="button"
-            onClick={() => setShowEditOwnersModal(true)}
-            variant="secondary"
-            size="small"
-            className="w-full"
-          >
+          <Button type="button" onClick={() => setShowEditOwnersModal(true)} size="small" className="w-full">
             Edit Owners
           </Button>
 
@@ -145,7 +139,6 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
           <div className="flex justify-end">
             <Button
               type="button"
-              variant="secondary"
               size="small"
               icon={isLoading ? faSpinner : faPlay}
               iconSpin={isLoading}

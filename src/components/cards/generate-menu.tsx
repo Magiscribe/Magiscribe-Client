@@ -50,7 +50,7 @@ function ChatBubble({ message, sender }: { message: Message; sender: 'user' | 'a
   return (
     <div className={`mb-4 flex ${sender === 'user' ? 'justify-end' : 'justify-start'}`}>
       <div
-        className={`max-w-[90%] p-3 rounded-lg ${
+        className={`max-w-[90%] p-3 rounded-2xl ${
           sender === 'user'
             ? 'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-white'
             : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-white'
