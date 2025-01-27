@@ -203,6 +203,7 @@ export type Mutation = {
   deleteInquiryResponse?: Maybe<InquiryResponse>;
   deleteMediaAsset?: Maybe<Scalars['Int']['output']>;
   deletePrompt?: Maybe<Prompt>;
+  emailInquiryToUsers?: Maybe<Scalars['String']['output']>;
   generateAudio?: Maybe<Scalars['String']['output']>;
   registerUser: Scalars['Boolean']['output'];
   updateInquiryOwners: Inquiry;
@@ -261,6 +262,12 @@ export type MutationDeleteMediaAssetArgs = {
 
 export type MutationDeletePromptArgs = {
   promptId: Scalars['ID']['input'];
+};
+
+
+export type MutationEmailInquiryToUsersArgs = {
+  inquiryId: Scalars['String']['input'];
+  userEmails: Array<Scalars['String']['input']>;
 };
 
 
@@ -637,6 +644,14 @@ export type SendContactMutationVariables = Exact<{
 
 
 export type SendContactMutation = { __typename?: 'Mutation', contact: { __typename?: 'ContactResponse', success: boolean, messageId?: string | null } };
+
+export type EmailInquiryToUsersMutationVariables = Exact<{
+  userEmails: Array<Scalars['String']['input']> | Scalars['String']['input'];
+  inquiryId: Scalars['String']['input'];
+}>;
+
+
+export type EmailInquiryToUsersMutation = { __typename?: 'Mutation', emailInquiryToUsers?: string | null };
 
 export type GetAllModelsQueryVariables = Exact<{ [key: string]: never; }>;
 

@@ -204,3 +204,9 @@ export const SEND_CONTACT = gql`
     }
   }
 `;
+
+export const EMAIL_INQUIRY_TO_USERS = gql`
+  mutation emailInquiryToUsers($userEmails: [String!]!, $inquiryId: String!) {
+    emailInquiryToUsers(userEmails: $userEmails, inquiryId: $inquiryId)
+  }
+`;

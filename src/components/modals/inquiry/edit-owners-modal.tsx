@@ -173,7 +173,3 @@ export function ModalEditOwners(props: ModalEditOwnersProps) {
 function isInputEmailInExistingOwners(ownerEmailInput: string, existingOwners: UserData[]) {
   return existingOwners.find((ownerData) => ownerData.primaryEmailAddress === ownerEmailInput);
 }
-
-function isValidEmailFormat(ownerEmailInput: string) {
-  return !!ownerEmailInput && ownerEmailInput.includes('@') && ownerEmailInput.includes('.');
-}
