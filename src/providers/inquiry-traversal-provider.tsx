@@ -366,7 +366,7 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
       agentId,
       input: {
         userMessage: [
-          `The instruction is: ${graphRef.current.getCurrentNode()?.data.text}`,
+          `The instruction is: ${JSON.stringify(graphRef.current.getCurrentNode()?.data.conditions)}`,
 
           // TODO: Remove this so that user can't provide invalid nodes.
           `The valid reachable nodes are: ${graphRef.current
