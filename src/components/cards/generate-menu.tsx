@@ -226,7 +226,7 @@ export default function GraphGeneratorMenu({ open, onUpdate, onClose }: GraphGen
           )}
         </div>
         <div className="p-4 border-t border-gray-200">
-          <div className="relative flex-grow flex items-center">
+          <div className="relative grow flex items-center">
             <Textarea
               value={inputMessage}
               name="message"

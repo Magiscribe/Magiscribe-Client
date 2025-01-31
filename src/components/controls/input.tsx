@@ -32,7 +32,7 @@ export default function Input({ label, subLabel, name, error, className, ...prop
 
   const isCheckbox = props.type === 'checkbox';
 
-  const baseClassName = 'w-auto p-2 border rounded-2xl dark:bg-slate-600 bg-white focus:outline-none focus:ring-2';
+  const baseClassName = 'w-auto p-2 border rounded-2xl dark:bg-slate-600 bg-white focus:outline-hidden focus:ring-2';
 
   const inputStyles = {
     default: clsx(

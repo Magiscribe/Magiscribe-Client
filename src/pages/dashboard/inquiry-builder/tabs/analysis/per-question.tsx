@@ -252,7 +252,7 @@ const PerQuestionTab: React.FC<PerQuestionTabProps> = ({ id }) => {
       <div>
         <h2 className="font-bold mb-2">Responses</h2>
         <div className="mb-6 p-4">
-          <div className="mb-6 p-4 bg-slate-100 dark:bg-slate-600 rounded">
+          <div className="mb-6 p-4 bg-slate-100 dark:bg-slate-600 rounded-sm">
             <p className="font-semibold mb-2 text-slate-700 dark:text-white">{currentNode.data.text}</p>
             {renderAnswers(currentNode.id)}
           </div>

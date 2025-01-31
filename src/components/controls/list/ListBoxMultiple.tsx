@@ -47,7 +47,7 @@ export default function ListBoxMultiple({
   maxDisplay = 2,
 }: ListBoxMultipleProps) {
   const baseButtonClassName = clsx(
-    'w-full p-3 border rounded-2xl focus:outline-none focus:ring-2',
+    'w-full p-3 border rounded-2xl focus:outline-hidden focus:ring-2',
     'relative overflow-hidden appearance-none dark:bg-slate-600 bg-white',
     {
       'border-slate-300': !error,
@@ -90,17 +90,14 @@ export default function ListBoxMultiple({
             />
           </ListboxButton>
           <Transition leave="transition ease-in duration-100" leaveFrom="opacity-100" leaveTo="opacity-0">
-            <ListboxOptions className="absolute z-10 w-full mt-1 rounded-xl border-2 border-slate-200 bg-white p-1 shadow-lg focus:outline-none dark:bg-slate-600 dark:border-slate-500 max-h-60 overflow-auto">
+            <ListboxOptions className="absolute z-10 w-full mt-1 rounded-xl border-2 border-slate-200 bg-white p-1 shadow-lg focus:outline-hidden dark:bg-slate-600 dark:border-slate-500 max-h-60 overflow-auto">
               {values.map((item) => (
                 <ListboxOption
                   key={item.id}
                   value={item}
-                  className="group flex cursor-default items-center gap-2 rounded-lg py-1.5 px-3 select-none data-[focus]:bg-slate-300 transition-colors dark:data-[focus]:bg-slate-500"
+                  className="group flex cursor-default items-center gap-2 rounded-lg py-1.5 px-3 select-none data-focus:bg-slate-300 transition-colors dark:data-focus:bg-slate-500"
                 >
-                  <FontAwesomeIcon
-                    icon={faCheck}
-                    className="invisible size-4 fill-white group-data-[selected]:visible"
-                  />
+                  <FontAwesomeIcon icon={faCheck} className="invisible size-4 fill-white group-data-selected:visible" />
                   <div className="text-sm/6">{item.name}</div>
                 </ListboxOption>
               ))}

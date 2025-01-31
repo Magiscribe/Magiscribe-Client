@@ -31,7 +31,7 @@ export function AlertComponent({ alert, unmountSelf }: AlertProps) {
         <div className="ml-3">
           <p className="leading-5 font-medium">{alert.message}</p>
         </div>
-        <button onClick={unmountSelf} className="mx-2 focus:outline-none">
+        <button onClick={unmountSelf} className="mx-2 focus:outline-hidden">
           <FontAwesomeIcon icon={faX} />
         </button>
       </div>

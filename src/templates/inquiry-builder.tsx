@@ -12,7 +12,7 @@ export default function InquiryBuilderTemplate() {
         className={clsx(
           'h-full w-full fixed',
           'text-white dark:text-slate-800',
-          'bg-gradient-to-r from-[#7133d5] to-[#0508be]',
+          'bg-linear-to-r from-[#7133d5] to-[#0508be]',
           ' dark:from-slate-800 dark:to-slate-800',
         )}
       ></div>

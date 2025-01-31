@@ -42,12 +42,12 @@ export default function SendInquiry({ open, onClose }: SendInquiryProps) {
         Share the link to this inquiry with anyone you want to get input from
       </p>
       <div className="flex items-stretch">
-        <p className="flex-grow p-2 rounded-l-md border border-r-0 border-slate-300 shadow-sm focus:border-slate-500 focus:ring-slate-500">
+        <p className="grow p-2 rounded-l-md border border-r-0 border-slate-300 shadow-xs focus:border-slate-500 focus:ring-slate-500">
           {link}
         </p>
         <button
           onClick={handleCopyLink}
-          className="inline-flex items-center px-4 rounded-r-md text-sm font-medium shadow-sm text-white bg-slate-600 hover:bg-slate-700 focus:outline-none"
+          className="inline-flex items-center px-4 rounded-r-md text-sm font-medium shadow-xs text-white bg-slate-600 hover:bg-slate-700 focus:outline-hidden"
         >
           <FontAwesomeIcon icon={faLink} className="mr-2" />
           <span className="whitespace-nowrap">Copy Link</span>

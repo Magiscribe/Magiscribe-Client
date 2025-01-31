@@ -96,7 +96,7 @@ export default function AgentLabTemplate() {
           value={collectionOptions.find((option) => option.value === collection)?.value || 'none'}
           onChange={handleCollectionChange}
           options={collectionOptions}
-          className="flex-grow"
+          className="grow"
         />
         <div className="flex justify-end gap-4 mt-4">
           <Button size="small" onClick={() => setCreateCollectionModalOpen(true)}>

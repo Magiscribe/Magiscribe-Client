@@ -164,7 +164,7 @@ const ViaChatTab: React.FC<ViaChatTabProps> = ({ id }) => {
           Clear
         </Button>
       </div>
-      <div className="flex-grow mb-4 rounded-lg overflow-y-auto max-h-[60vh]">
+      <div className="grow mb-4 rounded-lg overflow-y-auto max-h-[60vh]">
         {messages.map((message, index) => (
           <div key={index} className={clsx('pt-4 flex', message.sender === 'user' ? 'justify-end' : 'justify-start')}>
             <motion.div
@@ -199,7 +199,7 @@ const ViaChatTab: React.FC<ViaChatTabProps> = ({ id }) => {
           onChange={(e) => setInputMessage(e.target.value)}
           placeholder="Ask a question about your data..."
           disabled={loading}
-          className={clsx('rounded-r-none', 'flex-grow')}
+          className={clsx('rounded-r-none', 'grow')}
         />
         <Button type="submit" className={clsx('rounded-l-none')} disabled={loading}>
           Send

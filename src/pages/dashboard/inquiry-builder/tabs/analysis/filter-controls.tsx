@@ -111,7 +111,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({ onApplyFilters, hasActi
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="[&::-webkit-calendar-picker-indicator]:dark:invert"
+                className="dark:[&::-webkit-calendar-picker-indicator]:invert"
               />
             </div>
 
@@ -123,7 +123,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({ onApplyFilters, hasActi
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="[&::-webkit-calendar-picker-indicator]:dark:invert"
+                className="dark:[&::-webkit-calendar-picker-indicator]:invert"
               />
             </div>
           </div>

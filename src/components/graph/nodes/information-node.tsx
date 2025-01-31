@@ -59,8 +59,8 @@ export default function InformationNode({ id, data }: InformationNodeProps) {
       />
 
       <S3ImageNodeUploader nodeId={id} images={data.images} />
-      <Handle type="target" position={Position.Left} className="w-4 h-4 !bg-green-500" />
-      <CustomHandle connectionCount={1} type="source" position={Position.Right} className="w-4 h-4 !bg-green-500" />
+      <Handle type="target" position={Position.Left} className="w-4 h-4 bg-green-500!" />
+      <CustomHandle connectionCount={1} type="source" position={Position.Right} className="w-4 h-4 bg-green-500!" />
     </NodeContainer>
   );
 }

@@ -402,7 +402,7 @@ export default function UserInquiryPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="relative flex-grow flex items-center">
+              <div className="relative grow flex items-center">
                 <Textarea
                   value={inputMessage}
                   name="message"
@@ -506,7 +506,7 @@ export default function UserInquiryPage() {
 
   return (
     <>
-      <div className="w-full max-w-4xl flex-grow p-4 space-y-4 mx-auto">{getActiveScreen()}</div>
+      <div className="w-full max-w-4xl grow p-4 space-y-4 mx-auto">{getActiveScreen()}</div>
       {(screen === 'inquiry' || screen === 'end') && !state.error && renderInputArea()}
     </>
   );

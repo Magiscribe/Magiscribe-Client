@@ -50,7 +50,7 @@ export default function InquiryPage() {
                 className={({ selected }) =>
                   clsx(
                     'w-full rounded-lg py-2.5 text-sm font-medium leading-5',
-                    'ring-white ring-opacity-60 focus:outline-none focus:ring-2',
+                    'ring-white ring-opacity-60 focus:outline-hidden focus:ring-2',
                     selected
                       ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-white'
                       : 'text-white dark:text-slate-200',
