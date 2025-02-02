@@ -350,6 +350,7 @@ export type PromptInput = {
 
 export type Query = {
   __typename?: 'Query';
+  checkIfUsersRespondedToInquiry?: Maybe<Array<Scalars['String']['output']>>;
   getAgent?: Maybe<Agent>;
   getAgentWithPrompts?: Maybe<Agent>;
   getAllAgents: Array<Agent>;
@@ -371,6 +372,12 @@ export type Query = {
   getUsersByEmail?: Maybe<Array<Maybe<UserData>>>;
   getUsersById?: Maybe<Array<UserData>>;
   isUserRegistered: Scalars['Boolean']['output'];
+};
+
+
+export type QueryCheckIfUsersRespondedToInquiryArgs = {
+  inquiryId: Scalars['String']['input'];
+  userEmails: Array<Scalars['String']['input']>;
 };
 
 
@@ -790,6 +797,14 @@ export type GetInquiryTemplatesQueryVariables = Exact<{ [key: string]: never; }>
 
 
 export type GetInquiryTemplatesQuery = { __typename?: 'Query', getInquiryTemplates: Array<any> };
+
+export type CheckIfUsersRespondedToInquiryQueryVariables = Exact<{
+  userEmails: Array<Scalars['String']['input']> | Scalars['String']['input'];
+  inquiryId: Scalars['String']['input'];
+}>;
+
+
+export type CheckIfUsersRespondedToInquiryQuery = { __typename?: 'Query', checkIfUsersRespondedToInquiry?: Array<string> | null };
 
 export type PredictionAddedSubscriptionVariables = Exact<{
   subscriptionId: Scalars['ID']['input'];

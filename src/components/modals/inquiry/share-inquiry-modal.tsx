@@ -4,9 +4,12 @@ import Button from '@/components/controls/button';
 import Input from '@/components/controls/input';
 import { EmailValidationErrors, useValidateEmailListInput } from '@/components/graph/utils/email-validation';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
-import { useMutation } from '@apollo/client';
+import { useLazyQuery, useMutation } from '@apollo/client';
 import { EMAIL_INQUIRY_TO_USERS } from '@/clients/mutations';
 import { UserDataInput } from '@/graphql/types';
+import { CHECK_IF_USERS_RESPONDED_TO_INQUIRY } from '@/clients/queries';
+import {} from '@/graphql/types';
+import { CheckIfUsersRespondedToInquiryQuery } from '@/graphql/graphql';
 
 interface ModalShareInqiryProps {
   open: boolean;
@@ -21,19 +24,39 @@ export const SHARE_INQUIRY_MODAL_EMAIL_VALIDATION_ERRORS: EmailValidationErrors 
 
 export function ModalShareInquiry(props: ModalShareInqiryProps) {
   const [nameInput, setNameInput] = React.useState<string>('');
-  const { updateMetadata, metadata } = useInquiryBuilder();
+  const { updateMetadata, metadata, id } = useInquiryBuilder();
+  const [inquiryRespondentEmails, setInquiryRespondentEmails] = React.useState<string[]>([]);
+  const [checkIfUsersRespondedToInquiry] = useLazyQuery<CheckIfUsersRespondedToInquiryQuery>(
+    CHECK_IF_USERS_RESPONDED_TO_INQUIRY,
+  );
+
+  const invitedEmails = React.useMemo(() => {
+    return metadata.inviteList?.map((user) => user.primaryEmailAddress);
+  }, [metadata.inviteList]);
   const { emailInput, setEmailInput, emailInputError } = useValidateEmailListInput(
-    metadata.inviteList?.map((user) => user.primaryEmailAddress),
+    invitedEmails,
     SHARE_INQUIRY_MODAL_EMAIL_VALIDATION_ERRORS,
   );
   const [emailInquiryToUsers] = useMutation<string>(EMAIL_INQUIRY_TO_USERS);
-  const { id } = useInquiryBuilder();
+
+  // Check if any users invited to take the inquiry responded.
+  React.useEffect(() => {
+    (async () => {
+      const inquiryRespondentResults = await checkIfUsersRespondedToInquiry({
+        variables: {
+          userEmails: invitedEmails,
+          inquiryId: id,
+        },
+      });
+      setInquiryRespondentEmails(inquiryRespondentResults?.data?.checkIfUsersRespondedToInquiry as string[]);
+    })();
+  }, [[invitedEmails, id]]);
 
   const sendInviteEmails = React.useCallback(() => {
     (async () => {
       // Only email users that weren't already contacted
-      const usersToEmail = metadata.inviteList.filter(user => !user.lastContacted);
-      const emailsContacted = usersToEmail.map(users => users.primaryEmailAddress);
+      const usersToEmail = metadata.inviteList.filter((user) => !user.lastContacted);
+      const emailsContacted = usersToEmail.map((users) => users.primaryEmailAddress);
       const result = await emailInquiryToUsers({
         variables: {
           userData: usersToEmail,
@@ -42,20 +65,19 @@ export function ModalShareInquiry(props: ModalShareInqiryProps) {
       });
       updateMetadata({
         ...metadata,
-        inviteList: metadata.inviteList.map(user => {
-          const isUserContacted = emailsContacted.find(email => email === user.primaryEmailAddress);
+        inviteList: metadata.inviteList.map((user) => {
+          const isUserContacted = emailsContacted.find((email) => email === user.primaryEmailAddress);
           if (!isUserContacted) {
             return user;
           } else {
             const userWithLastContactedTime: UserDataInput = {
               ...user,
-              lastContacted: new Date().toUTCString()
-            }
-            return userWithLastContactedTime
+              lastContacted: new Date().toUTCString(),
+            };
+            return userWithLastContactedTime;
           }
-        } ),
+        }),
       });
-
     })();
   }, [metadata.inviteList]);
 
@@ -99,16 +121,29 @@ export function ModalShareInquiry(props: ModalShareInqiryProps) {
         return (
           <div className="grid grid-cols-1" key={index}>
             <div className="w-full flex items-center space-x-2 mb-4">
-              <Input label = "Email " name={item.primaryEmailAddress} value={item.primaryEmailAddress} disabled={true} />
-              <Input label = "Name " name={item.firstName ?? ''} value={item.firstName ?? ''} disabled={true} />
-              <Input label='Last Contacted' name={item.lastContacted ?? 'NA'} value={item.lastContacted ?? 'NA'} disabled={true} />
+              <Input label="Email " name={item.primaryEmailAddress} value={item.primaryEmailAddress} disabled={true} />
+              <Input label="Name " name={item.firstName ?? ''} value={item.firstName ?? ''} disabled={true} />
+              <Input
+                label="Last Contacted"
+                name={item.lastContacted ?? 'NA'}
+                value={item.lastContacted ?? 'NA'}
+                disabled={true}
+              />
+              <Input
+                label="Responded to inquiry"
+                name={item.primaryEmailAddress}
+                value={!!inquiryRespondentEmails?.find((email) => email === item.primaryEmailAddress) ? 'Yes' : 'No'}
+                disabled={true}
+              />
               <Button
                 type="button"
                 style={{ margin: '30px 0px 0px 10px' }}
                 onClick={() => {
                   updateMetadata({
                     ...metadata,
-                    inviteList: metadata.inviteList.filter((user) => user.primaryEmailAddress !== item.primaryEmailAddress),
+                    inviteList: metadata.inviteList.filter(
+                      (user) => user.primaryEmailAddress !== item.primaryEmailAddress,
+                    ),
                   });
                 }}
                 variant="inverseDanger"
