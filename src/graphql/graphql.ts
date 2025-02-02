@@ -109,6 +109,7 @@ export type StringFilter = {
 export type UserDataInput = {
   firstName?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['String']['input']>;
+  lastContacted?: InputMaybe<Scalars['String']['input']>;
   lastName?: InputMaybe<Scalars['String']['input']>;
   primaryEmailAddress: Scalars['String']['input'];
   username?: InputMaybe<Scalars['String']['input']>;

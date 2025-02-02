@@ -20,43 +20,61 @@ export const SHARE_INQUIRY_MODAL_EMAIL_VALIDATION_ERRORS: EmailValidationErrors 
 };
 
 export function ModalShareInquiry(props: ModalShareInqiryProps) {
-  const [contactedUsers, setContactedUsers] = React.useState<UserDataInput[]>([]);
   const [nameInput, setNameInput] = React.useState<string>('');
+  const { updateMetadata, metadata } = useInquiryBuilder();
   const { emailInput, setEmailInput, emailInputError } = useValidateEmailListInput(
-    contactedUsers?.map((user) => user.primaryEmailAddress),
+    metadata.inviteList?.map((user) => user.primaryEmailAddress),
     SHARE_INQUIRY_MODAL_EMAIL_VALIDATION_ERRORS,
   );
   const [emailInquiryToUsers] = useMutation<string>(EMAIL_INQUIRY_TO_USERS);
   const { id } = useInquiryBuilder();
 
-  // When adding a user, add email to inqiry metadata.  Then fetch user details.  For existing emails in metadata, check if user responded to inquiry
-  // Bulk fetch user details for previous users who were invited (will use user ids to check user response status).
-  // include date email was sent
-
   const sendInviteEmails = React.useCallback(() => {
     (async () => {
+      // Only email users that weren't already contacted
+      const usersToEmail = metadata.inviteList.filter(user => !user.lastContacted);
+      const emailsContacted = usersToEmail.map(users => users.primaryEmailAddress);
       const result = await emailInquiryToUsers({
         variables: {
-          userData: contactedUsers,
+          userData: usersToEmail,
           inquiryId: id,
         },
       });
+      updateMetadata({
+        ...metadata,
+        inviteList: metadata.inviteList.map(user => {
+          const isUserContacted = emailsContacted.find(email => email === user.primaryEmailAddress);
+          if (!isUserContacted) {
+            return user;
+          } else {
+            const userWithLastContactedTime: UserDataInput = {
+              ...user,
+              lastContacted: new Date().toUTCString()
+            }
+            return userWithLastContactedTime
+          }
+        } ),
+      });
+
     })();
-  }, [contactedUsers]);
+  }, [metadata.inviteList]);
 
   const onAddClick = React.useCallback(
     (email: string, name: string) => {
       const userDataInput: UserDataInput = { primaryEmailAddress: email, firstName: name };
-      setContactedUsers(contactedUsers.concat(userDataInput));
+      updateMetadata({
+        ...metadata,
+        inviteList: metadata.inviteList.concat(userDataInput),
+      });
       setEmailInput('');
       setNameInput('');
     },
-    [contactedUsers],
+    [metadata.inviteList],
   );
 
   return (
     <CustomModal
-      size="3xl"
+      size="5xl"
       open={props.open}
       onClose={props.onClose}
       title={'Share Inquiry'}
@@ -67,7 +85,7 @@ export function ModalShareInquiry(props: ModalShareInqiryProps) {
             variant="primary"
             size="medium"
             style={{ margin: '0px 20px 0px 0px' }}
-            disabled={!contactedUsers?.length}
+            disabled={!metadata.inviteList?.length}
           >
             Email inquiry to contact list
           </Button>
@@ -77,16 +95,21 @@ export function ModalShareInquiry(props: ModalShareInqiryProps) {
         </>
       }
     >
-      {contactedUsers?.map((item, index) => {
+      {metadata.inviteList?.map((item, index) => {
         return (
           <div className="grid grid-cols-1" key={index}>
             <div className="w-full flex items-center space-x-2 mb-4">
-              <Input name={item.primaryEmailAddress} value={item.primaryEmailAddress} disabled={true} />
-              <Input name={item.firstName ?? ''} value={item.firstName ?? ''} disabled={true} />
+              <Input label = "Email " name={item.primaryEmailAddress} value={item.primaryEmailAddress} disabled={true} />
+              <Input label = "Name " name={item.firstName ?? ''} value={item.firstName ?? ''} disabled={true} />
+              <Input label='Last Contacted' name={item.lastContacted ?? 'NA'} value={item.lastContacted ?? 'NA'} disabled={true} />
               <Button
                 type="button"
+                style={{ margin: '30px 0px 0px 10px' }}
                 onClick={() => {
-                  setContactedUsers(contactedUsers.filter((user) => user !== item));
+                  updateMetadata({
+                    ...metadata,
+                    inviteList: metadata.inviteList.filter((user) => user.primaryEmailAddress !== item.primaryEmailAddress),
+                  });
                 }}
                 variant="inverseDanger"
               >

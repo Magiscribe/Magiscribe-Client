@@ -18,6 +18,7 @@ import {
   PredictionType,
   UpdateInquiryMutation,
   UpdateInquiryOwnersMutation,
+  UserDataInput,
 } from '@/graphql/graphql';
 import { InquirySettings } from '@/graphql/types';
 import { useGraphContext } from '@/hooks/graph-state';
@@ -39,6 +40,7 @@ interface InquiryProviderProps {
 export interface Metadata {
   images: ImageMetadata[];
   text: string;
+  inviteList: UserDataInput[];
 }
 
 interface ContextType {
