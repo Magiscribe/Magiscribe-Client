@@ -267,7 +267,7 @@ export type MutationDeletePromptArgs = {
 
 export type MutationEmailInquiryToUsersArgs = {
   inquiryId: Scalars['String']['input'];
-  userEmails: Array<Scalars['String']['input']>;
+  userData: Array<UserDataInput>;
 };
 
 
@@ -481,6 +481,14 @@ export type UserData = {
   username?: Maybe<Scalars['String']['output']>;
 };
 
+export type UserDataInput = {
+  firstName?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  primaryEmailAddress: Scalars['String']['input'];
+  username?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type Voice = {
   __typename?: 'Voice';
   id: Scalars['String']['output'];
@@ -646,7 +654,7 @@ export type SendContactMutationVariables = Exact<{
 export type SendContactMutation = { __typename?: 'Mutation', contact: { __typename?: 'ContactResponse', success: boolean, messageId?: string | null } };
 
 export type EmailInquiryToUsersMutationVariables = Exact<{
-  userEmails: Array<Scalars['String']['input']> | Scalars['String']['input'];
+  userData: Array<UserDataInput> | UserDataInput;
   inquiryId: Scalars['String']['input'];
 }>;
 

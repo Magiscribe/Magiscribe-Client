@@ -35,7 +35,7 @@ const documents = {
     "\n  mutation deleteCollection($collectionId: ID!) {\n    deleteCollection(collectionId: $collectionId) {\n      id\n    }\n  }\n": types.DeleteCollectionDocument,
     "\n  mutation registerUser {\n    registerUser\n  }\n": types.RegisterUserDocument,
     "\n  mutation sendContact($input: ContactInput!) {\n    contact(input: $input) {\n      success\n      messageId\n    }\n  }\n": types.SendContactDocument,
-    "\n  mutation emailInquiryToUsers($userEmails: [String!]!, $inquiryId: String!) {\n    emailInquiryToUsers(userEmails: $userEmails, inquiryId: $inquiryId)\n  }\n": types.EmailInquiryToUsersDocument,
+    "\n  mutation emailInquiryToUsers($userData: [UserDataInput!]!, $inquiryId: String!) {\n    emailInquiryToUsers(userData: $userData, inquiryId: $inquiryId)\n  }\n": types.EmailInquiryToUsersDocument,
     "\n  query getAllModels {\n    getAllModels {\n      id\n      name\n    }\n  }\n": types.GetAllModelsDocument,
     "\n  query getAgentWithPrompts($agentId: ID!) {\n    getAgentWithPrompts(agentId: $agentId) {\n      id\n      name\n      description\n      reasoning {\n        llmModel\n        prompt\n        variablePassThrough\n      }\n      capabilities {\n        name\n        id\n        prompts {\n          name\n          id\n          text\n        }\n      }\n      memoryEnabled\n      subscriptionFilter\n      outputFilter\n    }\n  }\n": types.GetAgentWithPromptsDocument,
     "\n  query getAllAgents($logicalCollection: String) {\n    getAllAgents(logicalCollection: $logicalCollection) {\n      id\n      name\n      description\n      capabilities {\n        name\n        id\n      }\n    }\n  }\n": types.GetAllAgentsDocument,
@@ -160,7 +160,7 @@ export function gql(source: "\n  mutation sendContact($input: ContactInput!) {\n
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  mutation emailInquiryToUsers($userEmails: [String!]!, $inquiryId: String!) {\n    emailInquiryToUsers(userEmails: $userEmails, inquiryId: $inquiryId)\n  }\n"): (typeof documents)["\n  mutation emailInquiryToUsers($userEmails: [String!]!, $inquiryId: String!) {\n    emailInquiryToUsers(userEmails: $userEmails, inquiryId: $inquiryId)\n  }\n"];
+export function gql(source: "\n  mutation emailInquiryToUsers($userData: [UserDataInput!]!, $inquiryId: String!) {\n    emailInquiryToUsers(userData: $userData, inquiryId: $inquiryId)\n  }\n"): (typeof documents)["\n  mutation emailInquiryToUsers($userData: [UserDataInput!]!, $inquiryId: String!) {\n    emailInquiryToUsers(userData: $userData, inquiryId: $inquiryId)\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
