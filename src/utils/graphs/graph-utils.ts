@@ -259,7 +259,7 @@ export function validateGraph(graph: StrippedGraph): { valid: boolean; errors: s
         }
         if (
           node.type === 'question' &&
-          (node.data.type === 'rating-single' || node.data.type === 'rating-multi') &&
+          (node.data.type === 'single-select' || node.data.type === 'multi-select') &&
           !node.data.dynamicGeneration
         ) {
           if (!Array.isArray(node.data.ratings) || node.data.ratings.length === 0) {

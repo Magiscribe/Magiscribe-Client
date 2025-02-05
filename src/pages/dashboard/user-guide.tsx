@@ -30,7 +30,7 @@ const userGuide = [
   {
     question: 'What are the different types of questions that can be asked?',
     answer:
-      'Questions can either be open-ended, rating-single, or rating-multi. Open-ended questions allow the user to provide text response. Rating-single gives the respondent a list of options and lets them pick exactly one. Rating-multi allows the respondent to choose all that apply amongst a list of options.',
+      'Questions can either be open-ended, single-select, or multi-select. Open-ended questions allow the user to provide text response. Single-select gives the respondent a list of options and lets them pick exactly one. Multi-select allows the respondent to choose all that apply amongst a list of options.',
   },
   {
     question: 'What do each of the node types do?',
