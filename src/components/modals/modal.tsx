@@ -44,7 +44,7 @@ export default function CustomModal(props: Props) {
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black bg-opacity-25 backdrop-filter backdrop-blur-sm transition-opacity dark:bg-opacity-50" />
+          <div className="fixed inset-0 bg-black/50 backdrop-filter backdrop-blur-xs transition-opacity" />
         </TransitionChild>
 
         <div className="fixed inset-0 overflow-y-auto">

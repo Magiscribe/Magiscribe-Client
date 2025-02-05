@@ -94,7 +94,7 @@ export function S3ImageNodeUploader({ nodeId, images }: ImageUploaderProps): Rea
           <div className="flex flex-wrap gap-2">
             {displayImages.map((image, index) => (
               <div key={index} className="relative">
-                <img src={image.url} alt={`Uploaded ${index + 1}`} className="w-24 h-24 object-cover rounded" />
+                <img src={image.url} alt={`Uploaded ${index + 1}`} className="w-24 h-24 object-cover rounded-sm" />
                 <Button
                   icon={faX}
                   type="button"

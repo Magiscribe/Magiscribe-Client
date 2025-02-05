@@ -63,7 +63,7 @@ export default function StartNode({ id, data }: StartNodeProps) {
           className="nodrag"
         />
       </div>
-      <CustomHandle connectionCount={1} type={'source'} position={Position.Right} className="w-4 h-4 !bg-green-500" />
+      <CustomHandle connectionCount={1} type={'source'} position={Position.Right} className="w-4 h-4 bg-green-500!" />
     </NodeContainer>
   );
 }

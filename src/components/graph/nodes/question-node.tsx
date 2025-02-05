@@ -104,14 +104,14 @@ export default function QuestionNode({ id, data }: QuestionNodeProps) {
                 name={`rating-${index}`}
                 value={rating}
                 onChange={(e) => handleRatingChange(index, e.target.value)}
-                className="flex-grow nodrag"
+                className="grow nodrag"
               />
               <Button
                 onClick={() => removeRating(index)}
                 variant="transparentSecondary"
                 size="small"
                 icon={faTimesCircle}
-                className="nodrag flex-shrink-0 text-slate-400"
+                className="nodrag shrink-0 text-slate-400"
               />
             </div>
           ))}
@@ -120,8 +120,8 @@ export default function QuestionNode({ id, data }: QuestionNodeProps) {
           </Button>
         </div>
       )}
-      <Handle type="target" position={Position.Left} className="w-4 h-4 !bg-green-500" />
-      <CustomHandle connectionCount={1} type="source" position={Position.Right} className="w-4 h-4 !bg-green-500" />
+      <Handle type="target" position={Position.Left} className="w-4 h-4 bg-green-500!" />
+      <CustomHandle connectionCount={1} type="source" position={Position.Right} className="w-4 h-4 bg-green-500!" />
     </NodeContainer>
   );
 }

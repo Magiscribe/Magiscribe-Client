@@ -74,14 +74,14 @@ export default function LinkCard({
         style={{ backgroundImage: `url(${backgroundImage})` }}
         animate={backgroundControl}
       >
-        <div className={`absolute inset-0 bg-gradient-to-r ${bg}`}></div>
+        <div className={`absolute inset-0 bg-linear-to-r ${bg}`}></div>
       </motion.div>
       <motion.div
         className={`relative flex flex-col items-center justify-between bg-cover bg-center shadow-xl rounded-3xl overflow-hidden min-h-[200px]`}
         style={{ backgroundImage: `url(${backgroundImage})` }}
         animate={contentControl}
       >
-        <div className={`absolute inset-0 bg-gradient-to-r ${bg}`}></div>
+        <div className={`absolute inset-0 bg-linear-to-r ${bg}`}></div>
         <div className={`relative w-full h-full text-white p-4 z-10`}>
           <h2 className="text-5xl font-black mt-4">{title}</h2>
           <p className="mt-2">{description}</p>

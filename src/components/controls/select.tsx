@@ -17,7 +17,7 @@ const Select: React.FC<SelectProps> = ({ label, subLabel, name, error, options, 
   const id = useId();
 
   const baseSelectClassName = clsx(
-    'w-full p-3 border rounded-2xl focus:outline-none focus:ring-2',
+    'w-full p-3 border rounded-2xl focus:outline-hidden focus:ring-2',
     'relative overflow-hidden appearance-none dark:bg-slate-600 bg-white',
     {
       'border-slate-400': !error,

@@ -51,7 +51,7 @@ const Condition = ({ to, condition, nodeId, nodeColor, onChange, onRemove }: Con
           subLabel="The ID of the node this condition should route to"
           name="toNode"
           style={{ backgroundColor: toNodeValid ? nodeColor : undefined }}
-          className={[toNodeValid ? '' : '!bg-red-700', darkText ? 'text-black' : 'text-white'].join(' ')}
+          className={[toNodeValid ? '' : 'bg-red-700!', darkText ? 'text-black' : 'text-white'].join(' ')}
           onChange={({ target }) => onChange({ to: target.value, condition })}
           options={options}
           error={toNodeValid ? undefined : 'Please select a node'}

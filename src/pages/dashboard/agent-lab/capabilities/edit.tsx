@@ -329,7 +329,7 @@ export default function CapabilityEdit() {
                       className="bg-slate-100 dark:bg-slate-700 p-2 rounded-lg h-full w-full flex flex-col"
                     >
                       <h3 className="text-lg font-bold mb-2">{item.name}</h3>
-                      <p className="flex-grow mb-2">
+                      <p className="grow mb-2">
                         {item.text.substring(0, 50)}
                         {item.text.length > 50 ? '...' : ''}
                       </p>
@@ -385,7 +385,7 @@ export default function CapabilityEdit() {
                   </p>
                   <div className="flex justify-left space-x-2 mt-2">
                     {isEditing ? (
-                      <div className="flex-grow">
+                      <div className="grow">
                         <Input
                           name="name"
                           type="text"
@@ -415,7 +415,7 @@ export default function CapabilityEdit() {
                         </div>
                       </div>
                     ) : (
-                      <div className="flex-grow space-x-2">
+                      <div className="grow space-x-2">
                         <Button type="button" onClick={() => edit(item)}>
                           Edit
                         </Button>

@@ -15,7 +15,7 @@ export default function MarkdownCustom({ children }: { children: string | null |
         ul: ({ children }) => <ul className="list-disc pl-6">{children}</ul>,
         ol: ({ children }) => <ol className="list-decimal pl-6">{children}</ol>,
         li: ({ children }) => <li className="mb-1">{children}</li>,
-        code: ({ children }) => <code className="bg-slate-100 p-1 rounded">{children}</code>,
+        code: ({ children }) => <code className="bg-slate-100 p-1 rounded-sm">{children}</code>,
         a: ({ children, href }) => (
           <a className="text-blue-500 hover:underline" href={href as string}>
             {children}

@@ -22,7 +22,7 @@ export default function GenericDisclosure({ title, children, className }: Generi
                 'flex w-full',
                 'text-slate-800 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100',
                 'rounded-2xl py-2 text-left text-sm font-medium ',
-                'focus:outline-none focus-visible:ring focus-visible:ring-slate-500 focus-visible:ring-opacity-75',
+                'focus:outline-hidden focus-visible:ring-3 focus-visible:ring-slate-500 focus-visible:ring-opacity-75',
                 'transition-colors duration-200',
               )}
             >

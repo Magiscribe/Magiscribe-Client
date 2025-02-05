@@ -243,7 +243,7 @@ export default function PlaygroundDashboard() {
               <div className="flex flex-wrap gap-2">
                 {base64Images.map((image, index) => (
                   <div key={index} className="relative">
-                    <img src={image} alt={`Uploaded ${index + 1}`} className="w-24 h-24 object-cover rounded" />
+                    <img src={image} alt={`Uploaded ${index + 1}`} className="w-24 h-24 object-cover rounded-sm" />
                     <Button
                       type="button"
                       variant="transparentDanger"

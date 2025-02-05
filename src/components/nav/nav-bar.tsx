@@ -6,8 +6,8 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { useTitle } from '../../hooks/title-hook';
-import Button from '../controls/button';
 import { AnimatedLogo } from '../animated/animated-logo';
+import Button from '../controls/button';
 
 export function NavBar({ isFixed = true }) {
   const [atTop, setAtTop] = useState(true);
@@ -58,7 +58,7 @@ export function NavBar({ isFixed = true }) {
           </AnimatePresence>
         </Link>
         <div
-          className={`w-full flex-grow lg:flex lg:items-center lg:w-auto hidden mt-2 lg:mt-0 p-4 lg:p-0 z-20 bg-white lg:bg-transparent`}
+          className={`w-full grow lg:flex lg:items-center lg:w-auto hidden mt-2 lg:mt-0 p-4 lg:p-0 z-20 bg-white lg:bg-transparent`}
         >
           <ul className="list-reset lg:flex justify-end flex-1 items-center">{/* Add menu items here if needed */}</ul>
           <Button
@@ -94,7 +94,7 @@ export function NavBar({ isFixed = true }) {
           </SignedIn>
           <SignedOut>
             <SignInButton forceRedirectUrl="/dashboard">
-              <button className="px-4">Sign In</button>
+              <Button variant="transparentWhite">Sign In</Button>
             </SignInButton>
           </SignedOut>
         </div>

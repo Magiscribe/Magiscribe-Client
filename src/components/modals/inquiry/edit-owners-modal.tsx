@@ -1,16 +1,16 @@
 import { GET_USERS_BY_EMAIL, GET_USERS_BY_ID } from '@/clients/queries';
-import { useNavigate } from "react-router-dom";
 import Button from '@/components/controls/button';
 import Input from '@/components/controls/input';
 import { GetUsersByEmailQuery, GetUsersByIdQuery } from '@/graphql/graphql';
 import { UserData } from '@/graphql/types';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { useLazyQuery } from '@apollo/client';
+import { useUser } from '@clerk/clerk-react';
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import ConfirmationModal from '../confirm-modal';
 import CustomModal from '../modal';
-import { useUser } from '@clerk/clerk-react';
 
 interface ModalEditOwnersProps {
   open: boolean;
@@ -24,9 +24,10 @@ const EMAIL_VALIDATION_ERRORS = {
   INVALID_EMAIL_INPUT_ERROR: 'Please enter a valid user email',
   DUPLICATE_USER_ERROR: 'The user you entered already has access to this inquiry.',
   EMAIL_DOES_NOT_CORRESPOND_TO_A_VALID_USER_ERROR: 'No Magiscribe users with this email address were found.',
-}
+};
 
-const REMOVE_SELF_FROM_INQUIRY_CONFIRMATION = "You are about to remove yourself from the owners list of this inquiry.  You will no longer have access to edit this inquiry.  Are you sure you want to continue?"
+const REMOVE_SELF_FROM_INQUIRY_CONFIRMATION =
+  'You are about to remove yourself from the owners list of this inquiry.  You will no longer have access to edit this inquiry.  Are you sure you want to continue?';
 
 export function ModalEditOwners(props: ModalEditOwnersProps) {
   const navigate = useNavigate();
@@ -43,11 +44,10 @@ export function ModalEditOwners(props: ModalEditOwnersProps) {
 
   React.useEffect(() => {
     setOwnerEmailInputError('');
-    if (!!ownerEmailInput) {
+    if (ownerEmailInput) {
       if (!isValidEmailFormat(ownerEmailInput)) {
         setOwnerEmailInputError(EMAIL_VALIDATION_ERRORS.INVALID_EMAIL_INPUT_ERROR);
-      }
-      else if (isInputEmailInExistingOwners(ownerEmailInput, ownerDetails)) {
+      } else if (isInputEmailInExistingOwners(ownerEmailInput, ownerDetails)) {
         setOwnerEmailInputError(EMAIL_VALIDATION_ERRORS.DUPLICATE_USER_ERROR);
       }
     }
@@ -59,7 +59,7 @@ export function ModalEditOwners(props: ModalEditOwnersProps) {
       // Navigate to the dashboard page since the current user no longer has access to the inquiry.
       navigate('/dashboard');
     }
-    setOwnerToDelete({ id: "", primaryEmailAddress: "" });
+    setOwnerToDelete({ id: '', primaryEmailAddress: '' });
     props.onCloseConfirmDeleteOwnerModal();
   }, [ownerToDelete]);
 
@@ -145,7 +145,12 @@ export function ModalEditOwners(props: ModalEditOwnersProps) {
             }}
             error={ownerEmailInputError}
           />
-          <Button type="button" onClick={() => onAddClick(ownerEmailInput)} disabled={!!ownerEmailInputError} className="mt-14">
+          <Button
+            type="button"
+            onClick={() => onAddClick(ownerEmailInput)}
+            disabled={!!ownerEmailInputError}
+            className="mt-14"
+          >
             Add
           </Button>
         </div>
@@ -154,7 +159,11 @@ export function ModalEditOwners(props: ModalEditOwnersProps) {
         isOpen={props.isConfirmDeleteModalOpen}
         onClose={props.onCloseConfirmDeleteOwnerModal}
         onConfirm={onConfirmDelete}
-        text={currentUser?.user?.id === ownerToDelete?.id ? REMOVE_SELF_FROM_INQUIRY_CONFIRMATION : `Are you sure you want to remove the inquiry owner with email ${ownerToDelete?.primaryEmailAddress}?`}
+        text={
+          currentUser?.user?.id === ownerToDelete?.id
+            ? REMOVE_SELF_FROM_INQUIRY_CONFIRMATION
+            : `Are you sure you want to remove the inquiry owner with email ${ownerToDelete?.primaryEmailAddress}?`
+        }
       />
     </>
   );

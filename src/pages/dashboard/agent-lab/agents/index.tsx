@@ -44,7 +44,7 @@ function AgentCard({
 
   return (
     <div className="bg-slate-100 dark:bg-slate-600 text-slate-700 dark:text-white  p-4 rounded-2xl shadow-md h-full w-full flex flex-col">
-      <div className="flex-grow">
+      <div className="grow">
         <h2 className="text-xl font-bold mb-2 break-words">{agent.name}</h2>
         <p className="text-sm mb-4 break-words">{agent.description}</p>
         <div className="flex flex-wrap gap-2 mb-4">

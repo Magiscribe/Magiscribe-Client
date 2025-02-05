@@ -57,7 +57,7 @@ export default function GenericRadioGroup<T>({
               onClick={() => handleOptionClick(option.value)}
               className={({ checked }) =>
                 `${checked ? 'bg-blue-500 text-white' : 'bg-slate-200 dark:bg-slate-600'}
-                relative flex cursor-pointer rounded-lg px-4 py-2 shadow-md focus:outline-none`
+                relative flex cursor-pointer rounded-lg px-4 py-2 shadow-md focus:outline-hidden`
               }
             >
               {({ checked }) => (

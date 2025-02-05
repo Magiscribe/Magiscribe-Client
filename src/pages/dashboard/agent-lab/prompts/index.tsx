@@ -43,10 +43,10 @@ function PromptCard({
 
   return (
     <div className="bg-slate-100 dark:bg-slate-600 text-slate-700 dark:text-white  p-4 rounded-2xl shadow-md h-full w-full flex flex-col">
-      <div className="flex-grow">
+      <div className="grow">
         <h2 className="text-xl font-bold mb-4 break-words">{prompt.name}</h2>
       </div>
-      <div className="flex-grow">
+      <div className="grow">
         <p className="text-sm mb-4 break-words">
           {prompt.text.substring(0, 100).trim()}
           {prompt.text.length > 100 ? '...' : ''}

@@ -11,7 +11,7 @@ interface EndNodeProps {
 export default function EndNode({ id }: EndNodeProps) {
   return (
     <NodeContainer title={'End'} faIcon={faStop} id={id}>
-      <CustomHandle type={'target'} position={Position.Left} className="w-4 h-4 !bg-green-500" />
+      <CustomHandle type={'target'} position={Position.Left} className="w-4 h-4 bg-green-500!" />
     </NodeContainer>
   );
 }

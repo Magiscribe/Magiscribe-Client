@@ -111,7 +111,7 @@ const ReorderableList = <T extends BaseListItem>({
         'text-slate-700 dark:text-slate-200',
         'hover:bg-slate-200 dark:hover:bg-slate-600',
         'disabled:opacity-50 disabled:cursor-not-allowed',
-        'focus:outline-none focus:ring-2 focus:ring-indigo-500',
+        'focus:outline-hidden focus:ring-2 focus:ring-indigo-500',
       )}
     >
       <FontAwesomeIcon icon={direction === 'up' ? faArrowUp : faArrowDown} className="size-4" />
@@ -182,7 +182,7 @@ const ReorderableList = <T extends BaseListItem>({
                       />
                     </div>
                   )}
-                  <div className="flex-grow">
+                  <div className="grow">
                     {renderItem(item, editingItemId === item.id, (item) => handleEdit(item.id), handleCancelEdit)}
                   </div>
                   {showMoveButtons && (
