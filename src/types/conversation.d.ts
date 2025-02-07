@@ -36,7 +36,7 @@ export interface QuestionNodeData {
   images: ImageMetadata[];
   text: string;
   response: string;
-  type: 'rating-single' | 'rating-multi' | 'open-ended' | 'scalar-single' | 'scalar-multi';
+  type: 'single-select' | 'multi-select' | 'open-ended' | 'scalar-single' | 'scalar-multi';
   ratings?: string[];
   scalars?: string[];
 }
