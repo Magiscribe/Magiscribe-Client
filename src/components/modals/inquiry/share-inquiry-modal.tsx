@@ -10,6 +10,7 @@ import { UserDataInput } from '@/graphql/types';
 import { CHECK_IF_USERS_RESPONDED_TO_INQUIRY } from '@/clients/queries';
 import {} from '@/graphql/types';
 import { CheckIfUsersRespondedToInquiryQuery } from '@/graphql/graphql';
+import DataWithLabel from '@/components/controls/dataWithLabel';
 
 interface ModalShareInqiryProps {
   open: boolean;
@@ -50,7 +51,7 @@ export function ModalShareInquiry(props: ModalShareInqiryProps) {
       });
       setInquiryRespondentEmails(inquiryRespondentResults?.data?.checkIfUsersRespondedToInquiry as string[]);
     })();
-  }, [[invitedEmails, id]]);
+  }, [invitedEmails, id]);
 
   const sendInviteEmails = React.useCallback(() => {
     (async () => {
@@ -123,13 +124,13 @@ export function ModalShareInquiry(props: ModalShareInqiryProps) {
             <div className="w-full flex items-center space-x-2 mb-4">
               <Input label="Email " name={item.primaryEmailAddress} value={item.primaryEmailAddress} disabled={true} />
               <Input label="Name " name={item.firstName ?? ''} value={item.firstName ?? ''} disabled={true} />
-              <Input
+              <DataWithLabel
                 label="Last Contacted"
                 name={item.lastContacted ?? 'NA'}
                 value={item.lastContacted ?? 'NA'}
                 disabled={true}
               />
-              <Input
+              <DataWithLabel
                 label="Responded to inquiry"
                 name={item.primaryEmailAddress}
                 value={!!inquiryRespondentEmails?.find((email) => email === item.primaryEmailAddress) ? 'Yes' : 'No'}

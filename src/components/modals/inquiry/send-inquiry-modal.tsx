@@ -57,6 +57,9 @@ export default function SendInquiry({ open, onClose }: SendInquiryProps) {
             <span className="whitespace-nowrap">Copy Link</span>
           </button>
         </div>
+        <Button type="button" onClick={() => setShowShareInquiryModal(true)} size="small" className="w-full">
+          Share inquiry via email
+        </Button>
       </CustomModal>
       <ModalShareInquiry open={showShareInquiryModal} onClose={() => setShowShareInquiryModal(false)} />
     </>
