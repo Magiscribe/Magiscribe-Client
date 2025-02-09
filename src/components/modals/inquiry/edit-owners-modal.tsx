@@ -1,16 +1,17 @@
 import { GET_USERS_BY_EMAIL, GET_USERS_BY_ID } from '@/clients/queries';
+import { useNavigate } from 'react-router-dom';
 import Button from '@/components/controls/button';
 import Input from '@/components/controls/input';
 import { GetUsersByEmailQuery, GetUsersByIdQuery } from '@/graphql/graphql';
 import { UserData } from '@/graphql/types';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { useLazyQuery } from '@apollo/client';
-import { useUser } from '@clerk/clerk-react';
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import ConfirmationModal from '../confirm-modal';
 import CustomModal from '../modal';
+import { useUser } from '@clerk/clerk-react';
+import { useValidateEmailListInput } from '@/components/graph/utils/email-validation';
 
 interface ModalEditOwnersProps {
   open: boolean;
@@ -34,24 +35,20 @@ export function ModalEditOwners(props: ModalEditOwnersProps) {
   // Get the current Clerk user
   const currentUser = useUser();
   const [ownerDetails, setOwnerDetails] = React.useState<UserData[]>([]);
-  const [ownerEmailInput, setOwnerEmailInput] = React.useState<string>('');
   const [getUsersById] = useLazyQuery<GetUsersByIdQuery>(GET_USERS_BY_ID);
   const [getUsersByEmail] = useLazyQuery<GetUsersByEmailQuery>(GET_USERS_BY_EMAIL);
-  const [ownerEmailInputError, setOwnerEmailInputError] = React.useState<string>('');
   const [ownerToDelete, setOwnerToDelete] = React.useState<UserData>();
-
   const { owners, updateOwners } = useInquiryBuilder();
 
-  React.useEffect(() => {
-    setOwnerEmailInputError('');
-    if (ownerEmailInput) {
-      if (!isValidEmailFormat(ownerEmailInput)) {
-        setOwnerEmailInputError(EMAIL_VALIDATION_ERRORS.INVALID_EMAIL_INPUT_ERROR);
-      } else if (isInputEmailInExistingOwners(ownerEmailInput, ownerDetails)) {
-        setOwnerEmailInputError(EMAIL_VALIDATION_ERRORS.DUPLICATE_USER_ERROR);
-      }
-    }
-  }, [ownerEmailInput, ownerDetails]);
+  const existingOwnerEmails = React.useMemo(() => {
+    return ownerDetails.map((owner) => owner.primaryEmailAddress);
+  }, [ownerDetails]);
+  const {
+    emailInput: ownerEmailInput,
+    setEmailInput: setOwnerEmailInput,
+    emailInputError: ownerEmailInputError,
+    setEmailInputError: setOwnerEmailInputError,
+  } = useValidateEmailListInput(existingOwnerEmails, EMAIL_VALIDATION_ERRORS);
 
   const onConfirmDelete = React.useCallback(() => {
     updateOwners(owners.filter((owner) => owner !== ownerToDelete?.id));
@@ -167,9 +164,4 @@ export function ModalEditOwners(props: ModalEditOwnersProps) {
       />
     </>
   );
-}
-
-// Validate the input email format and verify that the input email does not correspond to an existing owner.
-function isInputEmailInExistingOwners(ownerEmailInput: string, existingOwners: UserData[]) {
-  return existingOwners.find((ownerData) => ownerData.primaryEmailAddress === ownerEmailInput);
 }
