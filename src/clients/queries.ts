@@ -279,7 +279,7 @@ export const GET_TEMPLATES = gql`
 `;
 
 export const CHECK_IF_USERS_RESPONDED_TO_INQUIRY = gql`
-  query checkIfUsersRespondedToInquiry($userEmails: [String!]!, $inquiryId: String!) {
+  query checkIfUsersRespondedToInquiry($userEmails: [String!]!, $inquiryId: ID!) {
     checkIfUsersRespondedToInquiry(userEmails: $userEmails, inquiryId: $inquiryId)
   }
 `;

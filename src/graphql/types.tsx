@@ -376,7 +376,7 @@ export type Query = {
 
 
 export type QueryCheckIfUsersRespondedToInquiryArgs = {
-  inquiryId: Scalars['String']['input'];
+  inquiryId: Scalars['ID']['input'];
   userEmails: Array<Scalars['String']['input']>;
 };
 
@@ -800,7 +800,7 @@ export type GetInquiryTemplatesQuery = { __typename?: 'Query', getInquiryTemplat
 
 export type CheckIfUsersRespondedToInquiryQueryVariables = Exact<{
   userEmails: Array<Scalars['String']['input']> | Scalars['String']['input'];
-  inquiryId: Scalars['String']['input'];
+  inquiryId: Scalars['ID']['input'];
 }>;
 
 
