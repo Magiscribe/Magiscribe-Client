@@ -1,4 +1,5 @@
 import React from 'react';
+import dayjs from 'dayjs';
 import CustomModal from '../modal';
 import Button from '@/components/controls/button';
 import Input from '@/components/controls/input';
@@ -16,6 +17,7 @@ interface ModalShareInqiryProps {
   open: boolean;
   onClose: () => void;
 }
+
 
 export const SHARE_INQUIRY_MODAL_EMAIL_VALIDATION_ERRORS: EmailValidationErrors = {
   INVALID_EMAIL_INPUT_ERROR: 'Please enter a valid user email',
@@ -127,7 +129,7 @@ export function ModalShareInquiry(props: ModalShareInqiryProps) {
               <DataWithLabel
                 label="Last Contacted"
                 name={item.lastContacted ?? 'NA'}
-                value={item.lastContacted ?? 'NA'}
+                value={item.lastContacted ? dayjs(item.lastContacted).format("YYYY-MM-DD HH:mm:ss"): "NA"}
                 disabled={true}
               />
               <DataWithLabel

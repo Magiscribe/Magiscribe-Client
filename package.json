@@ -29,6 +29,7 @@
     "@tailwindcss/vite": "^4.0.5",
     "@xyflow/react": "^12.4.2",
     "clsx": "^2.1.1",
+    "dayjs": "^1.11.13",
     "globals": "^15.14.0",
     "graphql": "16.10.0",
     "graphql-ws": "6.0.3",
