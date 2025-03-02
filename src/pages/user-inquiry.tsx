@@ -7,6 +7,7 @@ import Textarea from '@/components/controls/textarea';
 import RatingInput from '@/components/graph/rating-input';
 import MarkdownCustom from '@/components/markdown-custom';
 import { S3ImageLoader } from '@/components/s3-image-loader';
+import { UserDataInput } from '@/graphql/graphql';
 import { InquiryResponseUserDetails } from '@/graphql/types';
 import { useTranscribe } from '@/hooks/audio-hook';
 import useElevenLabsAudio from '@/hooks/audio-player';
@@ -22,7 +23,7 @@ import { faArrowUp, faChevronRight, faMicrophone, faMicrophoneSlash } from '@for
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { motion } from 'motion/react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 
 interface Message {
   id: string;
@@ -66,6 +67,7 @@ export default function UserInquiryPage() {
   const [selectedRatings, setSelectedRatings] = useState<string[]>([]);
   const [currentNode, setCurrentNode] = useState<StrippedNode | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const { primaryEmailAddress, firstName } = useUserInfoFromUrl();
 
   // Message Hooks
   const { messages, addMessage, isQueueProcessing: isProcessing } = useMessageQueue();
@@ -280,7 +282,7 @@ export default function UserInquiryPage() {
         <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white">{settings.title}</h2>
         <p className="text-slate-600 dark:text-slate-300 mb-6">{description}</p>
         <div className="space-y-4">
-          {requireNameCapture && (
+          {requireNameCapture && !firstName && (
             <Input
               label="Name"
               name="name"
@@ -290,7 +292,7 @@ export default function UserInquiryPage() {
               error={errors.name}
             />
           )}
-          {requireEmailCapture && (
+          {requireEmailCapture && !primaryEmailAddress && (
             <Input
               label="Email"
               name="email"
@@ -510,4 +512,25 @@ export default function UserInquiryPage() {
       {(screen === 'inquiry' || screen === 'end') && !state.error && renderInputArea()}
     </>
   );
+}
+
+function useUserInfoFromUrl(): UserDataInput {
+  const { setUserDetails } = useInquiry();
+  const [searchParams] = useSearchParams();
+  const email = searchParams.get('email');
+  const name = searchParams.get('name');
+
+  React.useEffect(() => {
+    if (email || name) {
+      setUserDetails({
+        email,
+        name,
+      });
+    }
+  }, [name, email]);
+
+  return {
+    primaryEmailAddress: email ?? '',
+    firstName: name ?? '',
+  };
 }

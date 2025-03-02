@@ -203,6 +203,7 @@ export type Mutation = {
   deleteInquiryResponse?: Maybe<InquiryResponse>;
   deleteMediaAsset?: Maybe<Scalars['Int']['output']>;
   deletePrompt?: Maybe<Prompt>;
+  emailInquiryToUsers?: Maybe<Scalars['String']['output']>;
   generateAudio?: Maybe<Scalars['String']['output']>;
   registerUser: Scalars['Boolean']['output'];
   updateInquiryOwners: Inquiry;
@@ -261,6 +262,12 @@ export type MutationDeleteMediaAssetArgs = {
 
 export type MutationDeletePromptArgs = {
   promptId: Scalars['ID']['input'];
+};
+
+
+export type MutationEmailInquiryToUsersArgs = {
+  inquiryId: Scalars['String']['input'];
+  userData: Array<UserDataInput>;
 };
 
 
@@ -343,6 +350,7 @@ export type PromptInput = {
 
 export type Query = {
   __typename?: 'Query';
+  checkIfUsersRespondedToInquiry?: Maybe<Array<Scalars['String']['output']>>;
   getAgent?: Maybe<Agent>;
   getAgentWithPrompts?: Maybe<Agent>;
   getAllAgents: Array<Agent>;
@@ -364,6 +372,12 @@ export type Query = {
   getUsersByEmail?: Maybe<Array<Maybe<UserData>>>;
   getUsersById?: Maybe<Array<UserData>>;
   isUserRegistered: Scalars['Boolean']['output'];
+};
+
+
+export type QueryCheckIfUsersRespondedToInquiryArgs = {
+  inquiryId: Scalars['ID']['input'];
+  userEmails: Array<Scalars['String']['input']>;
 };
 
 
@@ -472,6 +486,15 @@ export type UserData = {
   lastName?: Maybe<Scalars['String']['output']>;
   primaryEmailAddress: Scalars['String']['output'];
   username?: Maybe<Scalars['String']['output']>;
+};
+
+export type UserDataInput = {
+  firstName?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['String']['input']>;
+  lastContacted?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  primaryEmailAddress: Scalars['String']['input'];
+  username?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Voice = {
@@ -638,6 +661,14 @@ export type SendContactMutationVariables = Exact<{
 
 export type SendContactMutation = { __typename?: 'Mutation', contact: { __typename?: 'ContactResponse', success: boolean, messageId?: string | null } };
 
+export type EmailInquiryToUsersMutationVariables = Exact<{
+  userData: Array<UserDataInput> | UserDataInput;
+  inquiryId: Scalars['String']['input'];
+}>;
+
+
+export type EmailInquiryToUsersMutation = { __typename?: 'Mutation', emailInquiryToUsers?: string | null };
+
 export type GetAllModelsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -766,6 +797,14 @@ export type GetInquiryTemplatesQueryVariables = Exact<{ [key: string]: never; }>
 
 
 export type GetInquiryTemplatesQuery = { __typename?: 'Query', getInquiryTemplates: Array<any> };
+
+export type CheckIfUsersRespondedToInquiryQueryVariables = Exact<{
+  userEmails: Array<Scalars['String']['input']> | Scalars['String']['input'];
+  inquiryId: Scalars['ID']['input'];
+}>;
+
+
+export type CheckIfUsersRespondedToInquiryQuery = { __typename?: 'Query', checkIfUsersRespondedToInquiry?: Array<string> | null };
 
 export type PredictionAddedSubscriptionVariables = Exact<{
   subscriptionId: Scalars['ID']['input'];
