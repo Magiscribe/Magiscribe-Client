@@ -59,6 +59,12 @@ export type AgentReasoningInput = {
   variablePassThrough: Scalars['Boolean']['input'];
 };
 
+export type AverageInquiryResponseTime = {
+  __typename?: 'AverageInquiryResponseTime';
+  minutes: Scalars['Float']['output'];
+  responseCount: Scalars['Int']['output'];
+};
+
 export type Capability = {
   __typename?: 'Capability';
   alias: Scalars['String']['output'];
@@ -359,6 +365,7 @@ export type Query = {
   getAllCollections: Array<Collection>;
   getAllModels: Array<Model>;
   getAllPrompts?: Maybe<Array<Maybe<Prompt>>>;
+  getAverageInquiryResponseTime: AverageInquiryResponseTime;
   getCapability?: Maybe<Capability>;
   getCollection?: Maybe<Collection>;
   getInquiries?: Maybe<Array<Inquiry>>;
@@ -403,6 +410,11 @@ export type QueryGetAllCapabilitiesArgs = {
 
 export type QueryGetAllPromptsArgs = {
   logicalCollection?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryGetAverageInquiryResponseTimeArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -805,6 +817,13 @@ export type CheckIfUsersRespondedToInquiryQueryVariables = Exact<{
 
 
 export type CheckIfUsersRespondedToInquiryQuery = { __typename?: 'Query', checkIfUsersRespondedToInquiry?: Array<string> | null };
+
+export type GetAverageInquiryResponseTimeQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type GetAverageInquiryResponseTimeQuery = { __typename?: 'Query', getAverageInquiryResponseTime: { __typename?: 'AverageInquiryResponseTime', minutes: number, responseCount: number } };
 
 export type PredictionAddedSubscriptionVariables = Exact<{
   subscriptionId: Scalars['ID']['input'];

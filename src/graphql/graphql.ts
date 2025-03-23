@@ -17,6 +17,25 @@ export type Scalars = {
   JSONObject: { input: any; output: any; }
 };
 
+export type AddMediaAssetResponse = {
+  __typename?: 'AddMediaAssetResponse';
+  id: Scalars['String']['output'];
+  signedUrl: Scalars['String']['output'];
+};
+
+export type Agent = {
+  __typename?: 'Agent';
+  capabilities: Array<Capability>;
+  description: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  logicalCollection: Collection;
+  memoryEnabled: Scalars['Boolean']['output'];
+  name: Scalars['String']['output'];
+  outputFilter?: Maybe<Scalars['String']['output']>;
+  reasoning?: Maybe<AgentReasoning>;
+  subscriptionFilter?: Maybe<Scalars['String']['output']>;
+};
+
 export type AgentInput = {
   capabilities: Array<InputMaybe<Scalars['String']['input']>>;
   description: Scalars['String']['input'];
@@ -29,10 +48,37 @@ export type AgentInput = {
   subscriptionFilter?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type AgentReasoning = {
+  __typename?: 'AgentReasoning';
+  llmModel: Scalars['String']['output'];
+  prompt: Scalars['String']['output'];
+  variablePassThrough: Scalars['Boolean']['output'];
+};
+
 export type AgentReasoningInput = {
   llmModel: Scalars['String']['input'];
   prompt: Scalars['String']['input'];
   variablePassThrough: Scalars['Boolean']['input'];
+};
+
+export type AverageInquiryResponseTime = {
+  __typename?: 'AverageInquiryResponseTime';
+  minutes: Scalars['Float']['output'];
+  responseCount: Scalars['Int']['output'];
+};
+
+export type Capability = {
+  __typename?: 'Capability';
+  alias: Scalars['String']['output'];
+  description: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  llmModel: Scalars['String']['output'];
+  logicalCollection: Collection;
+  name: Scalars['String']['output'];
+  outputFilter?: Maybe<Scalars['String']['output']>;
+  outputMode: Scalars['String']['output'];
+  prompts: Array<Prompt>;
+  subscriptionFilter?: Maybe<Scalars['String']['output']>;
 };
 
 export type CapabilityInput = {
@@ -48,6 +94,12 @@ export type CapabilityInput = {
   subscriptionFilter?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type Collection = {
+  __typename?: 'Collection';
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+};
+
 export type CollectionInput = {
   id?: InputMaybe<Scalars['ID']['input']>;
   name: Scalars['String']['input'];
@@ -59,12 +111,52 @@ export type ContactInput = {
   name: Scalars['String']['input'];
 };
 
+export type ContactResponse = {
+  __typename?: 'ContactResponse';
+  messageId?: Maybe<Scalars['String']['output']>;
+  success: Scalars['Boolean']['output'];
+};
+
 export type FloatFilter = {
   eq?: InputMaybe<Scalars['Float']['input']>;
   gt?: InputMaybe<Scalars['Float']['input']>;
   gte?: InputMaybe<Scalars['Float']['input']>;
   lt?: InputMaybe<Scalars['Float']['input']>;
   lte?: InputMaybe<Scalars['Float']['input']>;
+};
+
+export type Inquiry = {
+  __typename?: 'Inquiry';
+  createdAt: Scalars['Float']['output'];
+  data: InquiryData;
+  id: Scalars['ID']['output'];
+  responses?: Maybe<Array<InquiryResponse>>;
+  updatedAt: Scalars['Float']['output'];
+  userId?: Maybe<Array<Scalars['ID']['output']>>;
+};
+
+export type InquiryData = {
+  __typename?: 'InquiryData';
+  draftGraph?: Maybe<Scalars['JSONObject']['output']>;
+  graph?: Maybe<Scalars['JSONObject']['output']>;
+  metadata?: Maybe<Scalars['JSONObject']['output']>;
+  settings: InquirySettings;
+};
+
+export type InquiryResponse = {
+  __typename?: 'InquiryResponse';
+  createdAt: Scalars['Float']['output'];
+  data: InquiryResponseData;
+  id: Scalars['ID']['output'];
+  updatedAt: Scalars['Float']['output'];
+  userId?: Maybe<Scalars['ID']['output']>;
+};
+
+export type InquiryResponseData = {
+  __typename?: 'InquiryResponseData';
+  history: Array<Scalars['JSONObject']['output']>;
+  status: InquiryResponseStatus;
+  userDetails?: Maybe<InquiryResponseUserDetails>;
 };
 
 export type InquiryResponseFilters = {
@@ -79,6 +171,169 @@ export enum InquiryResponseStatus {
   Pending = 'PENDING'
 }
 
+export type InquiryResponseUserDetails = {
+  __typename?: 'InquiryResponseUserDetails';
+  email?: Maybe<Scalars['String']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  recieveEmails?: Maybe<Scalars['Boolean']['output']>;
+};
+
+export type InquirySettings = {
+  __typename?: 'InquirySettings';
+  context?: Maybe<Scalars['String']['output']>;
+  goals: Scalars['String']['output'];
+  notifications?: Maybe<InquirySettingsNotifications>;
+  title: Scalars['String']['output'];
+  voice?: Maybe<Scalars['String']['output']>;
+};
+
+export type InquirySettingsNotifications = {
+  __typename?: 'InquirySettingsNotifications';
+  recieveEmailOnResponse?: Maybe<Scalars['Boolean']['output']>;
+};
+
+export type Model = {
+  __typename?: 'Model';
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  region: Scalars['String']['output'];
+};
+
+export type Mutation = {
+  __typename?: 'Mutation';
+  addMediaAsset?: Maybe<AddMediaAssetResponse>;
+  addPrediction?: Maybe<Scalars['String']['output']>;
+  contact: ContactResponse;
+  deleteAgent?: Maybe<Agent>;
+  deleteCapability?: Maybe<Capability>;
+  deleteCollection?: Maybe<Collection>;
+  deleteInquiry?: Maybe<Inquiry>;
+  deleteInquiryResponse?: Maybe<InquiryResponse>;
+  deleteMediaAsset?: Maybe<Scalars['Int']['output']>;
+  deletePrompt?: Maybe<Prompt>;
+  emailInquiryToUsers?: Maybe<Scalars['String']['output']>;
+  generateAudio?: Maybe<Scalars['String']['output']>;
+  registerUser: Scalars['Boolean']['output'];
+  updateInquiryOwners: Inquiry;
+  upsertAgent?: Maybe<Agent>;
+  upsertCapability?: Maybe<Capability>;
+  upsertCollection?: Maybe<Collection>;
+  upsertInquiry: Inquiry;
+  upsertInquiryResponse: InquiryResponse;
+  upsertPrompt?: Maybe<Prompt>;
+};
+
+
+export type MutationAddPredictionArgs = {
+  agentId: Scalars['ID']['input'];
+  attachments?: InputMaybe<Array<Scalars['JSONObject']['input']>>;
+  subscriptionId: Scalars['ID']['input'];
+  variables?: InputMaybe<Scalars['JSONObject']['input']>;
+};
+
+
+export type MutationContactArgs = {
+  input: ContactInput;
+};
+
+
+export type MutationDeleteAgentArgs = {
+  agentId: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteCapabilityArgs = {
+  capabilityId: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteCollectionArgs = {
+  collectionId: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteInquiryArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteInquiryResponseArgs = {
+  id: Scalars['ID']['input'];
+  inquiryId: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteMediaAssetArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+export type MutationDeletePromptArgs = {
+  promptId: Scalars['ID']['input'];
+};
+
+
+export type MutationEmailInquiryToUsersArgs = {
+  inquiryId: Scalars['String']['input'];
+  userData: Array<UserDataInput>;
+};
+
+
+export type MutationGenerateAudioArgs = {
+  text: Scalars['String']['input'];
+  voice: Scalars['String']['input'];
+};
+
+
+export type MutationUpdateInquiryOwnersArgs = {
+  id: Scalars['ID']['input'];
+  owners: Array<Scalars['String']['input']>;
+};
+
+
+export type MutationUpsertAgentArgs = {
+  agent: AgentInput;
+};
+
+
+export type MutationUpsertCapabilityArgs = {
+  capability: CapabilityInput;
+};
+
+
+export type MutationUpsertCollectionArgs = {
+  input: CollectionInput;
+};
+
+
+export type MutationUpsertInquiryArgs = {
+  data: Scalars['JSONObject']['input'];
+  fields?: InputMaybe<Array<Scalars['String']['input']>>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type MutationUpsertInquiryResponseArgs = {
+  data: Scalars['JSONObject']['input'];
+  fields?: InputMaybe<Array<Scalars['String']['input']>>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  inquiryId: Scalars['ID']['input'];
+  subscriptionId: Scalars['ID']['input'];
+};
+
+
+export type MutationUpsertPromptArgs = {
+  prompt: PromptInput;
+};
+
+export type Prediction = {
+  __typename?: 'Prediction';
+  id: Scalars['ID']['output'];
+  result?: Maybe<Scalars['String']['output']>;
+  subscriptionId: Scalars['ID']['output'];
+  type: PredictionType;
+};
+
 export enum PredictionType {
   Data = 'DATA',
   Error = 'ERROR',
@@ -86,11 +341,133 @@ export enum PredictionType {
   Success = 'SUCCESS'
 }
 
+export type Prompt = {
+  __typename?: 'Prompt';
+  id: Scalars['ID']['output'];
+  logicalCollection: Collection;
+  name: Scalars['String']['output'];
+  text: Scalars['String']['output'];
+};
+
 export type PromptInput = {
   id?: InputMaybe<Scalars['ID']['input']>;
   logicalCollection: Scalars['String']['input'];
   name: Scalars['String']['input'];
   text: Scalars['String']['input'];
+};
+
+export type Query = {
+  __typename?: 'Query';
+  checkIfUsersRespondedToInquiry?: Maybe<Array<Scalars['String']['output']>>;
+  getAgent?: Maybe<Agent>;
+  getAgentWithPrompts?: Maybe<Agent>;
+  getAllAgents: Array<Agent>;
+  getAllAudioVoices: Array<Voice>;
+  getAllCapabilities: Array<Capability>;
+  getAllCollections: Array<Collection>;
+  getAllModels: Array<Model>;
+  getAllPrompts?: Maybe<Array<Maybe<Prompt>>>;
+  getAverageInquiryResponseTime: AverageInquiryResponseTime;
+  getCapability?: Maybe<Capability>;
+  getCollection?: Maybe<Collection>;
+  getInquiries?: Maybe<Array<Inquiry>>;
+  getInquiry?: Maybe<Inquiry>;
+  getInquiryResponse?: Maybe<InquiryResponse>;
+  getInquiryResponseCount: Scalars['Int']['output'];
+  getInquiryResponses?: Maybe<Array<InquiryResponse>>;
+  getInquiryTemplates: Array<Scalars['JSONObject']['output']>;
+  getMediaAsset?: Maybe<Scalars['String']['output']>;
+  getPrompt?: Maybe<Prompt>;
+  getUsersByEmail?: Maybe<Array<Maybe<UserData>>>;
+  getUsersById?: Maybe<Array<UserData>>;
+  isUserRegistered: Scalars['Boolean']['output'];
+};
+
+
+export type QueryCheckIfUsersRespondedToInquiryArgs = {
+  inquiryId: Scalars['ID']['input'];
+  userEmails: Array<Scalars['String']['input']>;
+};
+
+
+export type QueryGetAgentArgs = {
+  agentId: Scalars['ID']['input'];
+};
+
+
+export type QueryGetAgentWithPromptsArgs = {
+  agentId: Scalars['ID']['input'];
+};
+
+
+export type QueryGetAllAgentsArgs = {
+  logicalCollection?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryGetAllCapabilitiesArgs = {
+  logicalCollection?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryGetAllPromptsArgs = {
+  logicalCollection?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryGetAverageInquiryResponseTimeArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryGetCapabilityArgs = {
+  capabilityId: Scalars['ID']['input'];
+};
+
+
+export type QueryGetCollectionArgs = {
+  collectionId: Scalars['ID']['input'];
+};
+
+
+export type QueryGetInquiryArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryGetInquiryResponseArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryGetInquiryResponseCountArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryGetInquiryResponsesArgs = {
+  filters?: InputMaybe<InquiryResponseFilters>;
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryGetMediaAssetArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+export type QueryGetPromptArgs = {
+  promptId: Scalars['ID']['input'];
+};
+
+
+export type QueryGetUsersByEmailArgs = {
+  userEmails: Array<Scalars['String']['input']>;
+};
+
+
+export type QueryGetUsersByIdArgs = {
+  userIds: Array<Scalars['String']['input']>;
 };
 
 export enum Role {
@@ -106,6 +483,25 @@ export type StringFilter = {
   startsWith?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type Subscription = {
+  __typename?: 'Subscription';
+  predictionAdded?: Maybe<Prediction>;
+};
+
+
+export type SubscriptionPredictionAddedArgs = {
+  subscriptionId: Scalars['ID']['input'];
+};
+
+export type UserData = {
+  __typename?: 'UserData';
+  firstName?: Maybe<Scalars['String']['output']>;
+  id: Scalars['String']['output'];
+  lastName?: Maybe<Scalars['String']['output']>;
+  primaryEmailAddress: Scalars['String']['output'];
+  username?: Maybe<Scalars['String']['output']>;
+};
+
 export type UserDataInput = {
   firstName?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['String']['input']>;
@@ -113,6 +509,13 @@ export type UserDataInput = {
   lastName?: InputMaybe<Scalars['String']['input']>;
   primaryEmailAddress: Scalars['String']['input'];
   username?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type Voice = {
+  __typename?: 'Voice';
+  id: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  tags: Array<Scalars['String']['output']>;
 };
 
 export type GenerateAudioMutationVariables = Exact<{
@@ -417,6 +820,13 @@ export type CheckIfUsersRespondedToInquiryQueryVariables = Exact<{
 
 export type CheckIfUsersRespondedToInquiryQuery = { __typename?: 'Query', checkIfUsersRespondedToInquiry?: Array<string> | null };
 
+export type GetAverageInquiryResponseTimeQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type GetAverageInquiryResponseTimeQuery = { __typename?: 'Query', getAverageInquiryResponseTime: { __typename?: 'AverageInquiryResponseTime', minutes: number, responseCount: number } };
+
 export type PredictionAddedSubscriptionVariables = Exact<{
   subscriptionId: Scalars['ID']['input'];
 }>;
@@ -468,4 +878,5 @@ export const GetAllCollectionsDocument = {"kind":"Document","definitions":[{"kin
 export const IsUserRegisteredDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"isUserRegistered"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"isUserRegistered"}}]}}]} as unknown as DocumentNode<IsUserRegisteredQuery, IsUserRegisteredQueryVariables>;
 export const GetInquiryTemplatesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getInquiryTemplates"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getInquiryTemplates"}}]}}]} as unknown as DocumentNode<GetInquiryTemplatesQuery, GetInquiryTemplatesQueryVariables>;
 export const CheckIfUsersRespondedToInquiryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"checkIfUsersRespondedToInquiry"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"userEmails"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"inquiryId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"checkIfUsersRespondedToInquiry"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"userEmails"},"value":{"kind":"Variable","name":{"kind":"Name","value":"userEmails"}}},{"kind":"Argument","name":{"kind":"Name","value":"inquiryId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"inquiryId"}}}]}]}}]} as unknown as DocumentNode<CheckIfUsersRespondedToInquiryQuery, CheckIfUsersRespondedToInquiryQueryVariables>;
+export const GetAverageInquiryResponseTimeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getAverageInquiryResponseTime"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getAverageInquiryResponseTime"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"minutes"}},{"kind":"Field","name":{"kind":"Name","value":"responseCount"}}]}}]}}]} as unknown as DocumentNode<GetAverageInquiryResponseTimeQuery, GetAverageInquiryResponseTimeQueryVariables>;
 export const PredictionAddedDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"subscription","name":{"kind":"Name","value":"predictionAdded"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"subscriptionId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"predictionAdded"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"subscriptionId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"subscriptionId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"subscriptionId"}},{"kind":"Field","name":{"kind":"Name","value":"result"}},{"kind":"Field","name":{"kind":"Name","value":"type"}}]}}]}}]} as unknown as DocumentNode<PredictionAddedSubscription, PredictionAddedSubscriptionVariables>;
