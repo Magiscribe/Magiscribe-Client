@@ -97,6 +97,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const [metadata, setMetadata] = useState<Metadata>({
     images: [],
     text: '',
+    inviteList: [],
   });
 
   const [owners, setOwners] = useState<string[]>([]);

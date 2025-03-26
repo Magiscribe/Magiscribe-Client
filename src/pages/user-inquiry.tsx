@@ -274,7 +274,7 @@ export default function UserInquiryPage() {
 
   const renderStartScreen = () => {
     const startNode = graph?.getCurrentNode();
-    
+
     const requireNameCapture = (startNode?.data?.requireName as boolean) ?? false;
     const requireEmailCapture = (startNode?.data?.requireEmail as boolean) ?? false;
     const description = (startNode?.data?.text as string) ?? '';
@@ -282,7 +282,9 @@ export default function UserInquiryPage() {
     return (
       <div className="bg-white dark:bg-slate-700 p-6 rounded-3xl shadow-lg">
         <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white">{settings.title}</h2>
-        {expectedInquiryResponseTime && (<p className="text-slate-600 dark:text-slate-300 mb-6">{`Estimated completion time: ${expectedInquiryResponseTime}`}</p>)}
+        {expectedInquiryResponseTime && (
+          <p className="text-slate-600 dark:text-slate-300 mb-6">{`Estimated completion time: ${expectedInquiryResponseTime}`}</p>
+        )}
         <p className="text-slate-600 dark:text-slate-300 mb-6">{description}</p>
         <div className="space-y-4">
           {requireNameCapture && !firstName && (

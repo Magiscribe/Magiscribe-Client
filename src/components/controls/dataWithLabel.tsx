@@ -24,7 +24,7 @@ interface DataWithLabelProps extends React.InputHTMLAttributes<HTMLInputElement>
  * @param {InputProps} props - The props for the Input component.
  * @returns {JSX.Element} The rendered Input component.
  */
-export default function DataWithLabel({ label, subLabel, name, className, ...props }: DataWithLabelProps) {
+export default function DataWithLabel({ label, subLabel, className, ...props }: DataWithLabelProps) {
   // A React hook that generates a unique ID for the input element to reference the label.
   const id = useId();
 

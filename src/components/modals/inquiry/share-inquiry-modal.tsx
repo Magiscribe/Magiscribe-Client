@@ -1,23 +1,23 @@
-import React from 'react';
-import dayjs from 'dayjs';
-import CustomModal from '../modal';
+import { EMAIL_INQUIRY_TO_USERS } from '@/clients/mutations';
+import { CHECK_IF_USERS_RESPONDED_TO_INQUIRY } from '@/clients/queries';
 import Button from '@/components/controls/button';
+import DataWithLabel from '@/components/controls/dataWithLabel';
 import Input from '@/components/controls/input';
 import { EmailValidationErrors, useValidateEmailListInput } from '@/components/graph/utils/email-validation';
+import { CheckIfUsersRespondedToInquiryQuery } from '@/graphql/graphql';
+import { UserDataInput } from '@/graphql/types';
+import {} from '@/graphql/types';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { useLazyQuery, useMutation } from '@apollo/client';
-import { EMAIL_INQUIRY_TO_USERS } from '@/clients/mutations';
-import { UserDataInput } from '@/graphql/types';
-import { CHECK_IF_USERS_RESPONDED_TO_INQUIRY } from '@/clients/queries';
-import {} from '@/graphql/types';
-import { CheckIfUsersRespondedToInquiryQuery } from '@/graphql/graphql';
-import DataWithLabel from '@/components/controls/dataWithLabel';
+import dayjs from 'dayjs';
+import React from 'react';
+
+import CustomModal from '../modal';
 
 interface ModalShareInqiryProps {
   open: boolean;
   onClose: () => void;
 }
-
 
 export const SHARE_INQUIRY_MODAL_EMAIL_VALIDATION_ERRORS: EmailValidationErrors = {
   INVALID_EMAIL_INPUT_ERROR: 'Please enter a valid user email',
@@ -60,7 +60,7 @@ export function ModalShareInquiry(props: ModalShareInqiryProps) {
       // Only email users that weren't already contacted
       const usersToEmail = metadata.inviteList.filter((user) => !user.lastContacted);
       const emailsContacted = usersToEmail.map((users) => users.primaryEmailAddress);
-      const result = await emailInquiryToUsers({
+      await emailInquiryToUsers({
         variables: {
           userData: usersToEmail,
           inquiryId: id,
@@ -129,7 +129,7 @@ export function ModalShareInquiry(props: ModalShareInqiryProps) {
               <DataWithLabel
                 label="Last Contacted"
                 name={item.lastContacted ?? 'NA'}
-                value={item.lastContacted ? dayjs(item.lastContacted).format("YYYY-MM-DD HH:mm:ss"): "NA"}
+                value={item.lastContacted ? dayjs(item.lastContacted).format('YYYY-MM-DD HH:mm:ss') : 'NA'}
                 disabled={true}
               />
               <DataWithLabel

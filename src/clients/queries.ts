@@ -286,7 +286,7 @@ export const CHECK_IF_USERS_RESPONDED_TO_INQUIRY = gql`
 
 export const GET_INQUIRY_RESPONSE_TIME = gql`
   query getAverageInquiryResponseTime($id: ID!) {
-    getAverageInquiryResponseTime(id: $id) {  
+    getAverageInquiryResponseTime(id: $id) {
       minutes
       responseCount
     }
