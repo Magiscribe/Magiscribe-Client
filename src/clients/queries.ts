@@ -283,3 +283,12 @@ export const CHECK_IF_USERS_RESPONDED_TO_INQUIRY = gql`
     checkIfUsersRespondedToInquiry(userEmails: $userEmails, inquiryId: $inquiryId)
   }
 `;
+
+export const GET_INQUIRY_RESPONSE_TIME = gql`
+  query getAverageInquiryResponseTime($id: ID!) {
+    getAverageInquiryResponseTime(id: $id) {  
+      minutes
+      responseCount
+    }
+  }
+`;
