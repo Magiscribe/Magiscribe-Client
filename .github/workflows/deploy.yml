@@ -22,7 +22,7 @@ jobs:
       - name: Assume AWS Role
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ github.ref == 'refs/heads/main' && 'arn:aws:iam::211125562192:role/GitHubAssumeRole' || 'arn:aws:iam::891377366124:role/GitHubAssumeRole' }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: us-east-1
 
       - uses: pnpm/action-setup@v4
@@ -37,14 +37,25 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Create .env file
+        run: |
+          cat > .env << EOL
+          # GraphQL
+          VITE_APP_WS_SERVER_URL=${{ secrets.VITE_APP_WS_SERVER_URL }}
+          VITE_APP_HTTP_SERVER_URL=${{ secrets.VITE_APP_HTTP_SERVER_URL }}
+          VITE_APP_CLERK_PK=${{ secrets.VITE_APP_CLERK_PK }}
+          EOL
+
       - name: Build
         run: |
           pnpm build --mode ${{ github.ref == 'refs/heads/main' && 'production' || 'development' }}
+        env:
+          NODE_ENV: ${{ github.ref == 'refs/heads/main' && 'production' || 'development' }}
 
       - name: Deploy
         run: |
           # Upload to S3
-          aws s3 sync dist/ s3://${{ github.ref == 'refs/heads/main' && 'client-dashboard-bucket-20240612194953021800000001' || 'client-dashboard-bucket-20240612193909644100000001' }} --delete
+          aws s3 sync dist/ s3://${{ secrets.S3_BUCKET }} --delete
 
           # Invalidate CloudFront cache
-          aws cloudfront create-invalidation --distribution-id ${{ github.ref == 'refs/heads/main' && 'E18WT1BH9N6CZG' || 'EEUTUZS1J24KA' }} --paths "/*"
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
