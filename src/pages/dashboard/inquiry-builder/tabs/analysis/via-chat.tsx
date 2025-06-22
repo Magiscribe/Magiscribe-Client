@@ -9,6 +9,7 @@ import { AddPredictionMutation, GetInquiryQuery, GetInquiryResponsesQuery } from
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
 import { getAgentIdByName } from '@/utils/agents';
 import { parseCodeBlocks } from '@/utils/markdown';
+import { minimizeAnalysisData } from '@/utils/analysis-data-minimizer';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
 import { faPaperPlane, faSpinner, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -113,18 +114,12 @@ const ViaChatTab: React.FC<ViaChatTabProps> = ({ id }) => {
     if (inputMessage.trim() === '') return;
 
     setMessages((prevMessages) => [...prevMessages, { type: 'text', content: inputMessage, sender: 'user' }]);
-    setInputMessage('');
-
-    const agentId = await getAgentIdByName('Chat Analysis', client);
+    setInputMessage('');    const agentId = await getAgentIdByName('Chat Analysis', client);
     if (agentId) {
       setLoading(true);
       try {
-        const data = {
-          id,
-          settings: inquiryData?.getInquiry?.data?.settings,
-          graph: inquiryData?.getInquiry?.data?.graph ?? inquiryData?.getInquiry?.data?.draftGraph,
-          responses: inquiryResponseData?.getInquiryResponses ?? [],
-        };
+        // Create minimized data structure for efficient LLM processing
+        const minimizedData = minimizeAnalysisData(inquiryData, inquiryResponseData);
 
         await addPrediction({
           variables: {
@@ -132,8 +127,8 @@ const ViaChatTab: React.FC<ViaChatTabProps> = ({ id }) => {
             agentId,
             input: {
               userMessage: inputMessage,
-              conversationData: JSON.stringify(data.responses),
-              numResponses: data.responses?.length ?? 0,
+              conversationData: JSON.stringify(minimizedData),
+              numResponses: minimizedData.responses.length,
             },
           },
         });
