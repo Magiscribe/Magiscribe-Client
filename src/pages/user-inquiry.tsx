@@ -394,7 +394,7 @@ export default function UserInquiryPage() {
     <div className="w-full p-4 max-w-4xl mx-auto">
       {screen === 'inquiry' && (
         <>
-          {currentNode && !state.loading && ((currentNode?.data?.type ?? '') as string).startsWith('rating') && (
+          {currentNode && !state.loading && ((currentNode?.data?.type ?? '') as string).endsWith('-select') && (
             <RatingInput
               ratings={(currentNode.data.ratings as string[]) ?? []}
               isMulti={currentNode.data.type === 'multi-select'}
