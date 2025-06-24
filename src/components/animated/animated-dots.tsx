@@ -1,9 +1,9 @@
-import { motion } from 'motion/react';
+import { motion, Transition } from 'motion/react';
 
-const bounceTransition = {
+const bounceTransition: Transition = {
   duration: 0.4,
   repeat: Infinity,
-  ease: 'easeOut',
+  ease: 'easeOut'
 };
 
 export default function AnimatedDots() {

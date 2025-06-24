@@ -114,9 +114,9 @@ const ViaChatTab: React.FC<ViaChatTabProps> = ({ id }) => {
     if (inputMessage.trim() === '') return;
 
     setMessages((prevMessages) => [...prevMessages, { type: 'text', content: inputMessage, sender: 'user' }]);
-    setInputMessage(''); 
+    setInputMessage('');
     const agentId = await getAgentIdByName('Chat Analysis', client);
-    
+
     if (agentId) {
       setLoading(true);
       try {

@@ -1,4 +1,5 @@
 import { GetInquiryQuery, GetInquiryResponsesQuery } from '@/graphql/graphql';
+import { Graph, QuestionNodeData } from '@/types/conversation';
 
 /**
  * Minimized data structure for efficient LLM analysis
@@ -34,28 +35,30 @@ export interface MinimizedAnalysisData {
  */
 export function minimizeAnalysisData(
   inquiryData: GetInquiryQuery | undefined,
-  responseData: GetInquiryResponsesQuery | undefined
+  responseData: GetInquiryResponsesQuery | undefined,
 ): MinimizedAnalysisData {
   const responses = responseData?.getInquiryResponses ?? [];
-  const graph = inquiryData?.getInquiry?.data?.graph ?? inquiryData?.getInquiry?.data?.draftGraph;
+  const graph: Graph = inquiryData?.getInquiry?.data?.graph ?? inquiryData?.getInquiry?.data?.draftGraph;
   const settings = inquiryData?.getInquiry?.data?.settings;
 
   // Extract questions from the graph
   const questions: MinimizedAnalysisData['questions'] = {};
-  
+
   if (graph?.nodes) {
-    graph.nodes.forEach((node: any) => {
+    graph.nodes.forEach((node) => {
       if (node.type === 'question' && node.data) {
-        const nodeType = node.data.type;
-        
+        const nodeData = node.data as QuestionNodeData;
+        const nodeType = nodeData.type;
+
         // Only include supported question types
         if (['single-select', 'multi-select', 'open-ended'].includes(nodeType)) {
           questions[node.id] = {
             text: node.data.text || '',
             type: nodeType as 'single-select' | 'multi-select' | 'open-ended',
-            ...(node.data.ratings && ['single-select', 'multi-select'].includes(nodeType) && {
-              options: node.data.ratings
-            })
+            ...(nodeData.ratings &&
+              ['single-select', 'multi-select'].includes(nodeType) && {
+                options: nodeData.ratings,
+              }),
           };
         }
       }
@@ -65,19 +68,19 @@ export function minimizeAnalysisData(
   // Transform responses to minimized format
   const minimizedResponses = responses.map((response) => {
     const userAnswers: { [nodeId: string]: { text?: string; selected?: string[] } } = {};
-    
+
     // Process each node visit in the user's history
     if (response.data?.history) {
-      response.data.history.forEach((nodeVisit: any) => {
+      response.data.history.forEach((nodeVisit) => {
         const nodeId = nodeVisit.id;
-        
+
         // Only include answers for question nodes we care about
         if (questions[nodeId] && nodeVisit.data?.response) {
           const responseData = nodeVisit.data.response;
-          
+
           userAnswers[nodeId] = {
             ...(responseData.text && { text: responseData.text }),
-            ...(responseData.ratings && { selected: responseData.ratings })
+            ...(responseData.ratings && { selected: responseData.ratings }),
           };
         }
       });
@@ -87,16 +90,16 @@ export function minimizeAnalysisData(
       userId: response.userId || response.id || 'anonymous',
       ...(response.data?.userDetails?.name && { name: response.data.userDetails.name }),
       ...(response.data?.userDetails?.email && { email: response.data.userDetails.email }),
-      answers: userAnswers
+      answers: userAnswers,
     };
   });
 
   return {
     summary: {
       totalResponses: responses.length,
-      inquiryTitle: settings?.title || 'Untitled Inquiry'
+      inquiryTitle: settings?.title || 'Untitled Inquiry',
     },
     questions,
-    responses: minimizedResponses
+    responses: minimizedResponses,
   };
 }
