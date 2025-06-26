@@ -2,10 +2,12 @@ import { ADD_PREDICTION } from '@/clients/mutations';
 import { GET_INQUIRIES_RESPONSES, GET_INQUIRY } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import Button from '@/components/controls/button';
+import MarkdownCustom from '@/components/markdown-custom';
 import { AddPredictionMutation, GetInquiryQuery, GetInquiryResponsesQuery } from '@/graphql/graphql';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
 import { GraphNode, NodeVisitAnalysisData, QuestionNodeData } from '@/types/conversation';
 import { getAgentIdByName } from '@/utils/agents';
+import { parseCodeBlocks } from '@/utils/markdown';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
 import { faChevronLeft, faChevronRight, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -88,7 +90,6 @@ const PerQuestionTab: React.FC<PerQuestionTabProps> = ({ id }) => {
     });
     return grouped;
   }, [inquiryResponseData?.getInquiryResponses]);
-
   useSubscription(GRAPHQL_SUBSCRIPTION, {
     variables: {
       subscriptionId,
@@ -98,12 +99,17 @@ const PerQuestionTab: React.FC<PerQuestionTabProps> = ({ id }) => {
 
       if (prediction && prediction.type === 'SUCCESS') {
         setIsGeneratingSummary(false);
-        const result = JSON.parse(JSON.parse(prediction.result)[0]);
-        if (result && result.summary) {
+        
+        // Parse the prediction result - it should be a markdown summary in triple backticks
+        const rawResult = JSON.parse(prediction.result)[0];
+        const parsedBlocks = parseCodeBlocks(rawResult, ['markdown']);
+        const summaryText = parsedBlocks.markdown || rawResult; // Fallback to raw result if no markdown block
+        
+        if (summaryText) {
           setSummaries((prev) => ({
             ...prev,
             [questionNodes[currentQuestionIndex].id]: {
-              text: result.summary,
+              text: summaryText,
               lastUpdated: new Date().toLocaleString(),
             },
           }));
@@ -167,10 +173,18 @@ const PerQuestionTab: React.FC<PerQuestionTabProps> = ({ id }) => {
     return Object.entries(nodeResponses).map(([userId, userResponses]) => {
       const userEmail = userIdToDetalsMap.get(userId)?.email;
       const userName = userIdToDetalsMap.get(userId)?.name;
-      return (
-        <div key={`${userId}-${nodeId}`} className="ml-4 mb-4">
+      return (        <div key={`${userId}-${nodeId}`} className="ml-4 mb-4">
           <p className="text-slate-700 dark:text-white font-semibold">
-            {userEmail || userName ? userName + ' (' + userEmail + ')' : userId}:
+            {(() => {
+              const name = userName;
+              const email = userEmail;
+              
+              if (!name || name === 'Unknown' || name === 'null') {
+                return `${email || userId}:`;
+              }
+              
+              return `${name} (${email}):`;
+            })()}
           </p>
           {userResponses.map((response, index) => {
             const isDynamicGeneration = response.data?.text !== undefined;
@@ -239,12 +253,11 @@ const PerQuestionTab: React.FC<PerQuestionTabProps> = ({ id }) => {
             </Button>
           ))}
         </div>
-      </div>
-
-      {currentSummary && (
+      </div>      {currentSummary && (
         <div className="my-4 p-4 bg-blue-100 dark:bg-blue-900/30 rounded-md">
-          <h3 className="font-bold mb-2">Summary</h3>
-          <p>{currentSummary.text}</p>
+          <div className="prose prose-sm max-w-none">
+            <MarkdownCustom>{currentSummary.text}</MarkdownCustom>
+          </div>
           <p className="text-sm text-slate-600 dark:text-slate-300 mt-2">Last Updated: {currentSummary.lastUpdated}</p>
         </div>
       )}
