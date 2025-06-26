@@ -4,6 +4,7 @@ import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import UserResponses from '@/components/analysis/user-responses';
 import Button from '@/components/controls/button';
 import ConfirmationModal from '@/components/modals/confirm-modal';
+import MarkdownCustom from '@/components/markdown-custom';
 import {
   AddPredictionMutation,
   DeleteInquiryResponseMutation,
@@ -14,6 +15,7 @@ import {
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
 import { useAddAlert } from '@/providers/alert-provider';
 import { getAgentIdByName } from '@/utils/agents';
+import { parseCodeBlocks } from '@/utils/markdown';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
 import { faSpinner, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -83,7 +85,6 @@ const PerResponseTab: React.FC<PerResponseTabProps> = ({ id, defaultSelect }) =>
     },
     errorPolicy: 'all',
   });
-
   // Subscription for summary generation
   useSubscription(GRAPHQL_SUBSCRIPTION, {
     variables: {
@@ -94,12 +95,17 @@ const PerResponseTab: React.FC<PerResponseTabProps> = ({ id, defaultSelect }) =>
 
       if (prediction && prediction.type === 'SUCCESS' && seletedResponse) {
         setIsGeneratingSummary(false);
-        const result = JSON.parse(JSON.parse(prediction.result)[0]);
-        if (result && result.summary) {
+        
+        // Parse the prediction result - it should be a markdown summary in triple backticks
+        const rawResult = JSON.parse(prediction.result)[0];
+        const parsedBlocks = parseCodeBlocks(rawResult, ['markdown']);
+        const summaryText = parsedBlocks.markdown || rawResult; // Fallback to raw result if no markdown block
+        
+        if (summaryText) {
           setSummaries((prev) => ({
             ...prev,
             [seletedResponse]: {
-              text: result.summary,
+              text: summaryText,
               lastUpdated: new Date().toLocaleString(),
             },
           }));
@@ -257,9 +263,17 @@ const PerResponseTab: React.FC<PerResponseTabProps> = ({ id, defaultSelect }) =>
                   seletedResponse === userId
                     ? 'bg-blue-500 dark:bg-blue-600 text-white'
                     : 'bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-white'
-                }`}
-              >
-                {data.userDetails?.name || 'Unknown'} ({data.userDetails?.email || userId})
+                }`}              >
+                {(() => {
+                  const name = data.userDetails?.name;
+                  const email = data.userDetails?.email || userId;
+                  
+                  if (!name || name === 'Unknown' || name === 'null') {
+                    return email;
+                  }
+                  
+                  return `${name} (${email})`;
+                })()}
               </button>
             ))}
           </div>
@@ -276,12 +290,11 @@ const PerResponseTab: React.FC<PerResponseTabProps> = ({ id, defaultSelect }) =>
               </Button>
             </div>
           )}
-        </div>
-
-        {seletedResponse && summaries[seletedResponse] && (
+        </div>        {seletedResponse && summaries[seletedResponse] && (
           <div className="my-4 p-4 bg-blue-100 dark:bg-blue-900 rounded-md">
-            <h3 className="font-bold mb-2">Summary</h3>
-            <p>{summaries[seletedResponse].text}</p>
+            <div className="prose prose-sm max-w-none">
+              <MarkdownCustom>{summaries[seletedResponse].text}</MarkdownCustom>
+            </div>
             <p className="text-sm text-slate-600 dark:text-slate-300 mt-2">
               Last Updated: {summaries[seletedResponse].lastUpdated}
             </p>
@@ -293,12 +306,18 @@ const PerResponseTab: React.FC<PerResponseTabProps> = ({ id, defaultSelect }) =>
         <div className="w-full">
           {seletedResponse && (
             <>
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="font-bold">
+              <div className="flex justify-between items-center mb-4">                <h2 className="font-bold">
                   User Response |{' '}
-                  {userResponse?.data.userDetails?.name
-                    ? userResponse?.data.userDetails?.name
-                    : (userResponse?.data.userDetails?.email ?? seletedResponse)}
+                  {(() => {
+                    const name = userResponse?.data.userDetails?.name;
+                    const email = userResponse?.data.userDetails?.email;
+                    
+                    if (!name || name === 'Unknown' || name === 'null') {
+                      return email || seletedResponse;
+                    }
+                    
+                    return name;
+                  })()}
                 </h2>
 
                 <Button onClick={() => setIsDeleteModalOpen(true)} variant="danger" size="small" icon={faTrash}>

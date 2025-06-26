@@ -42,10 +42,9 @@ export default function Textarea({
 
   const baseClassName =
     'w-full p-4 border rounded-2xl dark:bg-slate-600 bg-white focus:outline-hidden focus:ring-2 placeholder-slate-400';
-
   const textareaClassName = clsx(
     baseClassName,
-    'focus:ring-blue-600 resize-vertical min-h-[45px]',
+    'focus:ring-blue-600 resize-vertical min-h-[45px] max-h-[420px] overflow-y-auto',
     {
       'border-slate-400': !error,
       'border-red-700 focus:ring-red-500': error,
