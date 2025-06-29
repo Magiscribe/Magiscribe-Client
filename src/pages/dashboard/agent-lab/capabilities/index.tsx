@@ -1,9 +1,10 @@
 import { ADD_UPDATE_CAPABILITY, DELETE_CAPABILITY } from '@/clients/mutations';
-import { GET_ALL_CAPABILITIES } from '@/clients/queries';
+import { GET_ALL_CAPABILITIES, GET_ALL_MODELS } from '@/clients/queries';
 import Container from '@/components/container';
 import Button from '@/components/controls/button';
+import Select from '@/components/controls/select';
 import ConfirmationModal from '@/components/modals/confirm-modal';
-import { Capability, Prompt } from '@/graphql/types';
+import { Capability, Prompt, GetAllModelsQuery } from '@/graphql/types';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useMutation, useQuery } from '@apollo/client';
 import { motion } from 'motion/react';
@@ -14,16 +15,47 @@ function CapabilityCard({
   capability,
   onUpdate,
   onCopy,
+  models,
+  collection,
 }: {
   capability: Capability;
   onCopy: (id: string) => void;
   onUpdate?: () => void;
+  models?: GetAllModelsQuery;
+  collection?: string;
 }) {
   const [deleteCapability] = useMutation(DELETE_CAPABILITY);
+  const [upsertCapability] = useMutation(ADD_UPDATE_CAPABILITY);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const addAlert = useAddAlert();
   const navigate = useNavigate();
+
+  const handleModelChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    try {
+      await upsertCapability({
+        variables: {
+          capability: {
+            id: capability.id,
+            name: capability.name,
+            alias: capability.alias,
+            description: capability.description,
+            llmModel: e.target.value,
+            prompts: capability.prompts.map((prompt: Prompt) => prompt.id),
+            outputMode: capability.outputMode,
+            subscriptionFilter: capability.subscriptionFilter,
+            outputFilter: capability.outputFilter,
+            logicalCollection: collection,
+          },
+        },
+      });
+      addAlert('Model updated successfully', 'success');
+      if (onUpdate) onUpdate();
+    } catch (error) {
+      console.error(error);
+      addAlert('Failed to update model', 'error');
+    }
+  };
 
   const handleDelete = async () => {
     try {
@@ -44,9 +76,25 @@ function CapabilityCard({
   return (
     <div className="bg-slate-100 dark:bg-slate-600 text-slate-700 dark:text-white  p-4 rounded-2xl shadow-md h-full w-full flex flex-col">
       <div className="grow">
-        <h2 className="text-xl font-bold mb-2 break-words">
-          {capability.name} <span className="text-sm font-normal break-all">({capability.alias})</span>
-        </h2>
+        <div className="flex items-center gap-4 mb-2">
+          <h2 className="text-xl font-bold break-words flex-1">
+            {capability.name}
+          </h2>
+          <div className="flex-1">
+            <Select
+              name="llmModel"
+              value={capability.llmModel}
+              options={
+                models?.getAllModels.map((model) => ({
+                  value: model.id,
+                  label: model.name,
+                })) ?? []
+              }
+              onChange={handleModelChange}
+              className="text-sm"
+            />
+          </div>
+        </div>
         <p className="text-sm mb-4 break-words">{capability.description}</p>
         <div className="flex flex-wrap gap-2 mb-4">
           {capability.prompts.map((prompt: Prompt) => (
@@ -92,6 +140,7 @@ export default function CapabilityDashboard() {
       logicalCollection: params.collection,
     },
   });
+  const { data: models } = useQuery<GetAllModelsQuery>(GET_ALL_MODELS);
   const [upsertCapability] = useMutation(ADD_UPDATE_CAPABILITY);
 
   const addAlert = useAddAlert();
@@ -145,7 +194,14 @@ export default function CapabilityDashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2, delay: 0.05 * i }}
           >
-            <CapabilityCard key={capability.id} capability={capability} onCopy={handleCopy} onUpdate={refetch} />
+            <CapabilityCard 
+              key={capability.id} 
+              capability={capability} 
+              onCopy={handleCopy} 
+              onUpdate={refetch} 
+              models={models}
+              collection={collection}
+            />
           </motion.div>
         ))}
       </div>

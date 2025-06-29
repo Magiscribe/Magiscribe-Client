@@ -417,7 +417,10 @@ export default function UserInquiryPage() {
                   placeholder="Type your message here..."
                   onKeyDown={handleInputKeyDown}
                   rows={1}
-                  className="rounded-3xl resize-none overflow-hidden pb-12"
+                  className="rounded-3xl resize-none pb-12 pr-16 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent"
+                  style={{
+                    overflow: inputMessage.split('\n').length <= 3 ? 'hidden' : 'auto',
+                  }}
                 />
                 <Button
                   type="button"
@@ -429,7 +432,7 @@ export default function UserInquiryPage() {
                 </Button>
                 <Button
                   type="submit"
-                  className="absolute right-2 bottom-1.5"
+                  className="absolute right-3 bottom-1.5"
                   disabled={state.loading || (inputMessage.trim() === '' && selectedRatings.length === 0)}
                 >
                   <FontAwesomeIcon className="" icon={faArrowUp} />
