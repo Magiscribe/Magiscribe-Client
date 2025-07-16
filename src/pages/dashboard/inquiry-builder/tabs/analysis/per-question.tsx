@@ -1,10 +1,11 @@
 import { ADD_PREDICTION } from '@/clients/mutations';
-import { GET_INQUIRIES_RESPONSES, GET_INQUIRY } from '@/clients/queries';
+import { GET_INQUIRY } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import Button from '@/components/controls/button';
 import MarkdownCustom from '@/components/markdown-custom';
-import { AddPredictionMutation, GetInquiryQuery, GetInquiryResponsesQuery } from '@/graphql/graphql';
+import { AddPredictionMutation, GetInquiryQuery } from '@/graphql/graphql';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
+import { useFilteredResponses } from '@/hooks/useFilteredResponses';
 import { GraphNode, NodeVisitAnalysisData, QuestionNodeData } from '@/types/conversation';
 import { getAgentIdByName } from '@/utils/agents';
 import { parseCodeBlocks } from '@/utils/markdown';
@@ -34,6 +35,7 @@ const PerQuestionTab: React.FC<PerQuestionTabProps> = ({ id }) => {
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
   const [subscriptionId] = useState<string>(`per_question_summary_${Date.now()}`);
   const [summaries, setSummaries] = useWithLocalStorage<ResponseSummary>({}, `${id}-per-question-summary`);
+  const [showSummary, setShowSummary] = useState(true);
 
   const client = useApolloClient();
   const [addPrediction] = useMutation<AddPredictionMutation>(ADD_PREDICTION);
@@ -48,15 +50,12 @@ const PerQuestionTab: React.FC<PerQuestionTabProps> = ({ id }) => {
     errorPolicy: 'all',
   });
 
-  // Query for all responses (unfiltered)
+  // Use shared filtered responses hook
   const {
+    responses,
     loading: dataLoading,
-    data: inquiryResponseData,
     error: dataError,
-  } = useQuery<GetInquiryResponsesQuery>(GET_INQUIRIES_RESPONSES, {
-    variables: { id },
-    errorPolicy: 'all',
-  });
+  } = useFilteredResponses({ id });
 
   const questionNodes = useMemo(
     () =>
@@ -69,15 +68,15 @@ const PerQuestionTab: React.FC<PerQuestionTabProps> = ({ id }) => {
 
   const userIdToDetalsMap = useMemo(() => {
     const map = new Map();
-    inquiryResponseData?.getInquiryResponses?.forEach((response) => {
+    responses?.forEach((response) => {
       map.set(response.id, response.data.userDetails);
     });
     return map;
-  }, [inquiryResponseData?.getInquiryResponses]);
+  }, [responses]);
 
   const groupedResponses = useMemo(() => {
     const grouped: { [nodeId: string]: { [id: string]: NodeVisitAnalysisData[] } } = {};
-    inquiryResponseData?.getInquiryResponses?.forEach((response) => {
+    responses?.forEach((response) => {
       response.data.history.forEach((nodeVisit: NodeVisitAnalysisData) => {
         if (!grouped[nodeVisit.id]) {
           grouped[nodeVisit.id] = {};
@@ -89,7 +88,7 @@ const PerQuestionTab: React.FC<PerQuestionTabProps> = ({ id }) => {
       });
     });
     return grouped;
-  }, [inquiryResponseData?.getInquiryResponses]);
+  }, [responses]);
   useSubscription(GRAPHQL_SUBSCRIPTION, {
     variables: {
       subscriptionId,
@@ -113,6 +112,8 @@ const PerQuestionTab: React.FC<PerQuestionTabProps> = ({ id }) => {
               lastUpdated: new Date().toLocaleString(),
             },
           }));
+          // Show the summary when regeneration completes
+          setShowSummary(true);
         }
       }
     },
@@ -161,7 +162,7 @@ const PerQuestionTab: React.FC<PerQuestionTabProps> = ({ id }) => {
 
   if (graphLoading || dataLoading) return <p className="text-slate-700 dark:text-white">Loading...</p>;
   if (graphError || dataError) return <p className="text-slate-700 dark:text-white">Error loading data</p>;
-  if (!inquiryResponseData?.getInquiryResponses || !questionNodes.length) {
+  if (!responses || !questionNodes.length) {
     return <div className="p-4 text-white">No data available</div>;
   }
 
@@ -226,17 +227,24 @@ const PerQuestionTab: React.FC<PerQuestionTabProps> = ({ id }) => {
     <div className="bg-white dark:bg-slate-700 px-4 py-8 rounded-2xl shadow-xl text-slate-700 dark:text-white">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Per Question</h2>
-        <Button onClick={generateSummary} disabled={isGeneratingSummary}>
-          {isGeneratingSummary ? (
-            <>
-              Generating... <FontAwesomeIcon icon={faSpinner} spin className="ml-2" />
-            </>
-          ) : currentSummary ? (
-            'Regenerate Summary'
-          ) : (
-            'Generate Summary'
+        <div className="flex gap-2">
+          {currentSummary && (
+            <Button onClick={() => setShowSummary(!showSummary)} variant="secondary">
+              {showSummary ? 'Hide Summary' : 'Show Summary'}
+            </Button>
           )}
-        </Button>
+          <Button onClick={generateSummary} disabled={isGeneratingSummary}>
+            {isGeneratingSummary ? (
+              <>
+                Generating... <FontAwesomeIcon icon={faSpinner} spin className="ml-2" />
+              </>
+            ) : currentSummary ? (
+              'Regenerate Summary'
+            ) : (
+              'Generate Summary'
+            )}
+          </Button>
+        </div>
       </div>
 
       <div className="my-4">
@@ -253,7 +261,7 @@ const PerQuestionTab: React.FC<PerQuestionTabProps> = ({ id }) => {
             </Button>
           ))}
         </div>
-      </div>      {currentSummary && (
+      </div>      {currentSummary && showSummary && (
         <div className="my-4 p-4 bg-blue-100 dark:bg-blue-900/30 rounded-md">
           <div className="prose prose-sm max-w-none">
             <MarkdownCustom>{currentSummary.text}</MarkdownCustom>

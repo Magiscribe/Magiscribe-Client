@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { GET_INQUIRIES_RESPONSES } from '@/clients/queries';
-import { GetInquiryResponsesQuery } from '@/graphql/graphql';
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import clsx from 'clsx';
 import { motion } from 'motion/react';
@@ -8,22 +6,29 @@ import PerQuestionTab from './per-question';
 import PerResponseTab from './per-response';
 import ViaChatTab from './via-chat';
 import ExportButton from './export-button';
-import { useQuery } from '@apollo/client';
+import FilterControls from './filter-controls';
+import { AnalysisFilterProvider } from '@/contexts/AnalysisFilterContext';
 import { useSearchParams } from 'react-router-dom';
+import { useFilteredResponses } from '@/hooks/useFilteredResponses';
 
 interface AnalysisTabProps {
   id: string;
 }
 
 const AnalysisTab: React.FC<AnalysisTabProps> = ({ id }) => {
+  return (
+    <AnalysisFilterProvider>
+      <AnalysisTabContent id={id} />
+    </AnalysisFilterProvider>
+  );
+};
+
+const AnalysisTabContent: React.FC<AnalysisTabProps> = ({ id }) => {
   const [searchParams] = useSearchParams();
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
 
-  // Keep only the unfiltered query for export functionality
-  const { data: inquiryResponseData } = useQuery<GetInquiryResponsesQuery>(GET_INQUIRIES_RESPONSES, {
-    variables: { id },
-    errorPolicy: 'all',
-  });
+  // Get filtered responses for count display and exports
+  const { responses: filteredResponses } = useFilteredResponses({ id });
 
   const tabs = ['Per Response', 'Per Question', 'Via Chat'];
 
@@ -36,12 +41,17 @@ const AnalysisTab: React.FC<AnalysisTabProps> = ({ id }) => {
   return (
     <div className="mt-8 rounded-2xl">
       {/* Export buttons remain at the top level */}
-      {(inquiryResponseData?.getInquiryResponses?.length ?? 0) > 0 && (
+      {(filteredResponses?.length ?? 0) > 0 && (
         <div className="flex justify-end gap-4 mb-6">
-          <ExportButton id={id} responses={inquiryResponseData?.getInquiryResponses ?? []} type="csv" />
-          <ExportButton id={id} responses={inquiryResponseData?.getInquiryResponses ?? []} type="json" />
+          <ExportButton id={id} responses={filteredResponses ?? []} type="csv" />
+          <ExportButton id={id} responses={filteredResponses ?? []} type="json" />
         </div>
       )}
+
+      {/* Shared filter controls */}
+      <div className="mb-6">
+        <FilterControls responseCount={filteredResponses?.length ?? 0} />
+      </div>
 
       <TabGroup selectedIndex={selectedTabIndex} onChange={setSelectedTabIndex}>
         <TabList className="flex space-x-1 rounded-xl border-2 border-white mb-4">
@@ -66,7 +76,7 @@ const AnalysisTab: React.FC<AnalysisTabProps> = ({ id }) => {
         <TabPanels className="mt-2">
           <TabPanel>
             <motion.div initial={{ opacity: 0, x: -100 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 100 }}>
-              <PerResponseTab id={id} defaultSelect={searchParams.get('id')} />
+              <PerResponseTab id={id} />
             </motion.div>
           </TabPanel>
           <TabPanel>

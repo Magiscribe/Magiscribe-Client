@@ -1,19 +1,20 @@
 import Button from '@/components/controls/button';
 import Input from '@/components/controls/input';
 import { InquiryResponseFilters } from '@/graphql/graphql';
+import { useAnalysisFilters } from '@/contexts/AnalysisFilterContext';
 import { faFilter, faSearch } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useState } from 'react';
 
 interface FilterControlsProps {
-  onApplyFilters: (filters: InquiryResponseFilters) => void;
-  hasActiveFilters: boolean;
-  initialFilters: InquiryResponseFilters;
+  responseCount?: number;
 }
 
-const FilterControls: React.FC<FilterControlsProps> = ({ onApplyFilters, hasActiveFilters, initialFilters }) => {
-  const [nameFilter, setNameFilter] = useState<string>(initialFilters.name?.contains ?? '');
-  const [emailFilter, setEmailFilter] = useState<string>(initialFilters.email?.contains ?? '');
+const FilterControls: React.FC<FilterControlsProps> = ({ responseCount = 0 }) => {
+  const { filters, setFilters, hasActiveFilters, clearFilters } = useAnalysisFilters();
+  
+  const [nameFilter, setNameFilter] = useState<string>(filters.name?.contains ?? '');
+  const [emailFilter, setEmailFilter] = useState<string>(filters.email?.contains ?? '');
 
   // Helper to convert timestamp to YYYY-MM-DD in local time
   const formatDateForInput = (timestamp: number): string => {
@@ -22,45 +23,45 @@ const FilterControls: React.FC<FilterControlsProps> = ({ onApplyFilters, hasActi
   };
 
   const [startDate, setStartDate] = useState<string>(
-    initialFilters.createdAt?.gte ? formatDateForInput(initialFilters.createdAt.gte) : '',
+    filters.createdAt?.gte ? formatDateForInput(filters.createdAt.gte) : '',
   );
   const [endDate, setEndDate] = useState<string>(
-    initialFilters.createdAt?.lte ? formatDateForInput(initialFilters.createdAt.lte) : '',
+    filters.createdAt?.lte ? formatDateForInput(filters.createdAt.lte) : '',
   );
 
   useEffect(() => {
-    setNameFilter(initialFilters.name?.contains ?? '');
-    setEmailFilter(initialFilters.email?.contains ?? '');
-    setStartDate(initialFilters.createdAt?.gte ? formatDateForInput(initialFilters.createdAt.gte) : '');
-    setEndDate(initialFilters.createdAt?.lte ? formatDateForInput(initialFilters.createdAt.lte) : '');
-  }, [initialFilters]);
+    setNameFilter(filters.name?.contains ?? '');
+    setEmailFilter(filters.email?.contains ?? '');
+    setStartDate(filters.createdAt?.gte ? formatDateForInput(filters.createdAt.gte) : '');
+    setEndDate(filters.createdAt?.lte ? formatDateForInput(filters.createdAt.lte) : '');
+  }, [filters]);
 
   const handleApplyFilter = () => {
-    const filters: InquiryResponseFilters = {};
+    const newFilters: InquiryResponseFilters = {};
 
     if (nameFilter) {
-      filters.name = { contains: nameFilter };
+      newFilters.name = { contains: nameFilter };
     }
 
     if (emailFilter) {
-      filters.email = { contains: emailFilter };
+      newFilters.email = { contains: emailFilter };
     }
 
     if (startDate || endDate) {
-      filters.createdAt = {};
+      newFilters.createdAt = {};
 
       if (startDate) {
         const startDateTime = new Date(`${startDate}T00:00:00`);
-        filters.createdAt.gte = startDateTime.getTime();
+        newFilters.createdAt.gte = startDateTime.getTime();
       }
 
       if (endDate) {
         const endDateTime = new Date(`${endDate}T23:59:59.999`);
-        filters.createdAt.lte = endDateTime.getTime();
+        newFilters.createdAt.lte = endDateTime.getTime();
       }
     }
 
-    onApplyFilters(filters);
+    setFilters(newFilters);
   };
 
   const handleClearFilter = () => {
@@ -68,76 +69,85 @@ const FilterControls: React.FC<FilterControlsProps> = ({ onApplyFilters, hasActi
     setEmailFilter('');
     setStartDate('');
     setEndDate('');
-    onApplyFilters({});
+    clearFilters();
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between">
-        <div className="flex flex-wrap gap-4">
-          <div className="relative w-64">
-            <Input
-              name="name-filter"
-              type="text"
-              placeholder="Filter by name..."
-              value={nameFilter}
-              onChange={(e) => setNameFilter(e.target.value)}
-              className="pl-10"
-            />
-            <FontAwesomeIcon
-              icon={faSearch}
-              className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none"
-            />
-          </div>
-
-          <div className="relative w-64">
-            <Input
-              name="email-filter"
-              type="text"
-              placeholder="Filter by email..."
-              value={emailFilter}
-              onChange={(e) => setEmailFilter(e.target.value)}
-              className="pl-10"
-            />
-            <FontAwesomeIcon
-              icon={faSearch}
-              className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none"
-            />
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="w-48">
+    <div className="border-2 border-slate-300 dark:border-slate-600 rounded-lg p-4 bg-white dark:bg-slate-700">
+      <div className="space-y-4">
+        <div className="flex flex-wrap items-center justify-between">
+          <div className="flex flex-wrap gap-4">
+            <div className="relative w-64">
               <Input
-                name="start-date"
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="dark:[&::-webkit-calendar-picker-indicator]:invert"
+                name="name-filter"
+                type="text"
+                placeholder="Filter by name.ddddddd.."
+                value={nameFilter}
+                onChange={(e) => setNameFilter(e.target.value)}
+                className="pl-10"
+              />
+              <FontAwesomeIcon
+                icon={faSearch}
+                className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none"
               />
             </div>
 
-            <span className="text-white">to</span>
-
-            <div className="w-48">
+            <div className="relative w-64">
               <Input
-                name="end-date"
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                className="dark:[&::-webkit-calendar-picker-indicator]:invert"
+                name="email-filter"
+                type="text"
+                placeholder="Filter by email..."
+                value={emailFilter}
+                onChange={(e) => setEmailFilter(e.target.value)}
+                className="pl-10"
+              />
+              <FontAwesomeIcon
+                icon={faSearch}
+                className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none"
               />
             </div>
-          </div>
-        </div>
+            <div className="flex items-center gap-4">
+              <div className="w-48">
+                <Input
+                  name="start-date"
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="dark:[&::-webkit-calendar-picker-indicator]:invert"
+                />
+              </div>
 
-        <div className="flex gap-4">
-          <Button onClick={handleApplyFilter} icon={faFilter} variant="primary" size="medium">
-            Filter
-          </Button>
-          {hasActiveFilters && (
-            <Button onClick={handleClearFilter} variant="secondary" size="medium">
-              Clear
+              <span className="text-slate-700 dark:text-white">to</span>
+
+              <div className="w-48">
+                <Input
+                  name="end-date"
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="dark:[&::-webkit-calendar-picker-indicator]:invert"
+                />
+              </div>
+            </div>
+
+            {/* Response Count Display */}
+            <div className="flex items-center px-3 py-2 bg-slate-100 dark:bg-slate-600 rounded-md">
+              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                {responseCount} Response{responseCount !== 1 ? 's' : ''}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex gap-4">
+            <Button onClick={handleApplyFilter} icon={faFilter} variant="primary" size="medium">
+              Filter
             </Button>
-          )}
+            {hasActiveFilters && (
+              <Button onClick={handleClearFilter} variant="secondary" size="medium">
+                Clear
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </div>

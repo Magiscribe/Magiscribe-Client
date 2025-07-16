@@ -1,4 +1,5 @@
 import { GraphNode, NodeVisitAnalysisData } from '@/types/conversation';
+import MarkdownCustom from '@/components/markdown-custom';
 import { FC, useMemo } from 'react';
 
 interface UserResponsesProps {
@@ -14,15 +15,18 @@ const ResponseContent: FC<{
   responseText?: string;
   ratings?: string[];
 }> = ({ responseText, ratings = [] }) => (
-  <p className="text-slate-700 dark:text-white">
-    {responseText && <span>{responseText}</span>}
-    {ratings.length > 0 && (
-      <span>
-        {responseText ? ' - ' : ''}
-        {ratings.join(', ')}
-      </span>
+  <div className="text-slate-700 dark:text-white">
+    {responseText && (
+      <div className="prose prose-sm max-w-none">
+        <MarkdownCustom>{responseText}</MarkdownCustom>
+      </div>
     )}
-  </p>
+    {ratings.length > 0 && (
+      <div className={responseText ? 'mt-2' : ''}>
+        <span className="text-sm font-medium">Ratings: {ratings.join(', ')}</span>
+      </div>
+    )}
+  </div>
 );
 
 /**
@@ -30,7 +34,11 @@ const ResponseContent: FC<{
  */
 const NodeContent: FC<{ node: NodeVisitAnalysisData }> = ({ node }) => (
   <>
-    <p className="font-semibold text-slate-700 dark:text-white">{node?.data?.text}</p>
+    <div className="font-semibold text-slate-700 dark:text-white">
+      <div className="prose prose-sm max-w-none">
+        <MarkdownCustom>{node?.data?.text || ''}</MarkdownCustom>
+      </div>
+    </div>
     {node?.data?.response && (
       <>
         <hr className="my-2 border-slate-300 dark:border-slate-600" />

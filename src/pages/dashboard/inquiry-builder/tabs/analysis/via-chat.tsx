@@ -1,12 +1,13 @@
 import { ADD_PREDICTION } from '@/clients/mutations';
-import { GET_INQUIRIES_RESPONSES, GET_INQUIRY } from '@/clients/queries';
+import { GET_INQUIRY } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import Chart, { ChartProps } from '@/components/chart';
 import Button from '@/components/controls/button';
 import Input from '@/components/controls/input';
 import MarkdownCustom from '@/components/markdown-custom';
-import { AddPredictionMutation, GetInquiryQuery, GetInquiryResponsesQuery } from '@/graphql/graphql';
+import { AddPredictionMutation, GetInquiryQuery } from '@/graphql/graphql';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
+import { useFilteredResponses } from '@/hooks/useFilteredResponses';
 import { getAgentIdByName } from '@/utils/agents';
 import { parseCodeBlocks } from '@/utils/markdown';
 import { minimizeAnalysisData } from '@/utils/analysis-data-minimizer';
@@ -47,15 +48,12 @@ const ViaChatTab: React.FC<ViaChatTabProps> = ({ id }) => {
     errorPolicy: 'all',
   });
 
-  // Query for all responses (unfiltered)
+  // Use shared filtered responses hook
   const {
+    responses,
     loading: dataLoading,
-    data: inquiryResponseData,
     error: dataError,
-  } = useQuery<GetInquiryResponsesQuery>(GET_INQUIRIES_RESPONSES, {
-    variables: { id },
-    errorPolicy: 'all',
-  });
+  } = useFilteredResponses({ id });
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -120,7 +118,7 @@ const ViaChatTab: React.FC<ViaChatTabProps> = ({ id }) => {
     if (agentId) {
       setLoading(true);
       try {
-        const minimizedData = minimizeAnalysisData(inquiryData, inquiryResponseData);
+        const minimizedData = minimizeAnalysisData(inquiryData, { getInquiryResponses: responses });
 
         await addPrediction({
           variables: {
@@ -147,7 +145,7 @@ const ViaChatTab: React.FC<ViaChatTabProps> = ({ id }) => {
 
   if (graphLoading || dataLoading) return <p className="text-slate-700 dark:text-white">Loading...</p>;
   if (graphError || dataError) return <p className="text-slate-700 dark:text-white">Error loading data</p>;
-  if (!inquiryResponseData?.getInquiryResponses) {
+  if (!responses?.length) {
     return <div className="p-4 text-white">No data available</div>;
   }
 
