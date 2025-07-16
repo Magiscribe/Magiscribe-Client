@@ -1,5 +1,5 @@
 import { ADD_PREDICTION, DELETE_INQUIRY_RESPONSE } from '@/clients/mutations';
-import { GET_INQUIRIES_RESPONSES, GET_INQUIRY } from '@/clients/queries';
+import { GET_INQUIRY } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import UserResponses from '@/components/analysis/user-responses';
 import Button from '@/components/controls/button';
@@ -9,9 +9,8 @@ import {
   AddPredictionMutation,
   DeleteInquiryResponseMutation,
   GetInquiryQuery,
-  GetInquiryResponsesQuery,
-  InquiryResponseFilters,
 } from '@/graphql/graphql';
+import { useFilteredResponses } from '@/hooks/useFilteredResponses';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
 import { useAddAlert } from '@/providers/alert-provider';
 import { getAgentIdByName } from '@/utils/agents';
@@ -19,13 +18,10 @@ import { parseCodeBlocks } from '@/utils/markdown';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
 import { faSpinner, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useState } from 'react';
-
-import FilterControls from './filter-controls';
+import React, { useState, useEffect } from 'react';
 
 interface PerResponseTabProps {
   id: string;
-  defaultSelect: string | null;
 }
 
 type ResponseSummary = {
@@ -35,22 +31,16 @@ type ResponseSummary = {
   };
 };
 
-const PerResponseTab: React.FC<PerResponseTabProps> = ({ id, defaultSelect }) => {
-  const [seletedResponse, setSelectedUser] = useState<string | null>(defaultSelect);
+const PerResponseTab: React.FC<PerResponseTabProps> = ({ id }) => {
+  const [seletedResponse, setSelectedUser] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
   const [subscriptionId] = useState<string>(`per_response_summary_${Date.now()}`);
   const [summaries, setSummaries] = useWithLocalStorage<ResponseSummary>({}, `${id}-per-response-summary`);
+  const [showSummary, setShowSummary] = useState(true);
 
   // Modal state
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-
-  // Add filters state
-  const [appliedFilters, setAppliedFilters] = useState<InquiryResponseFilters>({
-    createdAt: {},
-    name: {},
-    email: {},
-  });
 
   // Hooks
   const addAlert = useAddAlert();
@@ -72,19 +62,13 @@ const PerResponseTab: React.FC<PerResponseTabProps> = ({ id, defaultSelect }) =>
 
   /*================================ API CALLS ==============================*/
 
-  // Query for responses with filters
+  // Use shared filtered responses hook
   const {
+    responses: inquiryResponses,
     loading: dataLoading,
-    data: inquiryResponseData,
     error: dataError,
     refetch: refetchInquiryResponses,
-  } = useQuery<GetInquiryResponsesQuery>(GET_INQUIRIES_RESPONSES, {
-    variables: {
-      id,
-      filters: appliedFilters,
-    },
-    errorPolicy: 'all',
-  });
+  } = useFilteredResponses({ id });
   // Subscription for summary generation
   useSubscription(GRAPHQL_SUBSCRIPTION, {
     variables: {
@@ -109,6 +93,8 @@ const PerResponseTab: React.FC<PerResponseTabProps> = ({ id, defaultSelect }) =>
               lastUpdated: new Date().toLocaleString(),
             },
           }));
+          // Show the summary when regeneration completes
+          setShowSummary(true);
         }
       }
     },
@@ -118,26 +104,14 @@ const PerResponseTab: React.FC<PerResponseTabProps> = ({ id, defaultSelect }) =>
     },
   });
 
+  // Auto-select first response when responses are loaded
+  useEffect(() => {
+    if (!seletedResponse && inquiryResponses && inquiryResponses.length > 0) {
+      setSelectedUser(inquiryResponses[0].id);
+    }
+  }, [inquiryResponses, seletedResponse]);
+
   /*================================ EVENT HANDLERS ==============================*/
-
-  // Handle filter application
-  const handleApplyFilters = (filters: InquiryResponseFilters) => {
-    const cleanedFilters: InquiryResponseFilters = {};
-
-    if (filters.createdAt && Object.keys(filters.createdAt).length > 0) {
-      cleanedFilters.createdAt = filters.createdAt;
-    }
-
-    if (filters.name && Object.keys(filters.name).length > 0) {
-      cleanedFilters.name = filters.name;
-    }
-
-    if (filters.email && Object.keys(filters.email).length > 0) {
-      cleanedFilters.email = filters.email;
-    }
-
-    setAppliedFilters(cleanedFilters);
-  };
 
   /**
    * Deletes a response from the inquiry
@@ -168,7 +142,7 @@ const PerResponseTab: React.FC<PerResponseTabProps> = ({ id, defaultSelect }) =>
 
   /*================================ HELPER ==============================*/
 
-  const responses = inquiryResponseData?.getInquiryResponses ?? [];
+  const responses = inquiryResponses ?? [];
 
   const usersPerPage = 40;
   const totalPages = Math.ceil(responses.length / usersPerPage);
@@ -177,9 +151,6 @@ const PerResponseTab: React.FC<PerResponseTabProps> = ({ id, defaultSelect }) =>
   const userResponse = responses.find((u) => u.id === seletedResponse);
   const userData = userResponse?.data.history ?? [];
 
-  // Check if any filters are actually applied
-  const hasActiveFilters = Object.values(appliedFilters).some((filter) => filter && Object.keys(filter).length > 0);
-
   const generateSummary = async () => {
     if (!seletedResponse) return;
 
@@ -187,7 +158,7 @@ const PerResponseTab: React.FC<PerResponseTabProps> = ({ id, defaultSelect }) =>
     const agentId = await getAgentIdByName('Summary Generator', client);
 
     if (agentId) {
-      const userResponse = inquiryResponseData?.getInquiryResponses?.find((u) => u.id === seletedResponse);
+      const userResponse = inquiryResponses?.find((u) => u.id === seletedResponse);
       const userData = userResponse?.data.history ?? [];
 
       const formattedResponses = userData.map((node) => ({
@@ -219,6 +190,16 @@ const PerResponseTab: React.FC<PerResponseTabProps> = ({ id, defaultSelect }) =>
     }
   };
 
+  /*================================ EFFECTS ==============================*/
+
+  // Automatically select the first response when responses are loaded
+  useEffect(() => {
+    if (responses.length > 0 && !seletedResponse) {
+      const firstResponseId = responses[0].id;
+      setSelectedUser(firstResponseId);
+    }
+  }, [responses, seletedResponse]);
+
   /*================================ RENDERING ==============================*/
 
   if (graphLoading || dataLoading) return <p className="text-slate-700 dark:text-white">Loading...</p>;
@@ -230,26 +211,25 @@ const PerResponseTab: React.FC<PerResponseTabProps> = ({ id, defaultSelect }) =>
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-bold">Per Response</h2>
           {seletedResponse && (
-            <Button onClick={generateSummary} disabled={isGeneratingSummary}>
-              {isGeneratingSummary ? (
-                <>
-                  Generating... <FontAwesomeIcon icon={faSpinner} spin className="ml-2" />
-                </>
-              ) : summaries[seletedResponse] ? (
-                'Regenerate Summary'
-              ) : (
-                'Generate Summary'
+            <div className="flex gap-2">
+              {summaries[seletedResponse] && (
+                <Button onClick={() => setShowSummary(!showSummary)} variant="secondary">
+                  {showSummary ? 'Hide Summary' : 'Show Summary'}
+                </Button>
               )}
-            </Button>
+              <Button onClick={generateSummary} disabled={isGeneratingSummary}>
+                {isGeneratingSummary ? (
+                  <>
+                    Generating... <FontAwesomeIcon icon={faSpinner} spin className="ml-2" />
+                  </>
+                ) : summaries[seletedResponse] ? (
+                  'Regenerate Summary'
+                ) : (
+                  'Generate Summary'
+                )}
+              </Button>
+            </div>
           )}
-        </div>
-
-        <div className="mt-6 mb-6">
-          <FilterControls
-            onApplyFilters={handleApplyFilters}
-            hasActiveFilters={hasActiveFilters}
-            initialFilters={appliedFilters}
-          />
         </div>
 
         <div className="my-4">
@@ -290,7 +270,7 @@ const PerResponseTab: React.FC<PerResponseTabProps> = ({ id, defaultSelect }) =>
               </Button>
             </div>
           )}
-        </div>        {seletedResponse && summaries[seletedResponse] && (
+        </div>        {seletedResponse && summaries[seletedResponse] && showSummary && (
           <div className="my-4 p-4 bg-blue-100 dark:bg-blue-900 rounded-md">
             <div className="prose prose-sm max-w-none">
               <MarkdownCustom>{summaries[seletedResponse].text}</MarkdownCustom>
