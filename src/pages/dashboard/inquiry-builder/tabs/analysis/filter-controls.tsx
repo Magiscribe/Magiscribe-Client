@@ -81,7 +81,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({ responseCount = 0 }) =>
               <Input
                 name="name-filter"
                 type="text"
-                placeholder="Filter by name.ddddddd.."
+                placeholder="Filter by name..."
                 value={nameFilter}
                 onChange={(e) => setNameFilter(e.target.value)}
                 className="pl-10"
