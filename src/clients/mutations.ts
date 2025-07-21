@@ -129,6 +129,16 @@ export const UPDATE_INQUIRY_OWNERS = gql`
   }
 `;
 
+export const UPDATE_INQUIRY_OWNER_EMAILS = gql`
+  mutation updateInquiryOwnerEmails($id: ID!, $ownerEmails: [String!]!) {
+    updateInquiryOwnerEmails(id: $id, ownerEmails: $ownerEmails) {
+      id
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
 export const DELETE_INQUIRY = gql`
   mutation deleteInquiry($id: ID!) {
     deleteInquiry(id: $id) {
@@ -196,17 +206,14 @@ export const REGISTER_USER = gql`
   }
 `;
 
-export const SEND_CONTACT = gql`
-  mutation sendContact($input: ContactInput!) {
-    contact(input: $input) {
-      success
-      messageId
-    }
-  }
-`;
-
 export const EMAIL_INQUIRY_TO_USERS = gql`
   mutation emailInquiryToUsers($userData: [UserDataInput!]!, $inquiryId: String!) {
     emailInquiryToUsers(userData: $userData, inquiryId: $inquiryId)
+  }
+`;
+
+export const SEND_CLEARK_INVITE = gql`
+  mutation sendClerkInvite($userEmail: String!) {
+    sendClerkInvite(userEmail: $userEmail)
   }
 `;
