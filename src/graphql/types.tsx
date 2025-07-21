@@ -116,6 +116,7 @@ export type Inquiry = {
   createdAt: Scalars['Float']['output'];
   data: InquiryData;
   id: Scalars['ID']['output'];
+  ownerEmail?: Maybe<Array<Scalars['String']['output']>>;
   responses?: Maybe<Array<InquiryResponse>>;
   updatedAt: Scalars['Float']['output'];
   userId?: Maybe<Array<Scalars['ID']['output']>>;
@@ -199,6 +200,8 @@ export type Mutation = {
   emailInquiryToUsers?: Maybe<Scalars['String']['output']>;
   generateAudio?: Maybe<Scalars['String']['output']>;
   registerUser: Scalars['Boolean']['output'];
+  sendClerkInvite?: Maybe<Scalars['String']['output']>;
+  updateInquiryOwnerEmails: Inquiry;
   updateInquiryOwners: Inquiry;
   upsertAgent?: Maybe<Agent>;
   upsertCapability?: Maybe<Capability>;
@@ -212,7 +215,6 @@ export type Mutation = {
 export type MutationAddPredictionArgs = {
   agentId: Scalars['ID']['input'];
   attachments?: InputMaybe<Array<Scalars['JSONObject']['input']>>;
-  inquiryId?: InputMaybe<Scalars['ID']['input']>;
   subscriptionId: Scalars['ID']['input'];
   variables?: InputMaybe<Scalars['JSONObject']['input']>;
 };
@@ -266,6 +268,17 @@ export type MutationGenerateAudioArgs = {
 };
 
 
+export type MutationSendClerkInviteArgs = {
+  userEmail: Scalars['String']['input'];
+};
+
+
+export type MutationUpdateInquiryOwnerEmailsArgs = {
+  id: Scalars['ID']['input'];
+  ownerEmails: Array<Scalars['String']['input']>;
+};
+
+
 export type MutationUpdateInquiryOwnersArgs = {
   id: Scalars['ID']['input'];
   owners: Array<Scalars['String']['input']>;
@@ -312,7 +325,6 @@ export type Prediction = {
   id: Scalars['ID']['output'];
   result?: Maybe<Scalars['String']['output']>;
   subscriptionId: Scalars['ID']['output'];
-  tokenUsage?: Maybe<TokenUsage>;
   type: PredictionType;
 };
 
@@ -360,7 +372,6 @@ export type Query = {
   getInquiryTemplates: Array<Scalars['JSONObject']['output']>;
   getMediaAsset?: Maybe<Scalars['String']['output']>;
   getPrompt?: Maybe<Prompt>;
-  getUserQuota?: Maybe<Quota>;
   getUsersByEmail?: Maybe<Array<Maybe<UserData>>>;
   getUsersById?: Maybe<Array<UserData>>;
   isUserRegistered: Scalars['Boolean']['output'];
@@ -453,17 +464,6 @@ export type QueryGetUsersByIdArgs = {
   userIds: Array<Scalars['String']['input']>;
 };
 
-export type Quota = {
-  __typename?: 'Quota';
-  allowedTokens: Scalars['Int']['output'];
-  createdAt: Scalars['String']['output'];
-  updatedAt: Scalars['String']['output'];
-  usedInputTokens: Scalars['Int']['output'];
-  usedOutputTokens: Scalars['Int']['output'];
-  usedTotalTokens: Scalars['Int']['output'];
-  userId: Scalars['ID']['output'];
-};
-
 export enum Role {
   Admin = 'admin',
   Default = 'default',
@@ -485,13 +485,6 @@ export type Subscription = {
 
 export type SubscriptionPredictionAddedArgs = {
   subscriptionId: Scalars['ID']['input'];
-};
-
-export type TokenUsage = {
-  __typename?: 'TokenUsage';
-  inputTokens: Scalars['Int']['output'];
-  outputTokens: Scalars['Int']['output'];
-  totalTokens: Scalars['Int']['output'];
 };
 
 export type UserData = {
@@ -540,9 +533,8 @@ export type DeleteMediaAssetMutationVariables = Exact<{
 export type DeleteMediaAssetMutation = { __typename?: 'Mutation', deleteMediaAsset?: number | null };
 
 export type AddPredictionMutationVariables = Exact<{
-  agentId: Scalars['ID']['input'];
   subscriptionId: Scalars['ID']['input'];
-  inquiryId?: InputMaybe<Scalars['ID']['input']>;
+  agentId: Scalars['ID']['input'];
   input?: InputMaybe<Scalars['JSONObject']['input']>;
   attachments?: InputMaybe<Array<Scalars['JSONObject']['input']> | Scalars['JSONObject']['input']>;
 }>;
@@ -616,6 +608,14 @@ export type UpdateInquiryOwnersMutationVariables = Exact<{
 
 export type UpdateInquiryOwnersMutation = { __typename?: 'Mutation', updateInquiryOwners: { __typename?: 'Inquiry', id: string, createdAt: number, updatedAt: number } };
 
+export type UpdateInquiryOwnerEmailsMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  ownerEmails: Array<Scalars['String']['input']> | Scalars['String']['input'];
+}>;
+
+
+export type UpdateInquiryOwnerEmailsMutation = { __typename?: 'Mutation', updateInquiryOwnerEmails: { __typename?: 'Inquiry', id: string, createdAt: number, updatedAt: number } };
+
 export type DeleteInquiryMutationVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
@@ -678,10 +678,12 @@ export type EmailInquiryToUsersMutationVariables = Exact<{
 
 export type EmailInquiryToUsersMutation = { __typename?: 'Mutation', emailInquiryToUsers?: string | null };
 
-export type GetUserQuotaQueryVariables = Exact<{ [key: string]: never; }>;
+export type SendClerkInviteMutationVariables = Exact<{
+  userEmail: Scalars['String']['input'];
+}>;
 
 
-export type GetUserQuotaQuery = { __typename?: 'Query', getUserQuota?: { __typename?: 'Quota', userId: string, allowedTokens: number, usedTotalTokens: number, usedInputTokens: number, usedOutputTokens: number, updatedAt: string, createdAt: string } | null };
+export type SendClerkInviteMutation = { __typename?: 'Mutation', sendClerkInvite?: string | null };
 
 export type GetAllModelsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -742,7 +744,7 @@ export type GetInquiryQueryVariables = Exact<{
 }>;
 
 
-export type GetInquiryQuery = { __typename?: 'Query', getInquiry?: { __typename?: 'Inquiry', id: string, userId?: Array<string> | null, createdAt: number, updatedAt: number, data: { __typename?: 'InquiryData', metadata?: any | null, graph?: any | null, draftGraph?: any | null, settings: { __typename?: 'InquirySettings', title: string, goals: string, voice?: string | null, context?: string | null, notifications?: { __typename?: 'InquirySettingsNotifications', recieveEmailOnResponse?: boolean | null } | null } } } | null };
+export type GetInquiryQuery = { __typename?: 'Query', getInquiry?: { __typename?: 'Inquiry', id: string, userId?: Array<string> | null, ownerEmail?: Array<string> | null, createdAt: number, updatedAt: number, data: { __typename?: 'InquiryData', metadata?: any | null, graph?: any | null, draftGraph?: any | null, settings: { __typename?: 'InquirySettings', title: string, goals: string, voice?: string | null, context?: string | null, notifications?: { __typename?: 'InquirySettingsNotifications', recieveEmailOnResponse?: boolean | null } | null } } } | null };
 
 export type GetUsersByIdQueryVariables = Exact<{
   userIds: Array<Scalars['String']['input']> | Scalars['String']['input'];
@@ -832,4 +834,4 @@ export type PredictionAddedSubscriptionVariables = Exact<{
 }>;
 
 
-export type PredictionAddedSubscription = { __typename?: 'Subscription', predictionAdded?: { __typename?: 'Prediction', id: string, subscriptionId: string, result?: string | null, type: PredictionType, tokenUsage?: { __typename?: 'TokenUsage', inputTokens: number, outputTokens: number, totalTokens: number } | null } | null };
+export type PredictionAddedSubscription = { __typename?: 'Subscription', predictionAdded?: { __typename?: 'Prediction', id: string, subscriptionId: string, result?: string | null, type: PredictionType } | null };

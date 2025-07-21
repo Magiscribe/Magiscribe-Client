@@ -5,13 +5,14 @@ import Input from '@/components/controls/input';
 import { GetUsersByEmailQuery, GetUsersByIdQuery } from '@/graphql/graphql';
 import { UserData } from '@/graphql/types';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
-import { useLazyQuery } from '@apollo/client';
+import { useLazyQuery, useMutation } from '@apollo/client';
 import React from 'react';
 
 import ConfirmationModal from '../confirm-modal';
 import CustomModal from '../modal';
 import { useUser } from '@clerk/clerk-react';
 import { useValidateEmailListInput } from '@/components/graph/utils/email-validation';
+import { SEND_CLEARK_INVITE } from '@/clients/mutations';
 
 interface ModalEditOwnersProps {
   open: boolean;
@@ -24,7 +25,7 @@ interface ModalEditOwnersProps {
 const EMAIL_VALIDATION_ERRORS = {
   INVALID_EMAIL_INPUT_ERROR: 'Please enter a valid user email',
   DUPLICATE_USER_ERROR: 'The user you entered already has access to this inquiry.',
-  EMAIL_DOES_NOT_CORRESPOND_TO_A_VALID_USER_ERROR: 'No Magiscribe users with this email address were found.',
+  EMAIL_DOES_NOT_CORRESPOND_TO_A_VALID_USER_ERROR: 'No Magiscribe users with this email address were found.  Magiscribe invite sent',
 };
 
 const REMOVE_SELF_FROM_INQUIRY_CONFIRMATION =
@@ -37,11 +38,12 @@ export function ModalEditOwners(props: ModalEditOwnersProps) {
   const [ownerDetails, setOwnerDetails] = React.useState<UserData[]>([]);
   const [getUsersById] = useLazyQuery<GetUsersByIdQuery>(GET_USERS_BY_ID);
   const [getUsersByEmail] = useLazyQuery<GetUsersByEmailQuery>(GET_USERS_BY_EMAIL);
+  const [sendClerkInvite] = useMutation<string>(SEND_CLEARK_INVITE);
   const [ownerToDelete, setOwnerToDelete] = React.useState<UserData>();
-  const { owners, updateOwners } = useInquiryBuilder();
+  const { owners, updateOwners, ownerEmails, updateOwnerEmails } = useInquiryBuilder();
 
   const existingOwnerEmails = React.useMemo(() => {
-    return ownerDetails.map((owner) => owner.primaryEmailAddress);
+    return ownerDetails.map((owner) => owner.primaryEmailAddress).concat(ownerEmails);
   }, [ownerDetails]);
   const {
     emailInput: ownerEmailInput,
@@ -51,14 +53,21 @@ export function ModalEditOwners(props: ModalEditOwnersProps) {
   } = useValidateEmailListInput(existingOwnerEmails, EMAIL_VALIDATION_ERRORS);
 
   const onConfirmDelete = React.useCallback(() => {
-    updateOwners(owners.filter((owner) => owner !== ownerToDelete?.id));
+    if (owners.filter((owner) => owner !== ownerToDelete?.id)) {
+      updateOwners(owners.filter((owner) => owner !== ownerToDelete?.id));
+    }
+    
+    if (ownerEmails.find((email) => email === ownerToDelete?.primaryEmailAddress)) {
+      updateOwnerEmails(ownerEmails.filter((email) => email !== ownerToDelete?.primaryEmailAddress));
+    }
+
     if (currentUser?.user?.id === ownerToDelete?.id) {
       // Navigate to the dashboard page since the current user no longer has access to the inquiry.
       navigate('/dashboard');
     }
     setOwnerToDelete({ id: '', primaryEmailAddress: '' });
     props.onCloseConfirmDeleteOwnerModal();
-  }, [ownerToDelete]);
+  }, [ownerToDelete, owners, ownerEmails]);
 
   const onAddClick = React.useCallback(
     async (ownerEmailInput: string) => {
@@ -73,6 +82,14 @@ export function ModalEditOwners(props: ModalEditOwnersProps) {
         updateOwners(owners.concat([userId]));
         setOwnerEmailInput('');
       } else {
+        // The added user doesn't have a magiscribe account.  Send a magiscribe invite to the user and add the corresponding user email to the owner emails list.
+        await sendClerkInvite({
+          variables: {
+            userEmail: ownerEmailInput,
+          },
+        });
+        updateOwnerEmails(ownerEmails.concat([ownerEmailInput]));
+        setOwnerEmailInput('');
         setOwnerEmailInputError(EMAIL_VALIDATION_ERRORS.EMAIL_DOES_NOT_CORRESPOND_TO_A_VALID_USER_ERROR);
       }
     },
@@ -121,7 +138,29 @@ export function ModalEditOwners(props: ModalEditOwnersProps) {
                     props.onDeleteOwner();
                   }}
                   variant="inverseDanger"
-                  disabled={ownerDetails.length === 1}
+                  // TODO: Don't allow removing the last owner from the inquiry, excluding any owners who have not yet created a Magiscribe account.
+                  // This is to prevent the last owner from being removed, which would make the inquiry inaccessible
+                  disabled={ownerDetails.length === 1 && ownerEmails.length === 0}
+                >
+                  Remove
+                </Button>
+              </div>
+            </div>
+          );
+        })}
+        {ownerEmails?.map((item, index) => {
+          return (
+            <div className="grid grid-cols-1" key={index}>
+              <div className="w-full flex items-center space-x-2 mb-4">
+                <Input name={item} value={item} disabled={true} />
+                <Button
+                  type="button"
+                  onClick={() => {
+                    setOwnerToDelete({id: "NA", primaryEmailAddress: item});
+                    props.onDeleteOwner();
+                  }}
+                  variant="inverseDanger"
+                  disabled={ownerDetails.length === 1 && ownerEmails.length === 0}
                 >
                   Remove
                 </Button>
