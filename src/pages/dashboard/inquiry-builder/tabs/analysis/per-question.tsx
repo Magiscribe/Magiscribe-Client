@@ -5,6 +5,7 @@ import Button from '@/components/controls/button';
 import MarkdownCustom from '@/components/markdown-custom';
 import { AddPredictionMutation, GetInquiryQuery } from '@/graphql/graphql';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
+import { useTokenUsageFromSubscription } from '@/hooks/use-token-usage-subscription';
 import { useFilteredResponses } from '@/hooks/useFilteredResponses';
 import { GraphNode, NodeVisitAnalysisData, QuestionNodeData } from '@/types/conversation';
 import { getAgentIdByName } from '@/utils/agents';
@@ -13,6 +14,7 @@ import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo
 import { faChevronLeft, faChevronRight, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useCallback, useMemo, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 export type ResponseSummary = {
   [nodeId: string]: {
@@ -33,10 +35,11 @@ const truncateText = (text: string, maxLength: number = 100): string => {
 const PerQuestionTab: React.FC<PerQuestionTabProps> = ({ id }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
-  const [subscriptionId] = useState<string>(`per_question_summary_${Date.now()}`);
+  const [subscriptionId] = useState<string>(uuidv4());
   const [summaries, setSummaries] = useWithLocalStorage<ResponseSummary>({}, `${id}-per-question-summary`);
   const [showSummary, setShowSummary] = useState(true);
 
+  const { handleSubscriptionData } = useTokenUsageFromSubscription();
   const client = useApolloClient();
   const [addPrediction] = useMutation<AddPredictionMutation>(ADD_PREDICTION);
 
@@ -96,6 +99,9 @@ const PerQuestionTab: React.FC<PerQuestionTabProps> = ({ id }) => {
     onData: ({ data: subscriptionData }) => {
       const prediction = subscriptionData.data?.predictionAdded;
 
+      // Update token usage from subscription data
+      handleSubscriptionData(subscriptionData);
+
       if (prediction && prediction.type === 'SUCCESS') {
         setIsGeneratingSummary(false);
         
@@ -147,6 +153,7 @@ const PerQuestionTab: React.FC<PerQuestionTabProps> = ({ id }) => {
           variables: {
             subscriptionId,
             agentId,
+            inquiryId: id,
             input: { userMessage: JSON.stringify(input) },
           },
         });

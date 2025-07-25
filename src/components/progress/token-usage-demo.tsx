@@ -3,12 +3,21 @@ import { useTokenUsage } from '@/providers/token-usage-provider';
 import { faPlus, faRedo } from '@fortawesome/free-solid-svg-icons';
 
 export default function TokenUsageDemo() {
-  const { addTokens, resetTokens, currentTokens, currentTier } = useTokenUsage();
+  const { addTokens, addFromAPI, resetTokens, currentTokens, currentTier } = useTokenUsage();
 
   const handleAddSmall = () => addTokens(50, 25); // Small API call
   const handleAddMedium = () => addTokens(200, 150); // Medium API call
   const handleAddLarge = () => addTokens(500, 300); // Large API call
   const handleAddMassive = () => addTokens(2000, 1500); // Massive API call
+  
+  const handleTestAPI = () => {
+    // Simulate an API response
+    addFromAPI({
+      inputTokens: 100,
+      outputTokens: 200,
+      totalTokens: 300
+    });
+  };
 
   return (
     <div className="bg-white dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-600">
@@ -37,6 +46,9 @@ export default function TokenUsageDemo() {
         </Button>
         <Button onClick={handleAddMassive} variant="primary" size="small" icon={faPlus}>
           +3.5K tokens
+        </Button>
+        <Button onClick={handleTestAPI} variant="accent" size="small" icon={faPlus}>
+          Test API (+300)
         </Button>
       </div>
 

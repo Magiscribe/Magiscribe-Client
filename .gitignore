@@ -27,3 +27,6 @@ dist-ssr
 !.env.development
 !.env.production
 !.env.example
+
+# Generated GraphQL files
+src/graphql

@@ -7,6 +7,11 @@ export const GRAPHQL_SUBSCRIPTION = gql`
       subscriptionId
       result
       type
+      tokenUsage {
+        inputTokens
+        outputTokens
+        totalTokens
+      }
     }
   }
 `;

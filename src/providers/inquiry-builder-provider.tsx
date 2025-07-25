@@ -22,6 +22,7 @@ import {
 } from '@/graphql/graphql';
 import { InquirySettings } from '@/graphql/types';
 import { useGraphContext } from '@/hooks/graph-state';
+import { useTokenUsageFromSubscription } from '@/hooks/use-token-usage-subscription';
 import { ImageMetadata } from '@/types/conversation';
 import { getAgentIdByName } from '@/utils/agents';
 import { applyGraphChangeset, formatGraph } from '@/utils/graphs/graph-utils';
@@ -102,6 +103,9 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
 
   const [owners, setOwners] = useState<string[]>([]);
 
+  // Token usage hook
+  const { handleSubscriptionData } = useTokenUsageFromSubscription();
+
   // Graph Generation States
   const [generatingGraph, setGeneratingGraph] = useState(false);
   const [pendingGraph, setPendingGraph] = useState(false);
@@ -141,6 +145,10 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     variables: { subscriptionId },
     onData: ({ data: subscriptionData }) => {
       const prediction = subscriptionData.data?.predictionAdded;
+      
+      // Update token usage from subscription data
+      handleSubscriptionData(subscriptionData);
+      
       try {
         if (prediction?.type === PredictionType.Success) {
           // Node: The prediction result is always present when the type is success.
@@ -372,6 +380,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
       variables: {
         subscriptionId,
         agentId,
+        inquiryId: id,
         input: {
           userMessage,
           conversationGraph: JSON.stringify(graph),
