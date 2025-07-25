@@ -7,7 +7,6 @@ import { IS_USER_REGISTERED } from '@/clients/queries';
 import LinkCard from '@/components/cards/card';
 import GenericHero from '@/components/heroes/generic-hero';
 import WelcomeModal from '@/components/modals/welcome-modal';
-import TokenUsageDemo from '@/components/progress/token-usage-demo';
 import { useSetTitle } from '@/hooks/title-hook';
 import { useMutation, useQuery } from '@apollo/client';
 import { useUser } from '@clerk/clerk-react';
@@ -88,11 +87,6 @@ export default function DashboardPage() {
         subtitle="Get started turning dialogue into discoveries."
       />
       <hr className="my-8" />
-      
-      {/* Token Usage Demo - for testing */}
-      <div className="mb-8">
-        <TokenUsageDemo />
-      </div>
       
       <div className="space-y-4">
         <div

@@ -324,12 +324,20 @@ export type MutationUpsertPromptArgs = {
   prompt: PromptInput;
 };
 
+export type TokenUsage = {
+  __typename?: 'TokenUsage';
+  inputTokens: Scalars['Int']['output'];
+  outputTokens: Scalars['Int']['output'];
+  totalTokens: Scalars['Int']['output'];
+};
+
 export type Prediction = {
   __typename?: 'Prediction';
   id: Scalars['ID']['output'];
   result?: Maybe<Scalars['String']['output']>;
   subscriptionId: Scalars['ID']['output'];
   type: PredictionType;
+  tokenUsage?: Maybe<TokenUsage>;
 };
 
 export enum PredictionType {
@@ -830,4 +838,4 @@ export type PredictionAddedSubscriptionVariables = Exact<{
 }>;
 
 
-export type PredictionAddedSubscription = { __typename?: 'Subscription', predictionAdded?: { __typename?: 'Prediction', id: string, subscriptionId: string, result?: string | null, type: PredictionType } | null };
+export type PredictionAddedSubscription = { __typename?: 'Subscription', predictionAdded?: { __typename?: 'Prediction', id: string, subscriptionId: string, result?: string | null, type: PredictionType, tokenUsage?: { __typename?: 'TokenUsage', inputTokens: number, outputTokens: number, totalTokens: number } | null } | null };

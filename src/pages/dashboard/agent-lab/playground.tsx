@@ -10,11 +10,13 @@ import { AddPredictionMutation } from '@/graphql/types';
 import { Agent } from '@/graphql/types';
 import useElevenLabsAudio from '@/hooks/audio-player';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
+import { useTokenUsageFromSubscription } from '@/hooks/use-token-usage-subscription';
 import { useMutation, useQuery, useSubscription } from '@apollo/client';
 import { faVolumeHigh, faVolumeMute } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 
 interface predictionAdded {
   id: string;
@@ -37,7 +39,7 @@ interface Form {
 }
 
 const initialForm: Form = {
-  subscriptionId: Math.random().toString(36),
+  subscriptionId: uuidv4(),
   voice: 'PHOEBE',
   agent: '',
   customInput: [{ key: 'userMessage', value: 'Placeholder' }],
@@ -47,6 +49,9 @@ const initialForm: Form = {
 export default function PlaygroundDashboard() {
   // React Router
   const params = useParams();
+
+  // Token usage hook
+  const { handleSubscriptionData } = useTokenUsageFromSubscription();
 
   // States
   const [loading, setLoading] = useState(false);
@@ -164,6 +169,9 @@ export default function PlaygroundDashboard() {
     shouldResubscribe: true,
     onData: ({ data }) => {
       const newPrediction = data.data.predictionAdded;
+
+      // Update token usage from subscription data
+      handleSubscriptionData(data);
 
       // Find existing response with matching ID and type 'DATA'
       const existingResponse = responses.find(
