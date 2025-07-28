@@ -185,6 +185,17 @@ export const DELETE_INQUIRY_RESPONSE = gql`
   }
 `;
 
+export const SET_INQUIRY_INTEGRATIONS = gql`
+  mutation setInquiryIntegrations($inquiryId: ID!, $integrations: [IntegrationInput!]!) {
+    setInquiryIntegrations(inquiryId: $inquiryId, integrations: $integrations) {
+      name
+      description
+      type
+      config
+    }
+  }
+`;
+
 export const UPSERT_COLLECTION = gql`
   mutation upsertCollection($input: CollectionInput!) {
     upsertCollection(input: $input) {
