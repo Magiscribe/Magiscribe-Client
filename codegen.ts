@@ -1,9 +1,9 @@
-import type { CodegenConfig } from '@/graphql-codegen/cli';
+import type { CodegenConfig } from '@graphql-codegen/cli';
 
 const config: CodegenConfig = {
   overwrite: true,
   ignoreNoDocuments: true,
-  schema: 'http://localhost:3000/graphql',
+  schema: 'http://127.0.0.1:3000/graphql',
   documents: ['src/**/*.tsx', 'src/**/*.ts'],
   hooks: {
     afterAllFileWrite: ['prettier --write'],
