@@ -196,14 +196,15 @@ export const REGISTER_USER = gql`
   }
 `;
 
-export const SEND_CONTACT = gql`
-  mutation sendContact($input: ContactInput!) {
-    contact(input: $input) {
-      success
-      messageId
-    }
-  }
-`;
+// TODO: Re-enable when contact mutation is implemented in API
+// export const SEND_CONTACT = gql`
+//   mutation sendContact($input: ContactInput!) {
+//     contact(input: $input) {
+//       success
+//       messageId
+//     }
+//   }
+// `;
 
 export const EMAIL_INQUIRY_TO_USERS = gql`
   mutation emailInquiryToUsers($userData: [UserDataInput!]!, $inquiryId: String!) {
