@@ -472,6 +472,13 @@ export default function UserInquiryPage() {
     </div>
   );
 
+  const renderLoading = () => (
+    <div className="flex flex-col items-center justify-center h-full">
+      <AnimatedDots />
+      <p className="text-slate-600 dark:text-slate-300 mt-4">Loading your inquiry...</p>
+    </div>
+  );
+
   const renderNotFound = () => (
     <div className="bg-white dark:bg-slate-700 p-6 rounded-3xl shadow-lg">
       <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white">Inquiry Not Found</h2>
@@ -498,6 +505,7 @@ export default function UserInquiryPage() {
   );
 
   const getActiveScreen = () => {
+    if (state.loading || !state.initialized) return renderLoading();
     if (state.error) return renderError();
     if (state.notFound) return renderNotFound();
 
