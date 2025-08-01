@@ -1,4 +1,4 @@
-import { ADD_PREDICTION, CREATE_INQUIRY_RESPONSE, UPDATE_INQUIRY_RESPONSE } from '@/clients/mutations';
+import { ADD_PREDICTION, CREATE_INQUIRY_RESPONSE, UPDATE_INQUIRY_RESPONSE, EXECUTE_INQUIRY_INTEGRATION_TOOL } from '@/clients/mutations';
 import { GET_INQUIRY } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import {
@@ -128,6 +128,7 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
   const [addPrediction] = useMutation<AddPredictionMutation>(ADD_PREDICTION);
   const [createResponse] = useMutation<CreateInquiryResponseMutation>(CREATE_INQUIRY_RESPONSE);
   const [updateResponse] = useMutation<UpdateInquiryResponseMutation>(UPDATE_INQUIRY_RESPONSE);
+  const [executeIntegrationTool] = useMutation(EXECUTE_INQUIRY_INTEGRATION_TOOL);
   const client = useApolloClient();
 
   /**
@@ -306,6 +307,8 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
       await handleDynamicGeneration();
     } else if (node.type === 'condition') {
       await handleConditionNode();
+    } else if (node.type === 'integration') {
+      await handleIntegrationNode();
     } else if (onNodeUpdateRef.current) {
       setState((prev) => ({ ...prev, loading: false }));
       onNodeUpdateRef.current(node);
@@ -392,6 +395,73 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
         data: result,
       });
     };
+  };
+
+  /**
+   * Handles visiting an integration node.
+   * This will execute the selected MCP integration tool with the provided prompt.
+   * @returns {Promise<void>} A promise that resolves when the integration execution is complete
+   */
+  const handleIntegrationNode = async (): Promise<void> => {
+    // Base Case 1: The graph manager is initialized.
+    if (!graphRef.current) return;
+
+    // Base Case 2: The current node is defined
+    const currentNode = graphRef.current.getCurrentNode();
+    if (!currentNode) return;
+
+    // Base Case 3: Check if integration is properly configured
+    const { selectedIntegration, prompt } = currentNode.data;
+    if (!selectedIntegration || !prompt) {
+      handleError(new Error('Integration node is not properly configured. Please select an integration and provide a prompt.'));
+      return;
+    }
+
+    setState((prev) => ({ ...prev, loading: true }));
+
+    try {
+      // Execute the integration tool
+      const result = await executeIntegrationTool({
+        variables: {
+          inquiryId: id,
+          integrationName: selectedIntegration,
+          prompt: prompt,
+        },
+      });
+
+      const integrationResult = result.data?.executeInquiryIntegrationTool;
+
+      if (integrationResult?.success) {
+        // Update the current node with the integration result
+        await graphRef.current.updateCurrentNodeData({
+          ...currentNode.data,
+          integrationResult: integrationResult.result,
+        });
+
+        setState((prev) => ({ ...prev, loading: false }));
+
+        // Notify subscribers of the updated node
+        if (onNodeUpdateRef.current) {
+          onNodeUpdateRef.current(currentNode);
+        }
+
+        // Move to the next node in the graph after successful integration execution
+        const outgoingNodes = graphRef.current.getOutgoingNodes();
+        if (outgoingNodes.length > 0) {
+          handleNextNode({
+            nextNodeId: outgoingNodes[0].id,
+            data: { message: integrationResult.result },
+          });
+        }
+      } else {
+        // Handle integration execution error
+        const errorMessage = integrationResult?.error || 'Integration execution failed';
+        handleError(new Error(`Integration execution failed: ${errorMessage}`));
+      }
+    } catch (error) {
+      console.error('Error executing integration:', error);
+      handleError(error instanceof Error ? error : new Error('Unknown error occurred during integration execution'));
+    }
   };
 
   const messageCounterRef = useRef<number>(1);
