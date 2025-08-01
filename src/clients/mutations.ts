@@ -234,3 +234,13 @@ export const EMAIL_INQUIRY_TO_USERS = gql`
     emailInquiryToUsers(userData: $userData, inquiryId: $inquiryId)
   }
 `;
+
+export const EXECUTE_INQUIRY_INTEGRATION_TOOL = gql`
+  mutation executeInquiryIntegrationTool($inquiryId: ID!, $integrationName: String!, $prompt: String!) {
+    executeInquiryIntegrationTool(inquiryId: $inquiryId, integrationName: $integrationName, prompt: $prompt) {
+      success
+      result
+      error
+    }
+  }
+`;
