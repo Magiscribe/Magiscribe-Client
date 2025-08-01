@@ -352,7 +352,7 @@ export default function UserInquiryPage() {
       ))}
       <div ref={messagesEndRef} />
 
-      {(state.loading || isProcessing) && (
+      {(isProcessing) && (
         <div className="flex justify-start items-center pt-4">
           <AnimatedDots />
         </div>
