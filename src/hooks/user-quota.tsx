@@ -1,6 +1,7 @@
-import { useQuery } from '@apollo/client';
+import { useQuery, useMutation } from '@apollo/client';
 import { useEffect } from 'react';
 import { GET_USER_QUOTA } from '@/clients/queries';
+import { RUN_QUOTA_UPDATE } from '@/clients/mutations';
 
 interface UserQuota {
   userId: string;
@@ -16,6 +17,8 @@ interface UseUserQuotaReturn {
   loading: boolean;
   error: any;
   refetch: () => void;
+  manualRefresh: () => Promise<void>;
+  isRefreshing: boolean;
 }
 
 /**
@@ -27,6 +30,18 @@ export function useUserQuota(): UseUserQuotaReturn {
     errorPolicy: 'all',
     notifyOnNetworkStatusChange: true,
   });
+
+  const [runQuotaUpdate, { loading: isRefreshing }] = useMutation(RUN_QUOTA_UPDATE);
+
+  // Manual refresh function
+  const manualRefresh = async () => {
+    try {
+      await runQuotaUpdate();
+      await refetch();
+    } catch (error) {
+      console.error('Manual quota refresh failed:', error);
+    }
+  };
 
   // Auto-refresh every hour at 1 minute past the hour
   useEffect(() => {
@@ -49,5 +64,7 @@ export function useUserQuota(): UseUserQuotaReturn {
     loading,
     error,
     refetch,
+    manualRefresh,
+    isRefreshing,
   };
 }

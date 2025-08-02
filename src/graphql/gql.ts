@@ -14,6 +14,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
+    "\n  mutation RunQuotaUpdate {\n    runQuotaUpdate\n  }\n": typeof types.RunQuotaUpdateDocument,
     "\n  mutation generateAudio($voice: String!, $text: String!) {\n    generateAudio(voice: $voice, text: $text)\n  }\n": typeof types.GenerateAudioDocument,
     "\n  mutation addMediaAsset {\n    addMediaAsset {\n      signedUrl\n      id\n    }\n  }\n": typeof types.AddMediaAssetDocument,
     "\n  mutation deleteMediaAsset($id: String!) {\n    deleteMediaAsset(id: $id)\n  }\n": typeof types.DeleteMediaAssetDocument,
@@ -61,6 +62,7 @@ type Documents = {
     "\n  subscription predictionAdded($subscriptionId: ID!) {\n    predictionAdded(subscriptionId: $subscriptionId) {\n      id\n      subscriptionId\n      result\n      type\n      tokenUsage {\n        inputTokens\n        outputTokens\n        totalTokens\n      }\n    }\n  }\n": typeof types.PredictionAddedDocument,
 };
 const documents: Documents = {
+    "\n  mutation RunQuotaUpdate {\n    runQuotaUpdate\n  }\n": types.RunQuotaUpdateDocument,
     "\n  mutation generateAudio($voice: String!, $text: String!) {\n    generateAudio(voice: $voice, text: $text)\n  }\n": types.GenerateAudioDocument,
     "\n  mutation addMediaAsset {\n    addMediaAsset {\n      signedUrl\n      id\n    }\n  }\n": types.AddMediaAssetDocument,
     "\n  mutation deleteMediaAsset($id: String!) {\n    deleteMediaAsset(id: $id)\n  }\n": types.DeleteMediaAssetDocument,
@@ -122,6 +124,10 @@ const documents: Documents = {
  */
 export function gql(source: string): unknown;
 
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation RunQuotaUpdate {\n    runQuotaUpdate\n  }\n"): (typeof documents)["\n  mutation RunQuotaUpdate {\n    runQuotaUpdate\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

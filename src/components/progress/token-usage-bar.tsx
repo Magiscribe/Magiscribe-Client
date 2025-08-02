@@ -1,17 +1,71 @@
 import { useUserQuota } from '@/hooks/user-quota';
+import { faRefresh } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { motion } from 'motion/react';
 import { useState } from 'react';
+
+// Token tiers - 10x progression like the original
+const TOKEN_TIERS = [
+  { level: 1, max: 1000, label: '1K' },
+  { level: 2, max: 10000, label: '10K' },
+  { level: 3, max: 100000, label: '100K' },
+  { level: 4, max: 1000000, label: '1M' },
+  { level: 5, max: 10000000, label: '10M' },
+  { level: 6, max: 100000000, label: '100M' },
+];
 
 interface TokenUsageBarProps {
   compact?: boolean;
 }
 
 export default function TokenUsageBar({ compact = false }: TokenUsageBarProps) {
-  const { usedTokens, allowedTokens, loading } = useUserQuota();
+  // Check feature flag
+  const showTokenUsageBar = import.meta.env.VITE_APP_SHOW_TOKEN_USAGE_BAR !== 'false';
+  
+  const { usedTokens, loading, manualRefresh, isRefreshing } = useUserQuota();
   const [isHovered, setIsHovered] = useState(false);
 
-  // Calculate progress from real quota data
-  const progress = Math.min(100, Math.max(0, (usedTokens / allowedTokens) * 100));
+  // Don't render if feature flag is disabled
+  if (!showTokenUsageBar) {
+    return null;
+  }
+
+  // Calculate current tier and progress like the original system
+  const getCurrentTierInfo = () => {
+    let currentTier = TOKEN_TIERS[0];
+    let nextTier: typeof TOKEN_TIERS[0] | null = TOKEN_TIERS[1] || null;
+    
+    for (let i = 0; i < TOKEN_TIERS.length; i++) {
+      if (usedTokens <= TOKEN_TIERS[i].max) {
+        currentTier = TOKEN_TIERS[i];
+        nextTier = TOKEN_TIERS[i + 1] || null;
+        break;
+      }
+    }
+
+    // If we've exceeded all tiers, use the highest tier
+    if (usedTokens > TOKEN_TIERS[TOKEN_TIERS.length - 1].max) {
+      currentTier = TOKEN_TIERS[TOKEN_TIERS.length - 1];
+      nextTier = null;
+    }
+
+    // Calculate progress within current tier
+    const progress = Math.min(100, Math.max(0, (usedTokens / currentTier.max) * 100));
+
+    return { currentTier, nextTier, progress };
+  };
+
+  const { currentTier, progress } = getCurrentTierInfo();
+  const isMaxLevel = usedTokens > TOKEN_TIERS[TOKEN_TIERS.length - 1].max;
+
+  // Handle manual refresh
+  const handleManualRefresh = async () => {
+    try {
+      await manualRefresh();
+    } catch (error) {
+      console.error('Manual refresh failed:', error);
+    }
+  };
 
   // Format current tokens with one decimal place in K format
   const formatCurrentTokens = (num: number): string => {
@@ -24,20 +78,9 @@ export default function TokenUsageBar({ compact = false }: TokenUsageBarProps) {
     return num.toString();
   };
 
-  // Format allowed tokens for display
-  const formatAllowedTokens = (num: number): string => {
-    if (num >= 1000000) {
-      return (num / 1000000).toFixed(0) + 'M';
-    }
-    if (num >= 1000) {
-      return (num / 1000).toFixed(0) + 'K';
-    }
-    return num.toString();
-  };
-
-  // Get progress bar color based on progress (keep existing logic)
+  // Get progress bar color based on progress and tier
   const getProgressColor = () => {
-    if (progress >= 95) {
+    if (isMaxLevel) {
       return 'from-purple-400 to-purple-600';
     }
     
@@ -50,9 +93,9 @@ export default function TokenUsageBar({ compact = false }: TokenUsageBarProps) {
     }
   };
 
-  // Get glow effect for high usage
+  // Get glow effect for level completion
   const getGlowClass = () => {
-    if (progress >= 95) {
+    if (progress >= 95 || isMaxLevel) {
       return 'shadow-lg shadow-current';
     }
     return '';
@@ -84,6 +127,17 @@ export default function TokenUsageBar({ compact = false }: TokenUsageBarProps) {
         <span className="text-xs text-gray-600 dark:text-gray-300">
           {formatCurrentTokens(usedTokens)}
         </span>
+        <button
+          onClick={handleManualRefresh}
+          disabled={isRefreshing}
+          className="p-1 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 disabled:opacity-50 transition-colors"
+          title="Refresh quota"
+        >
+          <FontAwesomeIcon 
+            icon={faRefresh} 
+            className={`w-3 h-3 ${isRefreshing ? 'animate-spin' : ''}`}
+          />
+        </button>
       </div>
     );
   }
@@ -113,13 +167,26 @@ export default function TokenUsageBar({ compact = false }: TokenUsageBarProps) {
           transition={{ duration: 0.2 }}
         >
           <span className="text-xs text-white/80 dark:text-slate-300">
-            {formatCurrentTokens(usedTokens)} / {formatAllowedTokens(allowedTokens)}
+            {formatCurrentTokens(usedTokens)} / {currentTier.label}
           </span>
         </motion.div>
       </div>
 
+      {/* Manual refresh button */}
+      <button
+        onClick={handleManualRefresh}
+        disabled={isRefreshing}
+        className="p-2 text-white/70 hover:text-white dark:text-slate-300 dark:hover:text-white disabled:opacity-50 transition-colors"
+        title="Refresh quota now"
+      >
+        <FontAwesomeIcon 
+          icon={faRefresh} 
+          className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`}
+        />
+      </button>
+
       {/* Achievement indicator */}
-      {progress >= 100 && (
+      {(progress >= 100 || isMaxLevel) && (
         <motion.div
           initial={{ scale: 0, rotate: 0 }}
           animate={{ scale: 1, rotate: 360 }}

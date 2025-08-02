@@ -518,6 +518,11 @@ export type Voice = {
   tags: Array<Scalars['String']['output']>;
 };
 
+export type RunQuotaUpdateMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type RunQuotaUpdateMutation = { __typename?: 'Mutation', runQuotaUpdate?: string | null };
+
 export type GenerateAudioMutationVariables = Exact<{
   voice: Scalars['String']['input'];
   text: Scalars['String']['input'];
