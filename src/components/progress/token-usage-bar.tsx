@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { motion } from 'motion/react';
 import { useState } from 'react';
 
-// Token tiers - 10x progression like the original
+// Think big motherfuckers goddamn
 const TOKEN_TIERS = [
   { level: 1, max: 1000, label: '1K' },
   { level: 2, max: 10000, label: '10K' },
@@ -12,6 +12,13 @@ const TOKEN_TIERS = [
   { level: 4, max: 1000000, label: '1M' },
   { level: 5, max: 10000000, label: '10M' },
   { level: 6, max: 100000000, label: '100M' },
+  { level: 7, max: 1000000000, label: '1B' },
+  { level: 8, max: 10000000000, label: '10B' },
+  { level: 9, max: 100000000000, label: '100B' },
+  { level: 10, max: 1000000000000, label: '1T' },
+  { level: 11, max: 10000000000000, label: '10T' },
+  { level: 12, max: 100000000000000, label: '100T' },
+  { level: 13, max: 1000000000000000, label: '1Q' },
 ];
 
 interface TokenUsageBarProps {
@@ -69,6 +76,12 @@ export default function TokenUsageBar({ compact = false }: TokenUsageBarProps) {
 
   // Format current tokens with one decimal place in K format
   const formatCurrentTokens = (num: number): string => {
+    if (num >= 1000000000000) {
+      return (num / 1000000000000).toFixed(1) + 'T';
+    }
+    if (num >= 1000000000) {
+      return (num / 1000000000).toFixed(1) + 'B';
+    }
     if (num >= 1000000) {
       return (num / 1000000).toFixed(1) + 'M';
     }
@@ -78,15 +91,19 @@ export default function TokenUsageBar({ compact = false }: TokenUsageBarProps) {
     return num.toString();
   };
 
-  // Get progress bar color based on progress and tier
+  // Get progress bar color based on absolute token count
   const getProgressColor = () => {
     if (isMaxLevel) {
       return 'from-purple-400 to-purple-600';
     }
     
-    if (progress < 60) {
+    // Stay green until we are above 1M tokens and working towards 10M
+    if (usedTokens < 1000000) {
       return 'from-green-400 to-green-600';
-    } else if (progress < 85) {
+    }
+    
+    // After 10M, use orange-to-red gradient based on progress within current tier
+    if (progress < 85) {
       return 'from-yellow-400 to-yellow-600';
     } else {
       return 'from-red-400 to-red-600';
