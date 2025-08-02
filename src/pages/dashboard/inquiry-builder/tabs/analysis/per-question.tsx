@@ -5,7 +5,6 @@ import Button from '@/components/controls/button';
 import MarkdownCustom from '@/components/markdown-custom';
 import { AddPredictionMutation, GetInquiryQuery } from '@/graphql/graphql';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
-import { useTokenUsageFromSubscription } from '@/hooks/use-token-usage-subscription';
 import { useFilteredResponses } from '@/hooks/useFilteredResponses';
 import { GraphNode, NodeVisitAnalysisData, QuestionNodeData } from '@/types/conversation';
 import { getAgentIdByName } from '@/utils/agents';
@@ -39,7 +38,6 @@ const PerQuestionTab: React.FC<PerQuestionTabProps> = ({ id }) => {
   const [summaries, setSummaries] = useWithLocalStorage<ResponseSummary>({}, `${id}-per-question-summary`);
   const [showSummary, setShowSummary] = useState(true);
 
-  const { handleSubscriptionData } = useTokenUsageFromSubscription();
   const client = useApolloClient();
   const [addPrediction] = useMutation<AddPredictionMutation>(ADD_PREDICTION);
 
@@ -98,9 +96,6 @@ const PerQuestionTab: React.FC<PerQuestionTabProps> = ({ id }) => {
     },
     onData: ({ data: subscriptionData }) => {
       const prediction = subscriptionData.data?.predictionAdded;
-
-      // Update token usage from subscription data
-      handleSubscriptionData(subscriptionData);
 
       if (prediction && prediction.type === 'SUCCESS') {
         setIsGeneratingSummary(false);

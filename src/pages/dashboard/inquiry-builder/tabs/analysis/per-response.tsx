@@ -12,7 +12,6 @@ import {
 } from '@/graphql/graphql';
 import { useFilteredResponses } from '@/hooks/useFilteredResponses';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
-import { useTokenUsageFromSubscription } from '@/hooks/use-token-usage-subscription';
 import { useAddAlert } from '@/providers/alert-provider';
 import { getAgentIdByName } from '@/utils/agents';
 import { parseCodeBlocks } from '@/utils/markdown';
@@ -46,7 +45,6 @@ const PerResponseTab: React.FC<PerResponseTabProps> = ({ id }) => {
 
   // Hooks
   const addAlert = useAddAlert();
-  const { handleSubscriptionData } = useTokenUsageFromSubscription();
 
   // Apollo hooks
   const client = useApolloClient();
@@ -79,9 +77,6 @@ const PerResponseTab: React.FC<PerResponseTabProps> = ({ id }) => {
     },
     onData: ({ data: subscriptionData }) => {
       const prediction = subscriptionData.data?.predictionAdded;
-
-      // Update token usage from subscription data
-      handleSubscriptionData(subscriptionData);
 
       if (prediction && prediction.type === 'SUCCESS' && seletedResponse) {
         setIsGeneratingSummary(false);

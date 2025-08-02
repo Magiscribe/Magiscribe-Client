@@ -2,7 +2,6 @@ import AnimatedOutlet from '@/components/animated/animated-outlet';
 import BackLinks from '@/components/nav/back-links';
 import Footer from '@/components/nav/footer';
 import { NavBar } from '@/components/nav/nav-bar';
-import { useAutoTokenIncrement } from '@/hooks/token-usage-hook';
 import { Protect, RedirectToSignIn } from '@clerk/clerk-react';
 import clsx from 'clsx';
 import { useMemo } from 'react';
@@ -16,9 +15,6 @@ export default function DashboardTemplate() {
     }),
     [pathname],
   );
-
-  // Auto-increment tokens when navigating (for demo)
-  useAutoTokenIncrement();
 
   return (
     <Protect fallback={<RedirectToSignIn />}>

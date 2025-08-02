@@ -7,7 +7,6 @@ import Input from '@/components/controls/input';
 import MarkdownCustom from '@/components/markdown-custom';
 import { AddPredictionMutation, GetInquiryQuery } from '@/graphql/graphql';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
-import { useTokenUsageFromSubscription } from '@/hooks/use-token-usage-subscription';
 import { useFilteredResponses } from '@/hooks/useFilteredResponses';
 import { getAgentIdByName } from '@/utils/agents';
 import { parseCodeBlocks } from '@/utils/markdown';
@@ -36,7 +35,6 @@ const ViaChatTab: React.FC<ViaChatTabProps> = ({ id }) => {
   const [subscriptionId] = useState<string>(uuidv4());
   const [messages, setMessages] = useWithLocalStorage<Message[]>([], `${id}-chat`);
 
-  const { handleSubscriptionData } = useTokenUsageFromSubscription();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const client = useApolloClient();
   const [addPrediction] = useMutation<AddPredictionMutation>(ADD_PREDICTION);
@@ -66,9 +64,6 @@ const ViaChatTab: React.FC<ViaChatTabProps> = ({ id }) => {
     variables: { subscriptionId },
     onData: ({ data: subscriptionData }) => {
       const prediction = subscriptionData.data?.predictionAdded;
-      
-      // Update token usage from subscription data
-      handleSubscriptionData(subscriptionData);
       
       if (prediction && prediction.type === 'SUCCESS') {
         setLoading(false);

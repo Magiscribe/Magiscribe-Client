@@ -1,4 +1,4 @@
-import { useTokenUsage } from '@/providers/token-usage-provider';
+import { useUserQuota } from '@/hooks/user-quota';
 import { motion } from 'motion/react';
 import { useState } from 'react';
 
@@ -7,20 +7,37 @@ interface TokenUsageBarProps {
 }
 
 export default function TokenUsageBar({ compact = false }: TokenUsageBarProps) {
-  const { currentTokens, currentTier, progress, isMaxLevel } = useTokenUsage();
+  const { usedTokens, allowedTokens, loading } = useUserQuota();
   const [isHovered, setIsHovered] = useState(false);
+
+  // Calculate progress from real quota data
+  const progress = Math.min(100, Math.max(0, (usedTokens / allowedTokens) * 100));
 
   // Format current tokens with one decimal place in K format
   const formatCurrentTokens = (num: number): string => {
+    if (num >= 1000000) {
+      return (num / 1000000).toFixed(1) + 'M';
+    }
     if (num >= 1000) {
       return (num / 1000).toFixed(1) + 'K';
     }
     return num.toString();
   };
 
-  // Get progress bar color based on progress and tier
+  // Format allowed tokens for display
+  const formatAllowedTokens = (num: number): string => {
+    if (num >= 1000000) {
+      return (num / 1000000).toFixed(0) + 'M';
+    }
+    if (num >= 1000) {
+      return (num / 1000).toFixed(0) + 'K';
+    }
+    return num.toString();
+  };
+
+  // Get progress bar color based on progress (keep existing logic)
   const getProgressColor = () => {
-    if (isMaxLevel) {
+    if (progress >= 95) {
       return 'from-purple-400 to-purple-600';
     }
     
@@ -33,13 +50,25 @@ export default function TokenUsageBar({ compact = false }: TokenUsageBarProps) {
     }
   };
 
-  // Get glow effect for level completion
+  // Get glow effect for high usage
   const getGlowClass = () => {
-    if (progress >= 95 || isMaxLevel) {
+    if (progress >= 95) {
       return 'shadow-lg shadow-current';
     }
     return '';
   };
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="flex items-center space-x-2">
+        <div className="w-16 h-2 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
+        {!compact && (
+          <span className="text-xs text-gray-600 dark:text-gray-300">Loading...</span>
+        )}
+      </div>
+    );
+  }
 
   if (compact) {
     return (
@@ -53,7 +82,7 @@ export default function TokenUsageBar({ compact = false }: TokenUsageBarProps) {
           />
         </div>
         <span className="text-xs text-gray-600 dark:text-gray-300">
-          {formatCurrentTokens(currentTokens)}
+          {formatCurrentTokens(usedTokens)}
         </span>
       </div>
     );
@@ -84,13 +113,13 @@ export default function TokenUsageBar({ compact = false }: TokenUsageBarProps) {
           transition={{ duration: 0.2 }}
         >
           <span className="text-xs text-white/80 dark:text-slate-300">
-            {formatCurrentTokens(currentTokens)} / {currentTier.label}
+            {formatCurrentTokens(usedTokens)} / {formatAllowedTokens(allowedTokens)}
           </span>
         </motion.div>
       </div>
 
       {/* Achievement indicator */}
-      {(progress >= 100 || isMaxLevel) && (
+      {progress >= 100 && (
         <motion.div
           initial={{ scale: 0, rotate: 0 }}
           animate={{ scale: 1, rotate: 360 }}

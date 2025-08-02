@@ -9,7 +9,6 @@ import {
   UpdateInquiryResponseMutation,
 } from '@/graphql/graphql';
 import { InquiryResponseStatus, InquiryResponseUserDetails, InquirySettings } from '@/graphql/types';
-import { useTokenUsageFromSubscription } from '@/hooks/use-token-usage-subscription';
 import { getAgentIdByName } from '@/utils/agents';
 import { NodeData, OptimizedNode } from '@/utils/graphs/graph';
 import { GraphManager } from '@/utils/graphs/graph-manager';
@@ -94,9 +93,6 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const lastPredictionVariablesRef = useRef<any>(null);
 
-  // Token usage hook
-  const { handleSubscriptionData } = useTokenUsageFromSubscription();
-
   // States
   const [userDetails, setUserDetails] = useState<InquiryResponseUserDetails>({});
   const [state, setState] = useState<State>({
@@ -172,9 +168,6 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
     onData: ({ data: subscriptionData }) => {
       try {
         const prediction = subscriptionData.data?.predictionAdded;
-
-        // Update token usage from subscription data
-        handleSubscriptionData(subscriptionData);
 
         if (prediction?.type === PredictionType.Success) {
           setState((prev) => ({ ...prev, loading: false }));

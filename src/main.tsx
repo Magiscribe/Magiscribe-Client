@@ -4,7 +4,6 @@ import { createRoot } from 'react-dom/client';
 import { ApolloProviderWrapper } from './clients/graphqlClient';
 import { TitleProvider } from './hooks/title-hook';
 import AlertProvider from './providers/alert-provider';
-import { TokenUsageProvider } from './providers/token-usage-provider';
 import Router from './router';
 
 import '@xyflow/react/dist/style.css';
@@ -20,9 +19,7 @@ root.render(
         <ApolloProviderWrapper>
           <TitleProvider>
             <AlertProvider>
-              <TokenUsageProvider>
-                <Router />
-              </TokenUsageProvider>
+              <Router />
             </AlertProvider>
           </TitleProvider>
         </ApolloProviderWrapper>
