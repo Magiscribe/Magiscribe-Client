@@ -5,9 +5,11 @@ export const GET_USER_QUOTA = gql`
     getUserQuota {
       userId
       allowedTokens
-      usedTokens
-      createdAt
+      usedTotalTokens
+      usedInputTokens
+      usedOutputTokens
       updatedAt
+      createdAt
     }
   }
 `;

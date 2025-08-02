@@ -6,7 +6,9 @@ import { RUN_QUOTA_UPDATE } from '@/clients/mutations';
 interface UserQuota {
   userId: string;
   allowedTokens: number;
-  usedTokens: number;
+  usedTotalTokens: number;
+  usedInputTokens: number;
+  usedOutputTokens: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -59,7 +61,7 @@ export function useUserQuota(): UseUserQuotaReturn {
   }, [refetch]);
 
   return {
-    usedTokens: data?.getUserQuota?.usedTokens || 0,
+    usedTokens: data?.getUserQuota?.usedTotalTokens || 0,
     allowedTokens: data?.getUserQuota?.allowedTokens || 10000000,
     loading,
     error,

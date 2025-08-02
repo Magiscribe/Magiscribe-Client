@@ -36,7 +36,7 @@ type Documents = {
     "\n  mutation deleteCollection($collectionId: ID!) {\n    deleteCollection(collectionId: $collectionId) {\n      id\n    }\n  }\n": typeof types.DeleteCollectionDocument,
     "\n  mutation registerUser {\n    registerUser\n  }\n": typeof types.RegisterUserDocument,
     "\n  mutation emailInquiryToUsers($userData: [UserDataInput!]!, $inquiryId: String!) {\n    emailInquiryToUsers(userData: $userData, inquiryId: $inquiryId)\n  }\n": typeof types.EmailInquiryToUsersDocument,
-    "\n  query GetUserQuota {\n    getUserQuota {\n      userId\n      allowedTokens\n      usedTokens\n      createdAt\n      updatedAt\n    }\n  }\n": typeof types.GetUserQuotaDocument,
+    "\n  query GetUserQuota {\n    getUserQuota {\n      userId\n      allowedTokens\n      usedTotalTokens\n      usedInputTokens\n      usedOutputTokens\n      updatedAt\n      createdAt\n    }\n  }\n": typeof types.GetUserQuotaDocument,
     "\n  query getAllModels {\n    getAllModels {\n      id\n      name\n    }\n  }\n": typeof types.GetAllModelsDocument,
     "\n  query getAgentWithPrompts($agentId: ID!) {\n    getAgentWithPrompts(agentId: $agentId) {\n      id\n      name\n      description\n      reasoning {\n        llmModel\n        prompt\n        variablePassThrough\n      }\n      capabilities {\n        name\n        id\n        prompts {\n          name\n          id\n          text\n        }\n      }\n      memoryEnabled\n      subscriptionFilter\n      outputFilter\n    }\n  }\n": typeof types.GetAgentWithPromptsDocument,
     "\n  query getAllAgents($logicalCollection: String) {\n    getAllAgents(logicalCollection: $logicalCollection) {\n      id\n      name\n      description\n      capabilities {\n        name\n        id\n      }\n    }\n  }\n": typeof types.GetAllAgentsDocument,
@@ -84,7 +84,7 @@ const documents: Documents = {
     "\n  mutation deleteCollection($collectionId: ID!) {\n    deleteCollection(collectionId: $collectionId) {\n      id\n    }\n  }\n": types.DeleteCollectionDocument,
     "\n  mutation registerUser {\n    registerUser\n  }\n": types.RegisterUserDocument,
     "\n  mutation emailInquiryToUsers($userData: [UserDataInput!]!, $inquiryId: String!) {\n    emailInquiryToUsers(userData: $userData, inquiryId: $inquiryId)\n  }\n": types.EmailInquiryToUsersDocument,
-    "\n  query GetUserQuota {\n    getUserQuota {\n      userId\n      allowedTokens\n      usedTokens\n      createdAt\n      updatedAt\n    }\n  }\n": types.GetUserQuotaDocument,
+    "\n  query GetUserQuota {\n    getUserQuota {\n      userId\n      allowedTokens\n      usedTotalTokens\n      usedInputTokens\n      usedOutputTokens\n      updatedAt\n      createdAt\n    }\n  }\n": types.GetUserQuotaDocument,
     "\n  query getAllModels {\n    getAllModels {\n      id\n      name\n    }\n  }\n": types.GetAllModelsDocument,
     "\n  query getAgentWithPrompts($agentId: ID!) {\n    getAgentWithPrompts(agentId: $agentId) {\n      id\n      name\n      description\n      reasoning {\n        llmModel\n        prompt\n        variablePassThrough\n      }\n      capabilities {\n        name\n        id\n        prompts {\n          name\n          id\n          text\n        }\n      }\n      memoryEnabled\n      subscriptionFilter\n      outputFilter\n    }\n  }\n": types.GetAgentWithPromptsDocument,
     "\n  query getAllAgents($logicalCollection: String) {\n    getAllAgents(logicalCollection: $logicalCollection) {\n      id\n      name\n      description\n      capabilities {\n        name\n        id\n      }\n    }\n  }\n": types.GetAllAgentsDocument,
@@ -215,7 +215,7 @@ export function gql(source: "\n  mutation emailInquiryToUsers($userData: [UserDa
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query GetUserQuota {\n    getUserQuota {\n      userId\n      allowedTokens\n      usedTokens\n      createdAt\n      updatedAt\n    }\n  }\n"): (typeof documents)["\n  query GetUserQuota {\n    getUserQuota {\n      userId\n      allowedTokens\n      usedTokens\n      createdAt\n      updatedAt\n    }\n  }\n"];
+export function gql(source: "\n  query GetUserQuota {\n    getUserQuota {\n      userId\n      allowedTokens\n      usedTotalTokens\n      usedInputTokens\n      usedOutputTokens\n      updatedAt\n      createdAt\n    }\n  }\n"): (typeof documents)["\n  query GetUserQuota {\n    getUserQuota {\n      userId\n      allowedTokens\n      usedTotalTokens\n      usedInputTokens\n      usedOutputTokens\n      updatedAt\n      createdAt\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

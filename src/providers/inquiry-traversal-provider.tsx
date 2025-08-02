@@ -285,6 +285,7 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
       await addPrediction({
         variables: {
           ...lastPredictionVariablesRef.current,
+          inquiryId: id, // Ensure inquiryId is included for token tracking
           input: {
             ...(lastPredictionVariablesRef.current?.input ?? {}),
             errorHandling: error?.message || 'An error occurred,  please identify and resolve the issue.',
@@ -333,6 +334,7 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
     lastPredictionVariablesRef.current = {
       subscriptionId,
       agentId,
+      inquiryId: id, // Always pass inquiryId for token tracking
       input: {
         userMessage: currentNode.data.text,
         context: settingsRef.current.context,
@@ -364,6 +366,7 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
     lastPredictionVariablesRef.current = {
       subscriptionId,
       agentId,
+      inquiryId: id, // Always pass inquiryId for token tracking
       input: {
         userMessage: [
           `The instruction is: ${JSON.stringify(graphRef.current.getCurrentNode()?.data.conditions)}`,

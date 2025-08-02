@@ -459,7 +459,9 @@ export type Quota = {
   allowedTokens: Scalars['Int']['output'];
   createdAt: Scalars['String']['output'];
   updatedAt: Scalars['String']['output'];
-  usedTokens: Scalars['Int']['output'];
+  usedInputTokens: Scalars['Int']['output'];
+  usedOutputTokens: Scalars['Int']['output'];
+  usedTotalTokens: Scalars['Int']['output'];
   userId: Scalars['ID']['output'];
 };
 
@@ -685,7 +687,7 @@ export type EmailInquiryToUsersMutation = { __typename?: 'Mutation', emailInquir
 export type GetUserQuotaQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetUserQuotaQuery = { __typename?: 'Query', getUserQuota?: { __typename?: 'Quota', userId: string, allowedTokens: number, usedTokens: number, createdAt: string, updatedAt: string } | null };
+export type GetUserQuotaQuery = { __typename?: 'Query', getUserQuota?: { __typename?: 'Quota', userId: string, allowedTokens: number, usedTotalTokens: number, usedInputTokens: number, usedOutputTokens: number, updatedAt: string, createdAt: string } | null };
 
 export type GetAllModelsQueryVariables = Exact<{ [key: string]: never; }>;
 
