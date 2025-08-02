@@ -14,7 +14,9 @@ interface UserQuota {
 }
 
 interface UseUserQuotaReturn {
-  usedTokens: number;
+  usedTotalTokens: number;
+  usedInputTokens: number;
+  usedOutputTokens: number;
   allowedTokens: number;
   loading: boolean;
   error: any;
@@ -61,7 +63,9 @@ export function useUserQuota(): UseUserQuotaReturn {
   }, [refetch]);
 
   return {
-    usedTokens: data?.getUserQuota?.usedTotalTokens || 0,
+    usedTotalTokens: data?.getUserQuota?.usedTotalTokens || 0,
+    usedInputTokens: data?.getUserQuota?.usedInputTokens || 0,
+    usedOutputTokens: data?.getUserQuota?.usedOutputTokens || 0,
     allowedTokens: data?.getUserQuota?.allowedTokens || 10000000,
     loading,
     error,
