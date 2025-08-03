@@ -1,11 +1,5 @@
 import { gql } from '@apollo/client';
 
-export const RUN_QUOTA_UPDATE = gql`
-  mutation RunQuotaUpdate {
-    runQuotaUpdate
-  }
-`;
-
 export const GENERATE_AUDIO = gql`
   mutation generateAudio($voice: String!, $text: String!) {
     generateAudio(voice: $voice, text: $text)

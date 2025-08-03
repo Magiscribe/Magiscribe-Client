@@ -199,7 +199,6 @@ export type Mutation = {
   emailInquiryToUsers?: Maybe<Scalars['String']['output']>;
   generateAudio?: Maybe<Scalars['String']['output']>;
   registerUser: Scalars['Boolean']['output'];
-  runQuotaUpdate?: Maybe<Scalars['String']['output']>;
   updateInquiryOwners: Inquiry;
   upsertAgent?: Maybe<Agent>;
   upsertCapability?: Maybe<Capability>;
@@ -519,11 +518,6 @@ export type Voice = {
   name: Scalars['String']['output'];
   tags: Array<Scalars['String']['output']>;
 };
-
-export type RunQuotaUpdateMutationVariables = Exact<{ [key: string]: never; }>;
-
-
-export type RunQuotaUpdateMutation = { __typename?: 'Mutation', runQuotaUpdate?: string | null };
 
 export type GenerateAudioMutationVariables = Exact<{
   voice: Scalars['String']['input'];

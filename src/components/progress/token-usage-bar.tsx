@@ -1,6 +1,4 @@
 import { useUserQuota } from '@/hooks/user-quota';
-import { faRefresh } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { motion } from 'motion/react';
 import { useState } from 'react';
 import CustomTooltip from '@/components/controls/custom-tooltip';
@@ -30,7 +28,7 @@ export default function TokenUsageBar({ compact = false }: TokenUsageBarProps) {
   // Check feature flag
   const showTokenUsageBar = import.meta.env.VITE_APP_SHOW_TOKEN_USAGE_BAR !== 'false';
   
-  const { usedTotalTokens, usedInputTokens, usedOutputTokens, allowedTokens, loading, manualRefresh, isRefreshing } = useUserQuota();
+  const { usedTotalTokens, usedInputTokens, usedOutputTokens, allowedTokens, loading, updatedAt } = useUserQuota();
   const [isHovered, setIsHovered] = useState(false);
 
   // Don't render if feature flag is disabled
@@ -66,15 +64,6 @@ export default function TokenUsageBar({ compact = false }: TokenUsageBarProps) {
   const { currentTier, progress } = getCurrentTierInfo();
   const isMaxLevel = usedTotalTokens > TOKEN_TIERS[TOKEN_TIERS.length - 1].max;
 
-  // Handle manual refresh
-  const handleManualRefresh = async () => {
-    try {
-      await manualRefresh();
-    } catch (error) {
-      console.error('Manual refresh failed:', error);
-    }
-  };
-
   // Format current tokens with one decimal place in K format
   const formatCurrentTokens = (num: number): string => {
     if (num >= 1000000000000) {
@@ -90,6 +79,21 @@ export default function TokenUsageBar({ compact = false }: TokenUsageBarProps) {
       return (num / 1000).toFixed(1) + 'K';
     }
     return num.toString();
+  };
+
+  // Format the updatedAt timestamp to a readable format
+  const formatLastUpdated = (timestamp: string): string => {
+    if (!timestamp) return 'Never';
+    try {
+      const date = new Date(timestamp);
+      if (isNaN(date.getTime())) {
+        return 'Unknown';
+      }
+      return date.toLocaleString();
+    } catch (error) {
+      console.error('Error formatting timestamp:', error, timestamp);
+      return 'Unknown';
+    }
   };
 
   // Calculate percentages for input/output within current tier
@@ -175,17 +179,6 @@ export default function TokenUsageBar({ compact = false }: TokenUsageBarProps) {
         <span className="text-xs text-gray-600 dark:text-gray-300">
           {formatCurrentTokens(usedTotalTokens)}
         </span>
-        <button
-          onClick={handleManualRefresh}
-          disabled={isRefreshing}
-          className="p-1 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 disabled:opacity-50 transition-colors"
-          title="Refresh quota"
-        >
-          <FontAwesomeIcon 
-            icon={faRefresh} 
-            className={`w-3 h-3 ${isRefreshing ? 'animate-spin' : ''}`}
-          />
-        </button>
       </div>
     );
   }
@@ -232,19 +225,6 @@ export default function TokenUsageBar({ compact = false }: TokenUsageBarProps) {
               </span>
             </motion.div>
           </div>
-
-          {/* Manual refresh button */}
-          <button
-            onClick={handleManualRefresh}
-            disabled={isRefreshing}
-            className="p-2 text-white/70 hover:text-white dark:text-slate-300 dark:hover:text-white disabled:opacity-50 transition-colors"
-            title="Refresh quota now"
-          >
-            <FontAwesomeIcon 
-              icon={faRefresh} 
-              className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`}
-            />
-          </button>
 
           {/* Achievement indicator */}
           {(progress >= 100 || isMaxLevel) && (
@@ -300,6 +280,14 @@ export default function TokenUsageBar({ compact = false }: TokenUsageBarProps) {
             <span className="font-medium text-slate-900 dark:text-slate-100">
               {formatCurrentTokens(allowedTokens)}
             </span>
+          </div>
+        </div>
+
+        {/* Last updated and update frequency info */}
+        <div className="border-t border-slate-200 dark:border-slate-600 pt-2 mt-2">
+          <div className="text-xs text-slate-600 dark:text-slate-400">
+            <div>Last Updated: {formatLastUpdated(updatedAt)}</div>
+            <div className="italic mt-1">*Token usage updates every hour</div>
           </div>
         </div>
       </div>
