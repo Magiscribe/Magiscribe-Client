@@ -21,6 +21,12 @@ export type AddMediaAssetResponse = {
   signedUrl: Scalars['String']['output'];
 };
 
+export type AddPredictionResponse = {
+  __typename?: 'AddPredictionResponse';
+  correlationId: Scalars['String']['output'];
+  status: Scalars['String']['output'];
+};
+
 export type Agent = {
   __typename?: 'Agent';
   capabilities: Array<Capability>;
@@ -125,6 +131,7 @@ export type InquiryData = {
   __typename?: 'InquiryData';
   draftGraph?: Maybe<Scalars['JSONObject']['output']>;
   graph?: Maybe<Scalars['JSONObject']['output']>;
+  integrations: Array<Scalars['ID']['output']>;
   metadata?: Maybe<Scalars['JSONObject']['output']>;
   settings: InquirySettings;
 };
@@ -178,6 +185,30 @@ export type InquirySettingsNotifications = {
   recieveEmailOnResponse?: Maybe<Scalars['Boolean']['output']>;
 };
 
+export type Integration = {
+  __typename?: 'Integration';
+  config: Scalars['JSONObject']['output'];
+  createdAt: Scalars['Float']['output'];
+  description: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  type: Scalars['String']['output'];
+  updatedAt: Scalars['Float']['output'];
+};
+
+export type IntegrationConnectionResult = {
+  __typename?: 'IntegrationConnectionResult';
+  error?: Maybe<Scalars['String']['output']>;
+  success: Scalars['Boolean']['output'];
+};
+
+export type IntegrationInput = {
+  config: Scalars['JSONObject']['input'];
+  description: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  type: Scalars['String']['input'];
+};
+
 export type Model = {
   __typename?: 'Model';
   id: Scalars['ID']['output'];
@@ -187,8 +218,9 @@ export type Model = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  addIntegrationToInquiry: Inquiry;
   addMediaAsset?: Maybe<AddMediaAssetResponse>;
-  addPrediction?: Maybe<Scalars['String']['output']>;
+  addPrediction: AddPredictionResponse;
   deleteAgent?: Maybe<Agent>;
   deleteCapability?: Maybe<Capability>;
   deleteCollection?: Maybe<Collection>;
@@ -199,6 +231,8 @@ export type Mutation = {
   emailInquiryToUsers?: Maybe<Scalars['String']['output']>;
   generateAudio?: Maybe<Scalars['String']['output']>;
   registerUser: Scalars['Boolean']['output'];
+  removeIntegrationFromInquiry: Inquiry;
+  setInquiryIntegrations: Array<Integration>;
   updateInquiryOwners: Inquiry;
   upsertAgent?: Maybe<Agent>;
   upsertCapability?: Maybe<Capability>;
@@ -209,10 +243,17 @@ export type Mutation = {
 };
 
 
+export type MutationAddIntegrationToInquiryArgs = {
+  inquiryId: Scalars['ID']['input'];
+  integrationId: Scalars['ID']['input'];
+};
+
+
 export type MutationAddPredictionArgs = {
   agentId: Scalars['ID']['input'];
   attachments?: InputMaybe<Array<Scalars['JSONObject']['input']>>;
   inquiryId?: InputMaybe<Scalars['ID']['input']>;
+  integrationId?: InputMaybe<Scalars['ID']['input']>;
   subscriptionId: Scalars['ID']['input'];
   variables?: InputMaybe<Scalars['JSONObject']['input']>;
 };
@@ -266,6 +307,18 @@ export type MutationGenerateAudioArgs = {
 };
 
 
+export type MutationRemoveIntegrationFromInquiryArgs = {
+  inquiryId: Scalars['ID']['input'];
+  integrationId: Scalars['ID']['input'];
+};
+
+
+export type MutationSetInquiryIntegrationsArgs = {
+  inquiryId: Scalars['ID']['input'];
+  integrations: Array<IntegrationInput>;
+};
+
+
 export type MutationUpdateInquiryOwnersArgs = {
   id: Scalars['ID']['input'];
   owners: Array<Scalars['String']['input']>;
@@ -309,6 +362,7 @@ export type MutationUpsertPromptArgs = {
 
 export type Prediction = {
   __typename?: 'Prediction';
+  correlationId?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   result?: Maybe<Scalars['String']['output']>;
   subscriptionId: Scalars['ID']['output'];
@@ -354,6 +408,7 @@ export type Query = {
   getCollection?: Maybe<Collection>;
   getInquiries?: Maybe<Array<Inquiry>>;
   getInquiry?: Maybe<Inquiry>;
+  getInquiryIntegrations: Array<Integration>;
   getInquiryResponse?: Maybe<InquiryResponse>;
   getInquiryResponseCount: Scalars['Int']['output'];
   getInquiryResponses?: Maybe<Array<InquiryResponse>>;
@@ -364,6 +419,7 @@ export type Query = {
   getUsersByEmail?: Maybe<Array<Maybe<UserData>>>;
   getUsersById?: Maybe<Array<UserData>>;
   isUserRegistered: Scalars['Boolean']['output'];
+  testMCPIntegration: IntegrationConnectionResult;
 };
 
 
@@ -418,6 +474,11 @@ export type QueryGetInquiryArgs = {
 };
 
 
+export type QueryGetInquiryIntegrationsArgs = {
+  inquiryId: Scalars['ID']['input'];
+};
+
+
 export type QueryGetInquiryResponseArgs = {
   id: Scalars['ID']['input'];
 };
@@ -453,15 +514,9 @@ export type QueryGetUsersByIdArgs = {
   userIds: Array<Scalars['String']['input']>;
 };
 
-export type Quota = {
-  __typename?: 'Quota';
-  allowedTokens: Scalars['Int']['output'];
-  createdAt: Scalars['String']['output'];
-  updatedAt: Scalars['String']['output'];
-  usedInputTokens: Scalars['Int']['output'];
-  usedOutputTokens: Scalars['Int']['output'];
-  usedTotalTokens: Scalars['Int']['output'];
-  userId: Scalars['ID']['output'];
+
+export type QueryTestMcpIntegrationArgs = {
+  integration: IntegrationInput;
 };
 
 export enum Role {
@@ -545,10 +600,12 @@ export type AddPredictionMutationVariables = Exact<{
   inquiryId?: InputMaybe<Scalars['ID']['input']>;
   input?: InputMaybe<Scalars['JSONObject']['input']>;
   attachments?: InputMaybe<Array<Scalars['JSONObject']['input']> | Scalars['JSONObject']['input']>;
+  inquiryId?: InputMaybe<Scalars['ID']['input']>;
+  integrationId?: InputMaybe<Scalars['ID']['input']>;
 }>;
 
 
-export type AddPredictionMutation = { __typename?: 'Mutation', addPrediction?: string | null };
+export type AddPredictionMutation = { __typename?: 'Mutation', addPrediction: { __typename?: 'AddPredictionResponse', status: string, correlationId: string } };
 
 export type UpsertAgentMutationVariables = Exact<{
   agent: AgentInput;
@@ -650,6 +707,14 @@ export type DeleteInquiryResponseMutationVariables = Exact<{
 
 
 export type DeleteInquiryResponseMutation = { __typename?: 'Mutation', deleteInquiryResponse?: { __typename?: 'InquiryResponse', id: string } | null };
+
+export type SetInquiryIntegrationsMutationVariables = Exact<{
+  inquiryId: Scalars['ID']['input'];
+  integrations: Array<IntegrationInput> | IntegrationInput;
+}>;
+
+
+export type SetInquiryIntegrationsMutation = { __typename?: 'Mutation', setInquiryIntegrations: Array<{ __typename?: 'Integration', name: string, description: string, type: string, config: any }> };
 
 export type UpsertCollectionMutationVariables = Exact<{
   input: CollectionInput;
@@ -826,6 +891,20 @@ export type GetAverageInquiryResponseTimeQueryVariables = Exact<{
 
 
 export type GetAverageInquiryResponseTimeQuery = { __typename?: 'Query', getAverageInquiryResponseTime: { __typename?: 'AverageInquiryResponseTime', minutes: number, responseCount: number } };
+
+export type GetInquiryIntegrationsQueryVariables = Exact<{
+  inquiryId: Scalars['ID']['input'];
+}>;
+
+
+export type GetInquiryIntegrationsQuery = { __typename?: 'Query', getInquiryIntegrations: Array<{ __typename?: 'Integration', id: string, name: string, description: string, type: string, config: any }> };
+
+export type TestMcpIntegrationQueryVariables = Exact<{
+  integration: IntegrationInput;
+}>;
+
+
+export type TestMcpIntegrationQuery = { __typename?: 'Query', testMCPIntegration: { __typename?: 'IntegrationConnectionResult', success: boolean, error?: string | null } };
 
 export type PredictionAddedSubscriptionVariables = Exact<{
   subscriptionId: Scalars['ID']['input'];

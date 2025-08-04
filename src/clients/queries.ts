@@ -310,10 +310,20 @@ export const GET_INQUIRY_RESPONSE_TIME = gql`
 export const GET_INQUIRY_INTEGRATIONS = gql`
   query getInquiryIntegrations($inquiryId: ID!) {
     getInquiryIntegrations(inquiryId: $inquiryId) {
+      id
       name
       description
       type
       config
+    }
+  }
+`;
+
+export const TEST_MCP_INTEGRATION = gql`
+  query testMCPIntegration($integration: IntegrationInput!) {
+    testMCPIntegration(integration: $integration) {
+      success
+      error
     }
   }
 `;

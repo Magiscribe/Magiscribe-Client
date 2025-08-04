@@ -19,6 +19,9 @@ export function parseMarkdownCodeBlocks(content: string) {
   if (markdownMatch) {
     parsedResult['text'] = markdownMatch[1];
   }
+  if (parsedResult.text === '') {
+    parsedResult.text = content; // Fallback to original content if no markdown block found
+  }
   return parsedResult;
 }
 

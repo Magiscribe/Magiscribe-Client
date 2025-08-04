@@ -12,20 +12,15 @@ import CustomHandle from '../handles/limit-handle';
 import { useNodeData } from '../utils';
 
 interface Integration {
+  id: string;
   name: string;
   description: string;
   type: string;
-  config: {
-    serverUrl: string;
-    auth?: {
-      apiKey?: string;
-    };
-  };
 }
 
 type IntegrationNodeProps = NodeProps & {
   data: {
-    selectedIntegration: string;
+    selectedIntegrationId: string;
     prompt: string;
   };
 };
@@ -55,26 +50,26 @@ export default function IntegrationNode({ id, data }: IntegrationNodeProps) {
     if (!integrationsData?.getInquiryIntegrations) return [];
     
     return integrationsData.getInquiryIntegrations.map((integration: Integration) => ({
-      value: integration.name,
+      value: integration.id,
       label: `${integration.name} - ${integration.description}`,
     }));
   }, [integrationsData]);
 
   const selectedIntegrationDetails = useMemo(() => {
-    if (!integrationsData?.getInquiryIntegrations || !data.selectedIntegration) return null;
+    if (!integrationsData?.getInquiryIntegrations || !data.selectedIntegrationId) return null;
     
     return integrationsData.getInquiryIntegrations.find(
-      (integration: Integration) => integration.name === data.selectedIntegration
+      (integration: Integration) => integration.id === data.selectedIntegrationId
     );
-  }, [integrationsData, data.selectedIntegration]);
+  }, [integrationsData, data.selectedIntegrationId]);
 
   return (
     <NodeContainer title="Integration" faIcon={faCog} id={id}>
       <Select
         label="Integration Tool"
-        name="selectedIntegration"
-        value={data.selectedIntegration}
-        onChange={(e) => handleUpdate({ selectedIntegration: e.target.value })}
+        name="selectedIntegrationId"
+        value={data.selectedIntegrationId}
+        onChange={(e) => handleUpdate({ selectedIntegrationId: e.target.value })}
         options={integrationOptions}
         className="nodrag"
         disabled={integrationsLoading}
@@ -100,7 +95,7 @@ export default function IntegrationNode({ id, data }: IntegrationNodeProps) {
       <Textarea
         label="System Prompt"
         subLabel={
-          data.selectedIntegration
+          data.selectedIntegrationId
             ? 'Instructions for the integration tool. Can reference user input from previous nodes using {{variable_name}} syntax.'
             : 'Define how this integration should be used (disabled until integration is selected)'
         }
@@ -110,7 +105,7 @@ export default function IntegrationNode({ id, data }: IntegrationNodeProps) {
         placeholder="Enter instructions for the integration tool..."
         className="resize-none overflow-hidden nodrag"
         rows={4}
-        disabled={!data.selectedIntegration}
+        disabled={!data.selectedIntegrationId}
       />
 
       <Handle type="target" position={Position.Left} className="w-4 h-4 bg-green-500!" />
