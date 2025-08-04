@@ -22,20 +22,11 @@ export const DELETE_MEDIA_ASSET = gql`
 `;
 
 export const ADD_PREDICTION = gql`
-  mutation addPrediction(
-    $agentId: ID!
-    $subscriptionId: ID!
-    $inquiryId: ID
-    $input: JSONObject
-    $attachments: [JSONObject!]
-  ) {
-    addPrediction(
-      agentId: $agentId
-      subscriptionId: $subscriptionId
-      inquiryId: $inquiryId
-      variables: $input
-      attachments: $attachments
-    )
+  mutation addPrediction($subscriptionId: ID!, $agentId: ID!, $input: JSONObject, $attachments: [JSONObject!], $inquiryId: ID, $integrationId: ID) {
+    addPrediction(subscriptionId: $subscriptionId, agentId: $agentId, variables: $input, attachments: $attachments, inquiryId: $inquiryId, integrationId: $integrationId) {
+      status
+      correlationId
+    }
   }
 `;
 
@@ -219,7 +210,7 @@ export const REGISTER_USER = gql`
   }
 `;
 
-// TODO: Re-enable when contact mutation is implemented in API
+// TODO: Fix contact mutation - schema doesn't exist in backend
 // export const SEND_CONTACT = gql`
 //   mutation sendContact($input: ContactInput!) {
 //     contact(input: $input) {
@@ -232,15 +223,5 @@ export const REGISTER_USER = gql`
 export const EMAIL_INQUIRY_TO_USERS = gql`
   mutation emailInquiryToUsers($userData: [UserDataInput!]!, $inquiryId: String!) {
     emailInquiryToUsers(userData: $userData, inquiryId: $inquiryId)
-  }
-`;
-
-export const EXECUTE_INQUIRY_INTEGRATION_TOOL = gql`
-  mutation executeInquiryIntegrationTool($inquiryId: ID!, $integrationName: String!, $prompt: String!) {
-    executeInquiryIntegrationTool(inquiryId: $inquiryId, integrationName: $integrationName, prompt: $prompt) {
-      success
-      result
-      error
-    }
   }
 `;

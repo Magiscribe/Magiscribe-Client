@@ -1,11 +1,12 @@
 import { SET_INQUIRY_INTEGRATIONS } from '@/clients/mutations';
-import { GET_INQUIRY_INTEGRATIONS } from '@/clients/queries';
+import { GET_INQUIRY_INTEGRATIONS, TEST_MCP_INTEGRATION } from '@/clients/queries';
 import Button from '@/components/controls/button';
 import Input from '@/components/controls/input';
+import Textarea from '@/components/controls/textarea';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
-import { useMutation, useQuery } from '@apollo/client';
-import { faCheck, faEdit, faPlus, faTimes, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
+import { faCheck, faEdit, faPlug, faPlus, faTimes, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useState, useEffect } from 'react';
 
 import ConfirmationModal from '../confirm-modal';
@@ -17,8 +18,13 @@ interface Integration {
   type: 'MCP';
   config: {
     serverUrl: string;
-    auth?: {
-      apiKey?: string;
+    // JSON-based configuration support
+    mcpConfig?: {
+      [key: string]: any;
+    };
+    // Environment variables for MCP server
+    environment?: {
+      [key: string]: string;
     };
   };
 }
@@ -35,15 +41,17 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [deleteConfirmIndex, setDeleteConfirmIndex] = useState<number | null>(null);
+  const [jsonConfigText, setJsonConfigText] = useState('');
+  const [environmentText, setEnvironmentText] = useState('');
+  const [isTestingConnection, setIsTestingConnection] = useState(false);
   const [formData, setFormData] = useState<Integration>({
     name: '',
     description: '',
     type: 'MCP',
     config: {
       serverUrl: '',
-      auth: {
-        apiKey: '',
-      },
+      mcpConfig: {},
+      environment: {},
     },
   });
 
@@ -51,6 +59,7 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
   const { id } = useInquiryBuilder();
   const alert = useAddAlert();
   const [setInquiryIntegrationsMutation, { loading: savingIntegrations }] = useMutation(SET_INQUIRY_INTEGRATIONS);
+  const [testIntegration] = useLazyQuery(TEST_MCP_INTEGRATION);
 
   // Load integrations when inquiry ID is available
   useQuery(GET_INQUIRY_INTEGRATIONS, {
@@ -83,11 +92,12 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
       type: 'MCP',
       config: {
         serverUrl: '',
-        auth: {
-          apiKey: '',
-        },
+        mcpConfig: {},
+        environment: {},
       },
     });
+    setJsonConfigText('');
+    setEnvironmentText('');
   };
 
   /**
@@ -99,14 +109,34 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
         ...formData,
         config: { ...formData.config, serverUrl: value },
       });
-    } else if (field === 'apiKey') {
-      setFormData({
-        ...formData,
-        config: {
-          ...formData.config,
-          auth: { ...formData.config.auth, apiKey: value },
-        },
-      });
+    } else if (field === 'jsonConfig') {
+      setJsonConfigText(value);
+      try {
+        const parsedConfig = JSON.parse(value);
+        setFormData({
+          ...formData,
+          config: {
+            ...formData.config,
+            mcpConfig: parsedConfig,
+          },
+        });
+      } catch (error) {
+        // Invalid JSON, don't update the config yet
+      }
+    } else if (field === 'environment') {
+      setEnvironmentText(value);
+      try {
+        const parsedEnv = JSON.parse(value);
+        setFormData({
+          ...formData,
+          config: {
+            ...formData.config,
+            environment: parsedEnv,
+          },
+        });
+      } catch (error) {
+        // Invalid JSON, don't update the environment yet
+      }
     } else {
       setFormData({ ...formData, [field]: value });
     }
@@ -116,9 +146,19 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
    * Start editing an existing integration
    */
   const startEdit = (index: number) => {
-    setFormData(integrations[index]);
+    const integration = integrations[index];
+    setFormData(integration);
     setEditingIndex(index);
     setShowAddForm(true);
+    
+    // Populate JSON fields if they exist
+    if (integration.config.mcpConfig && Object.keys(integration.config.mcpConfig).length > 0) {
+      setJsonConfigText(JSON.stringify(integration.config.mcpConfig, null, 2));
+    }
+    
+    if (integration.config.environment && Object.keys(integration.config.environment).length > 0) {
+      setEnvironmentText(JSON.stringify(integration.config.environment, null, 2));
+    }
   };
 
   /**
@@ -131,6 +171,70 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
   };
 
   /**
+   * Test the connection to the MCP integration
+   */
+  const testConnection = async () => {
+    if (!formData.name || !formData.config.serverUrl) {
+      alert('Name and Server URL are required to test connection', 'error');
+      return;
+    }
+
+    // Validate JSON config if provided
+    let testConfig = {};
+    let testEnvironment = {};
+
+    if (jsonConfigText.trim()) {
+      try {
+        testConfig = JSON.parse(jsonConfigText);
+      } catch (error) {
+        alert('Invalid JSON configuration. Please check your syntax.', 'error');
+        return;
+      }
+    }
+
+    if (environmentText.trim()) {
+      try {
+        testEnvironment = JSON.parse(environmentText);
+      } catch (error) {
+        alert('Invalid environment variables JSON. Please check your syntax.', 'error');
+        return;
+      }
+    }
+
+    const integrationToTest = {
+      name: formData.name,
+      description: formData.description,
+      type: formData.type,
+      config: {
+        serverUrl: formData.config.serverUrl,
+        ...(jsonConfigText.trim() && {
+          mcpConfig: testConfig
+        }),
+        ...(environmentText.trim() && {
+          environment: testEnvironment
+        }),
+      }
+    };
+
+    setIsTestingConnection(true);
+    try {
+      const result = await testIntegration({
+        variables: { integration: integrationToTest }
+      });
+
+      if (result.data?.testMCPIntegration?.success) {
+        alert('Connection test successful! 🎉', 'success');
+      } else {
+        alert(`Connection test failed: ${result.data?.testMCPIntegration?.error || 'Unknown error'}`, 'error');
+      }
+    } catch (error) {
+      alert(`Connection test failed: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
+    } finally {
+      setIsTestingConnection(false);
+    }
+  };
+
+  /**
    * Save integration (add or edit)
    */
   const saveIntegration = () => {
@@ -139,13 +243,38 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
       return;
     }
 
+    // Validate JSON config if provided
+    if (jsonConfigText.trim()) {
+      try {
+        JSON.parse(jsonConfigText);
+      } catch (error) {
+        alert('Invalid JSON configuration. Please check your syntax.', 'error');
+        return;
+      }
+    }
+
+    // Validate environment variables if provided
+    if (environmentText.trim()) {
+      try {
+        JSON.parse(environmentText);
+      } catch (error) {
+        alert('Invalid environment variables JSON. Please check your syntax.', 'error');
+        return;
+      }
+    }
+
     const newIntegration = {
       ...formData,
       config: {
         serverUrl: formData.config.serverUrl,
-        ...(formData.config.auth?.apiKey && {
-          auth: { apiKey: formData.config.auth.apiKey }
-        })
+        // Include JSON config if provided
+        ...(jsonConfigText.trim() && {
+          mcpConfig: JSON.parse(jsonConfigText)
+        }),
+        // Include environment variables if provided
+        ...(environmentText.trim() && {
+          environment: JSON.parse(environmentText)
+        }),
       }
     };
 
@@ -246,12 +375,6 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
         <div className="space-y-6">
           {/* Header with description and add button */}
           <div className="flex items-start justify-between">
-            <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Add MCP (Model Context Protocol) integrations to extend your inquiry capabilities.
-                These integrations allow your inquiry to connect with external tools and services.
-              </p>
-            </div>
             <Button
               type="button"
               size="small"
@@ -260,7 +383,7 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
               variant="primary"
               disabled={showAddForm}
             >
-              Add Integration
+              Add
             </Button>
           </div>
 
@@ -297,34 +420,88 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
                 placeholder="Brief description of what this integration does"
               />
 
-              <Input
-                name="apiKey"
-                label="API Key (optional)"
-                type="password"
-                value={formData.config.auth?.apiKey || ''}
-                onChange={(e) => handleInputChange('apiKey', e.target.value)}
-                placeholder="Enter API key if required"
-              />
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    MCP Configuration (JSON)
+                  </label>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
+                    Provide a JSON configuration object for the MCP server. 
+                    This should contain environment variables and settings that the MCP server expects.
+                    <br />
+                    <strong>Example for Atlassian:</strong> JIRA_URL, JIRA_USERNAME, JIRA_API_TOKEN, CONFLUENCE_URL, etc.
+                  </p>
+                  <Textarea
+                    name="jsonConfig"
+                    value={jsonConfigText}
+                    onChange={(e) => handleInputChange('jsonConfig', e.target.value)}
+                    placeholder={`{
+  "CONFLUENCE_URL": "https://your-company.atlassian.net/wiki",
+  "CONFLUENCE_USERNAME": "your.email@company.com",
+  "CONFLUENCE_API_TOKEN": "your_api_token",
+  "JIRA_URL": "https://your-company.atlassian.net",
+  "JIRA_USERNAME": "your.email@company.com",
+  "JIRA_API_TOKEN": "your_jira_api_token"
+}`}
+                    rows={8}
+                    className="font-mono text-sm"
+                  />
+                </div>
 
-              <div className="flex justify-end space-x-2">
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Environment Variables (JSON, optional)
+                  </label>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
+                    Additional environment variables to pass to the MCP server.
+                  </p>
+                  <Textarea
+                    name="environment"
+                    value={environmentText}
+                    onChange={(e) => handleInputChange('environment', e.target.value)}
+                    placeholder={`{
+  "READ_ONLY_MODE": "false",
+  "MCP_VERBOSE": "true",
+  "CONFLUENCE_SPACES_FILTER": "DEV,TEAM,DOC"
+}`}
+                    rows={4}
+                    className="font-mono text-sm"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-between items-center">
                 <Button
                   type="button"
                   size="small"
-                  icon={faTimes}
+                  icon={faPlug}
                   variant="transparentPrimary"
-                  onClick={cancelForm}
+                  onClick={testConnection}
+                  disabled={isTestingConnection || !formData.name || !formData.config.serverUrl}
                 >
-                  Cancel
+                  {isTestingConnection ? 'Testing...' : 'Test Connection'}
                 </Button>
-                <Button
-                  type="button"
-                  size="small"
-                  icon={faCheck}
-                  variant="primary"
-                  onClick={saveIntegration}
-                >
-                  {editingIndex !== null ? 'Update' : 'Add'} Integration
-                </Button>
+                
+                <div className="flex space-x-2">
+                  <Button
+                    type="button"
+                    size="small"
+                    icon={faTimes}
+                    variant="transparentPrimary"
+                    onClick={cancelForm}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="button"
+                    size="small"
+                    icon={faCheck}
+                    variant="primary"
+                    onClick={saveIntegration}
+                  >
+                    {editingIndex !== null ? 'Update' : 'Add'} Integration
+                  </Button>
+                </div>
               </div>
             </div>
           )}
@@ -342,6 +519,11 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
                         <span className="px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded">
                           {integration.type}
                         </span>
+                        {(integration.config.mcpConfig && Object.keys(integration.config.mcpConfig).length > 0) && (
+                          <span className="px-2 py-1 text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded">
+                            JSON Config
+                          </span>
+                        )}
                       </div>
                       {integration.description && (
                         <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
@@ -351,11 +533,18 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
                       <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
                         {integration.config.serverUrl}
                       </p>
-                      {integration.config.auth?.apiKey && (
-                        <p className="text-xs text-gray-500 dark:text-gray-500">
-                          🔑 API Key configured
-                        </p>
-                      )}
+                      <div className="flex items-center space-x-3 mt-1">
+                        {integration.config.mcpConfig && Object.keys(integration.config.mcpConfig).length > 0 && (
+                          <span className="text-xs text-gray-500 dark:text-gray-500">
+                            ⚙️ {Object.keys(integration.config.mcpConfig).length} config items
+                          </span>
+                        )}
+                        {integration.config.environment && Object.keys(integration.config.environment).length > 0 && (
+                          <span className="text-xs text-gray-500 dark:text-gray-500">
+                            🌍 {Object.keys(integration.config.environment).length} env vars
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <div className="flex space-x-2">
                       <Button

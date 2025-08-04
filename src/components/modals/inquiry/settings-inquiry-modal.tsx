@@ -7,7 +7,7 @@ import { useAddAlert } from '@/providers/alert-provider';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { VOICE_LINE_SAMPLES } from '@/utils/audio/voice-line-samples';
 import { useQuery } from '@apollo/client';
-import { faPlay, faSpinner, faCog } from '@fortawesome/free-solid-svg-icons';
+import { faPlay, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
