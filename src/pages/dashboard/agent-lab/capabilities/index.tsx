@@ -77,9 +77,7 @@ function CapabilityCard({
     <div className="bg-slate-100 dark:bg-slate-600 text-slate-700 dark:text-white  p-4 rounded-2xl shadow-md h-full w-full flex flex-col">
       <div className="grow">
         <div className="flex items-center gap-4 mb-2">
-          <h2 className="text-xl font-bold break-words flex-1">
-            {capability.name}
-          </h2>
+          <h2 className="text-xl font-bold break-words flex-1">{capability.name}</h2>
           <div className="flex-1">
             <Select
               name="llmModel"
@@ -194,11 +192,11 @@ export default function CapabilityDashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2, delay: 0.05 * i }}
           >
-            <CapabilityCard 
-              key={capability.id} 
-              capability={capability} 
-              onCopy={handleCopy} 
-              onUpdate={refetch} 
+            <CapabilityCard
+              key={capability.id}
+              capability={capability}
+              onCopy={handleCopy}
+              onUpdate={refetch}
               models={models}
               collection={collection}
             />

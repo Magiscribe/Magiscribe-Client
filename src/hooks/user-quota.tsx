@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client';
+import { ApolloError, useQuery } from '@apollo/client';
 import { useEffect } from 'react';
 import { GET_USER_QUOTA } from '@/clients/queries';
 
@@ -18,7 +18,7 @@ interface UseUserQuotaReturn {
   usedOutputTokens: number;
   allowedTokens: number;
   loading: boolean;
-  error: any;
+  error: ApolloError | undefined;
   refetch: () => void;
   updatedAt: string;
 }
@@ -44,7 +44,7 @@ export function useUserQuota(): UseUserQuotaReturn {
 
     // Check every minute if it's time to refresh
     const interval = setInterval(checkForRefresh, 60 * 1000);
-    
+
     return () => clearInterval(interval);
   }, [refetch]);
 

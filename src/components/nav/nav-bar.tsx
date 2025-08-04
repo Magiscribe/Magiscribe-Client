@@ -62,7 +62,7 @@ export function NavBar({ isFixed = true }) {
           className={`w-full grow lg:flex lg:items-center lg:w-auto hidden mt-2 lg:mt-0 p-4 lg:p-0 z-20 bg-white lg:bg-transparent`}
         >
           <ul className="list-reset lg:flex justify-end flex-1 items-center">{/* Add menu items here if needed */}</ul>
-          
+
           {/* Token Usage Progress Bar - only show when signed in */}
           <SignedIn>
             <div className="mr-6 hidden lg:block">
@@ -72,7 +72,7 @@ export function NavBar({ isFixed = true }) {
               <TokenUsageBar compact />
             </div>
           </SignedIn>
-          
+
           <Button
             onClick={toggleDarkMode}
             variant={isDark ? 'transparentWhiteFixed' : atTop ? 'transparentWhite' : 'transparentPrimary'}

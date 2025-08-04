@@ -17,8 +17,9 @@ interface AnalysisFilterProviderProps {
 export const AnalysisFilterProvider: React.FC<AnalysisFilterProviderProps> = ({ children }) => {
   const [filters, setFilters] = useState<InquiryResponseFilters>({});
 
-  const hasActiveFilters = Object.keys(filters).length > 0 && 
-    Object.values(filters).some(filter => filter && Object.keys(filter).length > 0);
+  const hasActiveFilters =
+    Object.keys(filters).length > 0 &&
+    Object.values(filters).some((filter) => filter && Object.keys(filter).length > 0);
 
   const clearFilters = () => setFilters({});
 
@@ -26,14 +27,10 @@ export const AnalysisFilterProvider: React.FC<AnalysisFilterProviderProps> = ({ 
     filters,
     setFilters,
     hasActiveFilters,
-    clearFilters
+    clearFilters,
   };
 
-  return (
-    <AnalysisFilterContext.Provider value={value}>
-      {children}
-    </AnalysisFilterContext.Provider>
-  );
+  return <AnalysisFilterContext.Provider value={value}>{children}</AnalysisFilterContext.Provider>;
 };
 
 export const useAnalysisFilters = (): AnalysisFilterContextType => {

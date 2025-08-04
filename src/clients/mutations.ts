@@ -22,8 +22,20 @@ export const DELETE_MEDIA_ASSET = gql`
 `;
 
 export const ADD_PREDICTION = gql`
-  mutation addPrediction($agentId: ID!, $subscriptionId: ID!, $inquiryId: ID, $input: JSONObject, $attachments: [JSONObject!]) {
-    addPrediction(agentId: $agentId, subscriptionId: $subscriptionId, inquiryId: $inquiryId, variables: $input, attachments: $attachments)
+  mutation addPrediction(
+    $agentId: ID!
+    $subscriptionId: ID!
+    $inquiryId: ID
+    $input: JSONObject
+    $attachments: [JSONObject!]
+  ) {
+    addPrediction(
+      agentId: $agentId
+      subscriptionId: $subscriptionId
+      inquiryId: $inquiryId
+      variables: $input
+      attachments: $attachments
+    )
   }
 `;
 

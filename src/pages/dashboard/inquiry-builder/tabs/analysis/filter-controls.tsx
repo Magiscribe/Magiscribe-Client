@@ -12,7 +12,7 @@ interface FilterControlsProps {
 
 const FilterControls: React.FC<FilterControlsProps> = ({ responseCount = 0 }) => {
   const { filters, setFilters, hasActiveFilters, clearFilters } = useAnalysisFilters();
-  
+
   const [nameFilter, setNameFilter] = useState<string>(filters.name?.contains ?? '');
   const [emailFilter, setEmailFilter] = useState<string>(filters.email?.contains ?? '');
 

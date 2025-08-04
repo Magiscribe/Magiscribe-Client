@@ -3,7 +3,7 @@ import { motion, Transition } from 'motion/react';
 const bounceTransition: Transition = {
   duration: 0.4,
   repeat: Infinity,
-  ease: 'easeOut'
+  ease: 'easeOut',
 };
 
 export default function AnimatedDots() {

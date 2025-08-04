@@ -27,7 +27,7 @@ interface TokenUsageBarProps {
 export default function TokenUsageBar({ compact = false }: TokenUsageBarProps) {
   // Check feature flag
   const showTokenUsageBar = import.meta.env.VITE_APP_SHOW_TOKEN_USAGE_BAR !== 'false';
-  
+
   const { usedTotalTokens, usedInputTokens, usedOutputTokens, allowedTokens, loading, updatedAt } = useUserQuota();
   const [isHovered, setIsHovered] = useState(false);
 
@@ -39,8 +39,8 @@ export default function TokenUsageBar({ compact = false }: TokenUsageBarProps) {
   // Calculate current tier and progress
   const getCurrentTierInfo = () => {
     let currentTier = TOKEN_TIERS[0];
-    let nextTier: typeof TOKEN_TIERS[0] | null = TOKEN_TIERS[1] || null;
-    
+    let nextTier: (typeof TOKEN_TIERS)[0] | null = TOKEN_TIERS[1] || null;
+
     for (let i = 0; i < TOKEN_TIERS.length; i++) {
       if (usedTotalTokens <= TOKEN_TIERS[i].max) {
         currentTier = TOKEN_TIERS[i];
@@ -106,31 +106,31 @@ export default function TokenUsageBar({ compact = false }: TokenUsageBarProps) {
       return {
         input: 'bg-purple-300',
         output: 'bg-purple-700',
-        background: 'from-purple-400 to-purple-600'
+        background: 'from-purple-400 to-purple-600',
       };
     }
-    
+
     // Stay green until we are above 1M tokens
     if (usedTotalTokens < 1000000) {
       return {
         input: 'bg-green-300',
         output: 'bg-green-700',
-        background: 'from-green-400 to-green-600'
+        background: 'from-green-400 to-green-600',
       };
     }
-    
+
     // After 1M, use yellow-to-red gradient based on progress
     if (progress < 85) {
       return {
         input: 'bg-yellow-300',
         output: 'bg-yellow-700',
-        background: 'from-yellow-400 to-yellow-600'
+        background: 'from-yellow-400 to-yellow-600',
       };
     } else {
       return {
         input: 'bg-red-300',
         output: 'bg-red-700',
-        background: 'from-red-400 to-red-600'
+        background: 'from-red-400 to-red-600',
       };
     }
   };
@@ -150,9 +150,7 @@ export default function TokenUsageBar({ compact = false }: TokenUsageBarProps) {
     return (
       <div className="flex items-center space-x-2">
         <div className="w-16 h-2 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
-        {!compact && (
-          <span className="text-xs text-gray-600 dark:text-gray-300">Loading...</span>
-        )}
+        {!compact && <span className="text-xs text-gray-600 dark:text-gray-300">Loading...</span>}
       </div>
     );
   }
@@ -176,9 +174,7 @@ export default function TokenUsageBar({ compact = false }: TokenUsageBarProps) {
             transition={{ duration: 0.5, ease: 'easeOut', delay: 0.1 }}
           />
         </div>
-        <span className="text-xs text-gray-600 dark:text-gray-300">
-          {formatCurrentTokens(usedTotalTokens)}
-        </span>
+        <span className="text-xs text-gray-600 dark:text-gray-300">{formatCurrentTokens(usedTotalTokens)}</span>
       </div>
     );
   }
@@ -212,7 +208,7 @@ export default function TokenUsageBar({ compact = false }: TokenUsageBarProps) {
                 transition={{ duration: 0.8, ease: 'easeOut', delay: 0.2 }}
               />
             </div>
-            
+
             {/* Progress text */}
             <motion.div
               className="mt-1 text-center"
@@ -241,10 +237,8 @@ export default function TokenUsageBar({ compact = false }: TokenUsageBarProps) {
       )}
     >
       <div className="p-3 min-w-[200px]">
-        <h4 className="font-semibold text-sm mb-3 text-slate-900 dark:text-slate-100">
-          Token Usage Breakdown
-        </h4>
-        
+        <h4 className="font-semibold text-sm mb-3 text-slate-900 dark:text-slate-100">Token Usage Breakdown</h4>
+
         {/* Input tokens */}
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center space-x-2">
@@ -255,7 +249,7 @@ export default function TokenUsageBar({ compact = false }: TokenUsageBarProps) {
             {formatCurrentTokens(usedInputTokens)}
           </span>
         </div>
-        
+
         {/* Output tokens */}
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center space-x-2">
@@ -266,7 +260,7 @@ export default function TokenUsageBar({ compact = false }: TokenUsageBarProps) {
             {formatCurrentTokens(usedOutputTokens)}
           </span>
         </div>
-        
+
         {/* Total and max allowed */}
         <div className="border-t border-slate-200 dark:border-slate-600 pt-2">
           <div className="flex justify-between text-xs">
@@ -277,9 +271,7 @@ export default function TokenUsageBar({ compact = false }: TokenUsageBarProps) {
           </div>
           <div className="flex justify-between text-xs mt-1">
             <span className="text-slate-700 dark:text-slate-300">Max Allowed</span>
-            <span className="font-medium text-slate-900 dark:text-slate-100">
-              {formatCurrentTokens(allowedTokens)}
-            </span>
+            <span className="font-medium text-slate-900 dark:text-slate-100">{formatCurrentTokens(allowedTokens)}</span>
           </div>
         </div>
 

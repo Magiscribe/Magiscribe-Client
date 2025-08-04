@@ -50,11 +50,7 @@ const ViaChatTab: React.FC<ViaChatTabProps> = ({ id }) => {
   });
 
   // Use shared filtered responses hook
-  const {
-    responses,
-    loading: dataLoading,
-    error: dataError,
-  } = useFilteredResponses({ id });
+  const { responses, loading: dataLoading, error: dataError } = useFilteredResponses({ id });
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -64,7 +60,7 @@ const ViaChatTab: React.FC<ViaChatTabProps> = ({ id }) => {
     variables: { subscriptionId },
     onData: ({ data: subscriptionData }) => {
       const prediction = subscriptionData.data?.predictionAdded;
-      
+
       if (prediction && prediction.type === 'SUCCESS') {
         setLoading(false);
         parseAndDisplayAnalysisResults(JSON.parse(prediction.result));

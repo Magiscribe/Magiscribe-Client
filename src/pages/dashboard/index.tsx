@@ -87,7 +87,7 @@ export default function DashboardPage() {
         subtitle="Get started turning dialogue into discoveries."
       />
       <hr className="my-8" />
-      
+
       <div className="space-y-4">
         <div
           className={clsx('grid grid-cols-1 gap-6', visibleCards.length === 1 ? 'md:grid-cols-1' : 'md:grid-cols-2')}

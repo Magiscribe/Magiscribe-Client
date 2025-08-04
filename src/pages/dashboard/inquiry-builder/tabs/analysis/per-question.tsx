@@ -52,11 +52,7 @@ const PerQuestionTab: React.FC<PerQuestionTabProps> = ({ id }) => {
   });
 
   // Use shared filtered responses hook
-  const {
-    responses,
-    loading: dataLoading,
-    error: dataError,
-  } = useFilteredResponses({ id });
+  const { responses, loading: dataLoading, error: dataError } = useFilteredResponses({ id });
 
   const questionNodes = useMemo(
     () =>
@@ -99,12 +95,12 @@ const PerQuestionTab: React.FC<PerQuestionTabProps> = ({ id }) => {
 
       if (prediction && prediction.type === 'SUCCESS') {
         setIsGeneratingSummary(false);
-        
+
         // Parse the prediction result - it should be a markdown summary in triple backticks
         const rawResult = JSON.parse(prediction.result)[0];
         const parsedBlocks = parseCodeBlocks(rawResult, ['markdown']);
         const summaryText = parsedBlocks.markdown || rawResult; // Fallback to raw result if no markdown block
-        
+
         if (summaryText) {
           setSummaries((prev) => ({
             ...prev,
@@ -176,16 +172,17 @@ const PerQuestionTab: React.FC<PerQuestionTabProps> = ({ id }) => {
     return Object.entries(nodeResponses).map(([userId, userResponses]) => {
       const userEmail = userIdToDetalsMap.get(userId)?.email;
       const userName = userIdToDetalsMap.get(userId)?.name;
-      return (        <div key={`${userId}-${nodeId}`} className="ml-4 mb-4">
+      return (
+        <div key={`${userId}-${nodeId}`} className="ml-4 mb-4">
           <p className="text-slate-700 dark:text-white font-semibold">
             {(() => {
               const name = userName;
               const email = userEmail;
-              
+
               if (!name || name === 'Unknown' || name === 'null') {
                 return `${email || userId}:`;
               }
-              
+
               return `${name} (${email}):`;
             })()}
           </p>
@@ -248,7 +245,6 @@ const PerQuestionTab: React.FC<PerQuestionTabProps> = ({ id }) => {
           </Button>
         </div>
       </div>
-
       <div className="my-4">
         <h2 className="font-bold mb-2">Select Question</h2>
         <div className="grid grid-cols-4 sm:grid-col-3 lg:grid-cols-6 gap-2">
@@ -263,7 +259,8 @@ const PerQuestionTab: React.FC<PerQuestionTabProps> = ({ id }) => {
             </Button>
           ))}
         </div>
-      </div>      {currentSummary && showSummary && (
+      </div>{' '}
+      {currentSummary && showSummary && (
         <div className="my-4 p-4 bg-blue-100 dark:bg-blue-900/30 rounded-md">
           <div className="prose prose-sm max-w-none">
             <MarkdownCustom>{currentSummary.text}</MarkdownCustom>
@@ -271,7 +268,6 @@ const PerQuestionTab: React.FC<PerQuestionTabProps> = ({ id }) => {
           <p className="text-sm text-slate-600 dark:text-slate-300 mt-2">Last Updated: {currentSummary.lastUpdated}</p>
         </div>
       )}
-
       <div>
         <h2 className="font-bold mb-2">Responses</h2>
         <div className="mb-6 p-4">

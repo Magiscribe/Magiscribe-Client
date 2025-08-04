@@ -5,11 +5,7 @@ import UserResponses from '@/components/analysis/user-responses';
 import Button from '@/components/controls/button';
 import ConfirmationModal from '@/components/modals/confirm-modal';
 import MarkdownCustom from '@/components/markdown-custom';
-import {
-  AddPredictionMutation,
-  DeleteInquiryResponseMutation,
-  GetInquiryQuery,
-} from '@/graphql/graphql';
+import { AddPredictionMutation, DeleteInquiryResponseMutation, GetInquiryQuery } from '@/graphql/graphql';
 import { useFilteredResponses } from '@/hooks/useFilteredResponses';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
 import { useAddAlert } from '@/providers/alert-provider';
@@ -80,12 +76,12 @@ const PerResponseTab: React.FC<PerResponseTabProps> = ({ id }) => {
 
       if (prediction && prediction.type === 'SUCCESS' && seletedResponse) {
         setIsGeneratingSummary(false);
-        
+
         // Parse the prediction result - it should be a markdown summary in triple backticks
         const rawResult = JSON.parse(prediction.result)[0];
         const parsedBlocks = parseCodeBlocks(rawResult, ['markdown']);
         const summaryText = parsedBlocks.markdown || rawResult; // Fallback to raw result if no markdown block
-        
+
         if (summaryText) {
           setSummaries((prev) => ({
             ...prev,
@@ -233,7 +229,6 @@ const PerResponseTab: React.FC<PerResponseTabProps> = ({ id }) => {
             </div>
           )}
         </div>
-
         <div className="my-4">
           <h2 className="font-bold mb-2">Select User</h2>
           <div className="grid grid-cols-4 sm:grid-col-3 lg:grid-cols-4 gap-2">
@@ -245,15 +240,16 @@ const PerResponseTab: React.FC<PerResponseTabProps> = ({ id }) => {
                   seletedResponse === userId
                     ? 'bg-blue-500 dark:bg-blue-600 text-white'
                     : 'bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-white'
-                }`}              >
+                }`}
+              >
                 {(() => {
                   const name = data.userDetails?.name;
                   const email = data.userDetails?.email || userId;
-                  
+
                   if (!name || name === 'Unknown' || name === 'null') {
                     return email;
                   }
-                  
+
                   return `${name} (${email})`;
                 })()}
               </button>
@@ -272,7 +268,8 @@ const PerResponseTab: React.FC<PerResponseTabProps> = ({ id }) => {
               </Button>
             </div>
           )}
-        </div>        {seletedResponse && summaries[seletedResponse] && showSummary && (
+        </div>{' '}
+        {seletedResponse && summaries[seletedResponse] && showSummary && (
           <div className="my-4 p-4 bg-blue-100 dark:bg-blue-900 rounded-md">
             <div className="prose prose-sm max-w-none">
               <MarkdownCustom>{summaries[seletedResponse].text}</MarkdownCustom>
@@ -282,26 +279,25 @@ const PerResponseTab: React.FC<PerResponseTabProps> = ({ id }) => {
             </p>
           </div>
         )}
-
         <hr className="my-6 border-slate-300 dark:border-slate-600" />
-
         <div className="w-full">
           {seletedResponse && (
             <>
-              <div className="flex justify-between items-center mb-4">                <h2 className="font-bold">
+              <div className="flex justify-between items-center mb-4">
+                {' '}
+                <h2 className="font-bold">
                   User Response |{' '}
                   {(() => {
                     const name = userResponse?.data.userDetails?.name;
                     const email = userResponse?.data.userDetails?.email;
-                    
+
                     if (!name || name === 'Unknown' || name === 'null') {
                       return email || seletedResponse;
                     }
-                    
+
                     return name;
                   })()}
                 </h2>
-
                 <Button onClick={() => setIsDeleteModalOpen(true)} variant="danger" size="small" icon={faTrash}>
                   Delete Response
                 </Button>
