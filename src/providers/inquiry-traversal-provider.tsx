@@ -15,6 +15,7 @@ import { GraphManager } from '@/utils/graphs/graph-manager';
 import { parseMarkdownCodeBlocks } from '@/utils/markdown';
 import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 interface InquiryProviderProps {
   /**
@@ -101,7 +102,7 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
     notFound: false,
     error: false,
   });
-  const subscriptionId = useRef<string>(`inquiry_${Date.now()}`).current;
+  const subscriptionId = useRef<string>(uuidv4()).current;
 
   // Event handlers
 
@@ -284,6 +285,7 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
       await addPrediction({
         variables: {
           ...lastPredictionVariablesRef.current,
+          inquiryId: id, // Ensure inquiryId is included for token tracking
           input: {
             ...(lastPredictionVariablesRef.current?.input ?? {}),
             errorHandling: error?.message || 'An error occurred,  please identify and resolve the issue.',
@@ -332,6 +334,7 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
     lastPredictionVariablesRef.current = {
       subscriptionId,
       agentId,
+      inquiryId: id, // Always pass inquiryId for token tracking
       input: {
         userMessage: currentNode.data.text,
         context: settingsRef.current.context,
@@ -363,6 +366,7 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
     lastPredictionVariablesRef.current = {
       subscriptionId,
       agentId,
+      inquiryId: id, // Always pass inquiryId for token tracking
       input: {
         userMessage: [
           `The instruction is: ${JSON.stringify(graphRef.current.getCurrentNode()?.data.conditions)}`,

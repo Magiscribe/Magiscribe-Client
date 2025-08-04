@@ -15,6 +15,7 @@ import { faVolumeHigh, faVolumeMute } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 
 interface predictionAdded {
   id: string;
@@ -37,7 +38,7 @@ interface Form {
 }
 
 const initialForm: Form = {
-  subscriptionId: Math.random().toString(36),
+  subscriptionId: uuidv4(),
   voice: 'PHOEBE',
   agent: '',
   customInput: [{ key: 'userMessage', value: 'Placeholder' }],

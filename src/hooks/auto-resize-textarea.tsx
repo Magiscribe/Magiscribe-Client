@@ -13,16 +13,16 @@ const useAutoResizeTextareaRef = (text: string) => {
   const resizeTextarea = useCallback(() => {
     if (textareaRef.current) {
       const textarea = textareaRef.current;
-      
+
       // Preserve cursor position and scroll position
       const selectionStart = textarea.selectionStart;
       const selectionEnd = textarea.selectionEnd;
       const scrollTop = textarea.scrollTop;
-      
+
       // Resize the textarea
       textarea.style.height = 'auto';
       textarea.style.height = `${textarea.scrollHeight}px`;
-      
+
       // Restore cursor position and scroll position
       textarea.setSelectionRange(selectionStart, selectionEnd);
       textarea.scrollTop = scrollTop;

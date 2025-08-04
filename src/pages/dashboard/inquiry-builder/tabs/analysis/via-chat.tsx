@@ -17,6 +17,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import clsx from 'clsx';
 import { motion } from 'motion/react';
 import React, { useEffect, useRef, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 interface Message {
   type: 'text' | 'chart';
@@ -31,7 +32,7 @@ interface ViaChatTabProps {
 const ViaChatTab: React.FC<ViaChatTabProps> = ({ id }) => {
   const [inputMessage, setInputMessage] = useState('');
   const [loading, setLoading] = useState<boolean>(false);
-  const [subscriptionId] = useState<string>(`advanced_analysis_${Date.now()}`);
+  const [subscriptionId] = useState<string>(uuidv4());
   const [messages, setMessages] = useWithLocalStorage<Message[]>([], `${id}-chat`);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -49,11 +50,7 @@ const ViaChatTab: React.FC<ViaChatTabProps> = ({ id }) => {
   });
 
   // Use shared filtered responses hook
-  const {
-    responses,
-    loading: dataLoading,
-    error: dataError,
-  } = useFilteredResponses({ id });
+  const { responses, loading: dataLoading, error: dataError } = useFilteredResponses({ id });
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -63,6 +60,7 @@ const ViaChatTab: React.FC<ViaChatTabProps> = ({ id }) => {
     variables: { subscriptionId },
     onData: ({ data: subscriptionData }) => {
       const prediction = subscriptionData.data?.predictionAdded;
+
       if (prediction && prediction.type === 'SUCCESS') {
         setLoading(false);
         parseAndDisplayAnalysisResults(JSON.parse(prediction.result));
@@ -124,6 +122,7 @@ const ViaChatTab: React.FC<ViaChatTabProps> = ({ id }) => {
           variables: {
             subscriptionId,
             agentId,
+            inquiryId: id,
             input: {
               userMessage: inputMessage,
               conversationData: JSON.stringify(minimizedData),

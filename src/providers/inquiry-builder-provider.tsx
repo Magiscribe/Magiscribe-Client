@@ -141,6 +141,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     variables: { subscriptionId },
     onData: ({ data: subscriptionData }) => {
       const prediction = subscriptionData.data?.predictionAdded;
+
       try {
         if (prediction?.type === PredictionType.Success) {
           // Node: The prediction result is always present when the type is success.
@@ -372,6 +373,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
       variables: {
         subscriptionId,
         agentId,
+        inquiryId: id,
         input: {
           userMessage,
           conversationGraph: JSON.stringify(graph),

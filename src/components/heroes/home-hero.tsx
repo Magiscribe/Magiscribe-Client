@@ -13,7 +13,7 @@ export default function HomeHero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          Turn Dialogue into Discovery
+          Spend More Time Developing
         </motion.h1>
         <motion.p
           className="leading-normal text-xl md:text-xl 2xl:text-3xl mb-8"
@@ -21,7 +21,7 @@ export default function HomeHero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.25 }}
         >
-          Magiscribe balances the efficiency of surveys with the depth of user interviews using the power of AI.
+          Magiscribe reduces the amount of time developers spend in daily standups and updating JIRA tickets by 40%
         </motion.p>
         <SignUpButton signInForceRedirectUrl="/dashboard" forceRedirectUrl="/dashboard">
           <motion.button
