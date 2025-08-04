@@ -505,7 +505,7 @@ export default function UserInquiryPage() {
   );
 
   const getActiveScreen = () => {
-    if (state.loading || !state.initialized) return renderLoading();
+    if (state.loading && !state.initialized) return renderLoading();
     if (state.error) return renderError();
     if (state.notFound) return renderNotFound();
 

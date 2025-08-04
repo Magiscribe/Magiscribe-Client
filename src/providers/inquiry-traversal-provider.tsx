@@ -1,4 +1,4 @@
-import { ADD_PREDICTION, CREATE_INQUIRY_RESPONSE, UPDATE_INQUIRY_RESPONSE, EXECUTE_INQUIRY_INTEGRATION_TOOL } from '@/clients/mutations';
+import { ADD_PREDICTION, CREATE_INQUIRY_RESPONSE, UPDATE_INQUIRY_RESPONSE } from '@/clients/mutations';
 import { GET_INQUIRY } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import {
@@ -104,6 +104,9 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
   });
   const subscriptionId = useRef<string>(uuidv4()).current;
 
+  // Track correlation IDs from integration node predictions
+  const integrationCorrelationIds = useRef<Set<string>>(new Set());
+
   // Event handlers
 
   /**
@@ -128,7 +131,6 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
   const [addPrediction] = useMutation<AddPredictionMutation>(ADD_PREDICTION);
   const [createResponse] = useMutation<CreateInquiryResponseMutation>(CREATE_INQUIRY_RESPONSE);
   const [updateResponse] = useMutation<UpdateInquiryResponseMutation>(UPDATE_INQUIRY_RESPONSE);
-  const [executeIntegrationTool] = useMutation(EXECUTE_INQUIRY_INTEGRATION_TOOL);
   const client = useApolloClient();
 
   /**
@@ -174,9 +176,33 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
         if (prediction?.type === PredictionType.Success) {
           setState((prev) => ({ ...prev, loading: false }));
 
+          // TODO: Resolve the match bug
           const result = JSON.parse(prediction.result);
-          const content = parseMarkdownCodeBlocks(result[0]);
+          console.log('Received prediction result:', result);
+          // If the parsed result is a nested json object or an array, convert it to a string
+          // This is to ensure that the content is always a string for proper node traversal
+          let content: {
+            text: string;
+          } = { text: '' };
 
+          if (typeof result === 'string') {
+            console.log('Received string result:', result);
+            content = parseMarkdownCodeBlocks(result);
+          } else if (Array.isArray(result)) {
+            console.log('Received array result:', result);
+            content = parseMarkdownCodeBlocks(result[0]);
+            console.log('Parsed first item from array:', content);
+          } else if (typeof result === 'object' && result !== null) {
+            console.log('Received object result:', result);
+            if ('text' in result && typeof result.text === 'string') {
+              content = parseMarkdownCodeBlocks(result.text);
+            } else {
+              console.log('Received object with no text property:', result);
+              content.text = JSON.stringify(result);
+            }
+          }
+
+          // Always trigger the callback for proper node traversal
           if (onSubscriptionDataRef.current) {
             onSubscriptionDataRef.current(content);
           }
@@ -308,6 +334,7 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
     } else if (node.type === 'condition') {
       await handleConditionNode();
     } else if (node.type === 'integration') {
+      console.log('Integration node visited:', node);
       await handleIntegrationNode();
     } else if (onNodeUpdateRef.current) {
       setState((prev) => ({ ...prev, loading: false }));
@@ -347,7 +374,10 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
       },
     };
     await addPrediction({
-      variables: lastPredictionVariablesRef.current,
+      variables: {
+        ...lastPredictionVariablesRef.current,
+        inquiryId: id, // Pass inquiry ID for MCP support
+      },
     });
 
     onSubscriptionDataRef.current = (result) => {
@@ -386,7 +416,10 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
       },
     };
     await addPrediction({
-      variables: lastPredictionVariablesRef.current,
+      variables: {
+        ...lastPredictionVariablesRef.current,
+        inquiryId: id, // Pass inquiry ID for MCP support
+      },
     });
 
     onSubscriptionDataRef.current = (result) => {
@@ -399,7 +432,7 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
 
   /**
    * Handles visiting an integration node.
-   * This will execute the selected MCP integration tool with the provided prompt.
+   * This will execute the selected MCP integration tool via a prediction call.
    * @returns {Promise<void>} A promise that resolves when the integration execution is complete
    */
   const handleIntegrationNode = async (): Promise<void> => {
@@ -411,57 +444,65 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
     if (!currentNode) return;
 
     // Base Case 3: Check if integration is properly configured
-    const { selectedIntegration, prompt } = currentNode.data;
-    if (!selectedIntegration || !prompt) {
-      handleError(new Error('Integration node is not properly configured. Please select an integration and provide a prompt.'));
+    const { selectedIntegrationId, prompt } = currentNode.data;
+    if (!selectedIntegrationId) {
+      handleError(new Error('Integration node is not properly configured. Please contact support.'));
       return;
     }
 
-    setState((prev) => ({ ...prev, loading: true }));
+    const agentId = await getAgentIdByName('Integration Generation', client);
 
-    try {
-      // Execute the integration tool
-      const result = await executeIntegrationTool({
-        variables: {
-          inquiryId: id,
-          integrationName: selectedIntegration,
-          prompt: prompt,
-        },
-      });
+    // Store prediction variables for error handling
+    lastPredictionVariablesRef.current = {
+      subscriptionId,
+      agentId,
+      input: {
+        userMessage: prompt,
+        context: settingsRef.current.context,
+        userDetails: userDetails,
+        conversationHistory: inquiryHistoryRef.current.join('\n\n'),
+      },
+    };
 
-      const integrationResult = result.data?.executeInquiryIntegrationTool;
+    const result = await addPrediction({
+      variables: {
+        ...lastPredictionVariablesRef.current,
+        inquiryId: id, // Pass inquiry ID for MCP support
+        integrationId: selectedIntegrationId, // Pass the integration ID
+      },
+    });
 
-      if (integrationResult?.success) {
-        // Update the current node with the integration result
-        await graphRef.current.updateCurrentNodeData({
-          ...currentNode.data,
-          integrationResult: integrationResult.result,
-        });
-
-        setState((prev) => ({ ...prev, loading: false }));
-
-        // Notify subscribers of the updated node
-        if (onNodeUpdateRef.current) {
-          onNodeUpdateRef.current(currentNode);
-        }
-
-        // Move to the next node in the graph after successful integration execution
-        const outgoingNodes = graphRef.current.getOutgoingNodes();
-        if (outgoingNodes.length > 0) {
-          handleNextNode({
-            nextNodeId: outgoingNodes[0].id,
-            data: { message: integrationResult.result },
-          });
-        }
-      } else {
-        // Handle integration execution error
-        const errorMessage = integrationResult?.error || 'Integration execution failed';
-        handleError(new Error(`Integration execution failed: ${errorMessage}`));
-      }
-    } catch (error) {
-      console.error('Error executing integration:', error);
-      handleError(error instanceof Error ? error : new Error('Unknown error occurred during integration execution'));
+    // Store the correlation ID to track that this prediction is from an integration node
+    const correlationId = result.data?.addPrediction?.correlationId;
+    if (correlationId) {
+      integrationCorrelationIds.current.add(correlationId);
     }
+
+    onSubscriptionDataRef.current = (predictionResult) => {
+      // Update the current node with the integration result
+      if (currentNode) {
+        currentNode.data = { ...currentNode.data, integrationResult: predictionResult.text };
+      }
+
+      setState((prev) => ({ ...prev, loading: false }));
+
+      // Add integration result to conversation history but don't show it to user
+      inquiryHistoryRef.current.push(`AI Integration Result: ${predictionResult.text}`);
+
+      // Notify subscribers of the updated node
+      if (onNodeUpdateRef.current) {
+        onNodeUpdateRef.current(currentNode);
+      }
+
+      // Move to the next node in the graph after successful integration execution
+      const outgoingNodes = graphRef.current?.getOutgoingNodes() || [];
+      if (outgoingNodes.length > 0) {
+        handleNextNode({
+          nextNodeId: outgoingNodes[0].id,
+          data: { message: predictionResult.text },
+        });
+      }
+    };
   };
 
   const messageCounterRef = useRef<number>(1);
