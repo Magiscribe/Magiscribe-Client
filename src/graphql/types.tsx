@@ -205,8 +205,23 @@ export type IntegrationConnectionResult = {
 export type IntegrationInput = {
   config: Scalars['JSONObject']['input'];
   description: Scalars['String']['input'];
+  id?: InputMaybe<Scalars['ID']['input']>;
   name: Scalars['String']['input'];
   type: Scalars['String']['input'];
+};
+
+export type McpTool = {
+  __typename?: 'MCPTool';
+  description: Scalars['String']['output'];
+  inputSchema?: Maybe<Scalars['JSONObject']['output']>;
+  name: Scalars['String']['output'];
+};
+
+export type McpToolsResult = {
+  __typename?: 'MCPToolsResult';
+  error?: Maybe<Scalars['String']['output']>;
+  success: Scalars['Boolean']['output'];
+  tools: Array<McpTool>;
 };
 
 export type Model = {
@@ -413,6 +428,7 @@ export type Query = {
   getInquiryResponseCount: Scalars['Int']['output'];
   getInquiryResponses?: Maybe<Array<InquiryResponse>>;
   getInquiryTemplates: Array<Scalars['JSONObject']['output']>;
+  getMCPIntegrationTools: McpToolsResult;
   getMediaAsset?: Maybe<Scalars['String']['output']>;
   getPrompt?: Maybe<Prompt>;
   getUserQuota?: Maybe<Quota>;
@@ -495,6 +511,11 @@ export type QueryGetInquiryResponsesArgs = {
 };
 
 
+export type QueryGetMcpIntegrationToolsArgs = {
+  integrationId: Scalars['ID']['input'];
+};
+
+
 export type QueryGetMediaAssetArgs = {
   id: Scalars['String']['input'];
 };
@@ -517,6 +538,17 @@ export type QueryGetUsersByIdArgs = {
 
 export type QueryTestMcpIntegrationArgs = {
   integration: IntegrationInput;
+};
+
+export type Quota = {
+  __typename?: 'Quota';
+  allowedTokens: Scalars['Int']['output'];
+  createdAt: Scalars['String']['output'];
+  updatedAt: Scalars['String']['output'];
+  usedInputTokens: Scalars['Int']['output'];
+  usedOutputTokens: Scalars['Int']['output'];
+  usedTotalTokens: Scalars['Int']['output'];
+  userId: Scalars['ID']['output'];
 };
 
 export enum Role {
@@ -595,9 +627,8 @@ export type DeleteMediaAssetMutationVariables = Exact<{
 export type DeleteMediaAssetMutation = { __typename?: 'Mutation', deleteMediaAsset?: number | null };
 
 export type AddPredictionMutationVariables = Exact<{
-  agentId: Scalars['ID']['input'];
   subscriptionId: Scalars['ID']['input'];
-  inquiryId?: InputMaybe<Scalars['ID']['input']>;
+  agentId: Scalars['ID']['input'];
   input?: InputMaybe<Scalars['JSONObject']['input']>;
   attachments?: InputMaybe<Array<Scalars['JSONObject']['input']> | Scalars['JSONObject']['input']>;
   inquiryId?: InputMaybe<Scalars['ID']['input']>;
@@ -905,6 +936,13 @@ export type TestMcpIntegrationQueryVariables = Exact<{
 
 
 export type TestMcpIntegrationQuery = { __typename?: 'Query', testMCPIntegration: { __typename?: 'IntegrationConnectionResult', success: boolean, error?: string | null } };
+
+export type GetMcpIntegrationToolsQueryVariables = Exact<{
+  integrationId: Scalars['ID']['input'];
+}>;
+
+
+export type GetMcpIntegrationToolsQuery = { __typename?: 'Query', getMCPIntegrationTools: { __typename?: 'MCPToolsResult', success: boolean, error?: string | null, tools: Array<{ __typename?: 'MCPTool', name: string, description: string, inputSchema?: any | null }> } };
 
 export type PredictionAddedSubscriptionVariables = Exact<{
   subscriptionId: Scalars['ID']['input'];
