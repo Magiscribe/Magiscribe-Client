@@ -327,3 +327,17 @@ export const TEST_MCP_INTEGRATION = gql`
     }
   }
 `;
+
+export const GET_MCP_INTEGRATION_TOOLS = gql`
+  query getMCPIntegrationTools($integrationId: ID!) {
+    getMCPIntegrationTools(integrationId: $integrationId) {
+      success
+      error
+      tools {
+        name
+        description
+        inputSchema
+      }
+    }
+  }
+`;

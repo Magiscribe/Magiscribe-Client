@@ -1,29 +1,25 @@
 import { SET_INQUIRY_INTEGRATIONS } from '@/clients/mutations';
-import { GET_INQUIRY_INTEGRATIONS, TEST_MCP_INTEGRATION } from '@/clients/queries';
+import { GET_INQUIRY_INTEGRATIONS, GET_MCP_INTEGRATION_TOOLS, TEST_MCP_INTEGRATION } from '@/clients/queries';
 import Button from '@/components/controls/button';
 import Input from '@/components/controls/input';
-import Textarea from '@/components/controls/textarea';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
-import { faCheck, faEdit, faPlug, faPlus, faTimes, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faEdit, faMinus, faPlug, faPlus, faTimes, faTools, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useState, useEffect } from 'react';
 
 import ConfirmationModal from '../confirm-modal';
 import CustomModal from '../modal';
 
 interface Integration {
+  id?: string;
   name: string;
   description: string;
   type: 'MCP';
   config: {
     serverUrl: string;
-    // JSON-based configuration support
-    mcpConfig?: {
-      [key: string]: any;
-    };
-    // Environment variables for MCP server
-    environment?: {
+    // Headers to pass with requests to the MCP server
+    headers?: {
       [key: string]: string;
     };
   };
@@ -41,17 +37,18 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [deleteConfirmIndex, setDeleteConfirmIndex] = useState<number | null>(null);
-  const [jsonConfigText, setJsonConfigText] = useState('');
-  const [environmentText, setEnvironmentText] = useState('');
+  const [headers, setHeaders] = useState<Array<{ key: string; value: string }>>([{ key: '', value: '' }]);
   const [isTestingConnection, setIsTestingConnection] = useState(false);
+  const [viewingToolsIndex, setViewingToolsIndex] = useState<number | null>(null);
+  const [discoveredTools, setDiscoveredTools] = useState<Array<{ name: string; description: string; inputSchema?: any }>>([]);
+  const [showToolsModal, setShowToolsModal] = useState(false);
   const [formData, setFormData] = useState<Integration>({
     name: '',
     description: '',
     type: 'MCP',
     config: {
       serverUrl: '',
-      mcpConfig: {},
-      environment: {},
+      headers: {},
     },
   });
 
@@ -60,6 +57,7 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
   const alert = useAddAlert();
   const [setInquiryIntegrationsMutation, { loading: savingIntegrations }] = useMutation(SET_INQUIRY_INTEGRATIONS);
   const [testIntegration] = useLazyQuery(TEST_MCP_INTEGRATION);
+  const [getMCPIntegrationTools, { loading: loadingTools }] = useLazyQuery(GET_MCP_INTEGRATION_TOOLS);
 
   // Load integrations when inquiry ID is available
   useQuery(GET_INQUIRY_INTEGRATIONS, {
@@ -78,6 +76,9 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
       setShowAddForm(false);
       setEditingIndex(null);
       setDeleteConfirmIndex(null);
+      setViewingToolsIndex(null);
+      setDiscoveredTools([]);
+      setShowToolsModal(false);
       resetForm();
     }
   }, [open]);
@@ -92,12 +93,10 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
       type: 'MCP',
       config: {
         serverUrl: '',
-        mcpConfig: {},
-        environment: {},
+        headers: {},
       },
     });
-    setJsonConfigText('');
-    setEnvironmentText('');
+    setHeaders([{ key: '', value: '' }]);
   };
 
   /**
@@ -109,37 +108,65 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
         ...formData,
         config: { ...formData.config, serverUrl: value },
       });
-    } else if (field === 'jsonConfig') {
-      setJsonConfigText(value);
-      try {
-        const parsedConfig = JSON.parse(value);
-        setFormData({
-          ...formData,
-          config: {
-            ...formData.config,
-            mcpConfig: parsedConfig,
-          },
-        });
-      } catch (error) {
-        // Invalid JSON, don't update the config yet
-      }
-    } else if (field === 'environment') {
-      setEnvironmentText(value);
-      try {
-        const parsedEnv = JSON.parse(value);
-        setFormData({
-          ...formData,
-          config: {
-            ...formData.config,
-            environment: parsedEnv,
-          },
-        });
-      } catch (error) {
-        // Invalid JSON, don't update the environment yet
-      }
     } else {
       setFormData({ ...formData, [field]: value });
     }
+  };
+
+  /**
+   * Handle header changes
+   */
+  const handleHeaderChange = (index: number, field: 'key' | 'value', value: string) => {
+    const newHeaders = [...headers];
+    newHeaders[index][field] = value;
+    setHeaders(newHeaders);
+    
+    // Update formData headers
+    const headersObj = newHeaders.reduce((acc, header) => {
+      if (header.key.trim() && header.value.trim()) {
+        acc[header.key.trim()] = header.value.trim();
+      }
+      return acc;
+    }, {} as { [key: string]: string });
+    
+    setFormData({
+      ...formData,
+      config: {
+        ...formData.config,
+        headers: headersObj,
+      },
+    });
+  };
+
+  /**
+   * Add a new header row
+   */
+  const addHeader = () => {
+    setHeaders([...headers, { key: '', value: '' }]);
+  };
+
+  /**
+   * Remove a header row
+   */
+  const removeHeader = (index: number) => {
+    const newHeaders = headers.filter((_, i) => i !== index);
+    setHeaders(newHeaders);
+    
+    // Update formData headers
+    const headersObj = newHeaders.reduce((acc, header) => {
+      if (header.key.trim() && header.value.trim()) {
+        acc[header.key.trim()] = header.value.trim();
+      }
+      return acc;
+    }, {} as { [key: string]: string });
+    
+    setFormData({
+      ...formData,
+      config: {
+        ...formData.config,
+        headers: headersObj,
+      },
+    });
   };
 
   /**
@@ -151,13 +178,15 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
     setEditingIndex(index);
     setShowAddForm(true);
     
-    // Populate JSON fields if they exist
-    if (integration.config.mcpConfig && Object.keys(integration.config.mcpConfig).length > 0) {
-      setJsonConfigText(JSON.stringify(integration.config.mcpConfig, null, 2));
-    }
-    
-    if (integration.config.environment && Object.keys(integration.config.environment).length > 0) {
-      setEnvironmentText(JSON.stringify(integration.config.environment, null, 2));
+    // Populate headers if they exist
+    if (integration.config.headers && Object.keys(integration.config.headers).length > 0) {
+      const headerPairs = Object.entries(integration.config.headers).map(([key, value]) => ({
+        key,
+        value,
+      }));
+      setHeaders(headerPairs.length > 0 ? headerPairs : [{ key: '', value: '' }]);
+    } else {
+      setHeaders([{ key: '', value: '' }]);
     }
   };
 
@@ -179,40 +208,13 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
       return;
     }
 
-    // Validate JSON config if provided
-    let testConfig = {};
-    let testEnvironment = {};
-
-    if (jsonConfigText.trim()) {
-      try {
-        testConfig = JSON.parse(jsonConfigText);
-      } catch (error) {
-        alert('Invalid JSON configuration. Please check your syntax.', 'error');
-        return;
-      }
-    }
-
-    if (environmentText.trim()) {
-      try {
-        testEnvironment = JSON.parse(environmentText);
-      } catch (error) {
-        alert('Invalid environment variables JSON. Please check your syntax.', 'error');
-        return;
-      }
-    }
-
     const integrationToTest = {
       name: formData.name,
       description: formData.description,
       type: formData.type,
       config: {
         serverUrl: formData.config.serverUrl,
-        ...(jsonConfigText.trim() && {
-          mcpConfig: testConfig
-        }),
-        ...(environmentText.trim() && {
-          environment: testEnvironment
-        }),
+        headers: formData.config.headers || {},
       }
     };
 
@@ -243,38 +245,11 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
       return;
     }
 
-    // Validate JSON config if provided
-    if (jsonConfigText.trim()) {
-      try {
-        JSON.parse(jsonConfigText);
-      } catch (error) {
-        alert('Invalid JSON configuration. Please check your syntax.', 'error');
-        return;
-      }
-    }
-
-    // Validate environment variables if provided
-    if (environmentText.trim()) {
-      try {
-        JSON.parse(environmentText);
-      } catch (error) {
-        alert('Invalid environment variables JSON. Please check your syntax.', 'error');
-        return;
-      }
-    }
-
     const newIntegration = {
       ...formData,
       config: {
         serverUrl: formData.config.serverUrl,
-        // Include JSON config if provided
-        ...(jsonConfigText.trim() && {
-          mcpConfig: JSON.parse(jsonConfigText)
-        }),
-        // Include environment variables if provided
-        ...(environmentText.trim() && {
-          environment: JSON.parse(environmentText)
-        }),
+        headers: formData.config.headers || {},
       }
     };
 
@@ -315,6 +290,47 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
   };
 
   /**
+   * View available tools for an integration
+   */
+  const viewAvailableTools = async (integrationIndex: number) => {
+    const integration = integrations[integrationIndex];
+    
+    if (!integration.id) {
+      alert('Integration must be saved before viewing tools', 'error');
+      return;
+    }
+
+    setViewingToolsIndex(integrationIndex);
+    setShowToolsModal(true);
+    
+    try {
+      const result = await getMCPIntegrationTools({
+        variables: { integrationId: integration.id }
+      });
+
+      if (result.data?.getMCPIntegrationTools?.success) {
+        const tools = result.data.getMCPIntegrationTools.tools || [];
+        setDiscoveredTools(tools);
+      } else {
+        alert(`Failed to load tools: ${result.data?.getMCPIntegrationTools?.error || 'Unknown error'}`, 'error');
+        setDiscoveredTools([]);
+      }
+    } catch (error) {
+      alert(`Failed to load tools: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
+      setDiscoveredTools([]);
+    }
+  };
+
+  /**
+   * Close tools modal
+   */
+  const closeToolsModal = () => {
+    setViewingToolsIndex(null);
+    setShowToolsModal(false);
+    setDiscoveredTools([]);
+  };
+
+  /**
    * Save all integrations to the backend
    */
   const saveAllIntegrations = async () => {
@@ -328,6 +344,7 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
         variables: {
           inquiryId: id,
           integrations: integrations.map(integration => ({
+            id: integration.id,
             name: integration.name,
             description: integration.description,
             type: integration.type,
@@ -423,50 +440,57 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    MCP Configuration (JSON)
+                    Headers
                   </label>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
-                    Provide a JSON configuration object for the MCP server. 
-                    This should contain environment variables and settings that the MCP server expects.
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
+                    Configure headers to be sent with requests to the MCP server.
                     <br />
-                    <strong>Example for Atlassian:</strong> JIRA_URL, JIRA_USERNAME, JIRA_API_TOKEN, CONFLUENCE_URL, etc.
+                    <strong>Example:</strong> Authorization → Bearer your-token-here
                   </p>
-                  <Textarea
-                    name="jsonConfig"
-                    value={jsonConfigText}
-                    onChange={(e) => handleInputChange('jsonConfig', e.target.value)}
-                    placeholder={`{
-  "CONFLUENCE_URL": "https://your-company.atlassian.net/wiki",
-  "CONFLUENCE_USERNAME": "your.email@company.com",
-  "CONFLUENCE_API_TOKEN": "your_api_token",
-  "JIRA_URL": "https://your-company.atlassian.net",
-  "JIRA_USERNAME": "your.email@company.com",
-  "JIRA_API_TOKEN": "your_jira_api_token"
-}`}
-                    rows={8}
-                    className="font-mono text-sm"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Environment Variables (JSON, optional)
-                  </label>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
-                    Additional environment variables to pass to the MCP server.
-                  </p>
-                  <Textarea
-                    name="environment"
-                    value={environmentText}
-                    onChange={(e) => handleInputChange('environment', e.target.value)}
-                    placeholder={`{
-  "READ_ONLY_MODE": "false",
-  "MCP_VERBOSE": "true",
-  "CONFLUENCE_SPACES_FILTER": "DEV,TEAM,DOC"
-}`}
-                    rows={4}
-                    className="font-mono text-sm"
-                  />
+                  
+                  <div className="space-y-2">
+                    {headers.map((header, index) => (
+                      <div key={index} className="grid grid-cols-5 gap-2 items-center">
+                        <div className="col-span-2">
+                          <Input
+                            name={`headerKey-${index}`}
+                            placeholder="Header name (e.g., Authorization)"
+                            value={header.key}
+                            onChange={(e) => handleHeaderChange(index, 'key', e.target.value)}
+                          />
+                        </div>
+                        <div className="col-span-2">
+                          <Input
+                            name={`headerValue-${index}`}
+                            placeholder="Header value (e.g., Bearer token123)"
+                            value={header.value}
+                            onChange={(e) => handleHeaderChange(index, 'value', e.target.value)}
+                          />
+                        </div>
+                        <div className="flex space-x-1">
+                          {index === headers.length - 1 && (
+                            <Button
+                              type="button"
+                              size="small"
+                              icon={faPlus}
+                              variant="transparentPrimary"
+                              onClick={addHeader}
+                              disabled={!header.key.trim() || !header.value.trim()}
+                            />
+                          )}
+                          {headers.length > 1 && (
+                            <Button
+                              type="button"
+                              size="small"
+                              icon={faMinus}
+                              variant="transparentPrimary"
+                              onClick={() => removeHeader(index)}
+                            />
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
 
@@ -519,9 +543,9 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
                         <span className="px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded">
                           {integration.type}
                         </span>
-                        {(integration.config.mcpConfig && Object.keys(integration.config.mcpConfig).length > 0) && (
+                        {(integration.config.headers && Object.keys(integration.config.headers).length > 0) && (
                           <span className="px-2 py-1 text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded">
-                            JSON Config
+                            Headers
                           </span>
                         )}
                       </div>
@@ -534,19 +558,24 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
                         {integration.config.serverUrl}
                       </p>
                       <div className="flex items-center space-x-3 mt-1">
-                        {integration.config.mcpConfig && Object.keys(integration.config.mcpConfig).length > 0 && (
+                        {integration.config.headers && Object.keys(integration.config.headers).length > 0 && (
                           <span className="text-xs text-gray-500 dark:text-gray-500">
-                            ⚙️ {Object.keys(integration.config.mcpConfig).length} config items
-                          </span>
-                        )}
-                        {integration.config.environment && Object.keys(integration.config.environment).length > 0 && (
-                          <span className="text-xs text-gray-500 dark:text-gray-500">
-                            🌍 {Object.keys(integration.config.environment).length} env vars
+                            📋 {Object.keys(integration.config.headers).length} headers
                           </span>
                         )}
                       </div>
                     </div>
                     <div className="flex space-x-2">
+                      <Button
+                        type="button"
+                        size="small"
+                        icon={faTools}
+                        variant="transparentPrimary"
+                        onClick={() => viewAvailableTools(index)}
+                        disabled={!integration.id || loadingTools}
+                      >
+                        {loadingTools && viewingToolsIndex === index ? 'Loading...' : 'View Tools'}
+                      </Button>
                       <Button
                         type="button"
                         size="small"
@@ -575,6 +604,110 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
             <div className="text-center py-8 text-gray-500 dark:text-gray-400">
               <p>No integrations configured yet.</p>
               <p className="text-sm">Click "Add Integration" to get started.</p>
+            </div>
+          )}
+        </div>
+      </CustomModal>
+
+      {/* Tools Modal */}
+      <CustomModal
+        size="3xl"
+        open={showToolsModal}
+        onClose={closeToolsModal}
+        title={`Available Tools - ${viewingToolsIndex !== null ? integrations[viewingToolsIndex]?.name : ''}`}
+        buttons={
+          <Button
+            type="button"
+            onClick={closeToolsModal}
+            variant="primary"
+            size="medium"
+          >
+            Close
+          </Button>
+        }
+      >
+        <div className="space-y-4">
+          {loadingTools ? (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-600 dark:text-gray-400">Loading available tools...</p>
+            </div>
+          ) : discoveredTools.length > 0 ? (
+            <div className="space-y-4">
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+                <p className="text-sm text-blue-800 dark:text-blue-200">
+                  🔧 Found <strong>{discoveredTools.length}</strong> available tool{discoveredTools.length === 1 ? '' : 's'} 
+                  for this integration. Click on any tool below to view its details and input schema.
+                </p>
+              </div>
+              
+              <div className="space-y-3">
+                {discoveredTools.map((tool, toolIndex) => (
+                  <details key={toolIndex} className="group">
+                    <summary className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                      <div className="flex items-center space-x-3">
+                        <div className="flex-shrink-0">
+                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        </div>
+                        <div>
+                          <h6 className="font-medium text-gray-900 dark:text-white">
+                            {tool.name}
+                          </h6>
+                        </div>
+                      </div>
+                      <div className="flex-shrink-0 ml-4">
+                        <svg 
+                          className="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </summary>
+                    
+                    <div className="mt-3 ml-4 mr-4 mb-4">
+                      <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border-l-4 border-blue-500">
+                        <div className="space-y-3">
+                          <div>
+                            <h6 className="text-sm font-medium text-gray-900 dark:text-white">Tool Details</h6>
+                            <div className="mt-2 space-y-2">
+                              <div className="flex">
+                                <span className="text-xs font-medium text-gray-500 dark:text-gray-400 w-20">Name:</span>
+                                <span className="text-xs text-gray-900 dark:text-white font-mono">{tool.name}</span>
+                              </div>
+                              <div className="flex">
+                                <span className="text-xs font-medium text-gray-500 dark:text-gray-400 w-20">Purpose:</span>
+                                <span className="text-xs text-gray-700 dark:text-gray-300">{tool.description}</span>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              💡 This tool can be executed through the Integration node in your inquiry workflow.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </details>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <div className="text-6xl mb-4">🔍</div>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No Tools Available</h3>
+              <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
+                No tools were found for this integration. This could mean:
+              </p>
+              <ul className="text-sm text-gray-500 dark:text-gray-400 mt-3 space-y-1">
+                <li>• The MCP server is not running</li>
+                <li>• The integration configuration is incorrect</li>
+                <li>• The server doesn't expose any tools</li>
+              </ul>
             </div>
           )}
         </div>
