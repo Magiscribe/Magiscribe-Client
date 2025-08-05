@@ -139,10 +139,11 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
     skip: !id,
     errorPolicy: 'all',
     onCompleted: ({ getInquiry }) => {
-      if (!getInquiry || !getInquiry.data) {
+      if (!getInquiry) {
         setState({ ...INITIAL_STATE, notFound: true });
         return;
       }
+
       const { graph, draftGraph, settings } = getInquiry.data;
       const usedGraph = preview ? draftGraph : graph;
 
