@@ -47,12 +47,18 @@ export default function IntegrationNode({ id, data }: IntegrationNodeProps) {
   );
 
   const integrationOptions = useMemo(() => {
-    if (!integrationsData?.getInquiryIntegrations) return [];
+    const options = [
+      { value: '', label: 'Select an integration...' }
+    ];
     
-    return integrationsData.getInquiryIntegrations.map((integration: Integration) => ({
+    if (!integrationsData?.getInquiryIntegrations) return options;
+    
+    const integrationItems = integrationsData.getInquiryIntegrations.map((integration: Integration) => ({
       value: integration.id,
       label: `${integration.name} - ${integration.description}`,
     }));
+    
+    return [...options, ...integrationItems];
   }, [integrationsData]);
 
   const selectedIntegrationDetails = useMemo(() => {

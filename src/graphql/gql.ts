@@ -61,7 +61,8 @@ type Documents = {
     "\n  query getAverageInquiryResponseTime($id: ID!) {\n    getAverageInquiryResponseTime(id: $id) {  \n      minutes\n      responseCount\n    }\n  }\n": typeof types.GetAverageInquiryResponseTimeDocument,
     "\n  query getInquiryIntegrations($inquiryId: ID!) {\n    getInquiryIntegrations(inquiryId: $inquiryId) {\n      id\n      name\n      description\n      type\n      config\n    }\n  }\n": typeof types.GetInquiryIntegrationsDocument,
     "\n  query testMCPIntegration($integration: IntegrationInput!) {\n    testMCPIntegration(integration: $integration) {\n      success\n      error\n    }\n  }\n": typeof types.TestMcpIntegrationDocument,
-    "\n  subscription predictionAdded($subscriptionId: ID!) {\n    predictionAdded(subscriptionId: $subscriptionId) {\n      id\n      subscriptionId\n      result\n      type\n    }\n  }\n": typeof types.PredictionAddedDocument,
+    "\n  query getMCPIntegrationTools($integrationId: ID!) {\n    getMCPIntegrationTools(integrationId: $integrationId) {\n      success\n      error\n      tools {\n        name\n        description\n        inputSchema\n      }\n    }\n  }\n": typeof types.GetMcpIntegrationToolsDocument,
+    "\n  subscription predictionAdded($subscriptionId: ID!) {\n    predictionAdded(subscriptionId: $subscriptionId) {\n      id\n      subscriptionId\n      result\n      type\n      tokenUsage {\n        inputTokens\n        outputTokens\n        totalTokens\n      }\n    }\n  }\n": typeof types.PredictionAddedDocument,
 };
 const documents: Documents = {
     "\n  mutation generateAudio($voice: String!, $text: String!) {\n    generateAudio(voice: $voice, text: $text)\n  }\n": types.GenerateAudioDocument,
@@ -111,7 +112,8 @@ const documents: Documents = {
     "\n  query getAverageInquiryResponseTime($id: ID!) {\n    getAverageInquiryResponseTime(id: $id) {  \n      minutes\n      responseCount\n    }\n  }\n": types.GetAverageInquiryResponseTimeDocument,
     "\n  query getInquiryIntegrations($inquiryId: ID!) {\n    getInquiryIntegrations(inquiryId: $inquiryId) {\n      id\n      name\n      description\n      type\n      config\n    }\n  }\n": types.GetInquiryIntegrationsDocument,
     "\n  query testMCPIntegration($integration: IntegrationInput!) {\n    testMCPIntegration(integration: $integration) {\n      success\n      error\n    }\n  }\n": types.TestMcpIntegrationDocument,
-    "\n  subscription predictionAdded($subscriptionId: ID!) {\n    predictionAdded(subscriptionId: $subscriptionId) {\n      id\n      subscriptionId\n      result\n      type\n    }\n  }\n": types.PredictionAddedDocument,
+    "\n  query getMCPIntegrationTools($integrationId: ID!) {\n    getMCPIntegrationTools(integrationId: $integrationId) {\n      success\n      error\n      tools {\n        name\n        description\n        inputSchema\n      }\n    }\n  }\n": types.GetMcpIntegrationToolsDocument,
+    "\n  subscription predictionAdded($subscriptionId: ID!) {\n    predictionAdded(subscriptionId: $subscriptionId) {\n      id\n      subscriptionId\n      result\n      type\n      tokenUsage {\n        inputTokens\n        outputTokens\n        totalTokens\n      }\n    }\n  }\n": types.PredictionAddedDocument,
 };
 
 /**
@@ -219,6 +221,10 @@ export function gql(source: "\n  mutation emailInquiryToUsers($userData: [UserDa
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "\n  query GetUserQuota {\n    getUserQuota {\n      userId\n      allowedTokens\n      usedTotalTokens\n      usedInputTokens\n      usedOutputTokens\n      updatedAt\n      createdAt\n    }\n  }\n"): (typeof documents)["\n  query GetUserQuota {\n    getUserQuota {\n      userId\n      allowedTokens\n      usedTotalTokens\n      usedInputTokens\n      usedOutputTokens\n      updatedAt\n      createdAt\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "\n  query getAllModels {\n    getAllModels {\n      id\n      name\n    }\n  }\n"): (typeof documents)["\n  query getAllModels {\n    getAllModels {\n      id\n      name\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -303,7 +309,7 @@ export function gql(source: "\n  query checkIfUsersRespondedToInquiry($userEmail
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query getAverageInquiryResponseTime($id: ID!) {\n    getAverageInquiryResponseTime(id: $id) {\n      minutes\n      responseCount\n    }\n  }\n"): (typeof documents)["\n  query getAverageInquiryResponseTime($id: ID!) {\n    getAverageInquiryResponseTime(id: $id) {\n      minutes\n      responseCount\n    }\n  }\n"];
+export function gql(source: "\n  query getAverageInquiryResponseTime($id: ID!) {\n    getAverageInquiryResponseTime(id: $id) {  \n      minutes\n      responseCount\n    }\n  }\n"): (typeof documents)["\n  query getAverageInquiryResponseTime($id: ID!) {\n    getAverageInquiryResponseTime(id: $id) {  \n      minutes\n      responseCount\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -315,7 +321,11 @@ export function gql(source: "\n  query testMCPIntegration($integration: Integrat
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  subscription predictionAdded($subscriptionId: ID!) {\n    predictionAdded(subscriptionId: $subscriptionId) {\n      id\n      subscriptionId\n      result\n      type\n    }\n  }\n"): (typeof documents)["\n  subscription predictionAdded($subscriptionId: ID!) {\n    predictionAdded(subscriptionId: $subscriptionId) {\n      id\n      subscriptionId\n      result\n      type\n    }\n  }\n"];
+export function gql(source: "\n  query getMCPIntegrationTools($integrationId: ID!) {\n    getMCPIntegrationTools(integrationId: $integrationId) {\n      success\n      error\n      tools {\n        name\n        description\n        inputSchema\n      }\n    }\n  }\n"): (typeof documents)["\n  query getMCPIntegrationTools($integrationId: ID!) {\n    getMCPIntegrationTools(integrationId: $integrationId) {\n      success\n      error\n      tools {\n        name\n        description\n        inputSchema\n      }\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  subscription predictionAdded($subscriptionId: ID!) {\n    predictionAdded(subscriptionId: $subscriptionId) {\n      id\n      subscriptionId\n      result\n      type\n      tokenUsage {\n        inputTokens\n        outputTokens\n        totalTokens\n      }\n    }\n  }\n"): (typeof documents)["\n  subscription predictionAdded($subscriptionId: ID!) {\n    predictionAdded(subscriptionId: $subscriptionId) {\n      id\n      subscriptionId\n      result\n      type\n      tokenUsage {\n        inputTokens\n        outputTokens\n        totalTokens\n      }\n    }\n  }\n"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};
