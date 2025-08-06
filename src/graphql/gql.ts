@@ -17,7 +17,7 @@ type Documents = {
     "\n  mutation generateAudio($voice: String!, $text: String!) {\n    generateAudio(voice: $voice, text: $text)\n  }\n": typeof types.GenerateAudioDocument,
     "\n  mutation addMediaAsset {\n    addMediaAsset {\n      signedUrl\n      id\n    }\n  }\n": typeof types.AddMediaAssetDocument,
     "\n  mutation deleteMediaAsset($id: String!) {\n    deleteMediaAsset(id: $id)\n  }\n": typeof types.DeleteMediaAssetDocument,
-    "\n  mutation addPrediction($subscriptionId: ID!, $agentId: ID!, $input: JSONObject, $attachments: [JSONObject!]) {\n    addPrediction(subscriptionId: $subscriptionId, agentId: $agentId, variables: $input, attachments: $attachments)\n  }\n": typeof types.AddPredictionDocument,
+    "\n  mutation addPrediction(\n    $agentId: ID!\n    $subscriptionId: ID!\n    $inquiryId: ID\n    $input: JSONObject\n    $attachments: [JSONObject!]\n  ) {\n    addPrediction(\n      agentId: $agentId\n      subscriptionId: $subscriptionId\n      inquiryId: $inquiryId\n      variables: $input\n      attachments: $attachments\n    )\n  }\n": typeof types.AddPredictionDocument,
     "\n  mutation upsertAgent($agent: AgentInput!) {\n    upsertAgent(agent: $agent) {\n      id\n      name\n      description\n      reasoning {\n        llmModel\n        prompt\n        variablePassThrough\n      }\n      capabilities {\n        id\n      }\n    }\n  }\n": typeof types.UpsertAgentDocument,
     "\n  mutation deleteAgent($agentId: ID!) {\n    deleteAgent(agentId: $agentId) {\n      id\n    }\n  }\n": typeof types.DeleteAgentDocument,
     "\n  mutation upsertCapability($capability: CapabilityInput!) {\n    upsertCapability(capability: $capability) {\n      id\n      name\n      alias\n      description\n      llmModel\n      outputMode\n      subscriptionFilter\n      outputFilter\n      prompts {\n        id\n        name\n        text\n      }\n    }\n  }\n": typeof types.UpsertCapabilityDocument,
@@ -37,6 +37,7 @@ type Documents = {
     "\n  mutation registerUser {\n    registerUser\n  }\n": typeof types.RegisterUserDocument,
     "\n  mutation emailInquiryToUsers($userData: [UserDataInput!]!, $inquiryId: String!) {\n    emailInquiryToUsers(userData: $userData, inquiryId: $inquiryId)\n  }\n": typeof types.EmailInquiryToUsersDocument,
     "\n  mutation sendClerkInvite($userEmail: String!) {\n    sendClerkInvite(userEmail: $userEmail)\n  }\n": typeof types.SendClerkInviteDocument,
+    "\n  query GetUserQuota {\n    getUserQuota {\n      userId\n      allowedTokens\n      usedTotalTokens\n      usedInputTokens\n      usedOutputTokens\n      updatedAt\n      createdAt\n    }\n  }\n": typeof types.GetUserQuotaDocument,
     "\n  query getAllModels {\n    getAllModels {\n      id\n      name\n    }\n  }\n": typeof types.GetAllModelsDocument,
     "\n  query getAgentWithPrompts($agentId: ID!) {\n    getAgentWithPrompts(agentId: $agentId) {\n      id\n      name\n      description\n      reasoning {\n        llmModel\n        prompt\n        variablePassThrough\n      }\n      capabilities {\n        name\n        id\n        prompts {\n          name\n          id\n          text\n        }\n      }\n      memoryEnabled\n      subscriptionFilter\n      outputFilter\n    }\n  }\n": typeof types.GetAgentWithPromptsDocument,
     "\n  query getAllAgents($logicalCollection: String) {\n    getAllAgents(logicalCollection: $logicalCollection) {\n      id\n      name\n      description\n      capabilities {\n        name\n        id\n      }\n    }\n  }\n": typeof types.GetAllAgentsDocument,
@@ -59,13 +60,13 @@ type Documents = {
     "\n  query getInquiryTemplates {\n    getInquiryTemplates\n  }\n": typeof types.GetInquiryTemplatesDocument,
     "\n  query checkIfUsersRespondedToInquiry($userEmails: [String!]!, $inquiryId: ID!) {\n    checkIfUsersRespondedToInquiry(userEmails: $userEmails, inquiryId: $inquiryId)\n  }\n": typeof types.CheckIfUsersRespondedToInquiryDocument,
     "\n  query getAverageInquiryResponseTime($id: ID!) {\n    getAverageInquiryResponseTime(id: $id) {\n      minutes\n      responseCount\n    }\n  }\n": typeof types.GetAverageInquiryResponseTimeDocument,
-    "\n  subscription predictionAdded($subscriptionId: ID!) {\n    predictionAdded(subscriptionId: $subscriptionId) {\n      id\n      subscriptionId\n      result\n      type\n    }\n  }\n": typeof types.PredictionAddedDocument,
+    "\n  subscription predictionAdded($subscriptionId: ID!) {\n    predictionAdded(subscriptionId: $subscriptionId) {\n      id\n      subscriptionId\n      result\n      type\n      tokenUsage {\n        inputTokens\n        outputTokens\n        totalTokens\n      }\n    }\n  }\n": typeof types.PredictionAddedDocument,
 };
 const documents: Documents = {
     "\n  mutation generateAudio($voice: String!, $text: String!) {\n    generateAudio(voice: $voice, text: $text)\n  }\n": types.GenerateAudioDocument,
     "\n  mutation addMediaAsset {\n    addMediaAsset {\n      signedUrl\n      id\n    }\n  }\n": types.AddMediaAssetDocument,
     "\n  mutation deleteMediaAsset($id: String!) {\n    deleteMediaAsset(id: $id)\n  }\n": types.DeleteMediaAssetDocument,
-    "\n  mutation addPrediction($subscriptionId: ID!, $agentId: ID!, $input: JSONObject, $attachments: [JSONObject!]) {\n    addPrediction(subscriptionId: $subscriptionId, agentId: $agentId, variables: $input, attachments: $attachments)\n  }\n": types.AddPredictionDocument,
+    "\n  mutation addPrediction(\n    $agentId: ID!\n    $subscriptionId: ID!\n    $inquiryId: ID\n    $input: JSONObject\n    $attachments: [JSONObject!]\n  ) {\n    addPrediction(\n      agentId: $agentId\n      subscriptionId: $subscriptionId\n      inquiryId: $inquiryId\n      variables: $input\n      attachments: $attachments\n    )\n  }\n": types.AddPredictionDocument,
     "\n  mutation upsertAgent($agent: AgentInput!) {\n    upsertAgent(agent: $agent) {\n      id\n      name\n      description\n      reasoning {\n        llmModel\n        prompt\n        variablePassThrough\n      }\n      capabilities {\n        id\n      }\n    }\n  }\n": types.UpsertAgentDocument,
     "\n  mutation deleteAgent($agentId: ID!) {\n    deleteAgent(agentId: $agentId) {\n      id\n    }\n  }\n": types.DeleteAgentDocument,
     "\n  mutation upsertCapability($capability: CapabilityInput!) {\n    upsertCapability(capability: $capability) {\n      id\n      name\n      alias\n      description\n      llmModel\n      outputMode\n      subscriptionFilter\n      outputFilter\n      prompts {\n        id\n        name\n        text\n      }\n    }\n  }\n": types.UpsertCapabilityDocument,
@@ -85,6 +86,7 @@ const documents: Documents = {
     "\n  mutation registerUser {\n    registerUser\n  }\n": types.RegisterUserDocument,
     "\n  mutation emailInquiryToUsers($userData: [UserDataInput!]!, $inquiryId: String!) {\n    emailInquiryToUsers(userData: $userData, inquiryId: $inquiryId)\n  }\n": types.EmailInquiryToUsersDocument,
     "\n  mutation sendClerkInvite($userEmail: String!) {\n    sendClerkInvite(userEmail: $userEmail)\n  }\n": types.SendClerkInviteDocument,
+    "\n  query GetUserQuota {\n    getUserQuota {\n      userId\n      allowedTokens\n      usedTotalTokens\n      usedInputTokens\n      usedOutputTokens\n      updatedAt\n      createdAt\n    }\n  }\n": types.GetUserQuotaDocument,
     "\n  query getAllModels {\n    getAllModels {\n      id\n      name\n    }\n  }\n": types.GetAllModelsDocument,
     "\n  query getAgentWithPrompts($agentId: ID!) {\n    getAgentWithPrompts(agentId: $agentId) {\n      id\n      name\n      description\n      reasoning {\n        llmModel\n        prompt\n        variablePassThrough\n      }\n      capabilities {\n        name\n        id\n        prompts {\n          name\n          id\n          text\n        }\n      }\n      memoryEnabled\n      subscriptionFilter\n      outputFilter\n    }\n  }\n": types.GetAgentWithPromptsDocument,
     "\n  query getAllAgents($logicalCollection: String) {\n    getAllAgents(logicalCollection: $logicalCollection) {\n      id\n      name\n      description\n      capabilities {\n        name\n        id\n      }\n    }\n  }\n": types.GetAllAgentsDocument,
@@ -107,7 +109,7 @@ const documents: Documents = {
     "\n  query getInquiryTemplates {\n    getInquiryTemplates\n  }\n": types.GetInquiryTemplatesDocument,
     "\n  query checkIfUsersRespondedToInquiry($userEmails: [String!]!, $inquiryId: ID!) {\n    checkIfUsersRespondedToInquiry(userEmails: $userEmails, inquiryId: $inquiryId)\n  }\n": types.CheckIfUsersRespondedToInquiryDocument,
     "\n  query getAverageInquiryResponseTime($id: ID!) {\n    getAverageInquiryResponseTime(id: $id) {\n      minutes\n      responseCount\n    }\n  }\n": types.GetAverageInquiryResponseTimeDocument,
-    "\n  subscription predictionAdded($subscriptionId: ID!) {\n    predictionAdded(subscriptionId: $subscriptionId) {\n      id\n      subscriptionId\n      result\n      type\n    }\n  }\n": types.PredictionAddedDocument,
+    "\n  subscription predictionAdded($subscriptionId: ID!) {\n    predictionAdded(subscriptionId: $subscriptionId) {\n      id\n      subscriptionId\n      result\n      type\n      tokenUsage {\n        inputTokens\n        outputTokens\n        totalTokens\n      }\n    }\n  }\n": types.PredictionAddedDocument,
 };
 
 /**
@@ -139,7 +141,7 @@ export function gql(source: "\n  mutation deleteMediaAsset($id: String!) {\n    
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  mutation addPrediction($subscriptionId: ID!, $agentId: ID!, $input: JSONObject, $attachments: [JSONObject!]) {\n    addPrediction(subscriptionId: $subscriptionId, agentId: $agentId, variables: $input, attachments: $attachments)\n  }\n"): (typeof documents)["\n  mutation addPrediction($subscriptionId: ID!, $agentId: ID!, $input: JSONObject, $attachments: [JSONObject!]) {\n    addPrediction(subscriptionId: $subscriptionId, agentId: $agentId, variables: $input, attachments: $attachments)\n  }\n"];
+export function gql(source: "\n  mutation addPrediction(\n    $agentId: ID!\n    $subscriptionId: ID!\n    $inquiryId: ID\n    $input: JSONObject\n    $attachments: [JSONObject!]\n  ) {\n    addPrediction(\n      agentId: $agentId\n      subscriptionId: $subscriptionId\n      inquiryId: $inquiryId\n      variables: $input\n      attachments: $attachments\n    )\n  }\n"): (typeof documents)["\n  mutation addPrediction(\n    $agentId: ID!\n    $subscriptionId: ID!\n    $inquiryId: ID\n    $input: JSONObject\n    $attachments: [JSONObject!]\n  ) {\n    addPrediction(\n      agentId: $agentId\n      subscriptionId: $subscriptionId\n      inquiryId: $inquiryId\n      variables: $input\n      attachments: $attachments\n    )\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -216,6 +218,10 @@ export function gql(source: "\n  mutation emailInquiryToUsers($userData: [UserDa
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  mutation sendClerkInvite($userEmail: String!) {\n    sendClerkInvite(userEmail: $userEmail)\n  }\n"): (typeof documents)["\n  mutation sendClerkInvite($userEmail: String!) {\n    sendClerkInvite(userEmail: $userEmail)\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query GetUserQuota {\n    getUserQuota {\n      userId\n      allowedTokens\n      usedTotalTokens\n      usedInputTokens\n      usedOutputTokens\n      updatedAt\n      createdAt\n    }\n  }\n"): (typeof documents)["\n  query GetUserQuota {\n    getUserQuota {\n      userId\n      allowedTokens\n      usedTotalTokens\n      usedInputTokens\n      usedOutputTokens\n      updatedAt\n      createdAt\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -307,7 +313,7 @@ export function gql(source: "\n  query getAverageInquiryResponseTime($id: ID!) {
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  subscription predictionAdded($subscriptionId: ID!) {\n    predictionAdded(subscriptionId: $subscriptionId) {\n      id\n      subscriptionId\n      result\n      type\n    }\n  }\n"): (typeof documents)["\n  subscription predictionAdded($subscriptionId: ID!) {\n    predictionAdded(subscriptionId: $subscriptionId) {\n      id\n      subscriptionId\n      result\n      type\n    }\n  }\n"];
+export function gql(source: "\n  subscription predictionAdded($subscriptionId: ID!) {\n    predictionAdded(subscriptionId: $subscriptionId) {\n      id\n      subscriptionId\n      result\n      type\n      tokenUsage {\n        inputTokens\n        outputTokens\n        totalTokens\n      }\n    }\n  }\n"): (typeof documents)["\n  subscription predictionAdded($subscriptionId: ID!) {\n    predictionAdded(subscriptionId: $subscriptionId) {\n      id\n      subscriptionId\n      result\n      type\n      tokenUsage {\n        inputTokens\n        outputTokens\n        totalTokens\n      }\n    }\n  }\n"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};

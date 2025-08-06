@@ -53,6 +53,7 @@ interface ContextType {
   metadata: Metadata;
   owners: string[];
   ownerEmails: string[];
+  isOwnerEmailsLoading: boolean;
   graph: { edges: Edge[]; nodes: Node[] };
 
   deleteInquiry: (onSuccess?: () => void, onError?: () => void) => Promise<void>;
@@ -65,7 +66,6 @@ interface ContextType {
   saveSettings: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
   saveOwners: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
   saveOwnerEmails: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
-
   setGraph: (graph: { edges: Edge[]; nodes: Node[] }) => void;
   saveGraph: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
   publishGraph: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
@@ -106,6 +106,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
 
   const [owners, setOwners] = useState<string[]>([]);
   const [ownerEmails, setOwnerEmails] = useState<string[]>([]);
+  const [isOwnerEmailsLoading, setIsOwnerEmailsLoading] = useState<boolean>(true);
 
   // Graph Generation States
   const [generatingGraph, setGeneratingGraph] = useState(false);
@@ -135,7 +136,10 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
       if (getInquiry.data.draftGraph) setGraph(getInquiry.data.draftGraph);
       if (getInquiry.data.draftGraph) resetInitialState(getInquiry.data.draftGraph);
       if (getInquiry.userId) setOwners(getInquiry.userId);
-      if (getInquiry.ownerEmail) setOwnerEmails(getInquiry.ownerEmail);
+      if (getInquiry.ownerEmail) {
+        setOwnerEmails(getInquiry.ownerEmail);
+        setIsOwnerEmailsLoading(false);
+      }
       setInitialized(true);
     },
   });
@@ -427,6 +431,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     updateOwnerEmails: setOwnerEmails,
     saveOwners,
     saveOwnerEmails,
+    isOwnerEmailsLoading,
     resetGraph,
 
     saveGraph,
