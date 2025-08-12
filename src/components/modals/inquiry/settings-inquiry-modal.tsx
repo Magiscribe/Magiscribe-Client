@@ -84,7 +84,7 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
           alert('Something went wrong!', 'error');
         },
       );
-    } catch (error) {
+    } catch {
       alert('Something went wrong!', 'error');
     }
   };
@@ -182,12 +182,7 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
                   Add MCP (Model Context Protocol) integrations to extend your inquiry capabilities
                 </p>
               </div>
-              <Button
-                type="button"
-                size="small"
-                onClick={() => setShowIntegrationModal(true)}
-                variant="primary"
-              >
+              <Button type="button" size="small" onClick={() => setShowIntegrationModal(true)} variant="primary">
                 Manage Integrations
               </Button>
             </div>
@@ -221,14 +216,7 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
         onCloseConfirmDeleteOwnerModal={() => setIsConfirmDeleteOwnerModalOpen(false)}
       />
 
-      <IntegrationManagementModal
-        open={showIntegrationModal}
-        onClose={() => setShowIntegrationModal(false)}
-        onSave={() => {
-          // Optionally refresh data or show success message
-          alert('Integrations updated successfully!', 'success');
-        }}
-      />
+      <IntegrationManagementModal open={showIntegrationModal} onClose={() => setShowIntegrationModal(false)} />
     </>
   );
 }

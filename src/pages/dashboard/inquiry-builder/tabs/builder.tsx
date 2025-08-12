@@ -97,7 +97,7 @@ export default function InquiryBuilder() {
               <GraphInput>
                 <Button
                   onClick={toggleChat}
-                  className="absolute top-4 right-4 z-100"
+                  className="absolute top-4 right-4 z-10`"
                   variant="primary"
                   icon={faMagicWandSparkles}
                 >
