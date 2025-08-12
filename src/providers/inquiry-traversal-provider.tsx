@@ -178,7 +178,6 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
 
           // TODO: Resolve the match bug
           const result = JSON.parse(prediction.result);
-          console.log('Received prediction result:', result);
           // If the parsed result is a nested json object or an array, convert it to a string
           // This is to ensure that the content is always a string for proper node traversal
           let content: {
@@ -186,18 +185,13 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
           } = { text: '' };
 
           if (typeof result === 'string') {
-            console.log('Received string result:', result);
             content = parseMarkdownCodeBlocks(result);
           } else if (Array.isArray(result)) {
-            console.log('Received array result:', result);
             content = parseMarkdownCodeBlocks(result[0]);
-            console.log('Parsed first item from array:', content);
           } else if (typeof result === 'object' && result !== null) {
-            console.log('Received object result:', result);
             if ('text' in result && typeof result.text === 'string') {
               content = parseMarkdownCodeBlocks(result.text);
             } else {
-              console.log('Received object with no text property:', result);
               content.text = JSON.stringify(result);
             }
           }
@@ -334,7 +328,6 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
     } else if (node.type === 'condition') {
       await handleConditionNode();
     } else if (node.type === 'integration') {
-      console.log('Integration node visited:', node);
       await handleIntegrationNode();
     } else if (onNodeUpdateRef.current) {
       setState((prev) => ({ ...prev, loading: false }));

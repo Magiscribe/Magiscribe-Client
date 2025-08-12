@@ -12,10 +12,13 @@ const variantClassNames = {
   light: 'bg-white text-blue-700 font-bold hover:bg-slate-100 focus:ring-slate-300',
   dark: 'bg-slate-600 text-white hover:bg-slate-700 focus:ring-slate-300',
 
-  transparentPrimary: 'text-blue-600 hover:text-blue-700 focus:outline-hidden focus:ring-0 select-none hover:text-blue-500',
-  transparentSecondary: 'text-slate-500 hover:text-slate-500 focus:outline-hidden focus:ring-0 select-none hover:text-slate-400',
+  transparentPrimary:
+    'text-blue-600 hover:text-blue-700 focus:outline-hidden focus:ring-0 select-none hover:text-blue-500',
+  transparentSecondary:
+    'text-slate-500 hover:text-slate-500 focus:outline-hidden focus:ring-0 select-none hover:text-slate-400',
   transparentDanger: 'text-red-600 hover:text-red-700 focus:outline-hidden focus:ring-0 select-none hover:text-red-500',
-  transparentSuccess: 'text-green-600 hover:text-green-700 focus:outline-hidden focus:ring-0 select-none hover:text-green-500',
+  transparentSuccess:
+    'text-green-600 hover:text-green-700 focus:outline-hidden focus:ring-0 select-none hover:text-green-500',
   transparentLight:
     'text-white dark:text-slate-600 hover:text-slate-400 dark:hover:text-white focus:outline-hidden focus:ring-0 select-none',
   transparentDark:

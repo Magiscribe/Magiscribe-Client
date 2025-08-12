@@ -1,4 +1,3 @@
-import blocksImage from '@/assets/imgs/cards/blocks.webp';
 import bondImage from '@/assets/imgs/cards/bond.webp';
 import roadImage from '@/assets/imgs/cards/road.webp';
 import yellImage from '@/assets/imgs/cards/yell.webp';
@@ -179,7 +178,11 @@ export default function DashboardPage() {
           </motion.div>
         </div>
 
-        <WelcomeModal isOpen={isWelcomeModalOpen} onClose={handleCloseWelcomeModal} onConfirm={handleCloseWelcomeModal} />
+        <WelcomeModal
+          isOpen={isWelcomeModalOpen}
+          onClose={handleCloseWelcomeModal}
+          onConfirm={handleCloseWelcomeModal}
+        />
       </InquiryBuilderProvider>
     </GraphProvider>
   );

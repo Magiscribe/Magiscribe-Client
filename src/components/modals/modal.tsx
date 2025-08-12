@@ -1,3 +1,5 @@
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from '@headlessui/react';
 import { Fragment } from 'react';
 
@@ -59,15 +61,15 @@ export default function CustomModal(props: Props) {
               leaveTo="opacity-0 scale-95"
             >
               <DialogPanel
-                className={`w-full ${sizeClass} transform rounded-2xl ${backgroundColor} p-6 text-left align-middle shadow-xl transition-all dark:bg-slate-800`}
+                className={`w-full ${sizeClass} transform rounded-2xl ${backgroundColor} p-6 text-left align-middle shadow-xl transition-all dark:bg-slate-800 relative`}
               >
                 <DialogTitle as="h3" className="text-lg font-medium leading-6 text-slate-900 dark:text-slate-100">
                   {props.title}
                   <button
-                    className="fixed top-2 right-4 p-4 text-slate-700 hover:text-orange-700 transition-colors duration-150 dark:text-slate-300 dark:hover:text-orange-500"
+                    className="absolute top-2 right-4 p-4 text-slate-700 hover:text-orange-700 transition-colors duration-150 dark:text-slate-300 dark:hover:text-orange-500"
                     onClick={closeModal}
                   >
-                    x
+                    <FontAwesomeIcon icon={faTimes} />
                   </button>
                 </DialogTitle>
                 <div className="mt-2 dark:text-slate-200">{props.children}</div>

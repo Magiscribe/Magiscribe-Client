@@ -28,10 +28,9 @@ interface Integration {
 interface IntegrationManagementModalProps {
   open: boolean;
   onClose: () => void;
-  onSave?: () => void;
 }
 
-export default function IntegrationManagementModal({ open, onClose, onSave }: IntegrationManagementModalProps) {
+export default function IntegrationManagementModal({ open, onClose }: IntegrationManagementModalProps) {
   // State
   const [integrations, setIntegrations] = useState<Integration[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -39,8 +38,11 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
   const [deleteConfirmIndex, setDeleteConfirmIndex] = useState<number | null>(null);
   const [headers, setHeaders] = useState<Array<{ key: string; value: string }>>([{ key: '', value: '' }]);
   const [isTestingConnection, setIsTestingConnection] = useState(false);
+  const [isSavingIntegration, setIsSavingIntegration] = useState(false);
   const [viewingToolsIndex, setViewingToolsIndex] = useState<number | null>(null);
-  const [discoveredTools, setDiscoveredTools] = useState<Array<{ name: string; description: string; inputSchema?: any }>>([]);
+  const [discoveredTools, setDiscoveredTools] = useState<
+    Array<{ name: string; description: string; inputSchema?: object }>
+  >([]);
   const [showToolsModal, setShowToolsModal] = useState(false);
   const [formData, setFormData] = useState<Integration>({
     name: '',
@@ -53,9 +55,9 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
   });
 
   // Hooks
-  const { id } = useInquiryBuilder();
+  const { id, refreshGraph } = useInquiryBuilder();
   const alert = useAddAlert();
-  const [setInquiryIntegrationsMutation, { loading: savingIntegrations }] = useMutation(SET_INQUIRY_INTEGRATIONS);
+  const [setInquiryIntegrationsMutation] = useMutation(SET_INQUIRY_INTEGRATIONS);
   const [testIntegration] = useLazyQuery(TEST_MCP_INTEGRATION);
   const [getMCPIntegrationTools, { loading: loadingTools }] = useLazyQuery(GET_MCP_INTEGRATION_TOOLS);
 
@@ -120,15 +122,18 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
     const newHeaders = [...headers];
     newHeaders[index][field] = value;
     setHeaders(newHeaders);
-    
+
     // Update formData headers
-    const headersObj = newHeaders.reduce((acc, header) => {
-      if (header.key.trim() && header.value.trim()) {
-        acc[header.key.trim()] = header.value.trim();
-      }
-      return acc;
-    }, {} as { [key: string]: string });
-    
+    const headersObj = newHeaders.reduce(
+      (acc, header) => {
+        if (header.key.trim() && header.value.trim()) {
+          acc[header.key.trim()] = header.value.trim();
+        }
+        return acc;
+      },
+      {} as { [key: string]: string },
+    );
+
     setFormData({
       ...formData,
       config: {
@@ -151,15 +156,18 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
   const removeHeader = (index: number) => {
     const newHeaders = headers.filter((_, i) => i !== index);
     setHeaders(newHeaders);
-    
+
     // Update formData headers
-    const headersObj = newHeaders.reduce((acc, header) => {
-      if (header.key.trim() && header.value.trim()) {
-        acc[header.key.trim()] = header.value.trim();
-      }
-      return acc;
-    }, {} as { [key: string]: string });
-    
+    const headersObj = newHeaders.reduce(
+      (acc, header) => {
+        if (header.key.trim() && header.value.trim()) {
+          acc[header.key.trim()] = header.value.trim();
+        }
+        return acc;
+      },
+      {} as { [key: string]: string },
+    );
+
     setFormData({
       ...formData,
       config: {
@@ -177,7 +185,7 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
     setFormData(integration);
     setEditingIndex(index);
     setShowAddForm(true);
-    
+
     // Populate headers if they exist
     if (integration.config.headers && Object.keys(integration.config.headers).length > 0) {
       const headerPairs = Object.entries(integration.config.headers).map(([key, value]) => ({
@@ -215,13 +223,13 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
       config: {
         serverUrl: formData.config.serverUrl,
         headers: formData.config.headers || {},
-      }
+      },
     };
 
     setIsTestingConnection(true);
     try {
       const result = await testIntegration({
-        variables: { integration: integrationToTest }
+        variables: { integration: integrationToTest },
       });
 
       if (result.data?.testMCPIntegration?.success) {
@@ -239,18 +247,20 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
   /**
    * Save integration (add or edit)
    */
-  const saveIntegration = () => {
+  const saveIntegration = async () => {
     if (!formData.name || !formData.config.serverUrl) {
       alert('Name and Server URL are required', 'error');
       return;
     }
+
+    setIsSavingIntegration(true);
 
     const newIntegration = {
       ...formData,
       config: {
         serverUrl: formData.config.serverUrl,
         headers: formData.config.headers || {},
-      }
+      },
     };
 
     let updatedIntegrations: Integration[];
@@ -259,14 +269,65 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
       // Edit existing integration
       updatedIntegrations = [...integrations];
       updatedIntegrations[editingIndex] = newIntegration;
-      alert('Integration updated successfully!', 'success');
+
+      // Save to backend immediately when updating
+      if (id) {
+        try {
+          await setInquiryIntegrationsMutation({
+            variables: {
+              inquiryId: id,
+              integrations: updatedIntegrations.map((integration) => ({
+                id: integration.id,
+                name: integration.name,
+                description: integration.description,
+                type: integration.type,
+                config: integration.config,
+              })),
+            },
+          });
+          alert('Integration updated and saved successfully!', 'success');
+          refreshGraph(); // Refresh graph to update integration nodes
+        } catch (error) {
+          alert('Failed to save integration update', 'error');
+          console.error('Error saving integration:', error);
+          setIsSavingIntegration(false);
+          return;
+        }
+      }
     } else {
       // Add new integration
       updatedIntegrations = [...integrations, newIntegration];
-      alert('Integration added successfully!', 'success');
+
+      // Save to backend immediately when adding
+      if (id) {
+        try {
+          await setInquiryIntegrationsMutation({
+            variables: {
+              inquiryId: id,
+              integrations: updatedIntegrations.map((integration) => ({
+                id: integration.id,
+                name: integration.name,
+                description: integration.description,
+                type: integration.type,
+                config: integration.config,
+              })),
+            },
+          });
+          alert('Integration added and saved successfully!', 'success');
+          refreshGraph(); // Refresh graph to update integration nodes
+        } catch (error) {
+          alert('Failed to save new integration', 'error');
+          console.error('Error saving integration:', error);
+          setIsSavingIntegration(false);
+          return;
+        }
+      } else {
+        alert('Integration added successfully!', 'success');
+      }
     }
 
     setIntegrations(updatedIntegrations);
+    setIsSavingIntegration(false);
     cancelForm();
   };
 
@@ -280,12 +341,76 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
   /**
    * Delete an integration
    */
-  const deleteIntegration = () => {
+  const deleteIntegration = async () => {
     if (deleteConfirmIndex !== null) {
-      const updatedIntegrations = integrations.filter((_: any, i: number) => i !== deleteConfirmIndex);
+      const updatedIntegrations = integrations.filter((_: object, i: number) => i !== deleteConfirmIndex);
+
+      // Save to backend
+      if (id) {
+        try {
+          await setInquiryIntegrationsMutation({
+            variables: {
+              inquiryId: id,
+              integrations: updatedIntegrations.map((integration) => ({
+                id: integration.id,
+                name: integration.name,
+                description: integration.description,
+                type: integration.type,
+                config: integration.config,
+              })),
+            },
+          });
+          alert('Integration deleted successfully!', 'success');
+          refreshGraph(); // Refresh graph to update integration nodes
+        } catch (error) {
+          alert('Failed to delete integration', 'error');
+          console.error('Error deleting integration:', error);
+          setDeleteConfirmIndex(null);
+          return;
+        }
+      } else {
+        alert('Integration removed successfully!', 'success');
+      }
+
       setIntegrations(updatedIntegrations);
       setDeleteConfirmIndex(null);
-      alert('Integration removed successfully!', 'success');
+    }
+  };
+
+  /**
+   * View available tools for the integration currently being edited/created in the form
+   */
+  const viewToolsForFormIntegration = async () => {
+    if (!formData.name || !formData.config.serverUrl) {
+      alert('Name and Server URL are required to view tools', 'error');
+      return;
+    }
+
+    // If we're editing an existing integration with an ID, we can view tools directly
+    if (editingIndex !== null && integrations[editingIndex]?.id) {
+      const integration = integrations[editingIndex];
+      setViewingToolsIndex(-1); // Use -1 to indicate form integration
+      setShowToolsModal(true);
+
+      try {
+        const result = await getMCPIntegrationTools({
+          variables: { integrationId: integration.id },
+        });
+
+        if (result.data?.getMCPIntegrationTools?.success) {
+          const tools = result.data.getMCPIntegrationTools.tools || [];
+          setDiscoveredTools(tools);
+        } else {
+          alert(`Failed to load tools: ${result.data?.getMCPIntegrationTools?.error || 'Unknown error'}`, 'error');
+          setDiscoveredTools([]);
+        }
+      } catch (error) {
+        alert(`Failed to load tools: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
+        setDiscoveredTools([]);
+      }
+    } else {
+      // For new integrations, we need to save first before viewing tools
+      alert('Please save the integration first before viewing available tools', 'info');
     }
   };
 
@@ -294,7 +419,7 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
    */
   const viewAvailableTools = async (integrationIndex: number) => {
     const integration = integrations[integrationIndex];
-    
+
     if (!integration.id) {
       alert('Integration must be saved before viewing tools', 'error');
       return;
@@ -302,10 +427,10 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
 
     setViewingToolsIndex(integrationIndex);
     setShowToolsModal(true);
-    
+
     try {
       const result = await getMCPIntegrationTools({
-        variables: { integrationId: integration.id }
+        variables: { integrationId: integration.id },
       });
 
       if (result.data?.getMCPIntegrationTools?.success) {
@@ -330,37 +455,6 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
     setDiscoveredTools([]);
   };
 
-  /**
-   * Save all integrations to the backend
-   */
-  const saveAllIntegrations = async () => {
-    if (!id) {
-      alert('No inquiry ID available', 'error');
-      return;
-    }
-
-    try {
-      await setInquiryIntegrationsMutation({
-        variables: {
-          inquiryId: id,
-          integrations: integrations.map(integration => ({
-            id: integration.id,
-            name: integration.name,
-            description: integration.description,
-            type: integration.type,
-            config: integration.config,
-          })),
-        },
-      });
-      alert('Integrations saved successfully!', 'success');
-      if (onSave) onSave();
-      onClose();
-    } catch (error) {
-      alert('Failed to save integrations', 'error');
-      console.error('Error saving integrations:', error);
-    }
-  };
-
   return (
     <>
       <CustomModal
@@ -369,24 +463,9 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
         onClose={onClose}
         title="Manage Integrations"
         buttons={
-          <>
-            <Button
-              type="button"
-              onClick={onClose}
-              variant="transparentPrimary"
-              size="medium"
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={saveAllIntegrations}
-              variant="primary"
-              size="medium"
-              disabled={savingIntegrations}
-            >
-              {savingIntegrations ? 'Saving...' : 'Save Integrations'}
-            </Button>
-          </>
+          <Button type="button" onClick={onClose} variant="primary" size="medium">
+            Close
+          </Button>
         }
       >
         <div className="space-y-6">
@@ -407,10 +486,8 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
           {/* Add/Edit Form */}
           {showAddForm && (
             <div className="space-y-4 p-4 border rounded-lg dark:border-gray-600 bg-gray-50 dark:bg-gray-800">
-              <h5 className="font-medium">
-                {editingIndex !== null ? 'Edit Integration' : 'Add New Integration'}
-              </h5>
-              
+              <h5 className="font-medium">{editingIndex !== null ? 'Edit Integration' : 'Add New Integration'}</h5>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
                   name="integrationName"
@@ -439,15 +516,13 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Headers
-                  </label>
+                  <label className="block text-sm font-medium mb-2">Headers</label>
                   <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
                     Configure headers to be sent with requests to the MCP server.
                     <br />
                     <strong>Example:</strong> Authorization → Bearer your-token-here
                   </p>
-                  
+
                   <div className="space-y-2">
                     {headers.map((header, index) => (
                       <div key={index} className="grid grid-cols-5 gap-2 items-center">
@@ -495,25 +570,37 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
               </div>
 
               <div className="flex justify-between items-center">
-                <Button
-                  type="button"
-                  size="small"
-                  icon={faPlug}
-                  variant="transparentPrimary"
-                  onClick={testConnection}
-                  disabled={isTestingConnection || !formData.name || !formData.config.serverUrl}
-                >
-                  {isTestingConnection ? 'Testing...' : 'Test Connection'}
-                </Button>
-                
                 <div className="flex space-x-2">
                   <Button
                     type="button"
                     size="small"
-                    icon={faTimes}
+                    icon={faPlug}
                     variant="transparentPrimary"
-                    onClick={cancelForm}
+                    onClick={testConnection}
+                    disabled={isTestingConnection || !formData.name || !formData.config.serverUrl}
                   >
+                    {isTestingConnection ? 'Testing...' : 'Test Connection'}
+                  </Button>
+                  <Button
+                    type="button"
+                    size="small"
+                    icon={faTools}
+                    variant="transparentPrimary"
+                    onClick={() => viewToolsForFormIntegration()}
+                    disabled={
+                      loadingTools ||
+                      !formData.name ||
+                      !formData.config.serverUrl ||
+                      editingIndex === null ||
+                      !integrations[editingIndex]?.id
+                    }
+                  >
+                    {loadingTools ? 'Loading...' : 'View Tools'}
+                  </Button>
+                </div>
+
+                <div className="flex space-x-2">
+                  <Button type="button" size="small" icon={faTimes} variant="transparentPrimary" onClick={cancelForm}>
                     Cancel
                   </Button>
                   <Button
@@ -522,8 +609,16 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
                     icon={faCheck}
                     variant="primary"
                     onClick={saveIntegration}
+                    disabled={isSavingIntegration}
                   >
-                    {editingIndex !== null ? 'Update' : 'Add'} Integration
+                    {isSavingIntegration
+                      ? editingIndex !== null
+                        ? 'Updating...'
+                        : 'Adding...'
+                      : editingIndex !== null
+                        ? 'Update'
+                        : 'Add'}{' '}
+                    Integration
                   </Button>
                 </div>
               </div>
@@ -536,27 +631,26 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
               <h5 className="font-medium">Current Integrations ({integrations.length})</h5>
               <div className="space-y-2">
                 {integrations.map((integration: Integration, index: number) => (
-                  <div key={index} className="flex items-center justify-between p-4 border rounded-lg dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-4 border rounded-lg dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                  >
                     <div className="flex-1">
                       <div className="flex items-center space-x-2">
                         <h6 className="font-medium">{integration.name}</h6>
                         <span className="px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded">
                           {integration.type}
                         </span>
-                        {(integration.config.headers && Object.keys(integration.config.headers).length > 0) && (
+                        {integration.config.headers && Object.keys(integration.config.headers).length > 0 && (
                           <span className="px-2 py-1 text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded">
                             Headers
                           </span>
                         )}
                       </div>
                       {integration.description && (
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                          {integration.description}
-                        </p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{integration.description}</p>
                       )}
-                      <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                        {integration.config.serverUrl}
-                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">{integration.config.serverUrl}</p>
                       <div className="flex items-center space-x-3 mt-1">
                         {integration.config.headers && Object.keys(integration.config.headers).length > 0 && (
                           <span className="text-xs text-gray-500 dark:text-gray-500">
@@ -614,14 +708,15 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
         size="3xl"
         open={showToolsModal}
         onClose={closeToolsModal}
-        title={`Available Tools - ${viewingToolsIndex !== null ? integrations[viewingToolsIndex]?.name : ''}`}
+        title={`Available Tools - ${
+          viewingToolsIndex === -1
+            ? formData.name || 'New Integration'
+            : viewingToolsIndex !== null
+              ? integrations[viewingToolsIndex]?.name
+              : ''
+        }`}
         buttons={
-          <Button
-            type="button"
-            onClick={closeToolsModal}
-            variant="primary"
-            size="medium"
-          >
+          <Button type="button" onClick={closeToolsModal} variant="primary" size="medium">
             Close
           </Button>
         }
@@ -636,11 +731,11 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
             <div className="space-y-4">
               <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
                 <p className="text-sm text-blue-800 dark:text-blue-200">
-                  🔧 Found <strong>{discoveredTools.length}</strong> available tool{discoveredTools.length === 1 ? '' : 's'} 
-                  for this integration. Click on any tool below to view its details and input schema.
+                  🔧 Found <strong>{discoveredTools.length}</strong> available tool
+                  {discoveredTools.length === 1 ? '' : 's'}
                 </p>
               </div>
-              
+
               <div className="space-y-3">
                 {discoveredTools.map((tool, toolIndex) => (
                   <details key={toolIndex} className="group">
@@ -650,23 +745,21 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
                           <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                         </div>
                         <div>
-                          <h6 className="font-medium text-gray-900 dark:text-white">
-                            {tool.name}
-                          </h6>
+                          <h6 className="font-medium text-gray-900 dark:text-white">{tool.name}</h6>
                         </div>
                       </div>
                       <div className="flex-shrink-0 ml-4">
-                        <svg 
-                          className="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" 
-                          fill="none" 
-                          stroke="currentColor" 
+                        <svg
+                          className="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform"
+                          fill="none"
+                          stroke="currentColor"
                           viewBox="0 0 24 24"
                         >
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                         </svg>
                       </div>
                     </summary>
-                    
+
                     <div className="mt-3 ml-4 mr-4 mb-4">
                       <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border-l-4 border-blue-500">
                         <div className="space-y-3">
@@ -678,12 +771,14 @@ export default function IntegrationManagementModal({ open, onClose, onSave }: In
                                 <span className="text-xs text-gray-900 dark:text-white font-mono">{tool.name}</span>
                               </div>
                               <div className="flex">
-                                <span className="text-xs font-medium text-gray-500 dark:text-gray-400 w-20">Purpose:</span>
+                                <span className="text-xs font-medium text-gray-500 dark:text-gray-400 w-20">
+                                  Purpose:
+                                </span>
                                 <span className="text-xs text-gray-700 dark:text-gray-300">{tool.description}</span>
                               </div>
                             </div>
                           </div>
-                          
+
                           <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
                             <p className="text-xs text-gray-500 dark:text-gray-400">
                               💡 This tool can be executed through the Integration node in your inquiry workflow.

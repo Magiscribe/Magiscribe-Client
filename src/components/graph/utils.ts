@@ -1,4 +1,11 @@
-import { faCodeBranch, faExclamationCircle, faPlay, faQuestionCircle, faStop, faCog } from '@fortawesome/free-solid-svg-icons';
+import {
+  faCodeBranch,
+  faExclamationCircle,
+  faPlay,
+  faQuestionCircle,
+  faStop,
+  faCog,
+} from '@fortawesome/free-solid-svg-icons';
 import { EdgeTypes, NodeTypes, useReactFlow } from '@xyflow/react';
 import { useCallback } from 'react';
 import QuestionNode from './nodes/question-node';
@@ -31,7 +38,8 @@ export const nodeTypesInfo = {
   integration: {
     name: 'Integration',
     icon: faCog,
-    description: 'The integration node allows executing external MCP tools and retrieving or updating data from external systems.',
+    description:
+      'The integration node allows executing external MCP tools and retrieving or updating data from external systems.',
     element: IntegrationNode,
     defaultData: {
       selectedIntegration: '',

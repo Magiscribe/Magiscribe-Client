@@ -47,25 +47,23 @@ export default function IntegrationNode({ id, data }: IntegrationNodeProps) {
   );
 
   const integrationOptions = useMemo(() => {
-    const options = [
-      { value: '', label: 'Select an integration...' }
-    ];
-    
+    const options = [{ value: '', label: 'Select an integration...' }];
+
     if (!integrationsData?.getInquiryIntegrations) return options;
-    
+
     const integrationItems = integrationsData.getInquiryIntegrations.map((integration: Integration) => ({
       value: integration.id,
-      label: `${integration.name} - ${integration.description}`,
+      label: integration.name,
     }));
-    
+
     return [...options, ...integrationItems];
   }, [integrationsData]);
 
   const selectedIntegrationDetails = useMemo(() => {
     if (!integrationsData?.getInquiryIntegrations || !data.selectedIntegrationId) return null;
-    
+
     return integrationsData.getInquiryIntegrations.find(
-      (integration: Integration) => integration.id === data.selectedIntegrationId
+      (integration: Integration) => integration.id === data.selectedIntegrationId,
     );
   }, [integrationsData, data.selectedIntegrationId]);
 
@@ -83,8 +81,8 @@ export default function IntegrationNode({ id, data }: IntegrationNodeProps) {
           integrationsLoading
             ? 'Loading available integrations...'
             : integrationOptions.length === 0
-            ? 'No integrations configured. Add integrations in inquiry settings.'
-            : 'Select an MCP integration tool to execute'
+              ? 'No integrations configured. Add integrations in inquiry settings.'
+              : 'Select an MCP integration tool to execute'
         }
       />
 
@@ -92,8 +90,12 @@ export default function IntegrationNode({ id, data }: IntegrationNodeProps) {
         <div className="p-3 bg-slate-100 dark:bg-slate-600 rounded-lg text-sm">
           <div className="font-medium text-slate-800 dark:text-white">Integration Details:</div>
           <div className="text-slate-600 dark:text-slate-300 mt-1">
-            <div><strong>Type:</strong> {selectedIntegrationDetails.type}</div>
-            <div><strong>Description:</strong> {selectedIntegrationDetails.description}</div>
+            <div>
+              <strong>Type:</strong> {selectedIntegrationDetails.type}
+            </div>
+            <div>
+              <strong>Description:</strong> {selectedIntegrationDetails.description}
+            </div>
           </div>
         </div>
       )}
