@@ -13,7 +13,7 @@ import TokenUsageBar from '../progress/token-usage-bar';
 export function NavBar({ isFixed = true }) {
   const [atTop, setAtTop] = useState(true);
 
-  const user = useUser();
+  const { isSignedIn } = useUser();
   const { title } = useTitle();
   const { isDark, toggle: toggleDarkMode } = useDarkMode();
   const navigate = useNavigate();
@@ -41,7 +41,7 @@ export function NavBar({ isFixed = true }) {
       } transition-all duration-300 ease-in-out`}
     >
       <div className="w-full container mx-auto flex flex-wrap items-center justify-between mt-0 py-2">
-        <Link to={user ? '/dashboard' : '/'} className="pl-4 flex items-center">
+        <Link to={isSignedIn ? '/dashboard' : '/'} className="pl-4 flex items-center">
           <AnimatedLogo />
           <AnimatePresence mode="wait">
             {title && (

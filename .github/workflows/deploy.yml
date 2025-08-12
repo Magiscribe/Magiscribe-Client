@@ -44,6 +44,9 @@ jobs:
           VITE_APP_WS_SERVER_URL=${{ secrets.VITE_APP_WS_SERVER_URL }}
           VITE_APP_HTTP_SERVER_URL=${{ secrets.VITE_APP_HTTP_SERVER_URL }}
           VITE_APP_CLERK_PK=${{ secrets.VITE_APP_CLERK_PK }}
+
+          VITE_APP_DOMAIN=${{ vars.VITE_APP_DOMAIN }}
+          VITE_APP_BASE_URL=${{ vars.VITE_APP_BASE_URL }}
           EOL
 
       - name: Build

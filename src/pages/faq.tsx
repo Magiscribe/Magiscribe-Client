@@ -1,6 +1,7 @@
 import { useSetTitle } from '@/hooks/title-hook';
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import clsx from 'clsx';
 import { motion } from 'motion/react';
 import React from 'react';
 
@@ -56,7 +57,8 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
         initial={{ opacity: 0, height: 0 }}
         animate={{ opacity: isOpen ? 1 : 0, height: isOpen ? 'auto' : 0 }}
         transition={{ duration: 0.3 }}
-        className="mt-2"
+        className={clsx('overflow-hidden', { 'max-h-0': !isOpen, 'max-h-screen': isOpen })}
+        onClick={() => setIsOpen(!isOpen)}
       >
         {answer}
       </motion.div>
