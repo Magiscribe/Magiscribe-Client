@@ -12,16 +12,16 @@ const variantClassNames = {
   light: 'bg-white text-blue-700 font-bold hover:bg-slate-100 focus:ring-slate-300',
   dark: 'bg-slate-600 text-white hover:bg-slate-700 focus:ring-slate-300',
 
-  transparentPrimary: 'text-blue-600 hover:text-blue-700 focus:outline-hidden focus:ring-0 select-none',
-  transparentSecondary: 'text-slate-500 hover:text-slate-500 focus:outline-hidden focus:ring-0 select-none',
-  transparentDanger: 'text-red-600 hover:text-red-700 focus:outline-hidden focus:ring-0 select-none',
-  transparentSuccess: 'text-green-600 hover:text-green-700 focus:outline-hidden focus:ring-0 select-none',
+  transparentPrimary: 'text-blue-600 hover:text-blue-700 focus:outline-hidden focus:ring-0 select-none hover:text-blue-500',
+  transparentSecondary: 'text-slate-500 hover:text-slate-500 focus:outline-hidden focus:ring-0 select-none hover:text-slate-400',
+  transparentDanger: 'text-red-600 hover:text-red-700 focus:outline-hidden focus:ring-0 select-none hover:text-red-500',
+  transparentSuccess: 'text-green-600 hover:text-green-700 focus:outline-hidden focus:ring-0 select-none hover:text-green-500',
   transparentLight:
     'text-white dark:text-slate-600 hover:text-slate-400 dark:hover:text-white focus:outline-hidden focus:ring-0 select-none',
   transparentDark:
     'text-slate-600 dark:text-white hover:text-slate-700 dark:hover:text-slate-400 border-0 focus:outline-hidden focus:ring-0 select-none',
-  transparentWhite: 'text-white hover:text-white focus:outline-hidden focus:ring-0 select-none',
-  transparentBlack: 'text-black hover:text-black focus:outline-hidden focus:ring-0 select-none',
+  transparentWhite: 'text-white hover:text-slate-300 focus:outline-hidden focus:ring-0 select-none',
+  transparentBlack: 'text-black hover:text-slate-600 focus:outline-hidden focus:ring-0 select-none',
 
   inversePrimary:
     'bg-transperant text-blue-600 hover:bg-blue-600 hover:text-white focus:ring-red-500 border border-2 border-blue-600',
@@ -97,7 +97,7 @@ const Button = <C extends React.ElementType = 'button'>({
   const Component = as || 'button';
 
   const baseClassName =
-    'inline-flex items-center justify-center font-medium rounded-2xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2';
+    'inline-flex items-center justify-center font-medium rounded-2xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer';
 
   const sizeClassNames = {
     regular: {

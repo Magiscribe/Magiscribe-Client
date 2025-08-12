@@ -75,7 +75,7 @@ export function NavBar({ isFixed = true }) {
 
           <Button
             onClick={toggleDarkMode}
-            variant={isDark ? 'transparentWhiteFixed' : atTop ? 'transparentWhite' : 'transparentPrimary'}
+            variant={isDark ? 'transparentWhite' : atTop ? 'transparentWhite' : 'transparentPrimary'}
             size="small"
             className="mr-4"
             icon={isDark ? faMoon : faSun}
@@ -87,7 +87,7 @@ export function NavBar({ isFixed = true }) {
           </SignedOut>
           <SignedIn>
             <div className="flex space-x-4">
-              <Button variant={atTop ? 'white' : 'primary'} onClick={() => navigate('/dashboard')}>
+              <Button variant={atTop ? 'transparentWhite' : 'primary'} onClick={() => navigate('/dashboard')}>
                 Dashboard
               </Button>
             </div>
@@ -96,7 +96,7 @@ export function NavBar({ isFixed = true }) {
             <UserButton
               appearance={{
                 elements: {
-                  rootBox: 'w-12 h-12 px-4',
+                  rootBox: 'px-4',
                   userButtonAvatarBox: 'w-12 h-12',
                   userButtonAvatar: 'w-12 h-12',
                   userButtonTrigger: 'w-12 h-12',
