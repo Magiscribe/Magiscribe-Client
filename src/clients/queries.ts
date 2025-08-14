@@ -306,3 +306,38 @@ export const GET_INQUIRY_RESPONSE_TIME = gql`
     }
   }
 `;
+
+export const GET_INQUIRY_INTEGRATIONS = gql`
+  query getInquiryIntegrations($inquiryId: ID!) {
+    getInquiryIntegrations(inquiryId: $inquiryId) {
+      id
+      name
+      description
+      type
+      config
+    }
+  }
+`;
+
+export const TEST_MCP_INTEGRATION = gql`
+  query testMCPIntegration($integration: IntegrationInput!) {
+    testMCPIntegration(integration: $integration) {
+      success
+      error
+    }
+  }
+`;
+
+export const GET_MCP_INTEGRATION_TOOLS = gql`
+  query getMCPIntegrationTools($integrationId: ID!) {
+    getMCPIntegrationTools(integrationId: $integrationId) {
+      success
+      error
+      tools {
+        name
+        description
+        inputSchema
+      }
+    }
+  }
+`;

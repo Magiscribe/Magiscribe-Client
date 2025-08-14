@@ -23,19 +23,24 @@ export const DELETE_MEDIA_ASSET = gql`
 
 export const ADD_PREDICTION = gql`
   mutation addPrediction(
-    $agentId: ID!
     $subscriptionId: ID!
-    $inquiryId: ID
+    $agentId: ID!
     $input: JSONObject
     $attachments: [JSONObject!]
+    $inquiryId: ID
+    $integrationId: ID
   ) {
     addPrediction(
-      agentId: $agentId
       subscriptionId: $subscriptionId
-      inquiryId: $inquiryId
+      agentId: $agentId
       variables: $input
       attachments: $attachments
-    )
+      inquiryId: $inquiryId
+      integrationId: $integrationId
+    ) {
+      status
+      correlationId
+    }
   }
 `;
 
@@ -185,6 +190,17 @@ export const DELETE_INQUIRY_RESPONSE = gql`
   }
 `;
 
+export const SET_INQUIRY_INTEGRATIONS = gql`
+  mutation setInquiryIntegrations($inquiryId: ID!, $integrations: [IntegrationInput!]!) {
+    setInquiryIntegrations(inquiryId: $inquiryId, integrations: $integrations) {
+      name
+      description
+      type
+      config
+    }
+  }
+`;
+
 export const UPSERT_COLLECTION = gql`
   mutation upsertCollection($input: CollectionInput!) {
     upsertCollection(input: $input) {
@@ -208,7 +224,7 @@ export const REGISTER_USER = gql`
   }
 `;
 
-// TODO: Re-enable when contact mutation is implemented in API
+// TODO: Fix contact mutation - schema doesn't exist in backend
 // export const SEND_CONTACT = gql`
 //   mutation sendContact($input: ContactInput!) {
 //     contact(input: $input) {

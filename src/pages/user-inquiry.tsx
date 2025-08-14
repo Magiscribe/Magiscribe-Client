@@ -21,7 +21,7 @@ import { StrippedNode } from '@/utils/graphs/graph';
 import { SignedIn, SignedOut, SignUpButton } from '@clerk/clerk-react';
 import { faArrowUp, faChevronRight, faMicrophone, faMicrophoneSlash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useInquiryResponseTime } from './hooks/inquiry-response-time';
@@ -34,6 +34,45 @@ interface Message {
 }
 
 const emailRegex = /.+@.+\..+/;
+
+/**
+ * Loading quotes for different node types
+ */
+const INTEGRATION_LOADING_QUOTES = [
+  'Connecting to external systems... please hold while we negotiate with the APIs.',
+  'Fetching data from integrations... our digital courier is running really fast.',
+  'Synchronizing with third-party services... teaching our systems to play nicely together.',
+  'Processing integration request... translating between different digital languages.',
+  'Communicating with external tools... sending diplomatic messages to other servers.',
+  'Executing integration logic... our AI is having a chat with your favorite apps.',
+];
+
+const QUESTION_LOADING_QUOTES = [
+  'Crafting the perfect question... our AI is consulting its dictionary of curiosity.',
+  'Generating dynamic questions... thinking of something clever to ask you.',
+  'Formulating inquiry... our question-bot is having a brainstorm session.',
+  'Creating personalized questions... tailoring this just for you.',
+  'Designing the next question... our AI is putting on its thinking cap.',
+  'Preparing thoughtful questions... quality takes time, even for AI.',
+];
+
+const INFORMATION_LOADING_QUOTES = [
+  'Generating helpful information... our AI is preparing its best explanation.',
+  'Crafting informative content... writing something worth your time.',
+  'Preparing personalized information... tailoring this message just for you.',
+  'Creating dynamic content... our AI is getting creative with the details.',
+  'Formulating the perfect response... quality information is worth the wait.',
+  'Generating contextual information... making sure this is relevant to you.',
+];
+
+const CONDITION_LOADING_QUOTES = [
+  'Analyzing your responses... our AI is being very thoughtful about what comes next.',
+  'Processing logic conditions... determining the best path forward for you.',
+  'Evaluating conversation flow... our AI is playing detective with your answers.',
+  'Making intelligent decisions... figuring out where this conversation should go.',
+  'Applying conditional logic... our AI is solving the puzzle of your responses.',
+  'Determining next steps... calculating the perfect path through this inquiry.',
+];
 
 export const useMessageQueue = () => {
   const calculateMessageDelay = (message: Message): number => {
@@ -68,6 +107,7 @@ export default function UserInquiryPage() {
   const [selectedRatings, setSelectedRatings] = useState<string[]>([]);
   const [currentNode, setCurrentNode] = useState<StrippedNode | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [currentLoadingQuote, setCurrentLoadingQuote] = useState('');
   const { primaryEmailAddress, firstName } = useUserInfoFromUrl();
   const expectedInquiryResponseTime = useInquiryResponseTime();
 
@@ -91,6 +131,69 @@ export default function UserInquiryPage() {
   useSetTitle()(settings?.title);
 
   /*================================ SIDE EFFECTS ==============================*/
+
+  /**
+   * Rotate loading quotes every 3 seconds when loading
+   */
+  useEffect(() => {
+    if (state.loading) {
+      // Get appropriate loading quotes based on current node type and loading state
+      let quotes: string[] = [];
+
+      if (currentNode) {
+        const nodeType = currentNode.type;
+        console.log(
+          'Loading quotes - Node type:',
+          nodeType,
+          'Loading:',
+          state.loading,
+          'Dynamic generation:',
+          currentNode.data?.dynamicGeneration,
+        );
+
+        // Check if it's dynamic generation (question or information with dynamic generation)
+        if (currentNode.data?.dynamicGeneration) {
+          if (nodeType === 'question') quotes = QUESTION_LOADING_QUOTES;
+          else if (nodeType === 'information') quotes = INFORMATION_LOADING_QUOTES;
+        }
+
+        // Check specific node types
+        if (quotes.length === 0) {
+          if (nodeType === 'condition') quotes = CONDITION_LOADING_QUOTES;
+          else if (nodeType === 'integration') quotes = INTEGRATION_LOADING_QUOTES;
+        }
+      } else {
+        // If we don't have a current node yet (initial loading), show generic loading quotes
+        console.log('Loading quotes - No current node yet, showing generic loading quotes');
+      }
+
+      // Default fallback (also used when currentNode is null)
+      if (quotes.length === 0) {
+        quotes = ['Processing your request...', 'Please wait while we work our magic...', 'Almost there...'];
+      }
+
+      console.log('Selected quotes array:', quotes);
+
+      if (quotes.length > 0) {
+        // Set initial quote
+        setCurrentLoadingQuote(quotes[0]);
+        console.log('Set initial loading quote:', quotes[0]);
+
+        // Rotate quotes every 3 seconds
+        const interval = setInterval(() => {
+          const newQuote = quotes[Math.floor(Math.random() * quotes.length)];
+          setCurrentLoadingQuote(newQuote);
+          console.log('Rotated to quote:', newQuote);
+        }, 3000);
+
+        return () => clearInterval(interval);
+      }
+    } else {
+      // Clear loading quote when not loading
+      setCurrentLoadingQuote('');
+      console.log('Cleared loading quote - Loading:', state.loading, 'Current node:', currentNode?.type);
+    }
+  }, [state.loading, currentNode]);
 
   /**
    * Scroll to bottom when messages change
@@ -157,6 +260,9 @@ export default function UserInquiryPage() {
    */
   const onNodeVisit = useCallback(
     async (node: StrippedNode) => {
+      // Always set the current node for loading quote purposes
+      setCurrentNode(node);
+
       if (node.type === 'end') {
         setScreen('end');
         return;
@@ -164,7 +270,6 @@ export default function UserInquiryPage() {
 
       if (node.type === 'information' || node.type === 'question') {
         const messageText = node.data.text as string;
-        setCurrentNode(node);
 
         if (audioEnabled && messageText) {
           audio.addSentence(messageText);
@@ -355,6 +460,20 @@ export default function UserInquiryPage() {
       {(state.loading || isProcessing) && (
         <div className="flex justify-start items-center pt-4">
           <AnimatedDots />
+          {state.loading && currentLoadingQuote && (
+            <AnimatePresence mode="wait">
+              <motion.p
+                key={currentLoadingQuote}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                transition={{ duration: 0.3 }}
+                className="text-sm italic text-slate-500 dark:text-slate-400 ml-3 -mt-6 max-w-[80%]"
+              >
+                {currentLoadingQuote}
+              </motion.p>
+            </AnimatePresence>
+          )}
         </div>
       )}
     </>
@@ -472,6 +591,13 @@ export default function UserInquiryPage() {
     </div>
   );
 
+  const renderLoading = () => (
+    <div className="flex flex-col items-center justify-center h-full">
+      <AnimatedDots />
+      <p className="text-slate-600 dark:text-slate-300 mt-4">Loading your inquiry...</p>
+    </div>
+  );
+
   const renderNotFound = () => (
     <div className="bg-white dark:bg-slate-700 p-6 rounded-3xl shadow-lg">
       <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white">Inquiry Not Found</h2>
@@ -498,6 +624,7 @@ export default function UserInquiryPage() {
   );
 
   const getActiveScreen = () => {
+    if (state.loading && !state.initialized) return renderLoading();
     if (state.error) return renderError();
     if (state.notFound) return renderNotFound();
 

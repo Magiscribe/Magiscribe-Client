@@ -9,7 +9,6 @@ import PromptDashboard from './pages/dashboard/agent-lab/prompts';
 import PromptEdit from './pages/dashboard/agent-lab/prompts/edit';
 import Contact from './pages/contact';
 import FAQPage from './pages/faq';
-import InquiriesBuilderPage from './pages/dashboard/inquiry-builder/inquiries';
 import InquiryBuilderPage from './pages/dashboard/inquiry-builder/inquiry';
 import HomeHero from './pages/home';
 import UserInquiryPage from './pages/user-inquiry';
@@ -101,15 +100,6 @@ const router = createBrowserRouter([
           {
             path: 'playground',
             element: <PlaygroundDashboard />,
-          },
-        ],
-      },
-      {
-        path: 'inquiry-builder',
-        children: [
-          {
-            path: '',
-            element: <InquiriesBuilderPage />,
           },
         ],
       },
