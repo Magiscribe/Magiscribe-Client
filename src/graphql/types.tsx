@@ -131,7 +131,7 @@ export type InquiryData = {
   __typename?: 'InquiryData';
   draftGraph?: Maybe<Scalars['JSONObject']['output']>;
   graph?: Maybe<Scalars['JSONObject']['output']>;
-  integrations: Array<Scalars['ID']['output']>;
+  integrations: Array<Integration>;
   metadata?: Maybe<Scalars['JSONObject']['output']>;
   settings: InquirySettings;
 };

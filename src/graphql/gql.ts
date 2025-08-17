@@ -17,7 +17,7 @@ type Documents = {
     "\n  mutation generateAudio($voice: String!, $text: String!) {\n    generateAudio(voice: $voice, text: $text)\n  }\n": typeof types.GenerateAudioDocument,
     "\n  mutation addMediaAsset {\n    addMediaAsset {\n      signedUrl\n      id\n    }\n  }\n": typeof types.AddMediaAssetDocument,
     "\n  mutation deleteMediaAsset($id: String!) {\n    deleteMediaAsset(id: $id)\n  }\n": typeof types.DeleteMediaAssetDocument,
-    "\n  mutation addPrediction($subscriptionId: ID!, $agentId: ID!, $input: JSONObject, $attachments: [JSONObject!], $inquiryId: ID, $integrationId: ID) {\n    addPrediction(subscriptionId: $subscriptionId, agentId: $agentId, variables: $input, attachments: $attachments, inquiryId: $inquiryId, integrationId: $integrationId) {\n      status\n      correlationId\n    }\n  }\n": typeof types.AddPredictionDocument,
+    "\n  mutation addPrediction(\n    $subscriptionId: ID!\n    $agentId: ID!\n    $input: JSONObject\n    $attachments: [JSONObject!]\n    $inquiryId: ID\n    $integrationId: ID\n  ) {\n    addPrediction(\n      subscriptionId: $subscriptionId\n      agentId: $agentId\n      variables: $input\n      attachments: $attachments\n      inquiryId: $inquiryId\n      integrationId: $integrationId\n    ) {\n      status\n      correlationId\n    }\n  }\n": typeof types.AddPredictionDocument,
     "\n  mutation upsertAgent($agent: AgentInput!) {\n    upsertAgent(agent: $agent) {\n      id\n      name\n      description\n      reasoning {\n        llmModel\n        prompt\n        variablePassThrough\n      }\n      capabilities {\n        id\n      }\n    }\n  }\n": typeof types.UpsertAgentDocument,
     "\n  mutation deleteAgent($agentId: ID!) {\n    deleteAgent(agentId: $agentId) {\n      id\n    }\n  }\n": typeof types.DeleteAgentDocument,
     "\n  mutation upsertCapability($capability: CapabilityInput!) {\n    upsertCapability(capability: $capability) {\n      id\n      name\n      alias\n      description\n      llmModel\n      outputMode\n      subscriptionFilter\n      outputFilter\n      prompts {\n        id\n        name\n        text\n      }\n    }\n  }\n": typeof types.UpsertCapabilityDocument,
@@ -58,7 +58,7 @@ type Documents = {
     "\n  query isUserRegistered {\n    isUserRegistered\n  }\n": typeof types.IsUserRegisteredDocument,
     "\n  query getInquiryTemplates {\n    getInquiryTemplates\n  }\n": typeof types.GetInquiryTemplatesDocument,
     "\n  query checkIfUsersRespondedToInquiry($userEmails: [String!]!, $inquiryId: ID!) {\n    checkIfUsersRespondedToInquiry(userEmails: $userEmails, inquiryId: $inquiryId)\n  }\n": typeof types.CheckIfUsersRespondedToInquiryDocument,
-    "\n  query getAverageInquiryResponseTime($id: ID!) {\n    getAverageInquiryResponseTime(id: $id) {  \n      minutes\n      responseCount\n    }\n  }\n": typeof types.GetAverageInquiryResponseTimeDocument,
+    "\n  query getAverageInquiryResponseTime($id: ID!) {\n    getAverageInquiryResponseTime(id: $id) {\n      minutes\n      responseCount\n    }\n  }\n": typeof types.GetAverageInquiryResponseTimeDocument,
     "\n  query getInquiryIntegrations($inquiryId: ID!) {\n    getInquiryIntegrations(inquiryId: $inquiryId) {\n      id\n      name\n      description\n      type\n      config\n    }\n  }\n": typeof types.GetInquiryIntegrationsDocument,
     "\n  query testMCPIntegration($integration: IntegrationInput!) {\n    testMCPIntegration(integration: $integration) {\n      success\n      error\n    }\n  }\n": typeof types.TestMcpIntegrationDocument,
     "\n  query getMCPIntegrationTools($integrationId: ID!) {\n    getMCPIntegrationTools(integrationId: $integrationId) {\n      success\n      error\n      tools {\n        name\n        description\n        inputSchema\n      }\n    }\n  }\n": typeof types.GetMcpIntegrationToolsDocument,
@@ -68,7 +68,7 @@ const documents: Documents = {
     "\n  mutation generateAudio($voice: String!, $text: String!) {\n    generateAudio(voice: $voice, text: $text)\n  }\n": types.GenerateAudioDocument,
     "\n  mutation addMediaAsset {\n    addMediaAsset {\n      signedUrl\n      id\n    }\n  }\n": types.AddMediaAssetDocument,
     "\n  mutation deleteMediaAsset($id: String!) {\n    deleteMediaAsset(id: $id)\n  }\n": types.DeleteMediaAssetDocument,
-    "\n  mutation addPrediction($subscriptionId: ID!, $agentId: ID!, $input: JSONObject, $attachments: [JSONObject!], $inquiryId: ID, $integrationId: ID) {\n    addPrediction(subscriptionId: $subscriptionId, agentId: $agentId, variables: $input, attachments: $attachments, inquiryId: $inquiryId, integrationId: $integrationId) {\n      status\n      correlationId\n    }\n  }\n": types.AddPredictionDocument,
+    "\n  mutation addPrediction(\n    $subscriptionId: ID!\n    $agentId: ID!\n    $input: JSONObject\n    $attachments: [JSONObject!]\n    $inquiryId: ID\n    $integrationId: ID\n  ) {\n    addPrediction(\n      subscriptionId: $subscriptionId\n      agentId: $agentId\n      variables: $input\n      attachments: $attachments\n      inquiryId: $inquiryId\n      integrationId: $integrationId\n    ) {\n      status\n      correlationId\n    }\n  }\n": types.AddPredictionDocument,
     "\n  mutation upsertAgent($agent: AgentInput!) {\n    upsertAgent(agent: $agent) {\n      id\n      name\n      description\n      reasoning {\n        llmModel\n        prompt\n        variablePassThrough\n      }\n      capabilities {\n        id\n      }\n    }\n  }\n": types.UpsertAgentDocument,
     "\n  mutation deleteAgent($agentId: ID!) {\n    deleteAgent(agentId: $agentId) {\n      id\n    }\n  }\n": types.DeleteAgentDocument,
     "\n  mutation upsertCapability($capability: CapabilityInput!) {\n    upsertCapability(capability: $capability) {\n      id\n      name\n      alias\n      description\n      llmModel\n      outputMode\n      subscriptionFilter\n      outputFilter\n      prompts {\n        id\n        name\n        text\n      }\n    }\n  }\n": types.UpsertCapabilityDocument,
@@ -109,7 +109,7 @@ const documents: Documents = {
     "\n  query isUserRegistered {\n    isUserRegistered\n  }\n": types.IsUserRegisteredDocument,
     "\n  query getInquiryTemplates {\n    getInquiryTemplates\n  }\n": types.GetInquiryTemplatesDocument,
     "\n  query checkIfUsersRespondedToInquiry($userEmails: [String!]!, $inquiryId: ID!) {\n    checkIfUsersRespondedToInquiry(userEmails: $userEmails, inquiryId: $inquiryId)\n  }\n": types.CheckIfUsersRespondedToInquiryDocument,
-    "\n  query getAverageInquiryResponseTime($id: ID!) {\n    getAverageInquiryResponseTime(id: $id) {  \n      minutes\n      responseCount\n    }\n  }\n": types.GetAverageInquiryResponseTimeDocument,
+    "\n  query getAverageInquiryResponseTime($id: ID!) {\n    getAverageInquiryResponseTime(id: $id) {\n      minutes\n      responseCount\n    }\n  }\n": types.GetAverageInquiryResponseTimeDocument,
     "\n  query getInquiryIntegrations($inquiryId: ID!) {\n    getInquiryIntegrations(inquiryId: $inquiryId) {\n      id\n      name\n      description\n      type\n      config\n    }\n  }\n": types.GetInquiryIntegrationsDocument,
     "\n  query testMCPIntegration($integration: IntegrationInput!) {\n    testMCPIntegration(integration: $integration) {\n      success\n      error\n    }\n  }\n": types.TestMcpIntegrationDocument,
     "\n  query getMCPIntegrationTools($integrationId: ID!) {\n    getMCPIntegrationTools(integrationId: $integrationId) {\n      success\n      error\n      tools {\n        name\n        description\n        inputSchema\n      }\n    }\n  }\n": types.GetMcpIntegrationToolsDocument,
@@ -145,7 +145,7 @@ export function gql(source: "\n  mutation deleteMediaAsset($id: String!) {\n    
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  mutation addPrediction($subscriptionId: ID!, $agentId: ID!, $input: JSONObject, $attachments: [JSONObject!], $inquiryId: ID, $integrationId: ID) {\n    addPrediction(subscriptionId: $subscriptionId, agentId: $agentId, variables: $input, attachments: $attachments, inquiryId: $inquiryId, integrationId: $integrationId) {\n      status\n      correlationId\n    }\n  }\n"): (typeof documents)["\n  mutation addPrediction($subscriptionId: ID!, $agentId: ID!, $input: JSONObject, $attachments: [JSONObject!], $inquiryId: ID, $integrationId: ID) {\n    addPrediction(subscriptionId: $subscriptionId, agentId: $agentId, variables: $input, attachments: $attachments, inquiryId: $inquiryId, integrationId: $integrationId) {\n      status\n      correlationId\n    }\n  }\n"];
+export function gql(source: "\n  mutation addPrediction(\n    $subscriptionId: ID!\n    $agentId: ID!\n    $input: JSONObject\n    $attachments: [JSONObject!]\n    $inquiryId: ID\n    $integrationId: ID\n  ) {\n    addPrediction(\n      subscriptionId: $subscriptionId\n      agentId: $agentId\n      variables: $input\n      attachments: $attachments\n      inquiryId: $inquiryId\n      integrationId: $integrationId\n    ) {\n      status\n      correlationId\n    }\n  }\n"): (typeof documents)["\n  mutation addPrediction(\n    $subscriptionId: ID!\n    $agentId: ID!\n    $input: JSONObject\n    $attachments: [JSONObject!]\n    $inquiryId: ID\n    $integrationId: ID\n  ) {\n    addPrediction(\n      subscriptionId: $subscriptionId\n      agentId: $agentId\n      variables: $input\n      attachments: $attachments\n      inquiryId: $inquiryId\n      integrationId: $integrationId\n    ) {\n      status\n      correlationId\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -309,7 +309,7 @@ export function gql(source: "\n  query checkIfUsersRespondedToInquiry($userEmail
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query getAverageInquiryResponseTime($id: ID!) {\n    getAverageInquiryResponseTime(id: $id) {  \n      minutes\n      responseCount\n    }\n  }\n"): (typeof documents)["\n  query getAverageInquiryResponseTime($id: ID!) {\n    getAverageInquiryResponseTime(id: $id) {  \n      minutes\n      responseCount\n    }\n  }\n"];
+export function gql(source: "\n  query getAverageInquiryResponseTime($id: ID!) {\n    getAverageInquiryResponseTime(id: $id) {\n      minutes\n      responseCount\n    }\n  }\n"): (typeof documents)["\n  query getAverageInquiryResponseTime($id: ID!) {\n    getAverageInquiryResponseTime(id: $id) {\n      minutes\n      responseCount\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
