@@ -151,6 +151,7 @@ export const GET_INQUIRY = gql`
     getInquiry(id: $id) {
       id
       userId
+      ownerEmail
       data {
         settings {
           title

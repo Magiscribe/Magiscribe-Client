@@ -4,6 +4,7 @@ import {
   DELETE_INQUIRY,
   DELETE_MEDIA_ASSET,
   UPDATE_INQUIRY,
+  UPDATE_INQUIRY_OWNER_EMAILS,
   UPDATE_INQUIRY_OWNERS,
 } from '@/clients/mutations';
 import { GET_INQUIRY } from '@/clients/queries';
@@ -51,6 +52,8 @@ interface ContextType {
   settings: InquirySettings;
   metadata: Metadata;
   owners: string[];
+  ownerEmails: string[];
+  isOwnerEmailsLoading: boolean;
   graph: { edges: Edge[]; nodes: Node[] };
 
   deleteInquiry: (onSuccess?: () => void, onError?: () => void) => Promise<void>;
@@ -58,10 +61,11 @@ interface ContextType {
   setSettings: (settings: InquirySettings) => void;
   updateMetadata: (metadata: Metadata) => void;
   updateOwners: (owners: string[]) => void;
+  updateOwnerEmails: (ownerEmails: string[]) => void;
   saveMetadata: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
   saveSettings: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
   saveOwners: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
-
+  saveOwnerEmails: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
   setGraph: (graph: { edges: Edge[]; nodes: Node[] }) => void;
   saveGraph: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
   publishGraph: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
@@ -101,6 +105,8 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   });
 
   const [owners, setOwners] = useState<string[]>([]);
+  const [ownerEmails, setOwnerEmails] = useState<string[]>([]);
+  const [isOwnerEmailsLoading, setIsOwnerEmailsLoading] = useState<boolean>(true);
 
   // Graph Generation States
   const [generatingGraph, setGeneratingGraph] = useState(false);
@@ -112,9 +118,9 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const { graph, setGraph, resetInitialState } = graphContext;
 
   // Events
-  const onGraphGenerationStartedRef = useRef<(message: string) => void>(() => {});
-  const onGraphGenerationCompletedRef = useRef<(message: string) => void>(() => {});
-  const onGraphGenerationErrorRef = useRef<() => void>(() => {});
+  const onGraphGenerationStartedRef = useRef<(message: string) => void>(() => { });
+  const onGraphGenerationCompletedRef = useRef<(message: string) => void>(() => { });
+  const onGraphGenerationErrorRef = useRef<() => void>(() => { });
 
   /**
    * Fetches the inquiry data from the server.
@@ -130,6 +136,10 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
       if (getInquiry.data.draftGraph) setGraph(getInquiry.data.draftGraph);
       if (getInquiry.data.draftGraph) resetInitialState(getInquiry.data.draftGraph);
       if (getInquiry.userId) setOwners(getInquiry.userId);
+      if (getInquiry.ownerEmail) {
+        setOwnerEmails(getInquiry.ownerEmail);
+        setIsOwnerEmailsLoading(false);
+      }
       setInitialized(true);
     },
   });
@@ -186,6 +196,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   const [deleteObject] = useMutation<DeleteInquiryMutation>(DELETE_INQUIRY);
   const [deleteMediaAsset] = useMutation<DeleteMediaAssetMutation>(DELETE_MEDIA_ASSET);
   const [updateInquiryOwners] = useMutation<UpdateInquiryOwnersMutation>(UPDATE_INQUIRY_OWNERS);
+  const [updateInquiryOwnerEmails] = useMutation<UpdateInquiryOwnersMutation>(UPDATE_INQUIRY_OWNER_EMAILS);
 
   /**
    * Deletes the inquiry.
@@ -283,6 +294,20 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
         variables: {
           id,
           owners,
+        },
+      });
+      if (onSuccess) onSuccess(id as string);
+    } catch {
+      if (onError) onError();
+    }
+  };
+
+  const saveOwnerEmails = async (onSuccess?: (id: string) => void, onError?: () => void) => {
+    try {
+      await updateInquiryOwnerEmails({
+        variables: {
+          id,
+          ownerEmails,
         },
       });
       if (onSuccess) onSuccess(id as string);
@@ -390,6 +415,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     settings,
     metadata,
     owners,
+    ownerEmails,
     graph,
 
     deleteInquiry,
@@ -402,7 +428,10 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
 
     setGraph,
     updateOwners: setOwners,
+    updateOwnerEmails: setOwnerEmails,
     saveOwners,
+    saveOwnerEmails,
+    isOwnerEmailsLoading,
     resetGraph,
 
     saveGraph,
