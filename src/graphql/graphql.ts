@@ -202,6 +202,7 @@ export type IntegrationConnectionResult = {
   __typename?: 'IntegrationConnectionResult';
   error?: Maybe<Scalars['String']['output']>;
   success: Scalars['Boolean']['output'];
+  tools: Array<McpTool>;
 };
 
 export type IntegrationInput = {
@@ -217,13 +218,6 @@ export type McpTool = {
   description: Scalars['String']['output'];
   inputSchema?: Maybe<Scalars['JSONObject']['output']>;
   name: Scalars['String']['output'];
-};
-
-export type McpToolsResult = {
-  __typename?: 'MCPToolsResult';
-  error?: Maybe<Scalars['String']['output']>;
-  success: Scalars['Boolean']['output'];
-  tools: Array<McpTool>;
 };
 
 export type Model = {
@@ -430,7 +424,6 @@ export type Query = {
   getInquiryResponseCount: Scalars['Int']['output'];
   getInquiryResponses?: Maybe<Array<InquiryResponse>>;
   getInquiryTemplates: Array<Scalars['JSONObject']['output']>;
-  getMCPIntegrationTools: McpToolsResult;
   getMediaAsset?: Maybe<Scalars['String']['output']>;
   getPrompt?: Maybe<Prompt>;
   getUserQuota?: Maybe<Quota>;
@@ -510,11 +503,6 @@ export type QueryGetInquiryResponseCountArgs = {
 export type QueryGetInquiryResponsesArgs = {
   filters?: InputMaybe<InquiryResponseFilters>;
   id: Scalars['ID']['input'];
-};
-
-
-export type QueryGetMcpIntegrationToolsArgs = {
-  integrationId: Scalars['ID']['input'];
 };
 
 
@@ -937,14 +925,7 @@ export type TestMcpIntegrationQueryVariables = Exact<{
 }>;
 
 
-export type TestMcpIntegrationQuery = { __typename?: 'Query', testMCPIntegration: { __typename?: 'IntegrationConnectionResult', success: boolean, error?: string | null } };
-
-export type GetMcpIntegrationToolsQueryVariables = Exact<{
-  integrationId: Scalars['ID']['input'];
-}>;
-
-
-export type GetMcpIntegrationToolsQuery = { __typename?: 'Query', getMCPIntegrationTools: { __typename?: 'MCPToolsResult', success: boolean, error?: string | null, tools: Array<{ __typename?: 'MCPTool', name: string, description: string, inputSchema?: any | null }> } };
+export type TestMcpIntegrationQuery = { __typename?: 'Query', testMCPIntegration: { __typename?: 'IntegrationConnectionResult', success: boolean, error?: string | null, tools: Array<{ __typename?: 'MCPTool', name: string, description: string, inputSchema?: any | null }> } };
 
 export type PredictionAddedSubscriptionVariables = Exact<{
   subscriptionId: Scalars['ID']['input'];
@@ -1000,6 +981,5 @@ export const GetInquiryTemplatesDocument = {"kind":"Document","definitions":[{"k
 export const CheckIfUsersRespondedToInquiryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"checkIfUsersRespondedToInquiry"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"userEmails"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"inquiryId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"checkIfUsersRespondedToInquiry"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"userEmails"},"value":{"kind":"Variable","name":{"kind":"Name","value":"userEmails"}}},{"kind":"Argument","name":{"kind":"Name","value":"inquiryId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"inquiryId"}}}]}]}}]} as unknown as DocumentNode<CheckIfUsersRespondedToInquiryQuery, CheckIfUsersRespondedToInquiryQueryVariables>;
 export const GetAverageInquiryResponseTimeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getAverageInquiryResponseTime"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getAverageInquiryResponseTime"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"minutes"}},{"kind":"Field","name":{"kind":"Name","value":"responseCount"}}]}}]}}]} as unknown as DocumentNode<GetAverageInquiryResponseTimeQuery, GetAverageInquiryResponseTimeQueryVariables>;
 export const GetInquiryIntegrationsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getInquiryIntegrations"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"inquiryId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getInquiryIntegrations"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"inquiryId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"inquiryId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"config"}}]}}]}}]} as unknown as DocumentNode<GetInquiryIntegrationsQuery, GetInquiryIntegrationsQueryVariables>;
-export const TestMcpIntegrationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"testMCPIntegration"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"integration"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"IntegrationInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"testMCPIntegration"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"integration"},"value":{"kind":"Variable","name":{"kind":"Name","value":"integration"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"error"}}]}}]}}]} as unknown as DocumentNode<TestMcpIntegrationQuery, TestMcpIntegrationQueryVariables>;
-export const GetMcpIntegrationToolsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getMCPIntegrationTools"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"integrationId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getMCPIntegrationTools"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"integrationId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"integrationId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"error"}},{"kind":"Field","name":{"kind":"Name","value":"tools"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"inputSchema"}}]}}]}}]}}]} as unknown as DocumentNode<GetMcpIntegrationToolsQuery, GetMcpIntegrationToolsQueryVariables>;
+export const TestMcpIntegrationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"testMCPIntegration"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"integration"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"IntegrationInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"testMCPIntegration"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"integration"},"value":{"kind":"Variable","name":{"kind":"Name","value":"integration"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"error"}},{"kind":"Field","name":{"kind":"Name","value":"tools"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"inputSchema"}}]}}]}}]}}]} as unknown as DocumentNode<TestMcpIntegrationQuery, TestMcpIntegrationQueryVariables>;
 export const PredictionAddedDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"subscription","name":{"kind":"Name","value":"predictionAdded"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"subscriptionId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"predictionAdded"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"subscriptionId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"subscriptionId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"subscriptionId"}},{"kind":"Field","name":{"kind":"Name","value":"result"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"tokenUsage"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"inputTokens"}},{"kind":"Field","name":{"kind":"Name","value":"outputTokens"}},{"kind":"Field","name":{"kind":"Name","value":"totalTokens"}}]}}]}}]}}]} as unknown as DocumentNode<PredictionAddedSubscription, PredictionAddedSubscriptionVariables>;

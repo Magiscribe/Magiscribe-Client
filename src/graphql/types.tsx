@@ -200,6 +200,7 @@ export type IntegrationConnectionResult = {
   __typename?: 'IntegrationConnectionResult';
   error?: Maybe<Scalars['String']['output']>;
   success: Scalars['Boolean']['output'];
+  tools: Array<McpTool>;
 };
 
 export type IntegrationInput = {
@@ -215,13 +216,6 @@ export type McpTool = {
   description: Scalars['String']['output'];
   inputSchema?: Maybe<Scalars['JSONObject']['output']>;
   name: Scalars['String']['output'];
-};
-
-export type McpToolsResult = {
-  __typename?: 'MCPToolsResult';
-  error?: Maybe<Scalars['String']['output']>;
-  success: Scalars['Boolean']['output'];
-  tools: Array<McpTool>;
 };
 
 export type Model = {
@@ -428,7 +422,6 @@ export type Query = {
   getInquiryResponseCount: Scalars['Int']['output'];
   getInquiryResponses?: Maybe<Array<InquiryResponse>>;
   getInquiryTemplates: Array<Scalars['JSONObject']['output']>;
-  getMCPIntegrationTools: McpToolsResult;
   getMediaAsset?: Maybe<Scalars['String']['output']>;
   getPrompt?: Maybe<Prompt>;
   getUserQuota?: Maybe<Quota>;
@@ -508,11 +501,6 @@ export type QueryGetInquiryResponseCountArgs = {
 export type QueryGetInquiryResponsesArgs = {
   filters?: InputMaybe<InquiryResponseFilters>;
   id: Scalars['ID']['input'];
-};
-
-
-export type QueryGetMcpIntegrationToolsArgs = {
-  integrationId: Scalars['ID']['input'];
 };
 
 
@@ -935,14 +923,7 @@ export type TestMcpIntegrationQueryVariables = Exact<{
 }>;
 
 
-export type TestMcpIntegrationQuery = { __typename?: 'Query', testMCPIntegration: { __typename?: 'IntegrationConnectionResult', success: boolean, error?: string | null } };
-
-export type GetMcpIntegrationToolsQueryVariables = Exact<{
-  integrationId: Scalars['ID']['input'];
-}>;
-
-
-export type GetMcpIntegrationToolsQuery = { __typename?: 'Query', getMCPIntegrationTools: { __typename?: 'MCPToolsResult', success: boolean, error?: string | null, tools: Array<{ __typename?: 'MCPTool', name: string, description: string, inputSchema?: any | null }> } };
+export type TestMcpIntegrationQuery = { __typename?: 'Query', testMCPIntegration: { __typename?: 'IntegrationConnectionResult', success: boolean, error?: string | null, tools: Array<{ __typename?: 'MCPTool', name: string, description: string, inputSchema?: any | null }> } };
 
 export type PredictionAddedSubscriptionVariables = Exact<{
   subscriptionId: Scalars['ID']['input'];

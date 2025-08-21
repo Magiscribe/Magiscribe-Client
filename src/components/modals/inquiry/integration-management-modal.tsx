@@ -1,9 +1,10 @@
 import { SET_INQUIRY_INTEGRATIONS } from '@/clients/mutations';
-import { GET_INQUIRY_INTEGRATIONS, GET_MCP_INTEGRATION_TOOLS, TEST_MCP_INTEGRATION } from '@/clients/queries';
+import { GET_INQUIRY_INTEGRATIONS, TEST_MCP_INTEGRATION } from '@/clients/queries';
 import Button from '@/components/controls/button';
 import Input from '@/components/controls/input';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
+import { cleanObjectForGraphQLInput } from '@/utils/graphql';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { faCheck, faEdit, faMinus, faPlug, faPlus, faTimes, faTools, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useState, useEffect } from 'react';
@@ -58,8 +59,7 @@ export default function IntegrationManagementModal({ open, onClose }: Integratio
   const { id, refreshGraph } = useInquiryBuilder();
   const alert = useAddAlert();
   const [setInquiryIntegrationsMutation] = useMutation(SET_INQUIRY_INTEGRATIONS);
-  const [testIntegration] = useLazyQuery(TEST_MCP_INTEGRATION);
-  const [getMCPIntegrationTools, { loading: loadingTools }] = useLazyQuery(GET_MCP_INTEGRATION_TOOLS);
+  const [testIntegration, { loading: loadingTools }] = useLazyQuery(TEST_MCP_INTEGRATION);
 
   // Load integrations when inquiry ID is available
   useQuery(GET_INQUIRY_INTEGRATIONS, {
@@ -99,6 +99,13 @@ export default function IntegrationManagementModal({ open, onClose }: Integratio
       },
     });
     setHeaders([{ key: '', value: '' }]);
+  };
+
+  /**
+   * Validate URL format (must start with http:// or https://)
+   */
+  const validateUrl = (url: string): boolean => {
+    return url.startsWith('http://') || url.startsWith('https://');
   };
 
   /**
@@ -216,6 +223,11 @@ export default function IntegrationManagementModal({ open, onClose }: Integratio
       return;
     }
 
+    if (!validateUrl(formData.config.serverUrl)) {
+      alert('Server URL must start with http:// or https://', 'error');
+      return;
+    }
+
     const integrationToTest = {
       name: formData.name,
       description: formData.description,
@@ -250,6 +262,11 @@ export default function IntegrationManagementModal({ open, onClose }: Integratio
   const saveIntegration = async () => {
     if (!formData.name || !formData.config.serverUrl) {
       alert('Name and Server URL are required', 'error');
+      return;
+    }
+
+    if (!validateUrl(formData.config.serverUrl)) {
+      alert('Server URL must start with http:// or https://', 'error');
       return;
     }
 
@@ -386,31 +403,41 @@ export default function IntegrationManagementModal({ open, onClose }: Integratio
       return;
     }
 
-    // If we're editing an existing integration with an ID, we can view tools directly
-    if (editingIndex !== null && integrations[editingIndex]?.id) {
-      const integration = integrations[editingIndex];
-      setViewingToolsIndex(-1); // Use -1 to indicate form integration
-      setShowToolsModal(true);
+    if (!validateUrl(formData.config.serverUrl)) {
+      alert('Server URL must start with http:// or https://', 'error');
+      return;
+    }
 
-      try {
-        const result = await getMCPIntegrationTools({
-          variables: { integrationId: integration.id },
-        });
+    const integrationToTest = {
+      name: formData.name,
+      description: formData.description,
+      type: formData.type,
+      config: {
+        serverUrl: formData.config.serverUrl,
+        headers: formData.config.headers || {},
+      },
+    };
 
-        if (result.data?.getMCPIntegrationTools?.success) {
-          const tools = result.data.getMCPIntegrationTools.tools || [];
-          setDiscoveredTools(tools);
-        } else {
-          alert(`Failed to load tools: ${result.data?.getMCPIntegrationTools?.error || 'Unknown error'}`, 'error');
-          setDiscoveredTools([]);
-        }
-      } catch (error) {
-        alert(`Failed to load tools: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
+    setViewingToolsIndex(-1); // Use -1 to indicate form integration
+    setShowToolsModal(true);
+
+    try {
+      // Use testIntegration which now returns both connection status and tools
+      // This will use the current form data including the latest URL
+      const result = await testIntegration({
+        variables: { integration: integrationToTest },
+      });
+
+      if (result.data?.testMCPIntegration?.success) {
+        const tools = result.data.testMCPIntegration.tools || [];
+        setDiscoveredTools(tools);
+      } else {
+        alert(`Failed to load tools: ${result.data?.testMCPIntegration?.error || 'Unknown error'}`, 'error');
         setDiscoveredTools([]);
       }
-    } else {
-      // For new integrations, we need to save first before viewing tools
-      alert('Please save the integration first before viewing available tools', 'info');
+    } catch (error) {
+      alert(`Failed to load tools: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
+      setDiscoveredTools([]);
     }
   };
 
@@ -419,25 +446,21 @@ export default function IntegrationManagementModal({ open, onClose }: Integratio
    */
   const viewAvailableTools = async (integrationIndex: number) => {
     const integration = integrations[integrationIndex];
-
-    if (!integration.id) {
-      alert('Integration must be saved before viewing tools', 'error');
-      return;
-    }
+    const cleanIntegration = cleanObjectForGraphQLInput(integration);
 
     setViewingToolsIndex(integrationIndex);
     setShowToolsModal(true);
 
     try {
-      const result = await getMCPIntegrationTools({
-        variables: { integrationId: integration.id },
+      const result = await testIntegration({
+        variables: { integration: cleanIntegration },
       });
 
-      if (result.data?.getMCPIntegrationTools?.success) {
-        const tools = result.data.getMCPIntegrationTools.tools || [];
+      if (result.data?.testMCPIntegration?.success) {
+        const tools = result.data.testMCPIntegration.tools || [];
         setDiscoveredTools(tools);
       } else {
-        alert(`Failed to load tools: ${result.data?.getMCPIntegrationTools?.error || 'Unknown error'}`, 'error');
+        alert(`Failed to load tools: ${result.data?.testMCPIntegration?.error || 'Unknown error'}`, 'error');
         setDiscoveredTools([]);
       }
     } catch (error) {
@@ -502,8 +525,16 @@ export default function IntegrationManagementModal({ open, onClose }: Integratio
                   label="Server URL *"
                   value={formData.config.serverUrl}
                   onChange={(e) => handleInputChange('serverUrl', e.target.value)}
-                  placeholder="http://localhost:8080"
+                  placeholder="https://localhost:8080 or http://localhost:8080"
+                  className={
+                    formData.config.serverUrl && !validateUrl(formData.config.serverUrl)
+                      ? 'border-red-500 dark:border-red-400'
+                      : ''
+                  }
                 />
+                {formData.config.serverUrl && !validateUrl(formData.config.serverUrl) && (
+                  <p className="text-xs text-red-600 dark:text-red-400 mt-1">URL must start with http:// or https://</p>
+                )}
               </div>
 
               <Input
@@ -591,8 +622,7 @@ export default function IntegrationManagementModal({ open, onClose }: Integratio
                       loadingTools ||
                       !formData.name ||
                       !formData.config.serverUrl ||
-                      editingIndex === null ||
-                      !integrations[editingIndex]?.id
+                      !validateUrl(formData.config.serverUrl)
                     }
                   >
                     {loadingTools ? 'Loading...' : 'View Tools'}
@@ -666,7 +696,7 @@ export default function IntegrationManagementModal({ open, onClose }: Integratio
                         icon={faTools}
                         variant="transparentPrimary"
                         onClick={() => viewAvailableTools(index)}
-                        disabled={!integration.id || loadingTools}
+                        disabled={loadingTools}
                       >
                         {loadingTools && viewingToolsIndex === index ? 'Loading...' : 'View Tools'}
                       </Button>

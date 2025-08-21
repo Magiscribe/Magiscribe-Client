@@ -60,8 +60,7 @@ type Documents = {
     "\n  query checkIfUsersRespondedToInquiry($userEmails: [String!]!, $inquiryId: ID!) {\n    checkIfUsersRespondedToInquiry(userEmails: $userEmails, inquiryId: $inquiryId)\n  }\n": typeof types.CheckIfUsersRespondedToInquiryDocument,
     "\n  query getAverageInquiryResponseTime($id: ID!) {\n    getAverageInquiryResponseTime(id: $id) {\n      minutes\n      responseCount\n    }\n  }\n": typeof types.GetAverageInquiryResponseTimeDocument,
     "\n  query getInquiryIntegrations($inquiryId: ID!) {\n    getInquiryIntegrations(inquiryId: $inquiryId) {\n      id\n      name\n      description\n      type\n      config\n    }\n  }\n": typeof types.GetInquiryIntegrationsDocument,
-    "\n  query testMCPIntegration($integration: IntegrationInput!) {\n    testMCPIntegration(integration: $integration) {\n      success\n      error\n    }\n  }\n": typeof types.TestMcpIntegrationDocument,
-    "\n  query getMCPIntegrationTools($integrationId: ID!) {\n    getMCPIntegrationTools(integrationId: $integrationId) {\n      success\n      error\n      tools {\n        name\n        description\n        inputSchema\n      }\n    }\n  }\n": typeof types.GetMcpIntegrationToolsDocument,
+    "\n  query testMCPIntegration($integration: IntegrationInput!) {\n    testMCPIntegration(integration: $integration) {\n      success\n      error\n      tools {\n        name\n        description\n        inputSchema\n      }\n    }\n  }\n": typeof types.TestMcpIntegrationDocument,
     "\n  subscription predictionAdded($subscriptionId: ID!) {\n    predictionAdded(subscriptionId: $subscriptionId) {\n      id\n      subscriptionId\n      result\n      type\n      tokenUsage {\n        inputTokens\n        outputTokens\n        totalTokens\n      }\n    }\n  }\n": typeof types.PredictionAddedDocument,
 };
 const documents: Documents = {
@@ -111,8 +110,7 @@ const documents: Documents = {
     "\n  query checkIfUsersRespondedToInquiry($userEmails: [String!]!, $inquiryId: ID!) {\n    checkIfUsersRespondedToInquiry(userEmails: $userEmails, inquiryId: $inquiryId)\n  }\n": types.CheckIfUsersRespondedToInquiryDocument,
     "\n  query getAverageInquiryResponseTime($id: ID!) {\n    getAverageInquiryResponseTime(id: $id) {\n      minutes\n      responseCount\n    }\n  }\n": types.GetAverageInquiryResponseTimeDocument,
     "\n  query getInquiryIntegrations($inquiryId: ID!) {\n    getInquiryIntegrations(inquiryId: $inquiryId) {\n      id\n      name\n      description\n      type\n      config\n    }\n  }\n": types.GetInquiryIntegrationsDocument,
-    "\n  query testMCPIntegration($integration: IntegrationInput!) {\n    testMCPIntegration(integration: $integration) {\n      success\n      error\n    }\n  }\n": types.TestMcpIntegrationDocument,
-    "\n  query getMCPIntegrationTools($integrationId: ID!) {\n    getMCPIntegrationTools(integrationId: $integrationId) {\n      success\n      error\n      tools {\n        name\n        description\n        inputSchema\n      }\n    }\n  }\n": types.GetMcpIntegrationToolsDocument,
+    "\n  query testMCPIntegration($integration: IntegrationInput!) {\n    testMCPIntegration(integration: $integration) {\n      success\n      error\n      tools {\n        name\n        description\n        inputSchema\n      }\n    }\n  }\n": types.TestMcpIntegrationDocument,
     "\n  subscription predictionAdded($subscriptionId: ID!) {\n    predictionAdded(subscriptionId: $subscriptionId) {\n      id\n      subscriptionId\n      result\n      type\n      tokenUsage {\n        inputTokens\n        outputTokens\n        totalTokens\n      }\n    }\n  }\n": types.PredictionAddedDocument,
 };
 
@@ -317,11 +315,7 @@ export function gql(source: "\n  query getInquiryIntegrations($inquiryId: ID!) {
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query testMCPIntegration($integration: IntegrationInput!) {\n    testMCPIntegration(integration: $integration) {\n      success\n      error\n    }\n  }\n"): (typeof documents)["\n  query testMCPIntegration($integration: IntegrationInput!) {\n    testMCPIntegration(integration: $integration) {\n      success\n      error\n    }\n  }\n"];
-/**
- * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function gql(source: "\n  query getMCPIntegrationTools($integrationId: ID!) {\n    getMCPIntegrationTools(integrationId: $integrationId) {\n      success\n      error\n      tools {\n        name\n        description\n        inputSchema\n      }\n    }\n  }\n"): (typeof documents)["\n  query getMCPIntegrationTools($integrationId: ID!) {\n    getMCPIntegrationTools(integrationId: $integrationId) {\n      success\n      error\n      tools {\n        name\n        description\n        inputSchema\n      }\n    }\n  }\n"];
+export function gql(source: "\n  query testMCPIntegration($integration: IntegrationInput!) {\n    testMCPIntegration(integration: $integration) {\n      success\n      error\n      tools {\n        name\n        description\n        inputSchema\n      }\n    }\n  }\n"): (typeof documents)["\n  query testMCPIntegration($integration: IntegrationInput!) {\n    testMCPIntegration(integration: $integration) {\n      success\n      error\n      tools {\n        name\n        description\n        inputSchema\n      }\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
