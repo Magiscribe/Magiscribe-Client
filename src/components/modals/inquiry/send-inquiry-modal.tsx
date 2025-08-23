@@ -45,17 +45,14 @@ export default function SendInquiry({ open, onClose }: SendInquiryProps) {
         <p className="text-slate-600 dark:text-slate-300 mb-6">
           Share the link to this inquiry with anyone you want to get input from
         </p>
-        <div className="flex items-stretch">
-          <p className="grow p-2 rounded-l-md border border-r-0 border-slate-300 shadow-xs focus:border-slate-500 focus:ring-slate-500">
+        <div className="flex items-stretch mb-2">
+          <p className="grow p-2 mr-2 rounded-md border border-slate-300 shadow-xs focus:border-slate-500 focus:ring-slate-500">
             {link}
           </p>
-          <button
-            onClick={handleCopyLink}
-            className="inline-flex items-center px-4 rounded-r-md text-sm font-medium shadow-xs text-white bg-slate-600 hover:bg-slate-700 focus:outline-hidden"
-          >
+          <Button variant="secondary" onClick={handleCopyLink}>
             <FontAwesomeIcon icon={faLink} className="mr-2" />
             <span className="whitespace-nowrap">Copy Link</span>
-          </button>
+          </Button>
         </div>
         <Button type="button" onClick={() => setShowShareInquiryModal(true)} size="small" className="w-full">
           Share inquiry via email

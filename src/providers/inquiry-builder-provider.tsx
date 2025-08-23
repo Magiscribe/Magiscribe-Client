@@ -6,7 +6,7 @@ import {
   UPDATE_INQUIRY,
   UPDATE_INQUIRY_OWNERS,
 } from '@/clients/mutations';
-import { GET_INQUIRY } from '@/clients/queries';
+import { GET_INQUIRY, GET_INQUIRY_INTEGRATIONS } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import {
   AddPredictionMutation,
@@ -65,6 +65,7 @@ interface ContextType {
   setGraph: (graph: { edges: Edge[]; nodes: Node[] }) => void;
   saveGraph: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
   publishGraph: (onSuccess?: (id: string) => void, onError?: () => void) => Promise<void>;
+  refreshGraph: () => void;
 
   save: (
     data: { settings?: InquirySettings; metadata?: Metadata; graph?: { nodes: Node[]; edges: Edge[] } },
@@ -382,6 +383,19 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
     });
   };
 
+  /**
+   * Refreshes the graph to update integration nodes with latest available integrations.
+   * This is useful when new integrations are added and need to be reflected in the graph.
+   */
+  const refreshGraph = () => {
+    // Refetch the integrations query to update all integration nodes
+    if (id) {
+      client.refetchQueries({
+        include: [GET_INQUIRY_INTEGRATIONS],
+      });
+    }
+  };
+
   const contextValue = {
     initialized,
 
@@ -407,6 +421,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
 
     saveGraph,
     publishGraph,
+    refreshGraph,
 
     save,
     saveSettingsAndGraph: saveAll,

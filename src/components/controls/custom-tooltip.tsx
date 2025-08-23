@@ -1,6 +1,6 @@
 import { Popover, PopoverButton, PopoverPanel, Transition } from '@headlessui/react';
 import { motion } from 'motion/react';
-import React, { Fragment, JSX, useCallback, useState } from 'react';
+import React, { Fragment, JSX, useCallback, useState, useRef, useEffect } from 'react';
 import { usePopper } from 'react-popper';
 
 interface CustomTooltipProps {
@@ -23,6 +23,7 @@ interface CustomTooltipProps {
     | 'left-start'
     | 'left-end';
   triggerOnHover?: boolean;
+  delay?: number;
 }
 
 export default function CustomTooltip({
@@ -30,10 +31,12 @@ export default function CustomTooltip({
   render,
   placement = 'top-start',
   triggerOnHover = false,
+  delay = 0,
 }: CustomTooltipProps) {
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
   const [popperElement, setPopperElement] = useState<HTMLElement | null>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { styles, attributes } = usePopper(referenceElement, popperElement, {
     placement: placement,
     modifiers: [{ name: 'offset', options: { offset: [0, 24] } }],
@@ -41,12 +44,37 @@ export default function CustomTooltip({
   });
 
   const handleMouseEnter = useCallback(() => {
-    if (triggerOnHover) setIsOpen(true);
-  }, [triggerOnHover]);
+    if (triggerOnHover) {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+
+      if (delay > 0) {
+        timeoutRef.current = setTimeout(() => {
+          setIsOpen(true);
+        }, delay);
+      } else {
+        setIsOpen(true);
+      }
+    }
+  }, [triggerOnHover, delay]);
 
   const handleMouseLeave = useCallback(() => {
-    if (triggerOnHover) setIsOpen(false);
+    if (triggerOnHover) {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      setIsOpen(false);
+    }
   }, [triggerOnHover]);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <Popover className="inline-block">

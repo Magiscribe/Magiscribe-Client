@@ -24,10 +24,7 @@ export default function InquiryPage() {
     <GraphProvider>
       <InquiryBuilderProvider id={id}>
         <div className="w-full flex items-center justify-between mb-4">
-          <Link
-            to="/dashboard/inquiry-builder"
-            className="flex items-center text-slate-100 hover:text-slate-200 transition-colors"
-          >
+          <Link to="/dashboard" className="flex items-center text-slate-100 hover:text-slate-200 transition-colors">
             <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
             Back
           </Link>

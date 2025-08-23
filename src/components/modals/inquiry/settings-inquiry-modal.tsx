@@ -8,7 +8,7 @@ import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { VOICE_LINE_SAMPLES } from '@/utils/audio/voice-line-samples';
 import { useQuery } from '@apollo/client';
 import { faPlay, faSpinner } from '@fortawesome/free-solid-svg-icons';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import Button from '../../controls/button';
@@ -16,6 +16,7 @@ import Select from '../../controls/select';
 import ConfirmationModal from '../confirm-modal';
 import CustomModal from '../modal';
 import { ModalEditOwners } from './edit-owners-modal';
+import IntegrationManagementModal from './integration-management-modal';
 
 /**
  * Props for the ModalUpsertInquiry component
@@ -34,6 +35,7 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
   const [deleteModal, setDeleteModal] = useState(false);
   const [showEditOwnersModal, setShowEditOwnersModal] = useState(false);
   const [isConfirmDeleteOwnerModalOpen, setIsConfirmDeleteOwnerModalOpen] = useState<boolean>(false);
+  const [showIntegrationModal, setShowIntegrationModal] = useState(false);
 
   // Hooks
   const { id, setSettings, settings, saveSettings, deleteInquiry } = useInquiryBuilder();
@@ -72,15 +74,19 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
   const handleSave = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
 
-    await saveSettings(
-      (id) => {
-        alert('Inquiry saved successfully!', 'success');
-        if (onSave) onSave(id as string);
-      },
-      () => {
-        alert('Something went wrong!', 'error');
-      },
-    );
+    try {
+      await saveSettings(
+        async (savedId) => {
+          alert('Inquiry saved successfully!', 'success');
+          if (onSave) onSave(savedId as string);
+        },
+        () => {
+          alert('Something went wrong!', 'error');
+        },
+      );
+    } catch {
+      alert('Something went wrong!', 'error');
+    }
   };
 
   /**
@@ -166,6 +172,21 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
               setSettings({ ...settings, notifications: { recieveEmailOnResponse: e.target.checked } });
             }}
           />
+
+          {/* Integrations Section */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="text-lg font-medium">Integrations</h4>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Add MCP (Model Context Protocol) integrations to extend your inquiry capabilities
+                </p>
+              </div>
+              <Button type="button" size="small" onClick={() => setShowIntegrationModal(true)} variant="primary">
+                Manage Integrations
+              </Button>
+            </div>
+          </div>
         </form>
       </CustomModal>
 
@@ -194,6 +215,8 @@ export default function ModalSettingsInquiry({ open, onSave, onClose }: ModalUps
         onDeleteOwner={() => setIsConfirmDeleteOwnerModalOpen(true)}
         onCloseConfirmDeleteOwnerModal={() => setIsConfirmDeleteOwnerModalOpen(false)}
       />
+
+      <IntegrationManagementModal open={showIntegrationModal} onClose={() => setShowIntegrationModal(false)} />
     </>
   );
 }
