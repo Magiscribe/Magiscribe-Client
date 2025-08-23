@@ -17,7 +17,8 @@
     "fix": "pnpm format && pnpm lint",
     "check": "pnpm run format:check && pnpm run lint",
     "preview": "vite preview",
-    "codegen": "graphql-codegen --config codegen.ts"
+    "codegen": "graphql-codegen --config codegen.ts",
+    "prepare": "husky"
   },
   "dependencies": {
     "@apollo/client": "3.13.9",
@@ -63,6 +64,7 @@
     "@vitejs/plugin-react-swc": "^4.0.0",
     "eslint": "^9.33.0",
     "eslint-config-prettier": "^10.1.8",
+    "husky": "^9.1.7",
     "postcss": "^8.5.6",
     "prettier": "3.6.2",
     "tailwindcss": "^4.1.11",
