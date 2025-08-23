@@ -1,5 +1,5 @@
 import { useGraphContext } from '@/hooks/graph-state';
-import { faChevronLeft, faChevronRight, faQuestionCircle, faRedo, faUndo } from '@fortawesome/free-solid-svg-icons';
+import { faRedo, faUndo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   addEdge,
@@ -36,7 +36,6 @@ function Flow({ children }: TreeInputProps) {
 
   // States
   const [addNodeModalOpen, setAddNodeModalOpen] = useState(false);
-  const [isNodeBarVisible, setIsNodeBarVisible] = useState(true);
 
   // New node state
   const connectingNodeId = useRef<string | null>(null);
@@ -240,8 +239,12 @@ function Flow({ children }: TreeInputProps) {
         const disabled = !validateNewNode(type);
 
         return (
-          <div key={type} className="w-44 flex items-center">
-            <div className="relative w-full text-slate-800 dark:text-white ">
+          <CustomTooltip
+            key={type}
+            placement="bottom"
+            triggerOnHover
+            delay={1000}
+            render={() => (
               <button
                 draggable={!disabled}
                 onDragStart={() => (disabled ? null : onDragStart(type))}
@@ -263,28 +266,20 @@ function Flow({ children }: TreeInputProps) {
                   addNode();
                 }}
                 disabled={disabled}
-                className="relative w-full max-w-xs px-4 py-2 bg-white dark:bg-slate-700 border-2 border-slate-400 font-semibold text-sm rounded-xl shadow-lg disabled:opacity-50 text-left"
+                className="w-12 h-12 bg-white dark:bg-slate-700 border-2 border-slate-400 rounded-xl shadow-lg disabled:opacity-50 flex items-center justify-center hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors"
               >
                 <FontAwesomeIcon
                   icon={nodeTypesInfo[type as keyof typeof nodeTypesInfo].icon}
-                  className="mr-2 text-blue-600 dark:text-blue-400"
+                  className="text-blue-600 dark:text-blue-400 text-lg"
                 />
-                {nodeTypesInfo[type as keyof typeof nodeTypesInfo].name}
               </button>
-              <CustomTooltip
-                placement="bottom-start"
-                triggerOnHover
-                render={() => (
-                  <FontAwesomeIcon
-                    icon={faQuestionCircle}
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-slate-400 dark:text-white"
-                  />
-                )}
-              >
-                <p className="text-xs font-normal">{nodeTypesInfo[type as keyof typeof nodeTypesInfo].description}</p>
-              </CustomTooltip>
+            )}
+          >
+            <div className="text-xs font-normal text-slate-900 dark:text-white">
+              <div className="font-semibold mb-1">{nodeTypesInfo[type as keyof typeof nodeTypesInfo].name}</div>
+              <div>{nodeTypesInfo[type as keyof typeof nodeTypesInfo].description}</div>
             </div>
-          </div>
+          </CustomTooltip>
         );
       })}
     </>
@@ -316,21 +311,8 @@ function Flow({ children }: TreeInputProps) {
   return (
     <>
       <div className="relative w-full h-full text-black">
-        <div className="absolute flex flex-row top-0 left-0 p-4 space-x-4 z-10">
-          <div className="flex flex-col space-y-2 text-white">
-            <h3 className="text-xl font-semibold text-left">Nodes</h3>
-            {isNodeBarVisible && <p className="-mt-2 text-xs text-nowrap">Drag and drop to add nodes</p>}
-          </div>
-          <div className="w-full flex flex-row space-x-4 m-auto">
-            {isNodeBarVisible && renderNodeButtons()}
-            <Button
-              variant="transparentWhite"
-              onClick={() => setIsNodeBarVisible(!isNodeBarVisible)}
-              className="z-10"
-              size="small"
-              icon={isNodeBarVisible ? faChevronLeft : faChevronRight}
-            />
-          </div>
+        <div className="absolute flex flex-row top-0 left-0 p-4 z-10">
+          <div className="flex flex-row space-x-3">{renderNodeButtons()}</div>
         </div>
         <div className="w-full h-full text-black">
           <ReactFlow

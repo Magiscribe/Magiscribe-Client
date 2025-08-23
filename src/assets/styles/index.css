@@ -65,3 +65,15 @@ button {
 .react-flow__node > div {
   @apply border-2 border-slate-400;
 }
+
+.react-flow__handle {
+  width: 16px !important;
+  height: 16px !important;
+  border-radius: 50% !important;
+}
+
+.react-flow__handle.react-flow__handle-left,
+.react-flow__handle.react-flow__handle-right {
+  width: 16px !important;
+  height: 16px !important;
+}
