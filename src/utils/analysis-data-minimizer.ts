@@ -53,7 +53,7 @@ export function minimizeAnalysisData(
         // Only include supported question types
         if (['single-select', 'multi-select', 'open-ended'].includes(nodeType)) {
           questions[node.id] = {
-            text: node.data.text || '',
+            text: nodeData.text || '',
             type: nodeType as 'single-select' | 'multi-select' | 'open-ended',
             ...(nodeData.ratings &&
               ['single-select', 'multi-select'].includes(nodeType) && {

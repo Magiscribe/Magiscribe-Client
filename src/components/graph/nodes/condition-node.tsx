@@ -96,13 +96,13 @@ export default function ConditionNode({ id, data }: ConditionNodeProps) {
           </div>
         ))}
       </div>
-      
+
       {isRandom && (
         <div className="mt-4 text-sm text-gray-600 dark:text-gray-300">
           <strong>Note:</strong> The sum of all probabilities must equal 1.00
         </div>
       )}
-      
+
       <div className="mt-4">
         <Button
           className="nodrag mt-2 w-full"
@@ -114,9 +114,7 @@ export default function ConditionNode({ id, data }: ConditionNodeProps) {
             let newCondition;
             if (isRandom) {
               // Calculate remaining probability: 1 - sum of all existing probabilities
-              const existingSum = data.conditions.reduce((sum, condition) => 
-                sum + (condition.probability || 0), 0
-              );
+              const existingSum = data.conditions.reduce((sum, condition) => sum + (condition.probability || 0), 0);
               const remainingProbability = Math.max(0, 1 - existingSum);
               // Round to 2 decimal places to avoid floating point precision issues
               const roundedProbability = Math.round(remainingProbability * 100) / 100;

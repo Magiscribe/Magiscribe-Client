@@ -248,16 +248,19 @@ const PerQuestionTab: React.FC<PerQuestionTabProps> = ({ id }) => {
       <div className="my-4">
         <h2 className="font-bold mb-2">Select Question</h2>
         <div className="grid grid-cols-4 sm:grid-col-3 lg:grid-cols-6 gap-2">
-          {questionNodes.map((node: GraphNode, index: number) => (
-            <Button
-              key={node.id}
-              onClick={() => setCurrentQuestionIndex(index)}
-              variant={currentQuestionIndex === index ? 'primary' : 'secondary'}
-              title={node.data?.text || `Question ${index + 1}`}
-            >
-              {truncateText(node.data?.text || `Question ${index + 1}`)}
-            </Button>
-          ))}
+          {questionNodes.map((node: GraphNode, index: number) => {
+            const questionData = node.data as QuestionNodeData;
+            return (
+              <Button
+                key={node.id}
+                onClick={() => setCurrentQuestionIndex(index)}
+                variant={currentQuestionIndex === index ? 'primary' : 'secondary'}
+                title={questionData?.text || `Question ${index + 1}`}
+              >
+                {truncateText(questionData?.text || `Question ${index + 1}`)}
+              </Button>
+            );
+          })}
         </div>
       </div>{' '}
       {currentSummary && showSummary && (

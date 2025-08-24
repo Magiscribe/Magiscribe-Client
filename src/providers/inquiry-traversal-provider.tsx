@@ -392,14 +392,14 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
 
     // Check if this is a random condition node
     const isRandom = currentNode.data.random ?? false;
-    
+
     if (isRandom) {
       // Handle random branching locally
       const conditions = currentNode.data.conditions as { to: string; probability?: number }[];
-      const validConditions = conditions.filter(cond => 
-        graphRef.current?.getOutgoingNodes().some(node => node.id === cond.to)
+      const validConditions = conditions.filter((cond) =>
+        graphRef.current?.getOutgoingNodes().some((node) => node.id === cond.to),
       );
-      
+
       if (validConditions.length === 0) {
         handleError(new Error('No valid outgoing nodes found for random condition'));
         return;
@@ -408,7 +408,7 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
       // Weighted random selection
       const totalWeight = validConditions.reduce((sum, cond) => sum + (cond.probability || 0), 0);
       let random = Math.random() * totalWeight;
-      
+
       let selectedNode = validConditions[0]; // fallback
       for (const condition of validConditions) {
         random -= condition.probability || 0;

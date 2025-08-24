@@ -42,7 +42,7 @@ const Condition = ({ to, condition, probability, nodeId, nodeColor, isRandom, on
       value: dest.id,
     })),
   );
-  
+
   // Calculate relative luminance of bg color and determine text color
   const hex = nodeColor.substring(1);
   const [r, g, b] = [hex.substring(0, 2), hex.substring(2, 4), hex.substring(4)].map((n) => parseInt(n, 16) / 255);
