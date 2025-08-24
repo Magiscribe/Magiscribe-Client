@@ -42,8 +42,12 @@ export interface QuestionNodeData {
 }
 
 export interface ConditionNodeData {
-  images: ImageMetadata[];
-  text: string;
+  random?: boolean;
+  conditions: {
+    to: string;
+    condition?: string;
+    probability?: number;
+  }[];
 }
 
 export interface InformationNodeData {
