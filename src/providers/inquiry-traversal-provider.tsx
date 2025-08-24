@@ -387,6 +387,47 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
     // Base Case 1: The graph manager is initialized.
     if (!graphRef.current) return;
 
+    const currentNode = graphRef.current.getCurrentNode();
+    if (!currentNode || !currentNode.data) return;
+
+    // Check if this is a random condition node
+    const isRandom = currentNode.data.random ?? false;
+    
+    if (isRandom) {
+      // Handle random branching locally
+      const conditions = currentNode.data.conditions as { to: string; probability?: number }[];
+      const validConditions = conditions.filter(cond => 
+        graphRef.current?.getOutgoingNodes().some(node => node.id === cond.to)
+      );
+      
+      if (validConditions.length === 0) {
+        handleError(new Error('No valid outgoing nodes found for random condition'));
+        return;
+      }
+
+      // Weighted random selection
+      const totalWeight = validConditions.reduce((sum, cond) => sum + (cond.probability || 0), 0);
+      let random = Math.random() * totalWeight;
+      
+      let selectedNode = validConditions[0]; // fallback
+      for (const condition of validConditions) {
+        random -= condition.probability || 0;
+        if (random <= 0) {
+          selectedNode = condition;
+          break;
+        }
+      }
+
+      // Move to the selected node
+      setState((prev) => ({ ...prev, loading: false }));
+      handleNextNode({
+        nextNodeId: selectedNode.to,
+        data: { randomSelection: true },
+      });
+      return;
+    }
+
+    // Handle deterministic condition node with AI agent
     const agentId = await getAgentIdByName('Condition Node', client);
 
     // TODO: Clean this up

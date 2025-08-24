@@ -1,31 +1,35 @@
 import Button from '@/components/controls/button';
+import Input from '@/components/controls/input';
 import { faCodeBranch, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { getOutgoers, Handle, NodeProps, Position, useEdges, useNodes, useReactFlow } from '@xyflow/react';
 import colors from 'tailwindcss/colors';
+import { useCallback } from 'react';
 
 import Condition from '../elements/condition';
 import NodeContainer from '../elements/node-container';
 
 type ConditionNodeProps = NodeProps & {
   data: {
+    random?: boolean;
     conditions: {
       to: string;
-      condition: string;
+      condition?: string;
+      probability?: number;
     }[];
   };
 };
 
 const nodeColorNames = [
   'red',
+  'cyan',
   'orange',
   'lime',
-  'green',
   'teal',
-  'cyan',
+  'green',
   'blue',
+  'pink',
   'violet',
   'fuchsia',
-  'pink',
   'rose',
 ] as const;
 
@@ -46,27 +50,59 @@ export default function ConditionNode({ id, data }: ConditionNodeProps) {
     updateEdgeData(edge.id, { color: nodeColorMap[node.id] });
   });
 
+  const isRandom = data.random ?? false;
+
+  const handleUpdate = useCallback(
+    (updates: Partial<ConditionNodeProps['data']>) => {
+      updateNodeData(id, { ...data, ...updates });
+    },
+    [id, data, updateNodeData],
+  );
+
   return (
     <NodeContainer title="Condition" faIcon={faCodeBranch} id={id}>
-      <div className="flex flex-col gap-8 mt-2">
+      <Input
+        label="Random"
+        name="random"
+        type="checkbox"
+        checked={isRandom}
+        onChange={(e) => handleUpdate({ random: (e.target as HTMLInputElement).checked })}
+        className="nodrag"
+      />
+
+      <div className={`flex flex-col mt-2 ${isRandom ? 'gap-8' : 'gap-4'}`}>
         {data.conditions.map((cond, index) => (
-          <Condition
-            {...cond}
-            nodeId={id}
-            nodeColor={nodeColorMap[cond.to] || colors.slate[200]}
-            onChange={({ to, condition }) => {
-              const conditions = [...data.conditions];
-              conditions[index] = { to, condition };
-              updateNodeData(id, { conditions });
-            }}
-            onRemove={() => {
-              const conditions = [...data.conditions];
-              conditions.splice(index, 1);
-              updateNodeData(id, { conditions });
-            }}
-          ></Condition>
+          <div key={index}>
+            <Condition
+              {...cond}
+              nodeId={id}
+              nodeColor={nodeColorMap[cond.to] || colors.slate[200]}
+              isRandom={isRandom}
+              onChange={({ to, condition, probability }) => {
+                const conditions = [...data.conditions];
+                conditions[index] = { to, condition, probability };
+                updateNodeData(id, { conditions });
+              }}
+              onRemove={() => {
+                const conditions = [...data.conditions];
+                conditions.splice(index, 1);
+                updateNodeData(id, { conditions });
+              }}
+            />
+            {/* Add dividing line between conditions in non-random mode */}
+            {!isRandom && index < data.conditions.length - 1 && (
+              <div className="mt-4 border-b border-gray-300 dark:border-gray-600"></div>
+            )}
+          </div>
         ))}
       </div>
+      
+      {isRandom && (
+        <div className="mt-4 text-sm text-gray-600 dark:text-gray-300">
+          <strong>Note:</strong> The sum of all probabilities must equal 1.00
+        </div>
+      )}
+      
       <div className="mt-4">
         <Button
           className="nodrag mt-2 w-full"
@@ -75,7 +111,20 @@ export default function ConditionNode({ id, data }: ConditionNodeProps) {
           size="medium"
           icon={faPlus}
           onClick={() => {
-            const conditions = [...data.conditions, { to: '', condition: '' }];
+            let newCondition;
+            if (isRandom) {
+              // Calculate remaining probability: 1 - sum of all existing probabilities
+              const existingSum = data.conditions.reduce((sum, condition) => 
+                sum + (condition.probability || 0), 0
+              );
+              const remainingProbability = Math.max(0, 1 - existingSum);
+              // Round to 2 decimal places to avoid floating point precision issues
+              const roundedProbability = Math.round(remainingProbability * 100) / 100;
+              newCondition = { to: '', probability: roundedProbability };
+            } else {
+              newCondition = { to: '', condition: '' };
+            }
+            const conditions = [...data.conditions, newCondition];
             updateNodeData(id, { conditions });
           }}
         >
