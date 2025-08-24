@@ -275,20 +275,20 @@ export function validateGraph(graph: StrippedGraph): { valid: boolean; errors: s
         }
 
         // Check if condition node has appropriate data based on mode
-        // Note: We have to as any here because the type of node.data.conditions is not inferred correctly on account
+        // Note: We have to cast here because the type of node.data.conditions is not inferred correctly on account
         //       of the library we are using for the graph editor.
-        const conditions = (node.data.conditions as { to: string; condition?: string; probability?: number }[]);
-        const isRandom = (node.data as any).random ?? false;
-        
+        const conditions = node.data.conditions as { to: string; condition?: string; probability?: number }[];
+        const isRandom = (node.data as Record<string, unknown>).random === true;
+
         if (isRandom) {
           // For random mode, check probabilities
-          const missingProbabilities = conditions.filter(cond => typeof cond.probability !== 'number');
+          const missingProbabilities = conditions.filter((cond) => typeof cond.probability !== 'number');
           if (missingProbabilities.length > 0) {
             errors.push(
               `Random condition node "${id}" has paths without probability values. Please add probability values for all paths.`,
             );
           }
-          
+
           const totalProbability = conditions.reduce((sum, cond) => sum + (cond.probability || 0), 0);
           if (Math.abs(totalProbability - 1.0) > 0.01) {
             errors.push(
@@ -297,7 +297,11 @@ export function validateGraph(graph: StrippedGraph): { valid: boolean; errors: s
           }
         } else {
           // For deterministic mode, check conditions
-          if (conditions.some((cond: { to: string; condition?: string }) => !cond.condition || cond.condition.trim() === '')) {
+          if (
+            conditions.some(
+              (cond: { to: string; condition?: string }) => !cond.condition || cond.condition.trim() === '',
+            )
+          ) {
             errors.push(
               `Condition node "${id}" is missing its decision criteria. Please add a condition to specify how the flow should branch.`,
             );
