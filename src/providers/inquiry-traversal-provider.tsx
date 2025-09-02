@@ -360,7 +360,10 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
       agentId,
       inquiryId: id, // Always pass inquiryId for token tracking
       input: {
-        userMessage: currentNode.data.text,
+        userMessage:
+          currentNode.type === 'question'
+            ? `${currentNode.data.text}\n\nCRUCIAL: You MUST set 'type' to '${currentNode.data.type}' in your response`
+            : currentNode.data.text,
         context: settingsRef.current.context,
         userDetails: userDetails,
         conversationHistory: inquiryHistoryRef.current.join('\n\n'),

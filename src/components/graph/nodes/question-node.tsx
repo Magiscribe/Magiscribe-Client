@@ -30,11 +30,14 @@ export default function QuestionNode({ id, data }: QuestionNodeProps) {
 
   const handleUpdate = useCallback(
     (updates: Partial<QuestionNodeProps['data']>) => {
-      if (updates.dynamicGeneration) {
-        updates = {
-          ...updates,
-          ratings: undefined,
-        };
+      if (updates.dynamicGeneration !== undefined) {
+        if (updates.dynamicGeneration) {
+          // Switching TO dynamic generation - clear ratings since they're not used in dynamic mode
+          updates = {
+            ...updates,
+            ratings: undefined,
+          };
+        }
       }
 
       Object.entries(updates).forEach(([key, value]) => {
@@ -43,7 +46,7 @@ export default function QuestionNode({ id, data }: QuestionNodeProps) {
         } as React.ChangeEvent<HTMLInputElement>);
       });
     },
-    [handleInputChange],
+    [handleInputChange, data.type],
   );
 
   const handleRatingChange = (index: number, value: string) => {
@@ -78,7 +81,17 @@ export default function QuestionNode({ id, data }: QuestionNodeProps) {
         name="type"
         value={data.type}
         onChange={(e) => handleUpdate({ type: e.target.value as NodeType })}
-        options={Object.values(NodeType).map((value) => ({ value, label: value }))}
+        options={Object.values(NodeType).map((value) => ({
+          value,
+          label:
+            value === NodeType.OpenEnded
+              ? 'Open Ended'
+              : value === NodeType.RatingSingle
+                ? 'Single Select'
+                : value === NodeType.RatingMulti
+                  ? 'Multi Select'
+                  : value,
+        }))}
         className="nodrag"
       />
 

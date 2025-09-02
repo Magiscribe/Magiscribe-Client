@@ -498,7 +498,7 @@ export default function UserInquiryPage() {
           </SignedOut>
           <SignedIn>
             <Link
-              to="/dashboard/inquiry-builder"
+              to="/dashboard"
               className="underline dark:text-white text-slate-800 hover:text-purple-600 transition-colors"
             >
               Go to Graph Builder
