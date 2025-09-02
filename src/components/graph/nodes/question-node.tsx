@@ -81,11 +81,16 @@ export default function QuestionNode({ id, data }: QuestionNodeProps) {
         name="type"
         value={data.type}
         onChange={(e) => handleUpdate({ type: e.target.value as NodeType })}
-        options={Object.values(NodeType).map((value) => ({ 
-          value, 
-          label: value === NodeType.OpenEnded ? 'Open Ended' :
-                 value === NodeType.RatingSingle ? 'Single Select' :
-                 value === NodeType.RatingMulti ? 'Multi Select' : value 
+        options={Object.values(NodeType).map((value) => ({
+          value,
+          label:
+            value === NodeType.OpenEnded
+              ? 'Open Ended'
+              : value === NodeType.RatingSingle
+                ? 'Single Select'
+                : value === NodeType.RatingMulti
+                  ? 'Multi Select'
+                  : value,
         }))}
         className="nodrag"
       />
