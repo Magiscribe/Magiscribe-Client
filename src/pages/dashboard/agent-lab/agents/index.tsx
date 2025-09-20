@@ -9,6 +9,7 @@ import { useMutation, useQuery } from '@apollo/client';
 import { motion } from 'motion/react';
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 function AgentCard({
   agent,
@@ -25,6 +26,7 @@ function AgentCard({
 
   const addAlert = useAddAlert();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleDelete = async () => {
     try {
@@ -33,11 +35,11 @@ function AgentCard({
           agentId: agent.id,
         },
       });
-      addAlert('Agent successfully deleted', 'success');
+      addAlert(t('pages.agentLab.alerts.agentDeleted'), 'success');
       if (onUpdate) onUpdate();
     } catch (error) {
       console.error(error);
-      addAlert('Failed to delete agent', 'error');
+      addAlert(t('pages.agentLab.alerts.agentDeleteFailed'), 'error');
     }
     setIsDeleteModalOpen(false);
   };
@@ -61,20 +63,20 @@ function AgentCard({
       </div>
       <div className="flex justify-end gap-2 mt-auto">
         <Button size="small" onClick={() => navigate(`edit?id=${agent.id}`)}>
-          Edit
+          {t('common.buttons.edit')}
         </Button>
         <Button onClick={() => onCopy(agent.id)} size="small">
-          Copy
+          {t('common.buttons.copy')}
         </Button>
         <Button onClick={() => setIsDeleteModalOpen(true)} size="small" variant="danger">
-          Delete
+          {t('common.buttons.delete')}
         </Button>
       </div>
       <ConfirmationModal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={handleDelete}
-        text="Are you sure you want to delete this agent?"
+        text={t('pages.agentLab.agents.deleteConfirmation')}
       />
     </div>
   );
@@ -93,11 +95,12 @@ export default function AgentDashboard() {
   const [upsertAgent] = useMutation<UpsertAgentMutation>(ADD_UPDATE_AGENT);
 
   const addAlert = useAddAlert();
+  const { t } = useTranslation();
 
   const handleCopy = async (id: string) => {
-    const selectedItem = data?.getAllAgents.find((agent) => agent.id === id);
+    const selectedItem = data?.getAllAgents.find((agent: any) => agent.id === id);
     if (!selectedItem) {
-      addAlert('Agent not found', 'error');
+      addAlert(t('pages.agentLab.alerts.agentNotFound'), 'error');
       return;
     }
 
@@ -109,36 +112,36 @@ export default function AgentDashboard() {
             id: null, // Ensure a new agent is created
             name: `${selectedItem.name} Copy ${timeStamp}`,
             description: selectedItem.description,
-            capabilities: selectedItem.capabilities.map((capability) => capability.id),
+            capabilities: selectedItem.capabilities.map((capability: any) => capability.id),
             logicalCollection: params.collection,
           },
         },
       });
 
       if (result.errors) {
-        addAlert('Error copying agent', 'error');
+        addAlert(t('pages.agentLab.alerts.agentCopyFailed'), 'error');
         return;
       }
 
-      addAlert('Agent copied successfully', 'success');
+      addAlert(t('pages.agentLab.alerts.agentCopied'), 'success');
       refetch();
     } catch (error) {
       console.error(error);
-      addAlert('Error copying agent', 'error');
+      addAlert(t('pages.agentLab.alerts.agentCopyFailed'), 'error');
     }
   };
 
   return (
     <Container>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Agents</h1>
+        <h1 className="text-3xl font-bold">{t('pages.agentLab.agents.title')}</h1>
         <Button as={Link} to="edit">
-          Add Agent
+          {t('pages.agentLab.agents.addAgent')}
         </Button>
       </div>
       <hr className="my-4" />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 my-8">
-        {data?.getAllAgents.map((agent, i) => (
+        {data?.getAllAgents.map((agent: any, i: number) => (
           <motion.div
             key={agent.id}
             initial={{ opacity: 0, y: 20 }}

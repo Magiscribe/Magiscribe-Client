@@ -19,6 +19,7 @@ import { useInquiry } from '@/providers/inquiry-traversal-provider';
 import { ImageMetadata } from '@/types/conversation';
 import { StrippedNode } from '@/utils/graphs/graph';
 import { SignedIn, SignedOut, SignUpButton } from '@clerk/clerk-react';
+import { useTranslation } from 'react-i18next';
 import { faArrowUp, faChevronRight, faMicrophone, faMicrophoneSlash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { motion, AnimatePresence } from 'motion/react';
@@ -38,41 +39,12 @@ const emailRegex = /.+@.+\..+/;
 /**
  * Loading quotes for different node types
  */
-const INTEGRATION_LOADING_QUOTES = [
-  'Connecting to external systems... please hold while we negotiate with the APIs.',
-  'Fetching data from integrations... our digital courier is running really fast.',
-  'Synchronizing with third-party services... teaching our systems to play nicely together.',
-  'Processing integration request... translating between different digital languages.',
-  'Communicating with external tools... sending diplomatic messages to other servers.',
-  'Executing integration logic... our AI is having a chat with your favorite apps.',
-];
-
-const QUESTION_LOADING_QUOTES = [
-  'Crafting the perfect question... our AI is consulting its dictionary of curiosity.',
-  'Generating dynamic questions... thinking of something clever to ask you.',
-  'Formulating inquiry... our question-bot is having a brainstorm session.',
-  'Creating personalized questions... tailoring this just for you.',
-  'Designing the next question... our AI is putting on its thinking cap.',
-  'Preparing thoughtful questions... quality takes time, even for AI.',
-];
-
-const INFORMATION_LOADING_QUOTES = [
-  'Generating helpful information... our AI is preparing its best explanation.',
-  'Crafting informative content... writing something worth your time.',
-  'Preparing personalized information... tailoring this message just for you.',
-  'Creating dynamic content... our AI is getting creative with the details.',
-  'Formulating the perfect response... quality information is worth the wait.',
-  'Generating contextual information... making sure this is relevant to you.',
-];
-
-const CONDITION_LOADING_QUOTES = [
-  'Analyzing your responses... our AI is being very thoughtful about what comes next.',
-  'Processing logic conditions... determining the best path forward for you.',
-  'Evaluating conversation flow... our AI is playing detective with your answers.',
-  'Making intelligent decisions... figuring out where this conversation should go.',
-  'Applying conditional logic... our AI is solving the puzzle of your responses.',
-  'Determining next steps... calculating the perfect path through this inquiry.',
-];
+const getLoadingQuotes = (t: any) => ({
+  INTEGRATION_LOADING_QUOTES: t('components.loadingQuotes.integration', { returnObjects: true }),
+  QUESTION_LOADING_QUOTES: t('components.loadingQuotes.question', { returnObjects: true }),
+  INFORMATION_LOADING_QUOTES: t('components.loadingQuotes.information', { returnObjects: true }),
+  CONDITION_LOADING_QUOTES: t('components.loadingQuotes.condition', { returnObjects: true }),
+});
 
 export const useMessageQueue = () => {
   const calculateMessageDelay = (message: Message): number => {
@@ -101,6 +73,8 @@ export const useMessageQueue = () => {
 };
 
 export default function UserInquiryPage() {
+  // Hooks
+  const { t } = useTranslation();
   // State
   const [screen, setScreen] = useState<'start' | 'inquiry' | 'end' | 'summary'>('start');
   const [inputMessage, setInputMessage] = useState('');
@@ -139,6 +113,7 @@ export default function UserInquiryPage() {
     if (state.loading) {
       // Get appropriate loading quotes based on current node type and loading state
       let quotes: string[] = [];
+      const loadingQuotes = getLoadingQuotes(t);
 
       if (currentNode) {
         const nodeType = currentNode.type;
@@ -153,14 +128,14 @@ export default function UserInquiryPage() {
 
         // Check if it's dynamic generation (question or information with dynamic generation)
         if (currentNode.data?.dynamicGeneration) {
-          if (nodeType === 'question') quotes = QUESTION_LOADING_QUOTES;
-          else if (nodeType === 'information') quotes = INFORMATION_LOADING_QUOTES;
+          if (nodeType === 'question') quotes = loadingQuotes.QUESTION_LOADING_QUOTES;
+          else if (nodeType === 'information') quotes = loadingQuotes.INFORMATION_LOADING_QUOTES;
         }
 
         // Check specific node types
         if (quotes.length === 0) {
-          if (nodeType === 'condition') quotes = CONDITION_LOADING_QUOTES;
-          else if (nodeType === 'integration') quotes = INTEGRATION_LOADING_QUOTES;
+          if (nodeType === 'condition') quotes = loadingQuotes.CONDITION_LOADING_QUOTES;
+          else if (nodeType === 'integration') quotes = loadingQuotes.INTEGRATION_LOADING_QUOTES;
         }
       } else {
         // If we don't have a current node yet (initial loading), show generic loading quotes
@@ -169,7 +144,7 @@ export default function UserInquiryPage() {
 
       // Default fallback (also used when currentNode is null)
       if (quotes.length === 0) {
-        quotes = ['Processing your request...', 'Please wait while we work our magic...', 'Almost there...'];
+        quotes = [t('common.labels.loading'), 'Please wait while we work our magic...', 'Almost there...'];
       }
 
       console.log('Selected quotes array:', quotes);
@@ -388,7 +363,7 @@ export default function UserInquiryPage() {
       <div className="bg-white dark:bg-slate-700 p-6 rounded-3xl shadow-lg">
         <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white">{settings.title}</h2>
         {expectedInquiryResponseTime && (
-          <p className="text-slate-600 dark:text-slate-300 mb-6">{`Estimated completion time: ${expectedInquiryResponseTime}`}</p>
+          <p className="text-slate-600 dark:text-slate-300 mb-6">{t('pages.userInquiry.estimatedTime', { time: expectedInquiryResponseTime })}</p>
         )}
         <p className="text-slate-600 dark:text-slate-300 mb-6">{description}</p>
         <div className="space-y-4">
@@ -414,7 +389,7 @@ export default function UserInquiryPage() {
           )}
           {requireEmailCapture && (
             <Input
-              label="Recieve copy of your responses via email?"
+              label={t('pages.userInquiry.receiveEmailCopy')}
               name="recieveEmails"
               type="checkbox"
               value={String(userDetails.recieveEmails ?? 'false')}
@@ -481,18 +456,18 @@ export default function UserInquiryPage() {
 
   const renderSummary = () => (
     <div className="bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-lg">
-      <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white text-center">Thank you!</h2>
-      <p className="text-lg text-slate-600 dark:text-slate-300 text-center">Your responses have been recorded.</p>
+      <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white text-center">{t('pages.userInquiry.thankYou')}</h2>
+      <p className="text-lg text-slate-600 dark:text-slate-300 text-center">{t('pages.userInquiry.responsesRecorded')}</p>
 
-      <img src={goHomeGif} alt="Thank You" className="mx-auto rounded-3xl mt-4" />
+      <img src={goHomeGif} alt={t('pages.userInquiry.thankYou')} className="mx-auto rounded-3xl mt-4" />
       <div className="w-full max-w-3xl mx-auto flex flex-col items-center">
         {/* Form */}
         <p className="text-center text-slate-600 dark:text-slate-400 mt-4">
-          Want to make your own inquiry?{' '}
+          {t('pages.userInquiry.makeOwnInquiry')}{' '}
           <SignedOut>
             <SignUpButton signInForceRedirectUrl="/dashboard" forceRedirectUrl="/dashboard">
               <button className="underline dark:text-white text-slate-800 hover:text-purple-600 transition-colors">
-                Sign up for free
+                {t('pages.userInquiry.signUpFree')}
               </button>
             </SignUpButton>
           </SignedOut>
@@ -501,7 +476,7 @@ export default function UserInquiryPage() {
               to="/dashboard"
               className="underline dark:text-white text-slate-800 hover:text-purple-600 transition-colors"
             >
-              Go to Graph Builder
+              {t('pages.userInquiry.goToBuilder')}
             </Link>
           </SignedIn>
         </p>
@@ -566,9 +541,9 @@ export default function UserInquiryPage() {
               transition={{ duration: 0.3, delay: 0.2 }}
             >
               <i>
-                Occasionally, mistakes may occur. If you notice any, please let us know at{' '}
-                <a href="mailto:support@magiscribe.com" className="underline">
-                  support@magiscribe.com
+                {t('pages.userInquiry.disclaimer')}{' '}
+                <a href={`mailto:${t('emails.support')}`} className="underline">
+                  {t('emails.support')}
                 </a>
                 .
               </i>
@@ -594,29 +569,29 @@ export default function UserInquiryPage() {
   const renderLoading = () => (
     <div className="flex flex-col items-center justify-center h-full">
       <AnimatedDots />
-      <p className="text-slate-600 dark:text-slate-300 mt-4">Loading your inquiry...</p>
+      <p className="text-slate-600 dark:text-slate-300 mt-4">{t('pages.userInquiry.loadingInquiry')}</p>
     </div>
   );
 
   const renderNotFound = () => (
     <div className="bg-white dark:bg-slate-700 p-6 rounded-3xl shadow-lg">
-      <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white">Inquiry Not Found</h2>
+      <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white">{t('pages.userInquiry.inquiryNotFound')}</h2>
       <p className="text-slate-600 dark:text-slate-300 mb-6">
-        The inquiry you are looking for does not exist. Please check the URL and try again.
+        {t('pages.userInquiry.inquiryNotFoundDescription')}
       </p>
     </div>
   );
 
   const renderError = () => (
     <div className="bg-white dark:bg-slate-700 p-6 rounded-3xl shadow-lg">
-      <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white">Something Went Wrong</h2>
+      <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white">{t('pages.userInquiry.somethingWentWrong')}</h2>
       <p className="text-slate-600 dark:text-slate-300 mb-6">
-        An error occurred while loading the inquiry. Please try again later.
+        {t('pages.userInquiry.errorDescription')}
       </p>
       <p className="text-slate-600 dark:text-slate-300 mb-6">
-        If the problem persists, please contact support at{' '}
-        <a href="mailto:support@magiscribe.com" className="underline">
-          support@magiscribe.com
+        {t('pages.userInquiry.errorPersists')}{' '}
+        <a href={`mailto:${t('emails.support')}`} className="underline">
+          {t('emails.support')}
         </a>
         .
       </p>

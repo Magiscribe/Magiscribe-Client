@@ -16,6 +16,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
+import { useTranslation } from 'react-i18next';
 
 interface predictionAdded {
   id: string;
@@ -48,6 +49,7 @@ const initialForm: Form = {
 export default function PlaygroundDashboard() {
   // React Router
   const params = useParams();
+  const { t } = useTranslation();
 
   // States
   const [loading, setLoading] = useState(false);
@@ -195,13 +197,13 @@ export default function PlaygroundDashboard() {
   return (
     <>
       <Container>
-        <h1 className="text-3xl font-bold">Playground</h1>
+        <h1 className="text-3xl font-bold">{t('pages.agentLab.playground.title')}</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-8">
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
               <Input
                 name="subscriptionId"
-                label="Subscription ID"
+                label={t('pages.agentLab.playground.subscriptionId')}
                 value={form.subscriptionId}
                 onChange={(e) => setForm({ ...form, subscriptionId: e.target.value })}
               />
@@ -209,7 +211,7 @@ export default function PlaygroundDashboard() {
             <div className="mb-4">
               <Input
                 name="voice"
-                label="Voice"
+                label={t('pages.agentLab.playground.voice')}
                 value={form.voice}
                 onChange={(e) => setForm({ ...form, voice: e.target.value })}
               />
@@ -217,7 +219,7 @@ export default function PlaygroundDashboard() {
             <div className="mb-4">
               <Select
                 name="agent"
-                label="Agents"
+                label={t('pages.agentLab.playground.agents')}
                 onChange={(e) => setForm({ ...form, agent: e.target.value })}
                 value={form.agent}
                 options={
@@ -237,10 +239,10 @@ export default function PlaygroundDashboard() {
               />
             </div>
             <div className="mb-4">
-              <Input name="image-upload" type="file" label="Upload Images" onChange={handleImageUpload} />
+              <Input name="image-upload" type="file" label={t('pages.agentLab.playground.uploadImages')} onChange={handleImageUpload} />
             </div>
             <div className="mb-4">
-              <label className="block text-sm font-bold mb-2">Uploaded Images</label>
+              <label className="block text-sm font-bold mb-2">{t('pages.agentLab.playground.uploadedImages')}</label>
               <div className="flex flex-wrap gap-2">
                 {base64Images.map((image, index) => (
                   <div key={index} className="relative">
@@ -250,19 +252,19 @@ export default function PlaygroundDashboard() {
                       variant="transparentDanger"
                       onClick={() => setBase64Images(base64Images.filter((_, i) => i !== index))}
                     >
-                      Remove
+                      {t('common.buttons.remove')}
                     </Button>
                   </div>
                 ))}
               </div>
             </div>
             <div className="space-x-2">
-              <Button disabled={loading}>Run</Button>
+              <Button disabled={loading}>{t('common.buttons.run')}</Button>
               <Button type="button" variant="success" onClick={() => setEnableAudio(!enableAudio)}>
-                Audio {enableAudio ? 'On' : 'Off'} <FontAwesomeIcon icon={enableAudio ? faVolumeHigh : faVolumeMute} />
+                {enableAudio ? t('pages.agentLab.playground.audioOn') : t('pages.agentLab.playground.audioOff')} <FontAwesomeIcon icon={enableAudio ? faVolumeHigh : faVolumeMute} />
               </Button>
               <Button type="button" variant="danger" onClick={handleClear}>
-                Clear
+                {t('common.buttons.clear')}
               </Button>
             </div>
           </form>

@@ -1,0 +1,422 @@
+{
+  "common": {
+    "buttons": {
+      "getStartedFree": "Get Started for Free",
+      "signIn": "Sign In",
+      "dashboard": "Dashboard",
+      "letsProceed": "Let's Get Started!",
+      "contactUs": "Contact Us",
+      "visitLinkedIn": "Visit our LinkedIn",
+      "joinDiscord": "Join our Discord",
+      "close": "Close",
+      "save": "Save",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "edit": "Edit",
+      "create": "Create",
+      "copy": "Copy",
+      "add": "Add",
+      "back": "Back",
+      "finish": "Finish",
+      "getStarted": "Get Started",
+      "run": "Run",
+      "clear": "Clear",
+      "remove": "Remove",
+      "preview": "Preview",
+      "confirm": "Confirm"
+    },
+    "navigation": {
+      "home": "Home",
+      "dashboard": "Dashboard",
+      "contact": "Contact",
+      "faq": "FAQ",
+      "privacy": "Privacy Policy",
+      "terms": "Terms & Conditions"
+    },
+    "labels": {
+      "updated": "Updated",
+      "response": "response",
+      "responses": "responses",
+      "responseTime": "Response Time",
+      "lastUpdated": "Last Updated",
+      "copyright": "© {{year}} Magiscribe. All rights reserved.",
+      "name": "Name",
+      "email": "Email",
+      "description": "Description",
+      "title": "Title",
+      "voice": "Voice",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "loading": "Loading..."
+    },
+    "forms": {
+      "placeholders": {
+        "yourName": "Your name",
+        "yourEmail": "Your email address",
+        "inquiryTitle": "Inquiry title",
+        "typeMessage": "Type your message here..."
+      },
+      "validation": {
+        "nameRequired": "Please enter your name.",
+        "emailRequired": "Please enter your email address.",
+        "validEmailRequired": "Please enter a valid email address."
+      }
+    },
+    "status": {
+      "success": "Success",
+      "error": "Error",
+      "warning": "Warning",
+      "info": "Info"
+    }
+  },
+  "pages": {
+    "home": {
+      "title": "",
+      "hero": {
+        "title": "Spend More Time Developing",
+        "subtitle": "Magiscribe reduces the amount of time developers spend in daily standups and updating JIRA tickets by 40%"
+      },
+      "about": {
+        "title": "What is Magiscribe?",
+        "balanceEfficiency": {
+          "title": "Balance Efficiency with Depth",
+          "description": "Magiscribe helps you combine the efficiency of surveys with the depth of user interviews. Gather quantitative data from many participants while pursuing qualitative insights through targeted follow-up questions."
+        },
+        "understandAudience": {
+          "title": "Understand Your Audience",
+          "description": "From simple yes-no surveys to in-depth quizzes and free-flowing conversations, our AI-powered platform streamlines audience insights. Magiscribe combines smart technology with artificial intelligence to deliver deeper understanding."
+        },
+        "roughDrafts": {
+          "title": "From rough drafts to rich dialogues",
+          "description": "Magiscribe produces semi-structured conversations allowing you to both guarantee particular questions get asked and allow for dynamic follow-up when the respondent says something interesting the same way a skilled interviewer would."
+        }
+      },
+      "contact": {
+        "title": "Get in Touch",
+        "subtitle": "Have a question, want to schedule a demo, or learn how Magiscribe can help you? Reach out to us and we'll get back to you as soon as possible!"
+      }
+    },
+    "contact": {
+      "title": "Contact Us",
+      "pageTitle": "Get in Touch",
+      "responseTime": {
+        "title": "Response Time",
+        "description": "We typically respond to inquiries within 6-12 hours during business days. For urgent matters, please reach out to us on Discord."
+      }
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "subtitle": "Learn how Magiscribe can turn dialogue into discovery",
+      "questions": {
+        "whatIsMagiscribe": {
+          "question": "What is Magiscribe?",
+          "answer": "Magiscribe is a user-friendly tool that revolutionizes how organizations gather insights from their audience. Unlike traditional surveys or time-intensive interviews, we offer dynamic, interactive conversations that adapt to each respondent, delivering deeper insights while saving you valuable time. Whether you're conducting market research, gathering customer feedback, or collecting stakeholder input, Magiscribe makes it effortless to create engaging, personalized interactions at scale."
+        },
+        "howDifferent": {
+          "question": "How is Magiscribe different from traditional surveys?",
+          "answer": "While traditional surveys are static and often miss crucial context, Magiscribe creates dynamic conversations that adapt based on your respondents' answers. Our platform combines the depth of personal interviews with the scalability of surveys, allowing you to capture nuanced feedback without the time investment of individual interviews. Plus, our smart follow-up system ensures you never miss important insights, automatically exploring interesting responses in greater detail."
+        },
+        "whoIsItFor": {
+          "question": "Who is Magiscribe for?",
+          "answer": "Magiscribe is perfect for anyone who needs meaningful insights from their audience, including market researchers, product managers, customer experience teams, and business strategists. Our platform is particularly valuable for organizations that want to scale their research efforts without sacrificing depth and quality. Whether you're a startup gathering customer feedback or an enterprise conducting large-scale market research, Magiscribe adapts to your needs."
+        },
+        "whatInsights": {
+          "question": "What kinds of insights can I gather with Magiscribe?",
+          "answer": "Magiscribe is incredibly versatile. You can use it for customer feedback, product research, market analysis, user experience studies, employee feedback, and much more. Our platform excels at uncovering the \"why\" behind responses through intelligent follow-up questions, helping you gather both quantitative data and qualitative insights in a single interaction."
+        },
+        "howEasy": {
+          "question": "How easy is it to get started?",
+          "answer": "Getting started with Magiscribe is simple. Our platform offers ready-to-use templates for common use cases, which you can customize to your specific needs with just a few clicks. We also provide AI-powered assistance to help you craft the perfect questions and conversation flows. You can create your first inquiry in minutes and start gathering insights right away."
+        },
+        "qualityResponses": {
+          "question": "How does Magiscribe ensure quality responses?",
+          "answer": "Our dynamic conversation approach naturally encourages more thoughtful and detailed responses. By adapting to each respondent's answers and asking relevant follow-up questions, we create an engaging experience that yields higher quality insights."
+        }
+      }
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "sections": {
+        "introduction": {
+          "title": "Introduction",
+          "content": "We have implemented this Privacy Policy because your privacy, and the privacy of other users, is important to us. This Privacy Policy explains our online information practices and the choices you can make about the way your Personal Information is collected and used in connection with the Services. \"Personal Information\" means any information that may be used to personally identify an individual, including, but not limited to, names, email addresses, and other contact information."
+        },
+        "termsOfUse": {
+          "title": "Terms of Use",
+          "content": "This Privacy Policy forms part of our Terms of Service."
+        },
+        "informationWeCollect": {
+          "title": "Information We Collect",
+          "content": "We collect Personal Information in the following ways:",
+          "accountInfo": {
+            "title": "Account Information",
+            "content": "When you create an account through Clerk authentication services, we receive basic profile information such as your name and email address."
+          },
+          "usageInfo": {
+            "title": "Usage Information",
+            "content": "We collect information about how you use our Services, including your inquiry responses, conversation patterns, and interaction with our AI features."
+          },
+          "technicalInfo": {
+            "title": "Technical Information",
+            "content": "When you use our Services, we may collect technical data such as your IP address, browser type, and device information through cookies and similar technologies."
+          }
+        },
+        "howWeUse": {
+          "title": "How We Use Your Information",
+          "content": "We use your Personal Information to:",
+          "items": [
+            "Provide and improve our Services",
+            "Generate analytics and improve our AI models",
+            "Communicate with you about our Services",
+            "Ensure security and prevent fraud"
+          ]
+        },
+        "dataSharing": {
+          "title": "Data Sharing",
+          "content": "We share your information with:",
+          "items": [
+            "AWS Bedrock (for AI processing through Claude)",
+            "Clerk (for authentication services)"
+          ],
+          "note": "Amazon Bedrock doesn't store or log your prompts and completions. Amazon Bedrock doesn't use your prompts and completions to train any AWS models and doesn't distribute them to third parties."
+        },
+        "dataSecurity": {
+          "title": "Data Security",
+          "content": "We implement appropriate technical and organizational measures to protect your Personal Information. However, no method of transmission over the Internet is 100% secure."
+        },
+        "yourRights": {
+          "title": "Your Rights",
+          "content": "You have the right to:",
+          "items": [
+            "Access your Personal Information",
+            "Correct inaccurate information",
+            "Request deletion of your information",
+            "Opt out of certain data collection"
+          ]
+        },
+        "changes": {
+          "title": "Changes to This Policy",
+          "content": "We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new policy on this page."
+        },
+        "contactUs": {
+          "title": "Contact Us",
+          "content": "If you have any questions about this Privacy Policy, please contact us."
+        }
+      },
+      "description": "This privacy policy governs how we, Magiscribe (\"we\", \"our\" or \"us\"), use Personal Information that we collect, receive and store about individuals in connection with the use of our website and services (collectively referred to as the \"Services\")."
+    },
+    "terms": {
+      "title": "Terms and Conditions",
+      "pageTitle": "Terms of Service",
+      "sections": {
+        "serviceDescription": {
+          "title": "Service Description",
+          "content": "Magiscribe provides a platform for creating and managing structured conversations through our inquiry system. Our services include but are not limited to inquiry creation, distribution, and response collection. The Service utilizes Anthropic's Claude AI model for various functionalities. When using the Service, you are subject to both these terms and any applicable Anthropic terms of service."
+        },
+        "userAccounts": {
+          "title": "User Accounts",
+          "content": "To use the Service, you must create an account using Clerk authentication services. You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account. You must immediately notify us of any unauthorized use of your account. Your use of Clerk authentication services is also subject to Clerk's terms of service and privacy policy."
+        },
+        "privacyData": {
+          "title": "Privacy and Data Protection",
+          "content": "We respect your privacy and handle your data in accordance with our Privacy Policy. When collecting responses through inquiries, you agree to inform respondents about data collection practices and obtain necessary consents. You acknowledge that the Service uses Anthropic's Claude AI model and that data processing may occur through Anthropic's systems in accordance with their privacy practices."
+        },
+        "intellectualProperty": {
+          "title": "Intellectual Property",
+          "content": "All content, features, and functionality of the Service are the exclusive property of Magiscribe and are protected by international copyright laws. You retain ownership of any content you create using our services, but grant us a license to use and process that content to provide and improve our services."
+        },
+        "prohibitedActivities": {
+          "title": "Prohibited Activities",
+          "content": "Users may not use Magiscribe for any illegal purposes or to distribute harmful content. We reserve the right to terminate accounts that violate these terms or engage in unauthorized activities."
+        },
+        "disclaimerWarranties": {
+          "title": "Disclaimer of Warranties",
+          "content": "The Service is provided \"as is\" and \"as available\" without warranties of any kind. We do not warrant that the Service will be uninterrupted or error-free. We are not responsible for the accuracy, reliability, or quality of any content or responses generated through the Service."
+        },
+        "limitationLiability": {
+          "title": "Limitation of Liability",
+          "content": "To the maximum extent permitted by law, Magiscribe shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use or inability to use the Service."
+        },
+        "changesTerms": {
+          "title": "Changes to Terms",
+          "content": "We reserve the right to modify these terms at any time. We will notify you of any changes by posting the new terms on the Service. Your continued use of the Service after such modifications constitutes your acceptance of the new terms."
+        },
+        "governingLaw": {
+          "title": "Governing Law",
+          "content": "These terms shall be governed by and construed in accordance with the laws of the United States, without regard to its conflict of law provisions. You agree to submit to the personal and exclusive jurisdiction of the courts located within the United States."
+        },
+        "contactUs": {
+          "title": "Contact Us",
+          "content": "If you have any questions about these Terms, please contact us."
+        }
+      },
+      "description": "By accessing and using Magiscribe (\"Service\"), you acknowledge that you have read, understood, and agree to be bound by these Terms of Service (\"Agreement\"). If you do not agree with any part of these terms, you may not use our services. This Agreement constitutes a binding agreement between you (\"User\" or \"you\") and Magiscribe (\"we,\" \"us,\" or \"our\")."
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "welcome": "{{name}}, welcome to Magiscribe!",
+      "welcomeGeneric": "Welcome to Magiscribe!",
+      "subtitle": "Get started turning dialogue into discoveries.",
+      "yourInquiries": "Your Inquiries",
+      "cards": {
+        "gettingStarted": {
+          "title": "Getting Started Guide",
+          "description": "Learn how to get started with Magiscribe's Inquiry Builder and start uncovering insights."
+        },
+        "contactUs": {
+          "title": "Contact Us",
+          "description": "Run into any issues? Contact us for help."
+        },
+        "agentLab": {
+          "title": "Agent Lab",
+          "description": "Build and manage AI agents."
+        }
+      }
+    },
+    "agentLab": {
+      "title": "Agent Lab",
+      "agents": {
+        "title": "Agents",
+        "addAgent": "Add Agent",
+        "editAgent": "Edit Agent",
+        "deleteConfirmation": "Are you sure you want to delete this agent?",
+        "fields": {
+          "name": "Name",
+          "description": "Description",
+          "capabilities": "Capabilities",
+          "reasoning": "Reasoning",
+          "llmModel": "LLM Model",
+          "reasoningPrompt": "Reasoning Prompt",
+          "variablePassThrough": "Variable Pass Through",
+          "memoryEnabled": "Memory Enabled",
+          "subscriptionFilter": "Subscription Filter",
+          "outputFilter": "Output Filter"
+        }
+      },
+      "playground": {
+        "title": "Playground",
+        "subscriptionId": "Subscription ID",
+        "voice": "Voice",
+        "agents": "Agents",
+        "uploadImages": "Upload Images",
+        "uploadedImages": "Uploaded Images",
+        "audioOn": "Audio On",
+        "audioOff": "Audio Off"
+      },
+      "alerts": {
+        "agentDeleted": "Agent successfully deleted",
+        "agentDeleteFailed": "Failed to delete agent",
+        "agentCopied": "Agent copied successfully",
+        "agentCopyFailed": "Error copying agent",
+        "agentNotFound": "Agent not found",
+        "agentSaved": "Agent saved successfully",
+        "agentSaveFailed": "Error saving agent"
+      }
+    },
+    "inquiryBuilder": {
+      "title": "Inquiry Builder",
+      "tabs": {
+        "builder": "Builder",
+        "analysis": "Analysis"
+      }
+    },
+    "userInquiry": {
+      "title": "User Inquiry",
+      "estimatedTime": "Estimated completion time: {{time}}",
+      "thankYou": "Thank you!",
+      "responsesRecorded": "Your responses have been recorded.",
+      "makeOwnInquiry": "Want to make your own inquiry?",
+      "signUpFree": "Sign up for free",
+      "goToBuilder": "Go to Graph Builder",
+      "loadingInquiry": "Loading your inquiry...",
+      "inquiryNotFound": "Inquiry Not Found",
+      "inquiryNotFoundDescription": "The inquiry you are looking for does not exist. Please check the URL and try again.",
+      "somethingWentWrong": "Something Went Wrong",
+      "errorDescription": "An error occurred while loading the inquiry. Please try again later.",
+      "errorPersists": "If the problem persists, please contact support at support@magiscribe.com",
+      "receiveEmailCopy": "Receive copy of your responses via email?",
+      "disclaimer": "Occasionally, mistakes may occur. If you notice any, please let us know at support@magiscribe.com"
+    }
+  },
+  "components": {
+    "welcomeModal": {
+      "title": "Welcome to Magiscribe!",
+      "subtitle": "{{name}}, we're excited to have you here!",
+      "description1": "Magiscribe helps you combine the efficiency of surveys with the depth of user interviews. Gather quantitative data from many participants while pursuing qualitative insights through targeted follow-up questions.",
+      "description2": "Get started by exploring our features or creating your first inquiry.",
+      "helpText": "Need help getting started? Check out our user guide or reach out to us at management@magiscribe.com"
+    },
+    "confirmModal": {
+      "title": "Confirm",
+      "defaultText": "Are you sure you want to proceed?"
+    },
+    "createInquiryModal": {
+      "title": "Create Inquiry",
+      "updateTitle": "Update Inquiry",
+      "goals": "Goals",
+      "goalsSubtitle": "Who are you trying to gain insights from and what type of information are you looking to capture?",
+      "receiveEmailOnResponse": "Receive Email On Response",
+      "receiveEmailSubtitle": "Be alerted via email when someone finishes your inquiry.",
+      "context": "Context (optional)",
+      "contextSubtitle": "Provide any additional background information. This helps Magiscribe to provide each survey respondent with relevant questions.",
+      "advancedSettings": "Advanced Settings",
+      "graphTemplate": "Graph Template",
+      "graphTemplateSubtitle": "Select a template to generate a conversation graph",
+      "voiceSubtitle": "This will be the voice used to read responses to the user if they have audio enabled",
+      "previewVoice": "Preview Voice",
+      "titleSubtitle": "This will be displayed to the people you are sending the inquiry to",
+      "goalsRequired": "Please enter some goals for the inquiry",
+      "graphGenerated": "Graph generated successfully!",
+      "inquirySaved": "Inquiry saved successfully!",
+      "somethingWrong": "Something went wrong!"
+    },
+    "inquiryCard": {
+      "updatedAt": "Updated: {{date}}"
+    },
+    "tokenUsage": {
+      "tokensUsed": "Tokens Used",
+      "unlimited": "Unlimited"
+    },
+    "loadingQuotes": {
+      "integration": [
+        "Connecting to external systems... please hold while we negotiate with the APIs.",
+        "Fetching data from integrations... our digital courier is running really fast.",
+        "Synchronizing with third-party services... teaching our systems to play nicely together.",
+        "Processing integration request... translating between different digital languages.",
+        "Communicating with external tools... sending diplomatic messages to other servers.",
+        "Executing integration logic... our AI is having a chat with your favorite apps."
+      ],
+      "question": [
+        "Crafting the perfect question... our AI is consulting its dictionary of curiosity.",
+        "Generating dynamic questions... thinking of something clever to ask you.",
+        "Formulating inquiry... our question-bot is having a brainstorm session.",
+        "Creating personalized questions... tailoring this just for you.",
+        "Designing the next question... our AI is putting on its thinking cap.",
+        "Preparing thoughtful questions... quality takes time, even for AI."
+      ],
+      "information": [
+        "Generating helpful information... our AI is preparing its best explanation.",
+        "Crafting informative content... writing something worth your time.",
+        "Preparing personalized information... tailoring this message just for you.",
+        "Creating dynamic content... our AI is getting creative with the details.",
+        "Formulating the perfect response... quality information is worth the wait.",
+        "Generating contextual information... making sure this is relevant to you."
+      ],
+      "condition": [
+        "Analyzing your responses... our AI is being very thoughtful about what comes next.",
+        "Processing logic conditions... determining the best path forward for you.",
+        "Evaluating conversation flow... our AI is playing detective with your answers.",
+        "Making intelligent decisions... figuring out where this conversation should go.",
+        "Applying conditional logic... our AI is solving the puzzle of your responses.",
+        "Determining next steps... calculating the perfect path through this inquiry."
+      ]
+    }
+  },
+  "emails": {
+    "management": "management@magiscribe.com",
+    "support": "support@magiscribe.com"
+  },
+  "dates": {
+    "lastUpdated": "December 10th, 2024"
+  }
+}

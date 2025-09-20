@@ -1,9 +1,12 @@
 import { SignUpButton } from '@clerk/clerk-react';
 import { motion } from 'motion/react';
+import { useTranslation } from 'react-i18next';
 
 import WizardShape from '../shapes/wizard';
 
 export default function HomeHero() {
+  const { t } = useTranslation();
+
   return (
     <div className="container px-12 mx-auto flex flex-wrap flex-col md:flex-row items-center">
       <div className="flex flex-col w-full md:w-3/5 justify-center items-start text-left">
@@ -13,7 +16,7 @@ export default function HomeHero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          Spend More Time Developing
+          {t('pages.home.hero.title')}
         </motion.h1>
         <motion.p
           className="leading-normal text-xl md:text-xl 2xl:text-3xl mb-8"
@@ -21,7 +24,7 @@ export default function HomeHero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.25 }}
         >
-          Magiscribe reduces the amount of time developers spend in daily standups and updating JIRA tickets by 40%
+          {t('pages.home.hero.subtitle')}
         </motion.p>
         <SignUpButton signInForceRedirectUrl="/dashboard" forceRedirectUrl="/dashboard">
           <motion.button
@@ -30,7 +33,7 @@ export default function HomeHero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.5 }}
           >
-            Get Started for Free
+            {t('common.buttons.getStartedFree')}
           </motion.button>
         </SignUpButton>
       </div>

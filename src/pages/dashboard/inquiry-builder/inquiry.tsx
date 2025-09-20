@@ -6,14 +6,17 @@ import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import clsx from 'clsx';
 import { motion } from 'motion/react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import AnalysisTab from './tabs/analysis';
 import InquiryBuilder from './tabs/builder';
 
 export default function InquiryPage() {
   const { id, view } = useParams<{ id: string; view: string }>();
+  const { t } = useTranslation();
 
-  const tabs = ['Builder', 'Analysis'];
+  const tabs = [t('pages.inquiryBuilder.tabs.builder'), t('pages.inquiryBuilder.tabs.analysis')];
+  const tabRoutes = ['builder', 'analysis']; // Original English tab names for URL routing
   const navigate = useNavigate();
 
   if (!id) {
@@ -26,17 +29,17 @@ export default function InquiryPage() {
         <div className="w-full flex items-center justify-between mb-4">
           <Link to="/dashboard" className="flex items-center text-slate-100 hover:text-slate-200 transition-colors">
             <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
-            Back
+            {t('common.buttons.back')}
           </Link>
         </div>
         <TabGroup
           selectedIndex={
-            tabs.findIndex((tab) => tab.toLowerCase() === view) > -1
-              ? tabs.findIndex((tab) => tab.toLowerCase() === view)
+            tabRoutes.findIndex((tab) => tab.toLowerCase() === view) > -1
+              ? tabRoutes.findIndex((tab) => tab.toLowerCase() === view)
               : 0
           }
           onChange={(index) => {
-            const tab = tabs[index];
+            const tab = tabRoutes[index];
             navigate(`/dashboard/inquiry-builder/${id}/${tab.toLowerCase()}`);
           }}
         >

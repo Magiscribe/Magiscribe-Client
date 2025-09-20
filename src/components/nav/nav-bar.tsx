@@ -4,6 +4,7 @@ import { faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import { useTitle } from '../../hooks/title-hook';
 import { AnimatedLogo } from '../animated/animated-logo';
@@ -12,6 +13,7 @@ import TokenUsageBar from '../progress/token-usage-bar';
 
 export function NavBar({ isFixed = true }) {
   const [atTop, setAtTop] = useState(true);
+  const { t } = useTranslation();
 
   const { isSignedIn } = useUser();
   const { title } = useTitle();
@@ -82,13 +84,13 @@ export function NavBar({ isFixed = true }) {
           />
           <SignedOut>
             <SignUpButton signInForceRedirectUrl="/dashboard" forceRedirectUrl="/dashboard">
-              <Button variant={atTop ? 'light' : 'primary'}>Get Started for Free</Button>
+              <Button variant={atTop ? 'light' : 'primary'}>{t('common.buttons.getStartedFree')}</Button>
             </SignUpButton>
           </SignedOut>
           <SignedIn>
             <div className="flex space-x-4">
               <Button variant={atTop ? 'transparentWhite' : 'primary'} onClick={() => navigate('/dashboard')}>
-                Dashboard
+                {t('common.navigation.dashboard')}
               </Button>
             </div>
           </SignedIn>
@@ -106,7 +108,7 @@ export function NavBar({ isFixed = true }) {
           </SignedIn>
           <SignedOut>
             <SignInButton forceRedirectUrl="/dashboard">
-              <Button variant="transparentWhite">Sign In</Button>
+              <Button variant="transparentWhite">{t('common.buttons.signIn')}</Button>
             </SignInButton>
           </SignedOut>
         </div>

@@ -9,6 +9,7 @@ import Router from './router';
 import '@xyflow/react/dist/style.css';
 import './assets/styles/index.css';
 import { ErrorBoundary } from './components/errors/error-boundary';
+import './i18n/i18n';
 
 const root = createRoot(document.getElementById('root')!);
 
