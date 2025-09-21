@@ -56,7 +56,7 @@ export default function PrivacyPage() {
           <h2>{t('pages.privacy.sections.howWeUse.title')}</h2>
           <p>{t('pages.privacy.sections.howWeUse.content')}</p>
           <ul>
-            {t('pages.privacy.sections.howWeUse.items', { returnObjects: true }).map((item: string, index: number) => (
+            {(t('pages.privacy.sections.howWeUse.items', { returnObjects: true }) as string[]).map((item: string, index: number) => (
               <li key={index}>{item}</li>
             ))}
           </ul>
@@ -64,7 +64,7 @@ export default function PrivacyPage() {
           <h2>{t('pages.privacy.sections.dataSharing.title')}</h2>
           <p>{t('pages.privacy.sections.dataSharing.content')}</p>
           <ul>
-            {t('pages.privacy.sections.dataSharing.items', { returnObjects: true }).map((item: string, index: number) => (
+            {(t('pages.privacy.sections.dataSharing.items', { returnObjects: true }) as string[]).map((item: string, index: number) => (
               <li key={index}>{item}</li>
             ))}
           </ul>
@@ -80,7 +80,7 @@ export default function PrivacyPage() {
           <h2>{t('pages.privacy.sections.yourRights.title')}</h2>
           <p>{t('pages.privacy.sections.yourRights.content')}</p>
           <ul>
-            {t('pages.privacy.sections.yourRights.items', { returnObjects: true }).map((item: string, index: number) => (
+            {(t('pages.privacy.sections.yourRights.items', { returnObjects: true }) as string[]).map((item: string, index: number) => (
               <li key={index}>{item}</li>
             ))}
           </ul>

@@ -1,17 +1,17 @@
-import bondImage from '@/assets/imgs/cards/bond.webp';
-import roadImage from '@/assets/imgs/cards/road.webp';
-import yellImage from '@/assets/imgs/cards/yell.webp';
+import agentImg from '@/assets/imgs/cards/agent.webp';
+import gettingStartedImg from '@/assets/imgs/cards/getting-started.webp';
+import contactImg from '@/assets/imgs/cards/contact.webp';
 import { REGISTER_USER } from '@/clients/mutations';
 import { GET_INQUIRIES, GET_INQUIRY_RESPONSE_COUNT, IS_USER_REGISTERED } from '@/clients/queries';
 import LinkCard from '@/components/cards/card';
 import GenericHero from '@/components/heroes/generic-hero';
 import CreateInquiry from '@/components/modals/inquiry/create-inquiry-modal';
 import WelcomeModal from '@/components/modals/welcome-modal';
-import { GetInquiriesQuery } from '@/graphql/graphql';
+import { GetInquiriesQuery, GetInquiryResponseCountQuery, IsUserRegisteredQuery } from '@/graphql/graphql';
 import GraphProvider from '@/hooks/graph-state';
 import { useSetTitle } from '@/hooks/title-hook';
 import { InquiryBuilderProvider } from '@/providers/inquiry-builder-provider';
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from "@apollo/client/react";
 import { useUser } from '@clerk/clerk-react';
 import clsx from 'clsx';
 import { motion } from 'motion/react';
@@ -27,7 +27,7 @@ function InquiryCard({ inquiry }: { inquiry: InquiryType }) {
   const settings = inquiry.data.settings;
 
   // Add the response count query
-  const { data: responseCountData } = useQuery(GET_INQUIRY_RESPONSE_COUNT, {
+  const { data: responseCountData } = useQuery<GetInquiryResponseCountQuery>(GET_INQUIRY_RESPONSE_COUNT, {
     variables: { id: inquiry.id },
   });
 
@@ -80,7 +80,7 @@ export default function DashboardPage() {
   const [createFormModal, setCreateFormModal] = useState(false);
 
   // Queries and mutations
-  const { data: registrationData } = useQuery(IS_USER_REGISTERED);
+  const { data: registrationData } = useQuery<IsUserRegisteredQuery>(IS_USER_REGISTERED);
   const { data: inquiriesData } = useQuery<GetInquiriesQuery>(GET_INQUIRIES);
   const [registerUser] = useMutation(REGISTER_USER);
 
@@ -97,7 +97,7 @@ export default function DashboardPage() {
       to: '/dashboard/user-guide',
       gradient: 'green',
       visible: !isAdmin,
-      backgroundImage: roadImage,
+      backgroundImage: gettingStartedImg,
       span: 1,
     },
     {
@@ -106,7 +106,7 @@ export default function DashboardPage() {
       to: '/contact',
       gradient: 'blue',
       visible: !isAdmin,
-      backgroundImage: yellImage,
+      backgroundImage: contactImg,
       span: 1,
     },
     {
@@ -115,7 +115,7 @@ export default function DashboardPage() {
       to: '/dashboard/agent-lab',
       gradient: 'orange',
       visible: isAdmin,
-      backgroundImage: bondImage,
+      backgroundImage: agentImg,
       span: 2,
     },
   ];

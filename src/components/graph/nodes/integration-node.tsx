@@ -4,7 +4,7 @@ import { GET_INQUIRY_INTEGRATIONS } from '@/clients/queries';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { faCog } from '@fortawesome/free-solid-svg-icons';
 import { Handle, NodeProps, Position } from '@xyflow/react';
-import { useQuery } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import React, { useCallback, useMemo } from 'react';
 
 import NodeContainer from '../elements/node-container';

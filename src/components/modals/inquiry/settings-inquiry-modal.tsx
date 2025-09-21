@@ -6,7 +6,7 @@ import useElevenLabsAudio from '@/hooks/audio-player';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { VOICE_LINE_SAMPLES } from '@/utils/audio/voice-line-samples';
-import { useQuery } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import { faPlay, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';

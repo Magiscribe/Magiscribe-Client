@@ -31,7 +31,26 @@
       "contact": "Contact",
       "faq": "FAQ",
       "privacy": "Privacy Policy",
-      "terms": "Terms & Conditions"
+      "terms": "Terms & Conditions",
+      "user-guide": "User Guide",
+      "agent-lab": "Agent Lab",
+      "playground": "Playground",
+      "agents": "Agents",
+      "capabilities": "Capabilities", 
+      "prompts": "Prompts",
+      "edit": "Edit",
+      "inquiry-builder": "Inquiry Builder",
+      "inquiry": "Inquiry",
+      "builder": "Builder",
+      "analysis": "Analysis"
+    },
+    "settings": {
+      "title": "Settings",
+      "language": "Language",
+      "theme": "Theme",
+      "lightMode": "Light Mode",
+      "darkMode": "Dark Mode",
+      "selectLanguage": "Select Language"
     },
     "labels": {
       "updated": "Updated",
@@ -348,7 +367,9 @@
     },
     "confirmModal": {
       "title": "Confirm",
-      "defaultText": "Are you sure you want to proceed?"
+      "defaultText": "Are you sure you want to proceed?",
+      "defaultConfirm": "Delete",
+      "defaultCancel": "Cancel"
     },
     "createInquiryModal": {
       "title": "Create Inquiry",
@@ -376,6 +397,73 @@
     "tokenUsage": {
       "tokensUsed": "Tokens Used",
       "unlimited": "Unlimited"
+    },
+    "integrationManagement": {
+      "title": "Manage Integrations",
+      "addIntegration": "Add Integration",
+      "editIntegration": "Edit Integration",
+      "testConnection": "Test Connection",
+      "testing": "Testing...",
+      "viewTools": "View Tools",
+      "loading": "Loading...",
+      "connectionSuccessful": "Connection test successful! 🎉",
+      "connectionFailed": "Connection test failed: {{error}}",
+      "toolsLoadFailed": "Failed to load tools: {{error}}",
+      "nameRequired": "Name and Server URL are required",
+      "nameAndUrlRequired": "Name and Server URL are required to test connection",
+      "urlValidation": "Server URL must start with http:// or https://",
+      "fields": {
+        "name": "Name",
+        "serverUrl": "Server URL",
+        "description": "Description",
+        "headers": "Headers"
+      },
+      "placeholders": {
+        "integrationName": "e.g., My Atlassian Integration",
+        "serverUrl": "https://localhost:8080 or http://localhost:8080",
+        "description": "Brief description of what this integration does",
+        "headerName": "Header name (e.g., Authorization)",
+        "headerValue": "Header value (e.g., Bearer token123)"
+      },
+      "messages": {
+        "noIntegrations": "No integrations configured yet.",
+        "clickAddToStart": "Click \"Add Integration\" to get started.",
+        "integrationAdded": "Integration added and saved successfully!",
+        "integrationUpdated": "Integration updated and saved successfully!",
+        "integrationDeleted": "Integration deleted successfully!",
+        "integrationRemoved": "Integration removed successfully!",
+        "saveFailed": "Failed to save integration",
+        "saveUpdateFailed": "Failed to save integration update",
+        "saveNewFailed": "Failed to save new integration",
+        "deleteFailed": "Failed to delete integration",
+        "updateFailed": "Failed to update integration",
+        "addNewIntegration": "Add New Integration",
+        "update": "Update",
+        "deleteConfirmation": "Are you sure you want to delete the integration \"{{name}}\"?",
+        "deleteIntegration": "Delete Integration",
+        "unknownError": "Unknown error",
+        "adding": "Adding...",
+        "updating": "Updating...",
+        "currentIntegrations": "Current Integrations ({{count}})",
+        "headersDescription": "Configure headers to be sent with requests to the MCP server.",
+        "headersExample": "Authorization → Bearer your-token-here"
+      },
+      "tools": {
+        "availableTools": "Available Tools - {{name}}",
+        "newIntegration": "New Integration",
+        "foundTools": "Found {{count}} available tool{{s}}",
+        "noToolsTitle": "No Tools Available",
+        "noToolsDescription": "No tools were found for this integration. This could mean:",
+        "noToolsReasons": [
+          "The MCP server is not running",
+          "The integration configuration is incorrect", 
+          "The server doesn't expose any tools"
+        ],
+        "toolDetails": "Tool Details",
+        "toolName": "Name:",
+        "toolPurpose": "Purpose:",
+        "toolNote": "💡 This tool can be executed through the Integration node in your inquiry workflow."
+      }
     },
     "loadingQuotes": {
       "integration": [

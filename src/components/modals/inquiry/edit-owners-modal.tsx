@@ -5,7 +5,7 @@ import Input from '@/components/controls/input';
 import { GetUsersByEmailQuery, GetUsersByIdQuery } from '@/graphql/graphql';
 import { UserData } from '@/graphql/types';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
-import { useLazyQuery } from '@apollo/client';
+import { useLazyQuery } from "@apollo/client/react";
 import React from 'react';
 
 import ConfirmationModal from '../confirm-modal';

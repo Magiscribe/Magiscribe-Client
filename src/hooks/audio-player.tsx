@@ -1,5 +1,5 @@
 import { GENERATE_AUDIO } from '@/clients/mutations';
-import { useMutation } from '@apollo/client';
+import { useMutation } from "@apollo/client/react";
 import { useCallback, useRef, useState } from 'react';
 
 interface QueueItem {

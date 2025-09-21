@@ -1,4 +1,4 @@
-import goHomeGif from '@/assets/imgs/go-home.gif';
+import goHomeGif from '@/assets/imgs/end-inquiry.gif';
 import AnimatedDots from '@/components/animated/animated-dots';
 import { ChartProps } from '@/components/chart';
 import Button from '@/components/controls/button';

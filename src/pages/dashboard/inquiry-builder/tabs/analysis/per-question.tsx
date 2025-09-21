@@ -9,7 +9,7 @@ import { useFilteredResponses } from '@/hooks/useFilteredResponses';
 import { GraphNode, NodeVisitAnalysisData, QuestionNodeData } from '@/types/conversation';
 import { getAgentIdByName } from '@/utils/agents';
 import { parseCodeBlocks } from '@/utils/markdown';
-import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
+import { useApolloClient, useMutation, useQuery, useSubscription } from "@apollo/client/react";
 import { faChevronLeft, faChevronRight, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useCallback, useMemo, useState } from 'react';

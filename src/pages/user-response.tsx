@@ -2,7 +2,7 @@ import { GET_INQUIRY, GET_INQUIRY_RESPONSE } from '@/clients/queries';
 import UserResponses from '@/components/analysis/user-responses';
 import { GetInquiryQuery, GetInquiryResponseQuery } from '@/graphql/graphql';
 import { useSetTitle } from '@/hooks/title-hook';
-import { useQuery } from '@apollo/client';
+import { useQuery } from "@apollo/client/react";
 import { useParams, useSearchParams } from 'react-router-dom';
 
 export default function UserResponsePage() {

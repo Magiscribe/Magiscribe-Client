@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { GET_INQUIRY_RESPONSE_TIME } from '@/clients/queries';
 import { GetAverageInquiryResponseTimeQuery } from '@/graphql/graphql';
-import { useLazyQuery } from '@apollo/client';
+import { useLazyQuery } from "@apollo/client/react";
 import { useInquiry } from '@/providers/inquiry-traversal-provider';
 
 export function useInquiryResponseTime(): string {

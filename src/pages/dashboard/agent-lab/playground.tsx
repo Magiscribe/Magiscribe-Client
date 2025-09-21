@@ -6,17 +6,18 @@ import Button from '@/components/controls/button';
 import Input from '@/components/controls/input';
 import Select from '@/components/controls/select';
 import { CustomInput, CustomInputSection } from '@/components/custom-variables';
-import { AddPredictionMutation } from '@/graphql/types';
+import { AddPredictionMutation, Subscription } from '@/graphql/types';
 import { Agent } from '@/graphql/types';
 import useElevenLabsAudio from '@/hooks/audio-player';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
-import { useMutation, useQuery, useSubscription } from '@apollo/client';
+import { useMutation, useQuery, useSubscription } from "@apollo/client/react";
 import { faVolumeHigh, faVolumeMute } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import { useTranslation } from 'react-i18next';
+import { PredictionAddedSubscription } from '@/graphql/graphql';
 
 interface predictionAdded {
   id: string;
@@ -162,11 +163,13 @@ export default function PlaygroundDashboard() {
    * Subscribes to the GraphQL subscription.
    * Updates responses and loading state based on received data.
    */
-  useSubscription(GRAPHQL_SUBSCRIPTION, {
+  useSubscription<PredictionAddedSubscription>(GRAPHQL_SUBSCRIPTION, {
     variables: { subscriptionId: form.subscriptionId },
     shouldResubscribe: true,
     onData: ({ data }) => {
-      const newPrediction = data.data.predictionAdded;
+      const newPrediction = data.data?.predictionAdded;
+
+      if (!newPrediction) return;
 
       // Find existing response with matching ID and type 'DATA'
       const existingResponse = responses.find(
@@ -184,7 +187,7 @@ export default function PlaygroundDashboard() {
 
       // Add audio chunk if enabled
       if (enableAudio && newPrediction.type === 'DATA') {
-        audio.addSentence(newPrediction.result);
+        audio.addSentence(newPrediction.result || '');
       }
 
       // Update loading state for 'ERROR' or 'SUCCESS' types

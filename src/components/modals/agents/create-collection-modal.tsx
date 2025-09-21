@@ -1,6 +1,6 @@
 import { UPSERT_COLLECTION } from '@/clients/mutations';
 import { useAddAlert } from '@/providers/alert-provider';
-import { useMutation } from '@apollo/client';
+import { useMutation } from "@apollo/client/react";
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useState } from 'react';

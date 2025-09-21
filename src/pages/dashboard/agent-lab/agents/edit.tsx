@@ -8,8 +8,8 @@ import Select from '@/components/controls/select';
 import Textarea from '@/components/controls/textarea';
 import { GetAgentQuery, GetAllCapabilitiesQuery, GetAllModelsQuery, UpsertAgentMutation } from '@/graphql/graphql';
 import { useAddAlert } from '@/providers/alert-provider';
-import { useMutation, useQuery } from '@apollo/client';
-import { useState } from 'react';
+import { useMutation, useQuery } from "@apollo/client/react";
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -57,32 +57,35 @@ export default function AgentEdit() {
     },
   });
 
-  useQuery<GetAgentQuery>(GET_AGENT, {
+  const { data: agentData } = useQuery<GetAgentQuery>(GET_AGENT, {
     skip: !searchParams.has('id'),
     variables: {
       agentId: searchParams.get('id'),
     },
-    onCompleted: (data) => {
-      if (!data.getAgent) return;
+  });
 
+  // Handle agent data loading with useEffect instead of onCompleted
+  useEffect(() => {
+    if (agentData?.getAgent) {
+      const agent = agentData.getAgent;
       setForm({
-        id: data.getAgent.id,
-        name: data.getAgent.name,
-        description: data.getAgent.description,
-        reasoning: data.getAgent.reasoning
+        id: agent.id,
+        name: agent.name,
+        description: agent.description,
+        reasoning: agent.reasoning
           ? {
-              llmModel: data.getAgent.reasoning.llmModel,
-              prompt: data.getAgent.reasoning.prompt,
-              variablePassThrough: data.getAgent.reasoning.variablePassThrough,
+              llmModel: agent.reasoning.llmModel,
+              prompt: agent.reasoning.prompt,
+              variablePassThrough: agent.reasoning.variablePassThrough,
             }
           : null,
-        capabilities: data.getAgent.capabilities.map((capability) => capability.id),
-        memoryEnabled: data.getAgent.memoryEnabled,
-        subscriptionFilter: data.getAgent.subscriptionFilter,
-        outputFilter: data.getAgent.outputFilter,
+        capabilities: agent.capabilities.map((capability) => capability.id),
+        memoryEnabled: agent.memoryEnabled,
+        subscriptionFilter: agent.subscriptionFilter,
+        outputFilter: agent.outputFilter,
       });
-    },
-  });
+    }
+  }, [agentData]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = event.target;
@@ -122,7 +125,7 @@ export default function AgentEdit() {
         },
       });
 
-      if (result.errors) {
+      if (result.error) {
         addAlert(t('pages.agentLab.alerts.agentSaveFailed'), 'error');
         return;
       }
@@ -131,6 +134,7 @@ export default function AgentEdit() {
       navigate('../agents');
     } catch (error) {
       console.error(error);
+      addAlert(t('pages.agentLab.alerts.agentSaveFailed'), 'error');
     }
   };
 
