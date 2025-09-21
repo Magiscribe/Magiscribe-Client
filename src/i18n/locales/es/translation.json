@@ -86,6 +86,9 @@
       "error": "Error",
       "warning": "Advertencia",
       "info": "Información"
+    },
+    "brand": {
+      "name": "Magiscribe"
     }
   },
   "pages": {
