@@ -1,7 +1,7 @@
 import { GET_MEDIA_ASSET } from '@/clients/queries';
 import { GetMediaAssetQuery } from '@/graphql/graphql';
 import { ImageMetadata } from '@/types/conversation';
-import { useLazyQuery } from "@apollo/client/react";
+import { useLazyQuery } from '@apollo/client/react';
 import { useEffect, useState } from 'react';
 
 type ImageLoaderProps = {

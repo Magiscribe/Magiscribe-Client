@@ -17,14 +17,10 @@ export default function PrivacyPage() {
           transition={{ duration: 0.5 }}
         >
           <h1 className="text-4xl font-bold">{t('pages.privacy.title')}</h1>
-          <p>
-            {t('pages.privacy.description')}
-          </p>
+          <p>{t('pages.privacy.description')}</p>
 
           <h2>{t('pages.privacy.sections.introduction.title')}</h2>
-          <p>
-            {t('pages.privacy.sections.introduction.content')}
-          </p>
+          <p>{t('pages.privacy.sections.introduction.content')}</p>
 
           <h2>{t('pages.privacy.sections.termsOfUse.title')}</h2>
           <p>
@@ -39,56 +35,50 @@ export default function PrivacyPage() {
           <p>{t('pages.privacy.sections.informationWeCollect.content')}</p>
 
           <h4>{t('pages.privacy.sections.informationWeCollect.accountInfo.title')}</h4>
-          <p>
-            {t('pages.privacy.sections.informationWeCollect.accountInfo.content')}
-          </p>
+          <p>{t('pages.privacy.sections.informationWeCollect.accountInfo.content')}</p>
 
           <h4>{t('pages.privacy.sections.informationWeCollect.usageInfo.title')}</h4>
-          <p>
-            {t('pages.privacy.sections.informationWeCollect.usageInfo.content')}
-          </p>
+          <p>{t('pages.privacy.sections.informationWeCollect.usageInfo.content')}</p>
 
           <h4>{t('pages.privacy.sections.informationWeCollect.technicalInfo.title')}</h4>
-          <p>
-            {t('pages.privacy.sections.informationWeCollect.technicalInfo.content')}
-          </p>
+          <p>{t('pages.privacy.sections.informationWeCollect.technicalInfo.content')}</p>
 
           <h2>{t('pages.privacy.sections.howWeUse.title')}</h2>
           <p>{t('pages.privacy.sections.howWeUse.content')}</p>
           <ul>
-            {(t('pages.privacy.sections.howWeUse.items', { returnObjects: true }) as string[]).map((item: string, index: number) => (
-              <li key={index}>{item}</li>
-            ))}
+            {(t('pages.privacy.sections.howWeUse.items', { returnObjects: true }) as string[]).map(
+              (item: string, index: number) => (
+                <li key={index}>{item}</li>
+              ),
+            )}
           </ul>
 
           <h2>{t('pages.privacy.sections.dataSharing.title')}</h2>
           <p>{t('pages.privacy.sections.dataSharing.content')}</p>
           <ul>
-            {(t('pages.privacy.sections.dataSharing.items', { returnObjects: true }) as string[]).map((item: string, index: number) => (
-              <li key={index}>{item}</li>
-            ))}
+            {(t('pages.privacy.sections.dataSharing.items', { returnObjects: true }) as string[]).map(
+              (item: string, index: number) => (
+                <li key={index}>{item}</li>
+              ),
+            )}
           </ul>
-          <p>
-            {t('pages.privacy.sections.dataSharing.note')}
-          </p>
+          <p>{t('pages.privacy.sections.dataSharing.note')}</p>
 
           <h2>{t('pages.privacy.sections.dataSecurity.title')}</h2>
-          <p>
-            {t('pages.privacy.sections.dataSecurity.content')}
-          </p>
+          <p>{t('pages.privacy.sections.dataSecurity.content')}</p>
 
           <h2>{t('pages.privacy.sections.yourRights.title')}</h2>
           <p>{t('pages.privacy.sections.yourRights.content')}</p>
           <ul>
-            {(t('pages.privacy.sections.yourRights.items', { returnObjects: true }) as string[]).map((item: string, index: number) => (
-              <li key={index}>{item}</li>
-            ))}
+            {(t('pages.privacy.sections.yourRights.items', { returnObjects: true }) as string[]).map(
+              (item: string, index: number) => (
+                <li key={index}>{item}</li>
+              ),
+            )}
           </ul>
 
           <h2>{t('pages.privacy.sections.changes.title')}</h2>
-          <p>
-            {t('pages.privacy.sections.changes.content')}
-          </p>
+          <p>{t('pages.privacy.sections.changes.content')}</p>
 
           <h2>{t('pages.privacy.sections.contactUs.title')}</h2>
           <p>

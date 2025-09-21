@@ -36,7 +36,7 @@
       "agent-lab": "Agent Lab",
       "playground": "Playground",
       "agents": "Agents",
-      "capabilities": "Capabilities", 
+      "capabilities": "Capabilities",
       "prompts": "Prompts",
       "edit": "Edit",
       "inquiry-builder": "Inquiry Builder",
@@ -193,10 +193,7 @@
         "dataSharing": {
           "title": "Data Sharing",
           "content": "We share your information with:",
-          "items": [
-            "AWS Bedrock (for AI processing through Claude)",
-            "Clerk (for authentication services)"
-          ],
+          "items": ["AWS Bedrock (for AI processing through Claude)", "Clerk (for authentication services)"],
           "note": "Amazon Bedrock doesn't store or log your prompts and completions. Amazon Bedrock doesn't use your prompts and completions to train any AWS models and doesn't distribute them to third parties."
         },
         "dataSecurity": {
@@ -456,7 +453,7 @@
         "noToolsDescription": "No tools were found for this integration. This could mean:",
         "noToolsReasons": [
           "The MCP server is not running",
-          "The integration configuration is incorrect", 
+          "The integration configuration is incorrect",
           "The server doesn't expose any tools"
         ],
         "toolDetails": "Tool Details",

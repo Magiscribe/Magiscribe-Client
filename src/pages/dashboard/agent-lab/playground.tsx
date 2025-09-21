@@ -6,11 +6,11 @@ import Button from '@/components/controls/button';
 import Input from '@/components/controls/input';
 import Select from '@/components/controls/select';
 import { CustomInput, CustomInputSection } from '@/components/custom-variables';
-import { AddPredictionMutation, Subscription } from '@/graphql/types';
+import { AddPredictionMutation } from '@/graphql/types';
 import { Agent } from '@/graphql/types';
 import useElevenLabsAudio from '@/hooks/audio-player';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
-import { useMutation, useQuery, useSubscription } from "@apollo/client/react";
+import { useMutation, useQuery, useSubscription } from '@apollo/client/react';
 import { faVolumeHigh, faVolumeMute } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useCallback, useEffect, useState } from 'react';
@@ -242,7 +242,12 @@ export default function PlaygroundDashboard() {
               />
             </div>
             <div className="mb-4">
-              <Input name="image-upload" type="file" label={t('pages.agentLab.playground.uploadImages')} onChange={handleImageUpload} />
+              <Input
+                name="image-upload"
+                type="file"
+                label={t('pages.agentLab.playground.uploadImages')}
+                onChange={handleImageUpload}
+              />
             </div>
             <div className="mb-4">
               <label className="block text-sm font-bold mb-2">{t('pages.agentLab.playground.uploadedImages')}</label>
@@ -264,7 +269,8 @@ export default function PlaygroundDashboard() {
             <div className="space-x-2">
               <Button disabled={loading}>{t('common.buttons.run')}</Button>
               <Button type="button" variant="success" onClick={() => setEnableAudio(!enableAudio)}>
-                {enableAudio ? t('pages.agentLab.playground.audioOn') : t('pages.agentLab.playground.audioOff')} <FontAwesomeIcon icon={enableAudio ? faVolumeHigh : faVolumeMute} />
+                {enableAudio ? t('pages.agentLab.playground.audioOn') : t('pages.agentLab.playground.audioOff')}{' '}
+                <FontAwesomeIcon icon={enableAudio ? faVolumeHigh : faVolumeMute} />
               </Button>
               <Button type="button" variant="danger" onClick={handleClear}>
                 {t('common.buttons.clear')}

@@ -5,7 +5,7 @@ import Button from '@/components/controls/button';
 import ConfirmationModal from '@/components/modals/confirm-modal';
 import { GetAllAgentsQuery, UpsertAgentMutation } from '@/graphql/graphql';
 import { useAddAlert } from '@/providers/alert-provider';
-import { useMutation, useQuery } from "@apollo/client/react";
+import { useMutation, useQuery } from '@apollo/client/react';
 import { motion } from 'motion/react';
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -98,7 +98,7 @@ export default function AgentDashboard() {
   const { t } = useTranslation();
 
   const handleCopy = async (id: string) => {
-    const selectedItem = data?.getAllAgents.find((agent: any) => agent.id === id);
+    const selectedItem = data?.getAllAgents.find((agent) => agent.id === id);
     if (!selectedItem) {
       addAlert(t('pages.agentLab.alerts.agentNotFound'), 'error');
       return;
@@ -112,7 +112,7 @@ export default function AgentDashboard() {
             id: null, // Ensure a new agent is created
             name: `${selectedItem.name} Copy ${timeStamp}`,
             description: selectedItem.description,
-            capabilities: selectedItem.capabilities.map((capability: any) => capability.id),
+            capabilities: selectedItem.capabilities.map((capability) => capability.id),
             logicalCollection: params.collection,
           },
         },
@@ -141,7 +141,7 @@ export default function AgentDashboard() {
       </div>
       <hr className="my-4" />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 my-8">
-        {data?.getAllAgents.map((agent: any, i: number) => (
+        {data?.getAllAgents.map((agent, i: number) => (
           <motion.div
             key={agent.id}
             initial={{ opacity: 0, y: 20 }}

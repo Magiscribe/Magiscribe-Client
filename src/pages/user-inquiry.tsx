@@ -39,11 +39,23 @@ const emailRegex = /.+@.+\..+/;
 /**
  * Loading quotes for different node types
  */
-const getLoadingQuotes = (t: any) => ({
-  INTEGRATION_LOADING_QUOTES: t('components.loadingQuotes.integration', { returnObjects: true }),
-  QUESTION_LOADING_QUOTES: t('components.loadingQuotes.question', { returnObjects: true }),
-  INFORMATION_LOADING_QUOTES: t('components.loadingQuotes.information', { returnObjects: true }),
-  CONDITION_LOADING_QUOTES: t('components.loadingQuotes.condition', { returnObjects: true }),
+interface LoadingQuotes {
+  INTEGRATION_LOADING_QUOTES: string[];
+  QUESTION_LOADING_QUOTES: string[];
+  INFORMATION_LOADING_QUOTES: string[];
+  CONDITION_LOADING_QUOTES: string[];
+}
+
+type TranslationFunction = (
+  key: string,
+  options?: { returnObjects?: true } & Record<string, boolean>,
+) => string[] | string;
+
+const getLoadingQuotes = (t: TranslationFunction): LoadingQuotes => ({
+  INTEGRATION_LOADING_QUOTES: t('components.loadingQuotes.integration', { returnObjects: true }) as string[],
+  QUESTION_LOADING_QUOTES: t('components.loadingQuotes.question', { returnObjects: true }) as string[],
+  INFORMATION_LOADING_QUOTES: t('components.loadingQuotes.information', { returnObjects: true }) as string[],
+  CONDITION_LOADING_QUOTES: t('components.loadingQuotes.condition', { returnObjects: true }) as string[],
 });
 
 export const useMessageQueue = () => {
@@ -363,7 +375,9 @@ export default function UserInquiryPage() {
       <div className="bg-white dark:bg-slate-700 p-6 rounded-3xl shadow-lg">
         <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white">{settings.title}</h2>
         {expectedInquiryResponseTime && (
-          <p className="text-slate-600 dark:text-slate-300 mb-6">{t('pages.userInquiry.estimatedTime', { time: expectedInquiryResponseTime })}</p>
+          <p className="text-slate-600 dark:text-slate-300 mb-6">
+            {t('pages.userInquiry.estimatedTime', { time: expectedInquiryResponseTime })}
+          </p>
         )}
         <p className="text-slate-600 dark:text-slate-300 mb-6">{description}</p>
         <div className="space-y-4">
@@ -456,8 +470,12 @@ export default function UserInquiryPage() {
 
   const renderSummary = () => (
     <div className="bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-lg">
-      <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white text-center">{t('pages.userInquiry.thankYou')}</h2>
-      <p className="text-lg text-slate-600 dark:text-slate-300 text-center">{t('pages.userInquiry.responsesRecorded')}</p>
+      <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white text-center">
+        {t('pages.userInquiry.thankYou')}
+      </h2>
+      <p className="text-lg text-slate-600 dark:text-slate-300 text-center">
+        {t('pages.userInquiry.responsesRecorded')}
+      </p>
 
       <img src={goHomeGif} alt={t('pages.userInquiry.thankYou')} className="mx-auto rounded-3xl mt-4" />
       <div className="w-full max-w-3xl mx-auto flex flex-col items-center">
@@ -575,19 +593,19 @@ export default function UserInquiryPage() {
 
   const renderNotFound = () => (
     <div className="bg-white dark:bg-slate-700 p-6 rounded-3xl shadow-lg">
-      <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white">{t('pages.userInquiry.inquiryNotFound')}</h2>
-      <p className="text-slate-600 dark:text-slate-300 mb-6">
-        {t('pages.userInquiry.inquiryNotFoundDescription')}
-      </p>
+      <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white">
+        {t('pages.userInquiry.inquiryNotFound')}
+      </h2>
+      <p className="text-slate-600 dark:text-slate-300 mb-6">{t('pages.userInquiry.inquiryNotFoundDescription')}</p>
     </div>
   );
 
   const renderError = () => (
     <div className="bg-white dark:bg-slate-700 p-6 rounded-3xl shadow-lg">
-      <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white">{t('pages.userInquiry.somethingWentWrong')}</h2>
-      <p className="text-slate-600 dark:text-slate-300 mb-6">
-        {t('pages.userInquiry.errorDescription')}
-      </p>
+      <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-white">
+        {t('pages.userInquiry.somethingWentWrong')}
+      </h2>
+      <p className="text-slate-600 dark:text-slate-300 mb-6">{t('pages.userInquiry.errorDescription')}</p>
       <p className="text-slate-600 dark:text-slate-300 mb-6">
         {t('pages.userInquiry.errorPersists')}{' '}
         <a href={`mailto:${t('emails.support')}`} className="underline">

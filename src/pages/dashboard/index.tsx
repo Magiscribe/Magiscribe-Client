@@ -11,7 +11,7 @@ import { GetInquiriesQuery, GetInquiryResponseCountQuery, IsUserRegisteredQuery 
 import GraphProvider from '@/hooks/graph-state';
 import { useSetTitle } from '@/hooks/title-hook';
 import { InquiryBuilderProvider } from '@/providers/inquiry-builder-provider';
-import { useMutation, useQuery } from "@apollo/client/react";
+import { useMutation, useQuery } from '@apollo/client/react';
 import { useUser } from '@clerk/clerk-react';
 import clsx from 'clsx';
 import { motion } from 'motion/react';
@@ -141,19 +141,16 @@ export default function DashboardPage() {
     navigate(`/dashboard/inquiry-builder/${id}`);
   };
 
-  const welcomeTitle = user ? 
-    t('pages.dashboard.welcome', { name: user.firstName }) : 
-    t('pages.dashboard.welcomeGeneric');
+  const welcomeTitle = user
+    ? t('pages.dashboard.welcome', { name: user.firstName })
+    : t('pages.dashboard.welcomeGeneric');
 
   return (
     <GraphProvider>
       <InquiryBuilderProvider>
         <CreateInquiry open={createFormModal} onClose={() => setCreateFormModal(false)} onSave={onCreateForm} />
 
-        <GenericHero
-          title={welcomeTitle}
-          subtitle={t('pages.dashboard.subtitle')}
-        />
+        <GenericHero title={welcomeTitle} subtitle={t('pages.dashboard.subtitle')} />
         <hr className="my-8" />
 
         <div className="space-y-4">

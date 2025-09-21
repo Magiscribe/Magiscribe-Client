@@ -1,4 +1,4 @@
-import { ApolloError, useQuery } from "@apollo/client/react";
+import { ApolloError, useQuery } from '@apollo/client/react';
 import { useEffect } from 'react';
 import { GET_USER_QUOTA } from '@/clients/queries';
 

@@ -35,9 +35,7 @@ export default function ContactForm() {
         <hr className="my-8" />
 
         <h3 className="text-xl font-semibold mb-4">{t('pages.contact.responseTime.title')}</h3>
-        <p className="text-gray-500 dark:text-gray-300">
-          {t('pages.contact.responseTime.description')}
-        </p>
+        <p className="text-gray-500 dark:text-gray-300">{t('pages.contact.responseTime.description')}</p>
       </Container>
     </div>
   );

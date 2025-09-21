@@ -5,7 +5,7 @@ import Button from '@/components/controls/button';
 import Input from '@/components/controls/input';
 import Textarea from '@/components/controls/textarea';
 import { useAddAlert } from '@/providers/alert-provider';
-import { useMutation, useQuery } from "@apollo/client/react";
+import { useMutation, useQuery } from '@apollo/client/react';
 import { useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 

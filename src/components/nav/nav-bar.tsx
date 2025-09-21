@@ -29,16 +29,16 @@ export function NavBar({ isFixed = true }) {
 
   const getLanguageDisplayName = (langCode: string) => {
     const names: Record<string, string> = {
-      'en': 'English',
-      'es': 'Español',
-      'fr': 'Français',
-      'de': 'Deutsch',
-      'it': 'Italiano',
-      'pt': 'Português',
-      'ru': 'Русский',
-      'zh': '中文',
-      'ja': '日本語',
-      'ko': '한국어'
+      en: 'English',
+      es: 'Español',
+      fr: 'Français',
+      de: 'Deutsch',
+      it: 'Italiano',
+      pt: 'Português',
+      ru: 'Русский',
+      zh: '中文',
+      ja: '日本語',
+      ko: '한국어',
     };
     return names[langCode] || langCode.toUpperCase();
   };
@@ -102,8 +102,11 @@ export function NavBar({ isFixed = true }) {
           <Menu as="div" className="relative inline-block text-left mr-4">
             <MenuButton
               className={`inline-flex items-center justify-center w-10 h-10 rounded-lg border-2 transition-all ${
-                isDark ? 'border-slate-400 text-slate-300 hover:border-slate-200 hover:text-slate-100' : 
-                atTop ? 'border-white text-white hover:border-slate-200' : 'border-blue-600 text-blue-600 hover:border-blue-700'
+                isDark
+                  ? 'border-slate-400 text-slate-300 hover:border-slate-200 hover:text-slate-100'
+                  : atTop
+                    ? 'border-white text-white hover:border-slate-200'
+                    : 'border-blue-600 text-blue-600 hover:border-blue-700'
               } hover:bg-opacity-10 hover:bg-current`}
             >
               <FontAwesomeIcon icon={faCog} size="sm" />
@@ -129,11 +132,7 @@ export function NavBar({ isFixed = true }) {
                           focus ? 'bg-slate-100 dark:bg-slate-700' : ''
                         } group flex w-full items-center px-4 py-2 text-sm text-slate-700 dark:text-slate-200`}
                       >
-                        <FontAwesomeIcon 
-                          icon={isDark ? faMoon : faSun} 
-                          className="mr-3 h-4 w-4" 
-                          aria-hidden="true" 
-                        />
+                        <FontAwesomeIcon icon={isDark ? faMoon : faSun} className="mr-3 h-4 w-4" aria-hidden="true" />
                         {isDark ? t('common.settings.darkMode') : t('common.settings.lightMode')}
                       </button>
                     )}
@@ -155,16 +154,14 @@ export function NavBar({ isFixed = true }) {
                       {({ focus }) => (
                         <button
                           onClick={() => changeLanguage(langCode)}
-                          className={`${
-                            focus ? 'bg-slate-100 dark:bg-slate-700' : ''
-                          } ${
-                            i18n.language === langCode ? 'bg-blue-50 dark:bg-blue-900 text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-200'
+                          className={`${focus ? 'bg-slate-100 dark:bg-slate-700' : ''} ${
+                            i18n.language === langCode
+                              ? 'bg-blue-50 dark:bg-blue-900 text-blue-600 dark:text-blue-400'
+                              : 'text-slate-700 dark:text-slate-200'
                           } group flex w-full items-center px-8 py-2 text-sm`}
                         >
                           {getLanguageDisplayName(langCode)}
-                          {i18n.language === langCode && (
-                            <span className="ml-auto">✓</span>
-                          )}
+                          {i18n.language === langCode && <span className="ml-auto">✓</span>}
                         </button>
                       )}
                     </MenuItem>

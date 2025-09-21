@@ -8,7 +8,7 @@ import Select from '@/components/controls/select';
 import Textarea from '@/components/controls/textarea';
 import { GetAgentQuery, GetAllCapabilitiesQuery, GetAllModelsQuery, UpsertAgentMutation } from '@/graphql/graphql';
 import { useAddAlert } from '@/providers/alert-provider';
-import { useMutation, useQuery } from "@apollo/client/react";
+import { useMutation, useQuery } from '@apollo/client/react';
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -142,11 +142,18 @@ export default function AgentEdit() {
     <>
       <Container>
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">{form.id ? t('pages.agentLab.agents.editAgent') : t('pages.agentLab.agents.addAgent')}</h1>
+          <h1 className="text-3xl font-bold">
+            {form.id ? t('pages.agentLab.agents.editAgent') : t('pages.agentLab.agents.addAgent')}
+          </h1>
         </div>
         <form className="mt-8" onSubmit={handleSave}>
           <div className="mb-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <Input name="name" label={t('pages.agentLab.agents.fields.name')} value={form.name} onChange={handleInputChange} />
+            <Input
+              name="name"
+              label={t('pages.agentLab.agents.fields.name')}
+              value={form.name}
+              onChange={handleInputChange}
+            />
             {form.reasoning && (
               <Select
                 label={t('pages.agentLab.agents.fields.llmModel')}
@@ -162,7 +169,7 @@ export default function AgentEdit() {
                   });
                 }}
                 options={
-                  models?.getAllModels.map((model: any) => ({
+                  models?.getAllModels.map((model) => ({
                     value: model.id,
                     label: model.name,
                   })) ?? []
@@ -176,13 +183,13 @@ export default function AgentEdit() {
               setSelected={(value) =>
                 setForm({
                   ...form,
-                  capabilities: value.map((capability: any) => capability.id),
+                  capabilities: value.map((capability) => capability.id),
                 })
               }
-              selected={(capabilities?.getAllCapabilities ?? []).filter((capability: any) =>
+              selected={(capabilities?.getAllCapabilities ?? []).filter((capability) =>
                 form.capabilities.includes(capability.id),
               )}
-              values={(capabilities?.getAllCapabilities ?? []).map((capability: any) => ({
+              values={(capabilities?.getAllCapabilities ?? []).map((capability) => ({
                 name: capability.name ?? '',
                 id: capability.id,
               }))}
@@ -190,7 +197,12 @@ export default function AgentEdit() {
           </div>
 
           <div className="mb-4">
-            <Textarea name="description" label={t('pages.agentLab.agents.fields.description')} value={form.description} onChange={handleInputChange} />
+            <Textarea
+              name="description"
+              label={t('pages.agentLab.agents.fields.description')}
+              value={form.description}
+              onChange={handleInputChange}
+            />
           </div>
 
           <div className="mb-4 grid grid-cols-1 lg:grid-cols-3 gap-4">

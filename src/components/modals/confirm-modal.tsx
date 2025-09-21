@@ -20,7 +20,7 @@ export default function ConfirmationModal({
   cancelText,
 }: ConfirmationModalProps) {
   const { t } = useTranslation();
-  
+
   return (
     <CustomModal title={t('components.confirmModal.title')} open={isOpen} onClose={onClose} size="md">
       <p>{text}</p>

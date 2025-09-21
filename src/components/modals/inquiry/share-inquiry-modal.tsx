@@ -8,7 +8,7 @@ import { CheckIfUsersRespondedToInquiryQuery } from '@/graphql/graphql';
 import { UserDataInput } from '@/graphql/types';
 import {} from '@/graphql/types';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
-import { useLazyQuery, useMutation } from "@apollo/client/react";
+import { useLazyQuery, useMutation } from '@apollo/client/react';
 import dayjs from 'dayjs';
 import React from 'react';
 

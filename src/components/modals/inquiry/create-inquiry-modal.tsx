@@ -7,7 +7,7 @@ import useElevenLabsAudio from '@/hooks/audio-player';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { VOICE_LINE_SAMPLES } from '@/utils/audio/voice-line-samples';
-import { useQuery } from "@apollo/client/react";
+import { useQuery } from '@apollo/client/react';
 import { faPlay, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Edge, Node } from '@xyflow/react';
@@ -224,7 +224,7 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
         <GenericRadioGroup<Template>
           label={t('components.createInquiryModal.graphTemplate')}
           subLabel={t('components.createInquiryModal.graphTemplateSubtitle')}
-          options={(templates?.getInquiryTemplates ?? []).map((template: any) => ({ ...template, value: template }))}
+          options={(templates?.getInquiryTemplates ?? []).map((template) => ({ ...template, value: template }))}
           value={selectedTemplate}
           onChange={setSelectedTemplate}
           clearable
@@ -238,7 +238,7 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
             value={settings.voice ?? ''}
             onChange={handleSelectChange('voice')}
             options={
-              voices?.getAllAudioVoices.map((voice: any) => ({
+              voices?.getAllAudioVoices.map((voice) => ({
                 value: voice.id,
                 label: `${voice.name} (${voice.tags.join(', ')})`,
               })) ?? []
@@ -262,7 +262,12 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
   );
 
   return (
-    <CustomModal size="5xl" open={open} onClose={onClose} title={id ? t('components.createInquiryModal.updateTitle') : t('components.createInquiryModal.title')}>
+    <CustomModal
+      size="5xl"
+      open={open}
+      onClose={onClose}
+      title={id ? t('components.createInquiryModal.updateTitle') : t('components.createInquiryModal.title')}
+    >
       <form className="space-y-4" onSubmit={handleSave}>
         <Input
           name="title"
@@ -328,7 +333,8 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
             {t('common.buttons.cancel')}
           </Button>
           <Button disabled={generatingGraph} onClick={handleSave} variant="primary" size="medium" className="ml-2">
-            {id ? t('common.buttons.save') : t('common.buttons.create')} {generatingGraph && <FontAwesomeIcon icon={faSpinner} className="ml-2" spin />}
+            {id ? t('common.buttons.save') : t('common.buttons.create')}{' '}
+            {generatingGraph && <FontAwesomeIcon icon={faSpinner} className="ml-2" spin />}
           </Button>
         </div>
       </form>

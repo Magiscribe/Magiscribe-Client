@@ -9,7 +9,7 @@ import Textarea from '@/components/controls/textarea';
 import CustomModal from '@/components/modals/modal';
 import { Prompt } from '@/graphql/types';
 import { useAddAlert } from '@/providers/alert-provider';
-import { useMutation, useQuery } from "@apollo/client/react";
+import { useMutation, useQuery } from '@apollo/client/react';
 import { useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 

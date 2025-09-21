@@ -19,7 +19,7 @@ function loadTranslations() {
 
     if (langCode) {
       resources[langCode] = {
-        translation: module.default || module
+        translation: module.default || module,
       };
       // Add to available languages
       if (!availableLanguageCodes.includes(langCode)) {
@@ -44,9 +44,9 @@ i18n
     debug: process.env.NODE_ENV === 'development',
     fallbackLng: 'en',
     interpolation: {
-      escapeValue: false
+      escapeValue: false,
     },
-    resources: loadTranslations()
+    resources: loadTranslations(),
   });
 
 export default i18n;

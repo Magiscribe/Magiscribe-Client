@@ -1,5 +1,5 @@
 import { GET_ALL_AGENTS } from '@/clients/queries';
-import { ApolloClient } from "@apollo/client/react";
+import { ApolloClient } from '@apollo/client/react';
 
 /**
  * Gets an agent id by name.

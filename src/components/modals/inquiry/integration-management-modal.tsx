@@ -5,14 +5,14 @@ import Input from '@/components/controls/input';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { cleanObjectForGraphQLInput } from '@/utils/graphql';
-import { useLazyQuery, useMutation, useQuery } from "@apollo/client/react";
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client/react';
 import { faCheck, faEdit, faMinus, faPlug, faPlus, faTimes, faTools, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import ConfirmationModal from '../confirm-modal';
 import CustomModal from '../modal';
-import { GetInquiryIntegrationsQuery } from '@/graphql/graphql';
+import { GetInquiryIntegrationsQuery, TestMcpIntegrationQuery } from '@/graphql/graphql';
 
 interface Integration {
   id?: string;
@@ -35,7 +35,7 @@ interface IntegrationManagementModalProps {
 
 export default function IntegrationManagementModal({ open, onClose }: IntegrationManagementModalProps) {
   const { t } = useTranslation();
-  
+
   // State
   const [integrations, setIntegrations] = useState<Integration[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -63,7 +63,7 @@ export default function IntegrationManagementModal({ open, onClose }: Integratio
   const { id, refreshGraph } = useInquiryBuilder();
   const alert = useAddAlert();
   const [setInquiryIntegrationsMutation] = useMutation(SET_INQUIRY_INTEGRATIONS);
-  const [testIntegration, { loading: loadingTools }] = useLazyQuery(TEST_MCP_INTEGRATION);
+  const [testIntegration, { loading: loadingTools }] = useLazyQuery<TestMcpIntegrationQuery>(TEST_MCP_INTEGRATION);
 
   // Load integrations when inquiry ID is available
   const { data } = useQuery<GetInquiryIntegrationsQuery>(GET_INQUIRY_INTEGRATIONS, {
@@ -249,14 +249,18 @@ export default function IntegrationManagementModal({ open, onClose }: Integratio
         variables: { integration: integrationToTest },
       });
 
-      if ((result.data as any)?.testMCPIntegration?.success) {
+      if (result.data?.testMCPIntegration?.success) {
         alert(t('components.integrationManagement.connectionSuccessful'), 'success');
       } else {
-        const error = (result.data as any)?.testMCPIntegration?.error || t('components.integrationManagement.messages.unknownError');
+        const error =
+          result.data?.testMCPIntegration?.error || t('components.integrationManagement.messages.unknownError');
         alert(t('components.integrationManagement.connectionFailed', { error }), 'error');
       }
     } catch (error) {
-      alert(`${t('components.integrationManagement.connectionFailed', { error: error instanceof Error ? error.message : t('components.integrationManagement.messages.unknownError') })}`, 'error');
+      alert(
+        `${t('components.integrationManagement.connectionFailed', { error: error instanceof Error ? error.message : t('components.integrationManagement.messages.unknownError') })}`,
+        'error',
+      );
     } finally {
       setIsTestingConnection(false);
     }
@@ -434,15 +438,26 @@ export default function IntegrationManagementModal({ open, onClose }: Integratio
         variables: { integration: integrationToTest },
       });
 
-      if ((result.data as any)?.testMCPIntegration?.success) {
-        const tools = (result.data as any).testMCPIntegration.tools || [];
+      if (result.data?.testMCPIntegration?.success) {
+        const tools = result.data.testMCPIntegration.tools || [];
         setDiscoveredTools(tools);
       } else {
-        alert(t('components.integrationManagement.toolsLoadFailed', { error: (result.data as any)?.testMCPIntegration?.error || t('components.integrationManagement.messages.unknownError') }), 'error');
+        alert(
+          t('components.integrationManagement.toolsLoadFailed', {
+            error:
+              result.data?.testMCPIntegration?.error || t('components.integrationManagement.messages.unknownError'),
+          }),
+          'error',
+        );
         setDiscoveredTools([]);
       }
     } catch (error) {
-      alert(t('components.integrationManagement.toolsLoadFailed', { error: error instanceof Error ? error.message : t('components.integrationManagement.messages.unknownError') }), 'error');
+      alert(
+        t('components.integrationManagement.toolsLoadFailed', {
+          error: error instanceof Error ? error.message : t('components.integrationManagement.messages.unknownError'),
+        }),
+        'error',
+      );
       setDiscoveredTools([]);
     }
   };
@@ -462,15 +477,26 @@ export default function IntegrationManagementModal({ open, onClose }: Integratio
         variables: { integration: cleanIntegration },
       });
 
-      if ((result.data as any)?.testMCPIntegration?.success) {
-        const tools = (result.data as any).testMCPIntegration.tools || [];
+      if (result.data?.testMCPIntegration?.success) {
+        const tools = result.data.testMCPIntegration.tools || [];
         setDiscoveredTools(tools);
       } else {
-        alert(t('components.integrationManagement.toolsLoadFailed', { error: (result.data as any)?.testMCPIntegration?.error || t('components.integrationManagement.messages.unknownError') }), 'error');
+        alert(
+          t('components.integrationManagement.toolsLoadFailed', {
+            error:
+              result.data?.testMCPIntegration?.error || t('components.integrationManagement.messages.unknownError'),
+          }),
+          'error',
+        );
         setDiscoveredTools([]);
       }
     } catch (error) {
-      alert(t('components.integrationManagement.toolsLoadFailed', { error: error instanceof Error ? error.message : t('components.integrationManagement.messages.unknownError') }), 'error');
+      alert(
+        t('components.integrationManagement.toolsLoadFailed', {
+          error: error instanceof Error ? error.message : t('components.integrationManagement.messages.unknownError'),
+        }),
+        'error',
+      );
       setDiscoveredTools([]);
     }
   };
@@ -515,7 +541,11 @@ export default function IntegrationManagementModal({ open, onClose }: Integratio
           {/* Add/Edit Form */}
           {showAddForm && (
             <div className="space-y-4 p-4 border rounded-lg dark:border-gray-600 bg-gray-50 dark:bg-gray-800">
-              <h5 className="font-medium">{editingIndex !== null ? t('components.integrationManagement.editIntegration') : t('components.integrationManagement.messages.addNewIntegration')}</h5>
+              <h5 className="font-medium">
+                {editingIndex !== null
+                  ? t('components.integrationManagement.editIntegration')
+                  : t('components.integrationManagement.messages.addNewIntegration')}
+              </h5>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
@@ -616,7 +646,9 @@ export default function IntegrationManagementModal({ open, onClose }: Integratio
                     onClick={testConnection}
                     disabled={isTestingConnection || !formData.name || !formData.config.serverUrl}
                   >
-                    {isTestingConnection ? t('components.integrationManagement.testing') : t('components.integrationManagement.testConnection')}
+                    {isTestingConnection
+                      ? t('components.integrationManagement.testing')
+                      : t('components.integrationManagement.testConnection')}
                   </Button>
                   <Button
                     type="button"
@@ -631,7 +663,9 @@ export default function IntegrationManagementModal({ open, onClose }: Integratio
                       !validateUrl(formData.config.serverUrl)
                     }
                   >
-                    {loadingTools ? t('components.integrationManagement.loading') : t('components.integrationManagement.viewTools')}
+                    {loadingTools
+                      ? t('components.integrationManagement.loading')
+                      : t('components.integrationManagement.viewTools')}
                   </Button>
                 </div>
 
@@ -704,7 +738,9 @@ export default function IntegrationManagementModal({ open, onClose }: Integratio
                         onClick={() => viewAvailableTools(index)}
                         disabled={loadingTools}
                       >
-                        {loadingTools && viewingToolsIndex === index ? t('components.integrationManagement.loading') : t('components.integrationManagement.viewTools')}
+                        {loadingTools && viewingToolsIndex === index
+                          ? t('components.integrationManagement.loading')
+                          : t('components.integrationManagement.viewTools')}
                       </Button>
                       <Button
                         type="button"
@@ -830,7 +866,9 @@ export default function IntegrationManagementModal({ open, onClose }: Integratio
           ) : (
             <div className="text-center py-12">
               <div className="text-6xl mb-4">🔍</div>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">{t('components.integrationManagement.tools.noToolsTitle')}</h3>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                {t('components.integrationManagement.tools.noToolsTitle')}
+              </h3>
               <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
                 No tools were found for this integration. This could mean:
               </p>
@@ -851,7 +889,9 @@ export default function IntegrationManagementModal({ open, onClose }: Integratio
         onConfirm={deleteIntegration}
         text={
           deleteConfirmIndex !== null
-            ? t('components.integrationManagement.messages.deleteConfirmation', { name: integrations[deleteConfirmIndex]?.name })
+            ? t('components.integrationManagement.messages.deleteConfirmation', {
+                name: integrations[deleteConfirmIndex]?.name,
+              })
             : ''
         }
         confirmText={t('components.integrationManagement.messages.deleteIntegration')}

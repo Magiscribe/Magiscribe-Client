@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next';
  * 3. common.navigation.settings
  * @param {Object} props
  * @param {string[]} props.pathSegments - Array of path segments representing the current location.
- * @returns 
+ * @returns
  */
 export default function BackLinks({ pathSegments }: { pathSegments: string[] }) {
   const { t } = useTranslation();
@@ -22,16 +22,16 @@ export default function BackLinks({ pathSegments }: { pathSegments: string[] }) 
     // Create translation key based on path hierarchy
     const pathKey = pathSegments.slice(0, index + 2).join('.');
     const translationKey = `common.navigation.${pathKey}`;
-    
+
     // Try specific translation first, fall back to generic segment translation, then to formatted string
     const translated = t(translationKey, { defaultValue: '' });
     if (translated) return translated;
-    
+
     // Try just the segment name
     const segmentKey = `common.navigation.${segment}`;
     const segmentTranslated = t(segmentKey, { defaultValue: '' });
     if (segmentTranslated) return segmentTranslated;
-    
+
     // Fall back to formatted segment name
     return segment.replace(/-/g, ' ');
   };

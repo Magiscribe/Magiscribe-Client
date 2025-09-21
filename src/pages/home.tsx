@@ -12,7 +12,7 @@ import { useSetTitle } from '../hooks/title-hook';
 
 function AboutSection() {
   const { t } = useTranslation();
-  
+
   return (
     <SectionTemplate>
       <motion.h2
@@ -69,7 +69,7 @@ function AboutSection() {
 
 function ContactSection() {
   const { t } = useTranslation();
-  
+
   return (
     <SectionTemplate>
       <motion.h2

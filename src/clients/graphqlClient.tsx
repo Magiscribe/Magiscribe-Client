@@ -1,4 +1,4 @@
-import { ApolloClient, from, HttpLink, InMemoryCache, split } from "@apollo/client";
+import { ApolloClient, from, HttpLink, InMemoryCache, split } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
 import { useAuth } from '@clerk/clerk-react';
@@ -6,7 +6,7 @@ import { createClient } from 'graphql-ws';
 
 import { getMainDefinition } from '@apollo/client/utilities';
 import React, { useMemo } from 'react';
-import { ApolloProvider } from "@apollo/client/react";
+import { ApolloProvider } from '@apollo/client/react';
 
 export const ApolloProviderWrapper = ({ children }: { children: React.ReactNode }) => {
   const { getToken } = useAuth();

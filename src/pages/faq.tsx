@@ -38,14 +38,7 @@ export default function FAQPage() {
   const { t } = useTranslation();
   useSetTitle()(t('pages.faq.title'));
 
-  const faqKeys = [
-    'whatIsMagiscribe',
-    'howDifferent', 
-    'whoIsItFor',
-    'whatInsights',
-    'howEasy',
-    'qualityResponses'
-  ];
+  const faqKeys = ['whatIsMagiscribe', 'howDifferent', 'whoIsItFor', 'whatInsights', 'howEasy', 'qualityResponses'];
 
   return (
     <>
@@ -60,10 +53,10 @@ export default function FAQPage() {
           <p className="mt-4">{t('pages.faq.subtitle')}</p>
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             {faqKeys.map((key, index) => (
-              <FAQItem 
-                key={index} 
-                question={t(`pages.faq.questions.${key}.question`)} 
-                answer={t(`pages.faq.questions.${key}.answer`)} 
+              <FAQItem
+                key={index}
+                question={t(`pages.faq.questions.${key}.question`)}
+                answer={t(`pages.faq.questions.${key}.answer`)}
               />
             ))}
           </motion.div>
