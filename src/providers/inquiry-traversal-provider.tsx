@@ -5,6 +5,7 @@ import {
   AddPredictionMutation,
   CreateInquiryResponseMutation,
   GetInquiryQuery,
+  PredictionAddedSubscription,
   PredictionType,
   UpdateInquiryResponseMutation,
 } from '@/graphql/graphql';
@@ -137,16 +138,21 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
    * Fetches the data object on mount when an ID is provided.
    * Will automatically start the inquiry process.
    */
-  useQuery<GetInquiryQuery>(GET_INQUIRY, {
+  const { data: inquiryData, error: inquiryError } = useQuery<GetInquiryQuery>(GET_INQUIRY, {
     variables: { id },
     skip: !id,
     errorPolicy: 'all',
-    onCompleted: ({ getInquiry }) => {
-      if (!getInquiry) {
-        setState({ ...INITIAL_STATE, notFound: true });
-        return;
-      }
+  });
 
+  // Handle inquiry data loading
+  useEffect(() => {
+    if (inquiryError) {
+      setState({ ...INITIAL_STATE, notFound: true });
+      return;
+    }
+
+    if (inquiryData?.getInquiry) {
+      const getInquiry = inquiryData.getInquiry;
       const { graph, draftGraph, settings } = getInquiry.data;
       const usedGraph = preview ? draftGraph : graph;
 
@@ -157,17 +163,17 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
       } else {
         setState({ ...INITIAL_STATE, notFound: true });
       }
-    },
-    onError: () => {
+    } else if (inquiryData) {
+      // Query completed but getInquiry is null
       setState({ ...INITIAL_STATE, notFound: true });
-    },
-  });
+    }
+  }, [inquiryData, inquiryError, preview]);
 
   /**
    * Subscribes to the predictionAdded subscription.
    * When a result from a prediction is received, it will trigger the onSubscriptionData callback.
    */
-  useSubscription(GRAPHQL_SUBSCRIPTION, {
+  useSubscription<PredictionAddedSubscription>(GRAPHQL_SUBSCRIPTION, {
     variables: { subscriptionId },
     onData: ({ data: subscriptionData }) => {
       try {
@@ -175,6 +181,8 @@ function InquiryTraversalProvider({ children, id, preview }: InquiryProviderProp
 
         if (prediction?.type === PredictionType.Success) {
           setState((prev) => ({ ...prev, loading: false }));
+
+          if (!prediction.result) return;
 
           // TODO: Resolve the match bug
           const result = JSON.parse(prediction.result);

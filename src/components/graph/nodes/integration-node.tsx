@@ -10,6 +10,7 @@ import React, { useCallback, useMemo } from 'react';
 import NodeContainer from '../elements/node-container';
 import CustomHandle from '../handles/limit-handle';
 import { useNodeData } from '../utils';
+import { GetInquiryIntegrationsQuery } from '@/graphql/graphql';
 
 interface Integration {
   id: string;
@@ -30,10 +31,13 @@ export default function IntegrationNode({ id, data }: IntegrationNodeProps) {
   const { id: inquiryId } = useInquiryBuilder();
 
   // Fetch available integrations for this inquiry
-  const { data: integrationsData, loading: integrationsLoading } = useQuery(GET_INQUIRY_INTEGRATIONS, {
-    variables: { inquiryId },
-    skip: !inquiryId,
-  });
+  const { data: integrationsData, loading: integrationsLoading } = useQuery<GetInquiryIntegrationsQuery>(
+    GET_INQUIRY_INTEGRATIONS,
+    {
+      variables: { inquiryId },
+      skip: !inquiryId,
+    },
+  );
 
   const handleUpdate = useCallback(
     (updates: Partial<IntegrationNodeProps['data']>) => {

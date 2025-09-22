@@ -659,7 +659,7 @@ export type UpsertPromptMutationVariables = Exact<{
 }>;
 
 
-export type UpsertPromptMutation = { __typename?: 'Mutation', upsertPrompt?: { __typename?: 'Prompt', id: string, name: string, text: string } | null };
+export type UpsertPromptMutation = { __typename?: 'Mutation', upsertPrompt?: { __typename?: 'Prompt', id: string, name: string, text: string, logicalCollection: { __typename?: 'Collection', id: string, name: string } } | null };
 
 export type DeletePromptMutationVariables = Exact<{
   promptId: Scalars['ID']['input'];
@@ -798,21 +798,21 @@ export type GetAllCapabilitiesQueryVariables = Exact<{
 }>;
 
 
-export type GetAllCapabilitiesQuery = { __typename?: 'Query', getAllCapabilities: Array<{ __typename?: 'Capability', id: string, alias: string, name: string, llmModel: string, description: string, outputMode: string, subscriptionFilter?: string | null, outputFilter?: string | null, prompts: Array<{ __typename?: 'Prompt', name: string, id: string, text: string }> }> };
+export type GetAllCapabilitiesQuery = { __typename?: 'Query', getAllCapabilities: Array<{ __typename?: 'Capability', id: string, alias: string, name: string, llmModel: string, description: string, outputMode: string, subscriptionFilter?: string | null, outputFilter?: string | null, prompts: Array<{ __typename?: 'Prompt', name: string, id: string, text: string, logicalCollection: { __typename?: 'Collection', id: string, name: string } }>, logicalCollection: { __typename?: 'Collection', id: string, name: string } }> };
 
 export type GetCapabilityQueryVariables = Exact<{
   capabilityId: Scalars['ID']['input'];
 }>;
 
 
-export type GetCapabilityQuery = { __typename?: 'Query', getCapability?: { __typename?: 'Capability', id: string, llmModel: string, alias: string, name: string, description: string, outputMode: string, subscriptionFilter?: string | null, outputFilter?: string | null, prompts: Array<{ __typename?: 'Prompt', name: string, id: string, text: string }> } | null };
+export type GetCapabilityQuery = { __typename?: 'Query', getCapability?: { __typename?: 'Capability', id: string, llmModel: string, alias: string, name: string, description: string, outputMode: string, subscriptionFilter?: string | null, outputFilter?: string | null, prompts: Array<{ __typename?: 'Prompt', name: string, id: string, text: string, logicalCollection: { __typename?: 'Collection', id: string, name: string } }>, logicalCollection: { __typename?: 'Collection', id: string, name: string } } | null };
 
 export type GetAllPromptsQueryVariables = Exact<{
   logicalCollection?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
-export type GetAllPromptsQuery = { __typename?: 'Query', getAllPrompts?: Array<{ __typename?: 'Prompt', id: string, name: string, text: string } | null> | null };
+export type GetAllPromptsQuery = { __typename?: 'Query', getAllPrompts?: Array<{ __typename?: 'Prompt', id: string, name: string, text: string, logicalCollection: { __typename?: 'Collection', id: string, name: string } } | null> | null };
 
 export type GetPromptQueryVariables = Exact<{
   promptId: Scalars['ID']['input'];

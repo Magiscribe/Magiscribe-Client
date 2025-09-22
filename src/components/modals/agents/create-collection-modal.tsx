@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import Button from '../../controls/button';
 import Input from '../../controls/input';
 import CustomModal from '../modal';
+import { UpsertCollectionMutation } from '@/graphql/graphql';
 
 /**
  * Props for the ModalUpsertInquiry component
@@ -26,7 +27,7 @@ const ModalUpsertCollection: React.FC<ModalUpsertCollection> = ({ open, onClose 
   const [form, setForm] = useState({ title: '' });
 
   // Query
-  const [upsertCollection] = useMutation(UPSERT_COLLECTION);
+  const [upsertCollection] = useMutation<UpsertCollectionMutation>(UPSERT_COLLECTION);
 
   // Hooks
   const navigate = useNavigate();
@@ -49,7 +50,7 @@ const ModalUpsertCollection: React.FC<ModalUpsertCollection> = ({ open, onClose 
         },
       });
 
-      if (result.errors) {
+      if (result.error) {
         addAlert('Error saving collection', 'error');
         setLoading(false);
         return;
@@ -57,7 +58,7 @@ const ModalUpsertCollection: React.FC<ModalUpsertCollection> = ({ open, onClose 
 
       addAlert('Collection saved successfully', 'success');
       setLoading(false);
-      navigate(`/dashboard/agent-lab/${result.data?.upsertCollection.id}`);
+      navigate(`/dashboard/agent-lab/${result.data?.upsertCollection?.id}`);
     } catch (error) {
       console.error(error);
     }

@@ -1,4 +1,5 @@
 import { GENERATE_AUDIO } from '@/clients/mutations';
+import { GenerateAudioMutation } from '@/graphql/graphql';
 import { useMutation } from '@apollo/client/react';
 import { useCallback, useRef, useState } from 'react';
 
@@ -10,7 +11,7 @@ interface QueueItem {
 export const useElevenLabsAudio = (voice?: string | null) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [generateAudio] = useMutation(GENERATE_AUDIO);
+  const [generateAudio] = useMutation<GenerateAudioMutation>(GENERATE_AUDIO);
 
   const audioQueueRef = useRef<QueueItem[]>([]);
   const currentIndexRef = useRef(0);
@@ -74,6 +75,10 @@ export const useElevenLabsAudio = (voice?: string | null) => {
           },
         });
         setIsLoading(false);
+
+        if (!audioUrl.data?.generateAudio) {
+          throw new Error('No audio URL returned');
+        }
 
         newItem.audio = new Audio(audioUrl.data.generateAudio);
 

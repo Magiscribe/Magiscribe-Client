@@ -3,7 +3,7 @@ import { GET_INQUIRY } from '@/clients/queries';
 import { GRAPHQL_SUBSCRIPTION } from '@/clients/subscriptions';
 import Button from '@/components/controls/button';
 import MarkdownCustom from '@/components/markdown-custom';
-import { AddPredictionMutation, GetInquiryQuery } from '@/graphql/graphql';
+import { AddPredictionMutation, GetInquiryQuery, PredictionAddedSubscription } from '@/graphql/graphql';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
 import { useFilteredResponses } from '@/hooks/useFilteredResponses';
 import { GraphNode, NodeVisitAnalysisData, QuestionNodeData } from '@/types/conversation';
@@ -86,7 +86,7 @@ const PerQuestionTab: React.FC<PerQuestionTabProps> = ({ id }) => {
     });
     return grouped;
   }, [responses]);
-  useSubscription(GRAPHQL_SUBSCRIPTION, {
+  useSubscription<PredictionAddedSubscription>(GRAPHQL_SUBSCRIPTION, {
     variables: {
       subscriptionId,
     },
@@ -95,6 +95,8 @@ const PerQuestionTab: React.FC<PerQuestionTabProps> = ({ id }) => {
 
       if (prediction && prediction.type === 'SUCCESS') {
         setIsGeneratingSummary(false);
+
+        if (!prediction.result) return;
 
         // Parse the prediction result - it should be a markdown summary in triple backticks
         const rawResult = JSON.parse(prediction.result)[0];

@@ -4,6 +4,7 @@ import Container from '@/components/container';
 import Button from '@/components/controls/button';
 import Select from '@/components/controls/select';
 import ConfirmationModal from '@/components/modals/confirm-modal';
+import { GetAllCapabilitiesQuery } from '@/graphql/graphql';
 import { Capability, Prompt, GetAllModelsQuery } from '@/graphql/types';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useMutation, useQuery } from '@apollo/client/react';
@@ -133,7 +134,7 @@ export default function CapabilityDashboard() {
 
   // Queries
   const { collection } = useParams<{ collection?: string }>();
-  const { data, refetch } = useQuery(GET_ALL_CAPABILITIES, {
+  const { data, refetch } = useQuery<GetAllCapabilitiesQuery>(GET_ALL_CAPABILITIES, {
     variables: {
       logicalCollection: params.collection,
     },
@@ -145,7 +146,7 @@ export default function CapabilityDashboard() {
   const navigate = useNavigate();
 
   const handleCopy = async (id: string) => {
-    const selectedItem = data?.getAllCapabilities.find((capability: Capability) => capability.id === id) as Capability;
+    const selectedItem = data?.getAllCapabilities.find((capability) => capability.id === id) as Capability;
     const timeStamp = Date.now();
     try {
       const result = await upsertCapability({
@@ -165,7 +166,7 @@ export default function CapabilityDashboard() {
         },
       });
 
-      if (result.errors) {
+      if (result.error) {
         addAlert('Error copying capability', 'error');
         return;
       }
@@ -185,7 +186,7 @@ export default function CapabilityDashboard() {
       </div>
       <hr className="my-4" />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 my-8">
-        {data?.getAllCapabilities.map((capability: Capability, i: number) => (
+        {data?.getAllCapabilities.map((capability, i: number) => (
           <motion.div
             key={capability.id}
             initial={{ opacity: 0, y: 20 }}

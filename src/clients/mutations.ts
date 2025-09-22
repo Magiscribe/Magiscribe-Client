@@ -104,6 +104,10 @@ export const ADD_UPDATE_PROMPT = gql`
       id
       name
       text
+      logicalCollection {
+        id
+        name
+      }
     }
   }
 `;

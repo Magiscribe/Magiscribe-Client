@@ -5,7 +5,12 @@ import UserResponses from '@/components/analysis/user-responses';
 import Button from '@/components/controls/button';
 import ConfirmationModal from '@/components/modals/confirm-modal';
 import MarkdownCustom from '@/components/markdown-custom';
-import { AddPredictionMutation, DeleteInquiryResponseMutation, GetInquiryQuery } from '@/graphql/graphql';
+import {
+  AddPredictionMutation,
+  DeleteInquiryResponseMutation,
+  GetInquiryQuery,
+  PredictionAddedSubscription,
+} from '@/graphql/graphql';
 import { useFilteredResponses } from '@/hooks/useFilteredResponses';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
 import { useAddAlert } from '@/providers/alert-provider';
@@ -67,7 +72,7 @@ const PerResponseTab: React.FC<PerResponseTabProps> = ({ id }) => {
     refetch: refetchInquiryResponses,
   } = useFilteredResponses({ id });
   // Subscription for summary generation
-  useSubscription(GRAPHQL_SUBSCRIPTION, {
+  useSubscription<PredictionAddedSubscription>(GRAPHQL_SUBSCRIPTION, {
     variables: {
       subscriptionId,
     },
@@ -76,6 +81,8 @@ const PerResponseTab: React.FC<PerResponseTabProps> = ({ id }) => {
 
       if (prediction && prediction.type === 'SUCCESS' && seletedResponse) {
         setIsGeneratingSummary(false);
+
+        if (!prediction.result) return;
 
         // Parse the prediction result - it should be a markdown summary in triple backticks
         const rawResult = JSON.parse(prediction.result)[0];
