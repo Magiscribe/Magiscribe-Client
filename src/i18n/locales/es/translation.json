@@ -507,6 +507,131 @@
     "management": "management@magiscribe.com",
     "support": "support@magiscribe.com"
   },
+  "nodes": {
+    "start": {
+      "title": "Inicio",
+      "messageLabel": "Mensaje",
+      "messageSubLabel": "Texto que se mostrará al usuario en la pantalla de inicio",
+      "messagePlaceholder": "Escribe tu texto aquí...",
+      "requireName": "Requerir Nombre",
+      "requireNameSubLabel": "Los usuarios deberán ingresar su nombre.",
+      "requireEmail": "Requerir Correo Electrónico",
+      "requireEmailSubLabel": "Los usuarios deberán proporcionar su correo electrónico."
+    },
+    "question": {
+      "title": "Pregunta",
+      "dynamicGenerationLabel": "Generación Dinámica",
+      "questionTypeLabel": "Tipo de Pregunta",
+      "messageLabel": "Mensaje",
+      "messagePlaceholder": "Escribe tu texto aquí...",
+      "messageSubLabelDynamic": "Prompt para que una IA genere una pregunta",
+      "messageSubLabelStatic": "Pregunta hecha directamente al usuario",
+      "selectableOptionsLabel": "Opciones Seleccionables",
+      "addSelectOption": "Agregar Opción de Selección",
+      "questionTypes": {
+        "openEnded": "Pregunta Abierta",
+        "singleSelect": "Selección Única",
+        "multiSelect": "Selección Múltiple"
+      }
+    },
+    "information": {
+      "title": "Información",
+      "dynamicGenerationLabel": "Generación Dinámica",
+      "messageLabel": "Mensaje",
+      "messagePlaceholder": "Escribe tu texto aquí...",
+      "messageSubLabelDynamic": "Prompt para que una IA genere información",
+      "messageSubLabelStatic": "Información mostrada directamente al usuario"
+    },
+    "condition": {
+      "title": "Condición",
+      "randomLabel": "Aleatorio",
+      "addCondition": "Agregar Condición"
+    },
+    "end": {
+      "title": "Fin"
+    },
+    "integration": {
+      "title": "Integración",
+      "selectIntegrationLabel": "Seleccionar Integración",
+      "selectIntegrationPrompt": "Selecciona una integración...",
+      "selectToolLabel": "Seleccionar Herramienta",
+      "selectToolPrompt": "Selecciona una herramienta...",
+      "configureIntegrations": "Configurar Integraciones"
+    }
+  },
+  "builder": {
+    "graphEditor": "Editor de Gráfico",
+    "untitledInquiry": "Consulta Sin Título",
+    "clearGraph": "Limpiar Gráfico",
+    "redoAction": "rehacer acción",
+    "undoAction": "deshacer acción"
+  },
+  "modals": {
+    "validationErrors": {
+      "title": "Gráfico de Consulta Inválido",
+      "subtitle": "Por favor, aborda los siguientes errores antes de publicar:",
+      "automagicallyFix": "Arreglar Mágicamente"
+    }
+  },
+  "userResponse": {
+    "title": "Tu Respuesta",
+    "submittedOn": "Enviada el {{date}}"
+  },
+  "userGuide": {
+    "title": "Guía de Usuario",
+    "subtitle": "Todo lo que necesitas saber para empezar con Magiscribe",
+    "videoTitle": "Video de Introducción",
+    "faqTitle": "Preguntas Frecuentes",
+    "questions": {
+      "whatAreInquiries": {
+        "question": "¿Qué son las consultas?",
+        "answer": "Las consultas son conversaciones estructuradas que puedes crear para recopilar información de tu audiencia. Piénsalas como encuestas inteligentes que pueden adaptarse y hacer preguntas de seguimiento basadas en las respuestas que las personas proporcionan."
+      },
+      "howToCreateInquiry": {
+        "question": "¿Cómo creo una consulta?",
+        "answer": "Empieza haciendo clic en 'Crear Nueva Consulta' en tu panel de control. Proporciona algunos objetivos (qué información quieres recopilar) y cualquier contexto adicional. Nuestro sistema generará automáticamente un gráfico de conversación para ti, que puedes personalizar según sea necesario."
+      },
+      "howToAchieveStructure": {
+        "question": "¿Cómo puedo lograr una estructura específica para mi conversación?",
+        "answer": "Usa el Editor de Gráficos en la pestaña 'Constructor' para agregar, editar y conectar diferentes nodos. Cada nodo representa un punto en tu conversación - preguntas, información o puntos de decisión. Arrastra para conectar nodos y crear el flujo que deseas."
+      },
+      "whatIsDynamicGeneration": {
+        "question": "¿Qué es la generación dinámica?",
+        "answer": "La generación dinámica permite que la IA cree contenido personalizado basado en las respuestas previas del usuario. En lugar de mostrar texto estático, la IA puede generar preguntas o información que sean más relevantes para el contexto específico de cada encuestado."
+      },
+      "whatAreQuestionTypes": {
+        "question": "¿Qué son los tipos de pregunta?",
+        "answer": "Magiscribe admite tres tipos de pregunta: Pregunta Abierta (el usuario puede escribir cualquier cosa), Selección Única (el usuario elige una opción) y Selección Múltiple (el usuario puede elegir múltiples opciones). El tipo que elijas determina cómo los usuarios pueden responder."
+      },
+      "whatDoNodeTypesDo": {
+        "question": "¿Qué hacen los diferentes tipos de nodos?",
+        "answer": "Los nodos de Inicio capturan información básica del usuario, los nodos de Pregunta recopilan respuestas, los nodos de Información proporcionan detalles, los nodos de Condición crean ramificaciones basadas en respuestas, los nodos de Fin concluyen la conversación, y los nodos de Integración conectan con herramientas externas."
+      },
+      "whatDoEdgesDo": {
+        "question": "¿Qué hacen las conexiones entre nodos?",
+        "answer": "Las conexiones (llamadas aristas) determinan el flujo de tu conversación. Definen qué nodo viene después de otro. Puedes crear flujos lineales simples o conversaciones complejas con ramificaciones que dependen de las respuestas del usuario."
+      },
+      "whatAreGraphRules": {
+        "question": "¿Qué son las reglas de gráfico?",
+        "answer": "Las reglas de gráfico aseguran que tu consulta funcione correctamente. Por ejemplo, cada gráfico debe tener exactamente un nodo de inicio y al menos un nodo de fin. Los nodos deben estar conectados correctamente, y no debería haber elementos desconectados en tu gráfico de conversación."
+      },
+      "howToDistributeInquiry": {
+        "question": "¿Cómo distribuyo mi consulta?",
+        "answer": "Solo permitiremos que distribuyas consultas con gráficos de conversación válidos. Para intentar hacer esto, haz clic en 'Publicar' en la pestaña 'Constructor' de tu consulta. Si tu gráfico es válido, obtendrás un enlace para enviar a las personas. Cualquiera que tenga ese enlace podrá responder directamente a tu consulta. Si tu gráfico no es válido, se mostrará una lista de errores. Puedes intentar dejar que la IA 'Arregle Mágicamente' los errores y luego intentar publicarla nuevamente."
+      },
+      "whatIfChangeGraphAfterPublishing": {
+        "question": "¿Qué pasa si cambio mi gráfico después de publicarlo?",
+        "answer": "Guardaremos cualquier cambio que hagas en el constructor de gráficos en un 'Gráfico Borrador'. Solo actualizaremos la consulta pública que las personas reciben cuando presiones 'Publicar' y todas las verificaciones de validación pasen. ¡Nuestro sistema es lo suficientemente flexible para permitirte agregar o quitar preguntas y ser compatible con versiones anteriores de tu gráfico!"
+      },
+      "areInquiriesAnonymous": {
+        "question": "¿Son anónimas las consultas?",
+        "answer": "Actualmente, cada consulta pone la decisión de si los encuestados deben ser identificados o no en manos del administrador. Puedes marcar las casillas 'Requerir Correo Electrónico' y 'Requerir Nombre' en el nodo de inicio para garantizar que recibas esta importante información demográfica."
+      }
+    }
+  },
+  "media": {
+    "youtubeVideoPlayer": "Reproductor de video de YouTube"
+  },
   "dates": {
     "lastUpdated": "10 de diciembre de 2024"
   }

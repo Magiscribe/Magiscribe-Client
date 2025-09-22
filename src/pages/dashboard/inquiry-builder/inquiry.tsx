@@ -16,7 +16,7 @@ export default function InquiryPage() {
   const { t } = useTranslation();
 
   const tabs = [t('pages.inquiryBuilder.tabs.builder'), t('pages.inquiryBuilder.tabs.analysis')];
-  const tabRoutes = ['builder', 'analysis']; // Original English tab names for URL routing
+  const tabRoutes = ['builder', 'analysis'];
   const navigate = useNavigate();
 
   if (!id) {

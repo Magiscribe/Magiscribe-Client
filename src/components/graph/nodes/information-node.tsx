@@ -5,6 +5,7 @@ import { ImageMetadata } from '@/types/conversation';
 import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { Handle, NodeProps, Position } from '@xyflow/react';
 import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import NodeContainer from '../elements/node-container';
 import CustomHandle from '../handles/limit-handle';
@@ -20,6 +21,7 @@ type InformationNodeProps = NodeProps & {
 
 export default function InformationNode({ id, data }: InformationNodeProps) {
   const { handleInputChange } = useNodeData<InformationNodeProps>(id);
+  const { t } = useTranslation();
 
   const handleUpdate = useCallback(
     (updates: Partial<InformationNodeProps['data']>) => {
@@ -33,9 +35,9 @@ export default function InformationNode({ id, data }: InformationNodeProps) {
   );
 
   return (
-    <NodeContainer title="Information" faIcon={faExclamationCircle} id={id}>
+    <NodeContainer title={t('nodes.information.title')} faIcon={faExclamationCircle} id={id}>
       <Input
-        label="Dynamic Generation"
+        label={t('nodes.information.dynamicGenerationLabel')}
         name="dynamic-generation"
         type="checkbox"
         checked={data.dynamicGeneration}
@@ -44,16 +46,16 @@ export default function InformationNode({ id, data }: InformationNodeProps) {
       />
 
       <Textarea
-        label="Message"
+        label={t('nodes.information.messageLabel')}
         subLabel={
           data.dynamicGeneration
-            ? 'Prompt for an AI to generate information'
-            : 'Information displayed directly to the user'
+            ? t('nodes.information.messageSubLabelDynamic')
+            : t('nodes.information.messageSubLabelStatic')
         }
         name="text"
         value={data.text}
         onChange={(e) => handleUpdate({ text: e.target.value })}
-        placeholder="Enter your text here..."
+        placeholder={t('nodes.information.messagePlaceholder')}
         className="resize-none overflow-hidden nodrag"
         rows={3}
       />

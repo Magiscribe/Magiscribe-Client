@@ -35,7 +35,7 @@ function AboutSection() {
             width="560"
             height="315"
             src="https://www.youtube.com/embed/45l_kHRTmdY?si=DQZnYOwZOL1qih1N"
-            title="YouTube video player"
+            title={t('media.youtubeVideoPlayer')}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           ></iframe>
         }

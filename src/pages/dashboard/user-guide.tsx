@@ -4,65 +4,7 @@ import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { motion } from 'motion/react';
 import React from 'react';
-
-const userGuide = [
-  {
-    question: 'What are inquiries?',
-    answer:
-      "Magiscribe inquiries are structured conversations about a particular topic that allow for dynamic follow-up. Imagine you are interviewing a customer about your product. You'd probably have a certain set of questions that you want to make sure you ask them, as well as potentially coming up with dynamic follow-up questions on the fly if your interviewee says something interesting. Our inquiries allow you to configure a structured, yet nuanced discussion that you can distribute to stakeholders at scale.",
-  },
-
-  {
-    question: 'How do I create an inquiry?',
-    answer:
-      'To create an inquiry you hit the big blue plus button on the dashboard. From there a modal will pop up and allow you to choose a template or start from scratch. If you choose a template, you\'ll have the opportunity to let an AI customize the template to your use case (recommended). From there, further modifications to the conversation graph can be done manually or with the "Graph Editor" chat window on the right side of the "Builder". ',
-  },
-  {
-    question: 'How do I achieve structure in my inquiries?',
-    answer:
-      'Magiscribe Inquiries are modeled using a directed conversation graph. As you may know, graphs consist of nodes and edges. There are five types of nodes: Start, Information, Question, Condition, and End. The conversation must progress from a Start node to an End node. In between, paths through the graph represent the different possible conversation flows that a user could have.',
-  },
-  {
-    question: 'What does it mean when a question node or an information node has "Dynamic Generation" enabled?',
-    answer:
-      'When "Dynamic Generation" is enabled, this indicates that the text in the node will serve as an instruction to an LLM to generate content on the fly based on that instruction and the entire conversation history. If "Dynamic Generation" is not selected then the text in the textarea will be displayed directly to the user.',
-  },
-  {
-    question: 'What are the different types of questions that can be asked?',
-    answer:
-      'Questions can either be open-ended, single-select, or multi-select. Open-ended questions allow the user to provide text response. Single-select gives the respondent a list of options and lets them pick exactly one. Multi-select allows the respondent to choose all that apply amongst a list of options.',
-  },
-  {
-    question: 'What do each of the node types do?',
-    answer:
-      "The start node represents the beginning of the conversation flow. The information node provides information to the user without requiring a response. The question node represents a point where the user is asked a question. The condition node allows for the conversation to take a different path based on the user's response. The end node represents the end of the conversation flow.",
-  },
-  {
-    question: 'What do the edges do?',
-    answer:
-      'The edges link nodes together in a directed fashion. If the user is at question node "A" and there exists an edge between node "A" and information node "B", once they answer the question they\'ll be routed to node "B". ',
-  },
-  {
-    question: 'What are the graph rules? ',
-    answer:
-      'There can only be one start node and there must be at least one end node. Every other type of node must have at least one incoming and outgoing edge. There must be at least one question node. Information nodes and question nodes can have multiple incoming edges, but only one outgoing edge. Condition nodes can have multiple incoming edges and must have multiple outgoing edges.',
-  },
-  {
-    question: 'How do I distribute my inquiry?',
-    answer:
-      'We will only allow you to distribute inquiries with valid conversation graphs. To attempt to do this, click "Publish" on the "Builder" tab of your inquiry. If your graph is valid, you\'ll get a link to send out to people. Anyone who has that link will be able to respond directly to your inquiry. If your graph is not valid, a list of errors will be displayed. You can attempt to let the AI "Automagically Fix" the errors and then try publishing it again.',
-  },
-  {
-    question: 'What if I change my graph after publishing it?',
-    answer:
-      'We will save any changes you make in the graph builder to a "Draft Graph". We will only update the public inquiry that people receive when you hit "Publish" and all validation checks pass. Our system is flexible enough to allow you to add or remove questions and be backwards compatible with previous versions of your graph!',
-  },
-  {
-    question: 'Are inquiries anonymous?',
-    answer:
-      'Currently, every inquiry puts the choice as to whether or not to have respondents be identified in the hands of the admin. You can check the "Require Email" and "Require Name" checkboxes in the start node to gurantee you receive this important demographic information.',
-  },
-];
+import { useTranslation } from 'react-i18next';
 
 function FAQItem({ question, answer }: { question: string; answer: string }) {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -91,40 +33,92 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
   );
 }
 
-export default function UserGuidePage() {
-  useSetTitle()('User Guide');
+export default function UserGuide() {
+  const { t } = useTranslation();
+  
+  // Get localized user guide content
+  const userGuide = [
+    {
+      question: t('userGuide.questions.whatAreInquiries.question'),
+      answer: t('userGuide.questions.whatAreInquiries.answer'),
+    },
+    {
+      question: t('userGuide.questions.howToCreateInquiry.question'),
+      answer: t('userGuide.questions.howToCreateInquiry.answer'),
+    },
+    {
+      question: t('userGuide.questions.howToAchieveStructure.question'),
+      answer: t('userGuide.questions.howToAchieveStructure.answer'),
+    },
+    {
+      question: t('userGuide.questions.whatIsDynamicGeneration.question'),
+      answer: t('userGuide.questions.whatIsDynamicGeneration.answer'),
+    },
+    {
+      question: t('userGuide.questions.whatAreQuestionTypes.question'),
+      answer: t('userGuide.questions.whatAreQuestionTypes.answer'),
+    },
+    {
+      question: t('userGuide.questions.whatDoNodeTypesDo.question'),
+      answer: t('userGuide.questions.whatDoNodeTypesDo.answer'),
+    },
+    {
+      question: t('userGuide.questions.whatDoEdgesDo.question'),
+      answer: t('userGuide.questions.whatDoEdgesDo.answer'),
+    },
+    {
+      question: t('userGuide.questions.whatAreGraphRules.question'),
+      answer: t('userGuide.questions.whatAreGraphRules.answer'),
+    },
+    {
+      question: t('userGuide.questions.howToDistributeInquiry.question'),
+      answer: t('userGuide.questions.howToDistributeInquiry.answer'),
+    },
+    {
+      question: t('userGuide.questions.whatIfChangeGraphAfterPublishing.question'),
+      answer: t('userGuide.questions.whatIfChangeGraphAfterPublishing.answer'),
+    },
+    {
+      question: t('userGuide.questions.areInquiriesAnonymous.question'),
+      answer: t('userGuide.questions.areInquiriesAnonymous.answer'),
+    },
+  ];
+
+  useSetTitle()(t('userGuide.title'));
 
   return (
     <>
-      <div className="container mx-auto mt-12 pb-16">
-        <motion.div
-          className="max-w-6xl mx-auto prose prose-invert"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <h1>User Guide</h1>
-          <ContentSection
-            content={
-              <iframe
-                className="w-full h-full aspect-video bg-indigo-700 flex flex-row rounded-2xl -mt-8"
-                width="560"
-                height="315"
-                src="https://www.youtube.com/embed/45l_kHRTmdY?si=DQZnYOwZOL1qih1N"
-                title="YouTube video player"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              ></iframe>
-            }
-            title="Quick Start Video"
-            description="Magiscribe allows you to create complex inquiries to collect high-quality data. Watch this video to get started."
-            reversed={false}
-          />
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-            {userGuide.map((faq, index) => (
-              <FAQItem key={index} question={faq.question} answer={faq.answer} />
-            ))}
-          </motion.div>
-        </motion.div>
+      <div className="w-full max-w-6xl mx-auto px-8 py-12 text-white">
+        <ContentSection
+          title={t('userGuide.title')}
+          description={t('userGuide.subtitle')}
+          reversed={false}
+          content={
+            <div className="max-w-6xl mx-auto prose prose-invert">
+              <div className="mb-8">
+                <h2 className="text-xl font-bold mb-4">{t('userGuide.videoTitle')}</h2>
+                <div className="aspect-w-16 aspect-h-9">
+                  <iframe
+                    className="w-full h-96"
+                    src="https://www.youtube.com/embed/45l_kHRTmdY?si=DQZnYOwZOL1qih1N"
+                    title={t('media.youtubeVideoPlayer')}
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                  ></iframe>
+                </div>
+              </div>
+              <div>
+                <h2 className="text-xl font-bold mb-4">{t('userGuide.faqTitle')}</h2>
+                <div className="space-y-4">
+                  {userGuide.map((item, index) => (
+                    <FAQItem key={index} question={item.question} answer={item.answer} />
+                  ))}
+                </div>
+              </div>
+            </div>
+          }
+        />
       </div>
     </>
   );

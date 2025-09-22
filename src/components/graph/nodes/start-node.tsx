@@ -3,6 +3,7 @@ import Textarea from '@/components/controls/textarea';
 import { faPlay } from '@fortawesome/free-solid-svg-icons';
 import { Position } from '@xyflow/react';
 import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import NodeContainer from '../elements/node-container';
 import CustomHandle from '../handles/limit-handle';
@@ -20,6 +21,7 @@ interface StartNodeProps {
 
 export default function StartNode({ id, data }: StartNodeProps) {
   const { handleInputChange } = useNodeData<StartNodeProps>(id);
+  const { t } = useTranslation();
 
   const handleUpdate = useCallback(
     (updates: Partial<StartNodeProps['data']>) => {
@@ -33,20 +35,20 @@ export default function StartNode({ id, data }: StartNodeProps) {
   );
 
   return (
-    <NodeContainer title={'Start'} faIcon={faPlay} id={id}>
+    <NodeContainer title={t('nodes.start.title')} faIcon={faPlay} id={id}>
       <div className="space-y-4 my-4">
         <Textarea
-          label="Message"
-          subLabel="Text that will be shown to the user on the start screen"
+          label={t('nodes.start.messageLabel')}
+          subLabel={t('nodes.start.messageSubLabel')}
           name="text"
           value={data.text}
           onChange={(e) => handleUpdate({ text: e.target.value })}
-          placeholder="Enter your text here..."
+          placeholder={t('nodes.start.messagePlaceholder')}
           className="resize-none overflow-hidden nodrag"
         />
         <Input
-          label="Require Name"
-          subLabel="Users will be required to enter their name."
+          label={t('nodes.start.requireName')}
+          subLabel={t('nodes.start.requireNameSubLabel')}
           name="enableNameCapture"
           type="checkbox"
           checked={data.requireName}
@@ -54,8 +56,8 @@ export default function StartNode({ id, data }: StartNodeProps) {
           className="nodrag"
         />
         <Input
-          label="Require Email"
-          subLabel="Users will be required to provide their email."
+          label={t('nodes.start.requireEmail')}
+          subLabel={t('nodes.start.requireEmailSubLabel')}
           name="enableEmailCapture"
           type="checkbox"
           checked={data.requireEmail}

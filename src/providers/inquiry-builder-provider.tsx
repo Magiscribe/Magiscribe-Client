@@ -137,7 +137,7 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
       if (getInquiry.userId) setOwners(getInquiry.userId);
       setInitialized(true);
     }
-  }, [inquiryData, resetInitialState, setGraph, setInitialized, setLastUpdated, setMetadata, setOwners, setSettings]);
+  }, []);
 
   /**
    * Subscribes to the prediction added subscription to get the generated graph.

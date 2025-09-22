@@ -17,6 +17,7 @@ import {
   XYPosition,
 } from '@xyflow/react';
 import React, { DragEvent, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import colors from 'tailwindcss/colors';
 
 import Button from '../controls/button';
@@ -33,6 +34,7 @@ function Flow({ children }: TreeInputProps) {
   const { screenToFlowPosition } = useReactFlow();
   const { graph, setGraph, triggerUpdate, canRedo, canUndo, onEdgesChange, onNodesChange, redo, undo } =
     useGraphContext();
+  const { t } = useTranslation();
 
   // States
   const [addNodeModalOpen, setAddNodeModalOpen] = useState(false);
@@ -347,10 +349,10 @@ function Flow({ children }: TreeInputProps) {
           >
             <Background />
             <Controls position="bottom-left" showInteractive={false}>
-              <ControlButton disabled={!canRedo} onClick={redo} aria-label="redo action" title="redo action">
+              <ControlButton disabled={!canRedo} onClick={redo} aria-label={t('builder.redoAction')} title={t('builder.redoAction')}>
                 <FontAwesomeIcon icon={faRedo} />
               </ControlButton>
-              <ControlButton disabled={!canUndo} onClick={undo} aria-label="undo action" title="undo action">
+              <ControlButton disabled={!canUndo} onClick={undo} aria-label={t('builder.undoAction')} title={t('builder.undoAction')}>
                 <FontAwesomeIcon icon={faUndo} />
               </ControlButton>
             </Controls>

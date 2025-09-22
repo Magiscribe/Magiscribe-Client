@@ -3,6 +3,7 @@ import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { validateGraph } from '@/utils/graphs/graph-utils';
 import { faMagicWandSparkles } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import CustomModal from '../modal';
 
@@ -28,6 +29,7 @@ export default function ModalValidationErrors({ open, onClose }: ValidationError
 
   // Hooks
   const { graph, generateGraph } = useInquiryBuilder();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (open) {
@@ -42,10 +44,10 @@ export default function ModalValidationErrors({ open, onClose }: ValidationError
   };
 
   return (
-    <CustomModal open={open} onClose={onClose} title="Invalid Inquiry Graph" size="4xl">
+    <CustomModal open={open} onClose={onClose} title={t('modals.validationErrors.title')} size="4xl">
       <div className="mt-4">
         <h3 className="text-lg font-semibold text-red-600 mb-2">
-          Please address the following errors before publishing:
+          {t('modals.validationErrors.subtitle')}
         </h3>
         <ul className="list-disc list-inside">
           {errors.map((error, index) => (
@@ -56,7 +58,7 @@ export default function ModalValidationErrors({ open, onClose }: ValidationError
         </ul>
         <div className="flex justify-end mt-4">
           <Button onClick={handleAutoFix} variant="primary" icon={faMagicWandSparkles}>
-            Automagically Fix
+            {t('modals.validationErrors.automagicallyFix')}
           </Button>
         </div>
       </div>

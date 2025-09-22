@@ -58,7 +58,7 @@
       "responses": "responses",
       "responseTime": "Response Time",
       "lastUpdated": "Last Updated",
-      "copyright": "© {{year}} Magiscribe. All rights reserved.",
+      "copyright": "© {{year}} PrezzW. All rights reserved.",
       "name": "Name",
       "email": "Email",
       "description": "Description",
@@ -66,7 +66,8 @@
       "voice": "Voice",
       "enabled": "Enabled",
       "disabled": "Disabled",
-      "loading": "Loading..."
+      "loading": "Loading...",
+      "note": "Note"
     },
     "forms": {
       "placeholders": {
@@ -88,7 +89,7 @@
       "info": "Info"
     },
     "brand": {
-      "name": "Magiscribe"
+      "name": "PrezzW"
     }
   },
   "pages": {
@@ -96,26 +97,26 @@
       "title": "",
       "hero": {
         "title": "Spend More Time Developing",
-        "subtitle": "Magiscribe reduces the amount of time developers spend in daily standups and updating JIRA tickets by 40%"
+        "subtitle": "PrezzW reduces the amount of time developers spend in daily standups and updating JIRA tickets by 40%"
       },
       "about": {
-        "title": "What is Magiscribe?",
+        "title": "What is PrezzW?",
         "balanceEfficiency": {
           "title": "Balance Efficiency with Depth",
-          "description": "Magiscribe helps you combine the efficiency of surveys with the depth of user interviews. Gather quantitative data from many participants while pursuing qualitative insights through targeted follow-up questions."
+          "description": "PrezzW helps you combine the efficiency of surveys with the depth of user interviews. Gather quantitative data from many participants while pursuing qualitative insights through targeted follow-up questions."
         },
         "understandAudience": {
           "title": "Understand Your Audience",
-          "description": "From simple yes-no surveys to in-depth quizzes and free-flowing conversations, our AI-powered platform streamlines audience insights. Magiscribe combines smart technology with artificial intelligence to deliver deeper understanding."
+          "description": "From simple yes-no surveys to in-depth quizzes and free-flowing conversations, our AI-powered platform streamlines audience insights. PrezzW combines smart technology with artificial intelligence to deliver deeper understanding."
         },
         "roughDrafts": {
           "title": "From rough drafts to rich dialogues",
-          "description": "Magiscribe produces semi-structured conversations allowing you to both guarantee particular questions get asked and allow for dynamic follow-up when the respondent says something interesting the same way a skilled interviewer would."
+          "description": "PrezzW produces semi-structured conversations allowing you to both guarantee particular questions get asked and allow for dynamic follow-up when the respondent says something interesting the same way a skilled interviewer would."
         }
       },
       "contact": {
         "title": "Get in Touch",
-        "subtitle": "Have a question, want to schedule a demo, or learn how Magiscribe can help you? Reach out to us and we'll get back to you as soon as possible!"
+        "subtitle": "Have a question, want to schedule a demo, or learn how PrezzW can help you? Reach out to us and we'll get back to you as soon as possible!"
       }
     },
     "contact": {
@@ -128,30 +129,30 @@
     },
     "faq": {
       "title": "Frequently Asked Questions",
-      "subtitle": "Learn how Magiscribe can turn dialogue into discovery",
+      "subtitle": "Learn how PrezzW can turn dialogue into discovery",
       "questions": {
-        "whatIsMagiscribe": {
-          "question": "What is Magiscribe?",
-          "answer": "Magiscribe is a user-friendly tool that revolutionizes how organizations gather insights from their audience. Unlike traditional surveys or time-intensive interviews, we offer dynamic, interactive conversations that adapt to each respondent, delivering deeper insights while saving you valuable time. Whether you're conducting market research, gathering customer feedback, or collecting stakeholder input, Magiscribe makes it effortless to create engaging, personalized interactions at scale."
+        "whatIsPrezzW": {
+          "question": "What is PrezzW?",
+          "answer": "PrezzW is a user-friendly tool that revolutionizes how organizations gather insights from their audience. Unlike traditional surveys or time-intensive interviews, we offer dynamic, interactive conversations that adapt to each respondent, delivering deeper insights while saving you valuable time. Whether you're conducting market research, gathering customer feedback, or collecting stakeholder input, PrezzW makes it effortless to create engaging, personalized interactions at scale."
         },
         "howDifferent": {
-          "question": "How is Magiscribe different from traditional surveys?",
-          "answer": "While traditional surveys are static and often miss crucial context, Magiscribe creates dynamic conversations that adapt based on your respondents' answers. Our platform combines the depth of personal interviews with the scalability of surveys, allowing you to capture nuanced feedback without the time investment of individual interviews. Plus, our smart follow-up system ensures you never miss important insights, automatically exploring interesting responses in greater detail."
+          "question": "How is PrezzW different from traditional surveys?",
+          "answer": "While traditional surveys are static and often miss crucial context, PrezzW creates dynamic conversations that adapt based on your respondents' answers. Our platform combines the depth of personal interviews with the scalability of surveys, allowing you to capture nuanced feedback without the time investment of individual interviews. Plus, our smart follow-up system ensures you never miss important insights, automatically exploring interesting responses in greater detail."
         },
         "whoIsItFor": {
-          "question": "Who is Magiscribe for?",
-          "answer": "Magiscribe is perfect for anyone who needs meaningful insights from their audience, including market researchers, product managers, customer experience teams, and business strategists. Our platform is particularly valuable for organizations that want to scale their research efforts without sacrificing depth and quality. Whether you're a startup gathering customer feedback or an enterprise conducting large-scale market research, Magiscribe adapts to your needs."
+          "question": "Who is PrezzW for?",
+          "answer": "PrezzW is perfect for anyone who needs meaningful insights from their audience, including market researchers, product managers, customer experience teams, and business strategists. Our platform is particularly valuable for organizations that want to scale their research efforts without sacrificing depth and quality. Whether you're a startup gathering customer feedback or an enterprise conducting large-scale market research, PrezzW adapts to your needs."
         },
         "whatInsights": {
-          "question": "What kinds of insights can I gather with Magiscribe?",
-          "answer": "Magiscribe is incredibly versatile. You can use it for customer feedback, product research, market analysis, user experience studies, employee feedback, and much more. Our platform excels at uncovering the \"why\" behind responses through intelligent follow-up questions, helping you gather both quantitative data and qualitative insights in a single interaction."
+          "question": "What kinds of insights can I gather with PrezzW?",
+          "answer": "PrezzW is incredibly versatile. You can use it for customer feedback, product research, market analysis, user experience studies, employee feedback, and much more. Our platform excels at uncovering the \"why\" behind responses through intelligent follow-up questions, helping you gather both quantitative data and qualitative insights in a single interaction."
         },
         "howEasy": {
           "question": "How easy is it to get started?",
-          "answer": "Getting started with Magiscribe is simple. Our platform offers ready-to-use templates for common use cases, which you can customize to your specific needs with just a few clicks. We also provide AI-powered assistance to help you craft the perfect questions and conversation flows. You can create your first inquiry in minutes and start gathering insights right away."
+          "answer": "Getting started with PrezzW is simple. Our platform offers ready-to-use templates for common use cases, which you can customize to your specific needs with just a few clicks. We also provide AI-powered assistance to help you craft the perfect questions and conversation flows. You can create your first inquiry in minutes and start gathering insights right away."
         },
         "qualityResponses": {
-          "question": "How does Magiscribe ensure quality responses?",
+          "question": "How does PrezzW ensure quality responses?",
           "answer": "Our dynamic conversation approach naturally encourages more thoughtful and detailed responses. By adapting to each respondent's answers and asking relevant follow-up questions, we create an engaging experience that yields higher quality insights."
         }
       }
@@ -222,7 +223,7 @@
           "content": "If you have any questions about this Privacy Policy, please contact us."
         }
       },
-      "description": "This privacy policy governs how we, Magiscribe (\"we\", \"our\" or \"us\"), use Personal Information that we collect, receive and store about individuals in connection with the use of our website and services (collectively referred to as the \"Services\")."
+      "description": "This privacy policy governs how we, PrezzW (\"we\", \"our\" or \"us\"), use Personal Information that we collect, receive and store about individuals in connection with the use of our website and services (collectively referred to as the \"Services\")."
     },
     "terms": {
       "title": "Terms and Conditions",
@@ -230,7 +231,7 @@
       "sections": {
         "serviceDescription": {
           "title": "Service Description",
-          "content": "Magiscribe provides a platform for creating and managing structured conversations through our inquiry system. Our services include but are not limited to inquiry creation, distribution, and response collection. The Service utilizes Anthropic's Claude AI model for various functionalities. When using the Service, you are subject to both these terms and any applicable Anthropic terms of service."
+          "content": "PrezzW provides a platform for creating and managing structured conversations through our inquiry system. Our services include but are not limited to inquiry creation, distribution, and response collection. The Service utilizes Anthropic's Claude AI model for various functionalities. When using the Service, you are subject to both these terms and any applicable Anthropic terms of service."
         },
         "userAccounts": {
           "title": "User Accounts",
@@ -242,11 +243,11 @@
         },
         "intellectualProperty": {
           "title": "Intellectual Property",
-          "content": "All content, features, and functionality of the Service are the exclusive property of Magiscribe and are protected by international copyright laws. You retain ownership of any content you create using our services, but grant us a license to use and process that content to provide and improve our services."
+          "content": "All content, features, and functionality of the Service are the exclusive property of PrezzW and are protected by international copyright laws. You retain ownership of any content you create using our services, but grant us a license to use and process that content to provide and improve our services."
         },
         "prohibitedActivities": {
           "title": "Prohibited Activities",
-          "content": "Users may not use Magiscribe for any illegal purposes or to distribute harmful content. We reserve the right to terminate accounts that violate these terms or engage in unauthorized activities."
+          "content": "Users may not use PrezzW for any illegal purposes or to distribute harmful content. We reserve the right to terminate accounts that violate these terms or engage in unauthorized activities."
         },
         "disclaimerWarranties": {
           "title": "Disclaimer of Warranties",
@@ -254,7 +255,7 @@
         },
         "limitationLiability": {
           "title": "Limitation of Liability",
-          "content": "To the maximum extent permitted by law, Magiscribe shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use or inability to use the Service."
+          "content": "To the maximum extent permitted by law, PrezzW shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use or inability to use the Service."
         },
         "changesTerms": {
           "title": "Changes to Terms",
@@ -269,18 +270,18 @@
           "content": "If you have any questions about these Terms, please contact us."
         }
       },
-      "description": "By accessing and using Magiscribe (\"Service\"), you acknowledge that you have read, understood, and agree to be bound by these Terms of Service (\"Agreement\"). If you do not agree with any part of these terms, you may not use our services. This Agreement constitutes a binding agreement between you (\"User\" or \"you\") and Magiscribe (\"we,\" \"us,\" or \"our\")."
+      "description": "By accessing and using PrezzW (\"Service\"), you acknowledge that you have read, understood, and agree to be bound by these Terms of Service (\"Agreement\"). If you do not agree with any part of these terms, you may not use our services. This Agreement constitutes a binding agreement between you (\"User\" or \"you\") and PrezzW (\"we,\" \"us,\" or \"our\")."
     },
     "dashboard": {
       "title": "Dashboard",
-      "welcome": "{{name}}, welcome to Magiscribe!",
-      "welcomeGeneric": "Welcome to Magiscribe!",
+      "welcome": "{{name}}, welcome to PrezzW!",
+      "welcomeGeneric": "Welcome to PrezzW!",
       "subtitle": "Get started turning dialogue into discoveries.",
       "yourInquiries": "Your Inquiries",
       "cards": {
         "gettingStarted": {
           "title": "Getting Started Guide",
-          "description": "Learn how to get started with Magiscribe's Inquiry Builder and start uncovering insights."
+          "description": "Learn how to get started with PrezzW's Inquiry Builder and start uncovering insights."
         },
         "contactUs": {
           "title": "Contact Us",
@@ -352,18 +353,22 @@
       "inquiryNotFoundDescription": "The inquiry you are looking for does not exist. Please check the URL and try again.",
       "somethingWentWrong": "Something Went Wrong",
       "errorDescription": "An error occurred while loading the inquiry. Please try again later.",
-      "errorPersists": "If the problem persists, please contact support at support@magiscribe.com",
+      "errorPersists": "If the problem persists, please contact support at support@PrezzW.com",
       "receiveEmailCopy": "Receive copy of your responses via email?",
-      "disclaimer": "Occasionally, mistakes may occur. If you notice any, please let us know at support@magiscribe.com"
+      "disclaimer": "Occasionally, mistakes may occur. If you notice any, please let us know at support@PrezzW.com"
+    },
+    "userResponse": {
+      "title": "Your Response",
+      "submittedOn": "Submitted on"
     }
   },
   "components": {
     "welcomeModal": {
-      "title": "Welcome to Magiscribe!",
+      "title": "Welcome to PrezzW!",
       "subtitle": "{{name}}, we're excited to have you here!",
-      "description1": "Magiscribe helps you combine the efficiency of surveys with the depth of user interviews. Gather quantitative data from many participants while pursuing qualitative insights through targeted follow-up questions.",
+      "description1": "PrezzW helps you combine the efficiency of surveys with the depth of user interviews. Gather quantitative data from many participants while pursuing qualitative insights through targeted follow-up questions.",
       "description2": "Get started by exploring our features or creating your first inquiry.",
-      "helpText": "Need help getting started? Check out our user guide or reach out to us at management@magiscribe.com"
+      "helpText": "Need help getting started? Check out our user guide or reach out to us at management@PrezzW.com"
     },
     "confirmModal": {
       "title": "Confirm",
@@ -379,7 +384,7 @@
       "receiveEmailOnResponse": "Receive Email On Response",
       "receiveEmailSubtitle": "Be alerted via email when someone finishes your inquiry.",
       "context": "Context (optional)",
-      "contextSubtitle": "Provide any additional background information. This helps Magiscribe to provide each survey respondent with relevant questions.",
+      "contextSubtitle": "Provide any additional background information. This helps PrezzW to provide each survey respondent with relevant questions.",
       "advancedSettings": "Advanced Settings",
       "graphTemplate": "Graph Template",
       "graphTemplateSubtitle": "Select a template to generate a conversation graph",
@@ -501,8 +506,137 @@
     }
   },
   "emails": {
-    "management": "management@magiscribe.com",
-    "support": "support@magiscribe.com"
+    "management": "management@PrezzW.com",
+    "support": "support@PrezzW.com"
+  },
+  "nodes": {
+    "start": {
+      "title": "Start",
+      "messageLabel": "Message",
+      "messageSubLabel": "Text that will be shown to the user on the start screen",
+      "messagePlaceholder": "Enter your text here...",
+      "requireName": "Require Name",
+      "requireNameSubLabel": "Users will be required to enter their name.",
+      "requireEmail": "Require Email",
+      "requireEmailSubLabel": "Users will be required to provide their email."
+    },
+    "question": {
+      "title": "Question",
+      "dynamicGenerationLabel": "Dynamic Generation",
+      "questionTypeLabel": "Question Type",
+      "messageLabel": "Message",
+      "messagePlaceholder": "Enter your text here...",
+      "messageSubLabelDynamic": "Prompt for an AI to generate a question",
+      "messageSubLabelStatic": "Question asked directly to the user",
+      "selectableOptionsLabel": "Selectable Options",
+      "addSelectOption": "Add Select Option",
+      "questionTypes": {
+        "openEnded": "Open Ended",
+        "singleSelect": "Single Select",
+        "multiSelect": "Multi Select"
+      }
+    },
+    "information": {
+      "title": "Information",
+      "dynamicGenerationLabel": "Dynamic Generation",
+      "messageLabel": "Message",
+      "messagePlaceholder": "Enter your text here...",
+      "messageSubLabelDynamic": "Prompt for an AI to generate information",
+      "messageSubLabelStatic": "Information displayed directly to the user"
+    },
+    "condition": {
+      "title": "Condition",
+      "randomLabel": "Random",
+      "addCondition": "Add Condition",
+      "addNewConditionTitle": "Add new condition",
+      "probabilityNote": "Note: The sum of all probabilities must equal 1.00"
+    },
+    "integration": {
+      "title": "Integration",
+      "integrationToolLabel": "Integration Tool",
+      "selectIntegrationPlaceholder": "Select an integration...",
+      "selectIntegrationSubLabel": "Select an MCP integration tool to execute",
+      "noIntegrationsSubLabel": "No integrations configured. Add integrations in inquiry settings.",
+      "loadingIntegrationsSubLabel": "Loading available integrations...",
+      "integrationDetailsTitle": "Integration Details:",
+      "systemPromptLabel": "System Prompt",
+      "systemPromptPlaceholder": "Enter instructions for the integration tool...",
+      "systemPromptSubLabelEnabled": "Instructions for the integration tool. Can reference user input from previous nodes using {{variable_name}} syntax.",
+      "systemPromptSubLabelDisabled": "Define how this integration should be used (disabled until integration is selected)",
+      "detailsType": "Type:",
+      "detailsDescription": "Description:"
+    },
+    "end": {
+      "title": "End"
+    }
+  },
+  "builder": {
+    "graphEditor": "Graph Editor",
+    "untitledInquiry": "Untitled Inquiry",
+    "clearGraph": "Clear Graph",
+    "redoAction": "redo action",
+    "undoAction": "undo action"
+  },
+  "media": {
+    "youtubeVideoPlayer": "YouTube video player"
+  },
+  "modals": {
+    "validationErrors": {
+      "title": "Invalid Inquiry Graph",
+      "subtitle": "Please address the following errors before publishing:",
+      "automagicallyFix": "Automagically Fix"
+    }
+  },
+  "userGuide": {
+    "title": "User Guide",
+    "subtitle": "Learn how to get the most out of PrezzW",
+    "videoTitle": "Getting Started with PrezzW",
+    "questions": {
+      "whatAreInquiries": {
+        "question": "What are inquiries?",
+        "answer": "Magiscribe inquiries are structured conversations about a particular topic that allow for dynamic follow-up. Imagine you are interviewing a customer about your product. You'd probably have a certain set of questions that you want to make sure you ask them, as well as potentially coming up with dynamic follow-up questions on the fly if your interviewee says something interesting. Our inquiries allow you to configure a structured, yet nuanced discussion that you can distribute to stakeholders at scale."
+      },
+      "howToCreateInquiry": {
+        "question": "How do I create an inquiry?",
+        "answer": "To create an inquiry you hit the big blue plus button on the dashboard. From there a modal will pop up and allow you to choose a template or start from scratch. If you choose a template, you'll have the opportunity to let an AI customize the template to your use case (recommended). From there, further modifications to the conversation graph can be done manually or with the \"Graph Editor\" chat window on the right side of the \"Builder\"."
+      },
+      "howToAchieveStructure": {
+        "question": "How do I achieve structure in my inquiries?",
+        "answer": "Magiscribe Inquiries are modeled using a directed conversation graph. As you may know, graphs consist of nodes and edges. There are five types of nodes: Start, Information, Question, Condition, and End. The conversation must progress from a Start node to an End node. In between, paths through the graph represent the different possible conversation flows that a user could have."
+      },
+      "whatIsDynamicGeneration": {
+        "question": "What does it mean when a question node or an information node has \"Dynamic Generation\" enabled?",
+        "answer": "When \"Dynamic Generation\" is enabled, this indicates that the text in the node will serve as an instruction to an LLM to generate content on the fly based on that instruction and the entire conversation history. If \"Dynamic Generation\" is not selected then the text in the textarea will be displayed directly to the user."
+      },
+      "whatAreQuestionTypes": {
+        "question": "What are the different types of questions that can be asked?",
+        "answer": "Questions can either be open-ended, single-select, or multi-select. Open-ended questions allow the user to provide text response. Single-select gives the respondent a list of options and lets them pick exactly one. Multi-select allows the respondent to choose all that apply amongst a list of options."
+      },
+      "whatDoNodeTypesDo": {
+        "question": "What do each of the node types do?",
+        "answer": "The start node represents the beginning of the conversation flow. The information node provides information to the user without requiring a response. The question node represents a point where the user is asked a question. The condition node allows for the conversation to take a different path based on the user's response. The end node represents the end of the conversation flow."
+      },
+      "whatDoEdgesDo": {
+        "question": "What do the edges do?",
+        "answer": "The edges link nodes together in a directed fashion. If the user is at question node \"A\" and there exists an edge between node \"A\" and information node \"B\", once they answer the question they'll be routed to node \"B\"."
+      },
+      "whatAreGraphRules": {
+        "question": "What are the graph rules?",
+        "answer": "There can only be one start node and there must be at least one end node. Every other type of node must have at least one incoming and outgoing edge. There must be at least one question node. Information nodes and question nodes can have multiple incoming edges, but only one outgoing edge. Condition nodes can have multiple incoming edges and must have multiple outgoing edges."
+      },
+      "howToDistributeInquiry": {
+        "question": "How do I distribute my inquiry?",
+        "answer": "We will only allow you to distribute inquiries with valid conversation graphs. To attempt to do this, click \"Publish\" on the \"Builder\" tab of your inquiry. If your graph is valid, you'll get a link to send out to people. Anyone who has that link will be able to respond directly to your inquiry. If your graph is not valid, a list of errors will be displayed. You can attempt to let the AI \"Automagically Fix\" the errors and then try publishing it again."
+      },
+      "whatIfChangeGraphAfterPublishing": {
+        "question": "What if I change my graph after publishing it?",
+        "answer": "We will save any changes you make in the graph builder to a \"Draft Graph\". We will only update the public inquiry that people receive when you hit \"Publish\" and all validation checks pass. Our system is flexible enough to allow you to add or remove questions and be backwards compatible with previous versions of your graph!"
+      },
+      "areInquiriesAnonymous": {
+        "question": "Are inquiries anonymous?",
+        "answer": "Currently, every inquiry puts the choice as to whether or not to have respondents be identified in the hands of the admin. You can check the \"Require Email\" and \"Require Name\" checkboxes in the start node to guarantee you receive this important demographic information."
+      }
+    }
   },
   "dates": {
     "lastUpdated": "December 10th, 2024"
