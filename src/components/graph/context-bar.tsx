@@ -6,6 +6,7 @@ import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { formatGraph, validateGraph } from '@/utils/graphs/graph-utils';
 import { faCog, faEllipsisV, faEye, faPaperPlane, faRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Button from '../controls/button';
 import Input from '../controls/input';
@@ -13,6 +14,8 @@ import ModalValidationErrors from '../modals/inquiry/inquiry-validation-errors-m
 import ModalSettingsInquiry from '../modals/inquiry/settings-inquiry-modal';
 
 export default function GraphContextBar() {
+  const { t } = useTranslation();
+  
   // States
   const [clearGraphModal, setClearGraphModal] = useState(false);
   const [sendModalOpen, setSendModalOpen] = useState(false);
@@ -66,7 +69,7 @@ export default function GraphContextBar() {
         <div className="w-full max-w-2xl">
           <Input
             name="title"
-            value={settings.title ?? 'Untitled Inquiry'}
+            value={settings.title ?? t('builder.untitledInquiry')}
             onChange={(e) => {
               setSettings({ ...settings, title: e.target.value });
             }}
@@ -101,7 +104,7 @@ export default function GraphContextBar() {
           setClearGraphModal(false);
         }}
         text="Are you sure you want to clear the graph? This action cannot be undone."
-        confirmText="Clear Graph"
+        confirmText={t('builder.clearGraph')}
       />
 
       <ModalSettingsInquiry

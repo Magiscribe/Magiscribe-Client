@@ -1,6 +1,7 @@
-import { ApolloError, useQuery } from '@apollo/client';
-import { useEffect } from 'react';
 import { GET_USER_QUOTA } from '@/clients/queries';
+import { ErrorLike } from '@apollo/client';
+import { useQuery } from '@apollo/client/react';
+import { useEffect } from 'react';
 
 interface UserQuota {
   userId: string;
@@ -18,7 +19,7 @@ interface UseUserQuotaReturn {
   usedOutputTokens: number;
   allowedTokens: number;
   loading: boolean;
-  error: ApolloError | undefined;
+  error: ErrorLike | undefined;
   refetch: () => void;
   updatedAt: string;
 }

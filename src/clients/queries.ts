@@ -94,6 +94,10 @@ export const GET_ALL_CAPABILITIES = gql`
         name
         id
         text
+        logicalCollection {
+          id
+          name
+        }
       }
       alias
       name
@@ -102,6 +106,10 @@ export const GET_ALL_CAPABILITIES = gql`
       outputMode
       subscriptionFilter
       outputFilter
+      logicalCollection {
+        id
+        name
+      }
     }
   }
 `;
@@ -115,6 +123,10 @@ export const GET_CAPABILITY = gql`
         name
         id
         text
+        logicalCollection {
+          id
+          name
+        }
       }
       alias
       name
@@ -122,6 +134,10 @@ export const GET_CAPABILITY = gql`
       outputMode
       subscriptionFilter
       outputFilter
+      logicalCollection {
+        id
+        name
+      }
     }
   }
 `;
@@ -132,6 +148,10 @@ export const GET_ALL_PROMPTS = gql`
       id
       name
       text
+      logicalCollection {
+        id
+        name
+      }
     }
   }
 `;

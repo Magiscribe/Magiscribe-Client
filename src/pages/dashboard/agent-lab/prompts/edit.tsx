@@ -4,9 +4,10 @@ import Container from '@/components/container';
 import Button from '@/components/controls/button';
 import Input from '@/components/controls/input';
 import Textarea from '@/components/controls/textarea';
+import { GetPromptQuery, UpsertPromptMutation } from '@/graphql/graphql';
 import { useAddAlert } from '@/providers/alert-provider';
-import { useMutation, useQuery } from '@apollo/client';
-import { useState } from 'react';
+import { useMutation, useQuery } from '@apollo/client/react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 export default function PromptEdit() {
@@ -24,20 +25,25 @@ export default function PromptEdit() {
   const [searchParams] = useSearchParams();
 
   // Queries and Mutations
-  const [upsertPrompt] = useMutation(ADD_UPDATE_PROMPT);
-  useQuery(GET_PROMPT, {
+  const [upsertPrompt] = useMutation<UpsertPromptMutation>(ADD_UPDATE_PROMPT);
+  const { data: promptData } = useQuery<GetPromptQuery>(GET_PROMPT, {
     skip: !searchParams.has('id'),
     variables: {
       promptId: searchParams.get('id'),
     },
-    onCompleted: (data) => {
-      setForm({
-        id: data.getPrompt.id,
-        name: data.getPrompt.name,
-        text: data.getPrompt.text,
-      });
-    },
   });
+
+  // Handle prompt data loading
+  useEffect(() => {
+    if (promptData?.getPrompt) {
+      const prompt = promptData.getPrompt;
+      setForm({
+        id: prompt.id,
+        name: prompt.name,
+        text: prompt.text,
+      });
+    }
+  }, [promptData]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = event.target;
@@ -62,7 +68,7 @@ export default function PromptEdit() {
         },
       });
 
-      if (result.errors) {
+      if (result.error) {
         addAlert('Error saving prompt', 'error');
         return;
       }

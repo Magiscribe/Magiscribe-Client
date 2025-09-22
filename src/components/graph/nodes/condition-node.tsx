@@ -4,6 +4,7 @@ import { faCodeBranch, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { getOutgoers, Handle, NodeProps, Position, useEdges, useNodes, useReactFlow } from '@xyflow/react';
 import colors from 'tailwindcss/colors';
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Condition from '../elements/condition';
 import NodeContainer from '../elements/node-container';
@@ -39,6 +40,7 @@ export default function ConditionNode({ id, data }: ConditionNodeProps) {
   const { updateNodeData, updateEdgeData } = useReactFlow();
   const nodes = useNodes();
   const edges = useEdges();
+  const { t } = useTranslation();
   const nodeColorMap: Record<string, string> = {};
   let nodeColorIndex = 0;
   getOutgoers({ id }, nodes, edges).forEach((node) => {
@@ -60,9 +62,9 @@ export default function ConditionNode({ id, data }: ConditionNodeProps) {
   );
 
   return (
-    <NodeContainer title="Condition" faIcon={faCodeBranch} id={id}>
+    <NodeContainer title={t('nodes.condition.title')} faIcon={faCodeBranch} id={id}>
       <Input
-        label="Random"
+        label={t('nodes.condition.randomLabel')}
         name="random"
         type="checkbox"
         checked={isRandom}
@@ -99,14 +101,14 @@ export default function ConditionNode({ id, data }: ConditionNodeProps) {
 
       {isRandom && (
         <div className="mt-4 text-sm text-gray-600 dark:text-gray-300">
-          <strong>Note:</strong> The sum of all probabilities must equal 1.00
+          <strong>{t('common.labels.note')}:</strong> {t('nodes.condition.probabilityNote')}
         </div>
       )}
 
       <div className="mt-4">
         <Button
           className="nodrag mt-2 w-full"
-          title="Add new condition"
+          title={t('nodes.condition.addNewConditionTitle')}
           variant="primary"
           size="medium"
           icon={faPlus}
@@ -126,7 +128,7 @@ export default function ConditionNode({ id, data }: ConditionNodeProps) {
             updateNodeData(id, { conditions });
           }}
         >
-          Add Condition
+          {t('nodes.condition.addCondition')}
         </Button>
       </div>
 

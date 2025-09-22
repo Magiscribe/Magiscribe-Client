@@ -1,0 +1,638 @@
+{
+  "common": {
+    "buttons": {
+      "getStartedFree": "Empieza Gratis",
+      "signIn": "Iniciar Sesión",
+      "dashboard": "Panel de Control",
+      "letsProceed": "¡Empecemos!",
+      "contactUs": "Contáctanos",
+      "visitLinkedIn": "Visita nuestro LinkedIn",
+      "joinDiscord": "Únete a nuestro Discord",
+      "close": "Cerrar",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "delete": "Eliminar",
+      "edit": "Editar",
+      "create": "Crear",
+      "copy": "Copiar",
+      "add": "Agregar",
+      "back": "Atrás",
+      "finish": "Finalizar",
+      "getStarted": "Empezar",
+      "run": "Ejecutar",
+      "clear": "Limpiar",
+      "remove": "Quitar",
+      "preview": "Vista Previa",
+      "confirm": "Confirmar"
+    },
+    "navigation": {
+      "home": "Inicio",
+      "dashboard": "Panel de Control",
+      "contact": "Contacto",
+      "faq": "Preguntas Frecuentes",
+      "privacy": "Política de Privacidad",
+      "terms": "Términos y Condiciones",
+      "user-guide": "Guía de Usuario",
+      "agent-lab": "Laboratorio de Agentes",
+      "playground": "Área de Pruebas",
+      "agents": "Agentes",
+      "capabilities": "Capacidades",
+      "prompts": "Prompts",
+      "edit": "Editar",
+      "inquiry-builder": "Creador de Consultas",
+      "inquiry": "Consulta",
+      "builder": "Constructor",
+      "analysis": "Análisis"
+    },
+    "settings": {
+      "title": "Configuración",
+      "language": "Idioma",
+      "theme": "Tema",
+      "lightMode": "Modo Claro",
+      "darkMode": "Modo Oscuro",
+      "selectLanguage": "Seleccionar Idioma"
+    },
+    "labels": {
+      "updated": "Actualizado",
+      "response": "respuesta",
+      "responses": "respuestas",
+      "responseTime": "Tiempo de Respuesta",
+      "lastUpdated": "Última Actualización",
+      "copyright": "© {{year}} Magiscribe. Todos los derechos reservados.",
+      "name": "Nombre",
+      "email": "Correo Electrónico",
+      "description": "Descripción",
+      "title": "Título",
+      "voice": "Voz",
+      "enabled": "Habilitado",
+      "disabled": "Deshabilitado",
+      "loading": "Cargando..."
+    },
+    "forms": {
+      "placeholders": {
+        "yourName": "Tu nombre",
+        "yourEmail": "Tu dirección de correo electrónico",
+        "inquiryTitle": "Título de la consulta",
+        "typeMessage": "Escribe tu mensaje aquí..."
+      },
+      "validation": {
+        "nameRequired": "Por favor, ingresa tu nombre.",
+        "emailRequired": "Por favor, ingresa tu dirección de correo electrónico.",
+        "validEmailRequired": "Por favor, ingresa una dirección de correo electrónico válida."
+      }
+    },
+    "status": {
+      "success": "Éxito",
+      "error": "Error",
+      "warning": "Advertencia",
+      "info": "Información"
+    },
+    "brand": {
+      "name": "Magiscribe"
+    }
+  },
+  "pages": {
+    "home": {
+      "title": "",
+      "hero": {
+        "title": "Pasa Más Tiempo Desarrollando",
+        "subtitle": "Magiscribe reduce en un 40% el tiempo que los desarrolladores dedican a reuniones diarias y a actualizar tickets de JIRA."
+      },
+      "about": {
+        "title": "¿Qué es Magiscribe?",
+        "balanceEfficiency": {
+          "title": "Equilibra Eficiencia con Profundidad",
+          "description": "Magiscribe te ayuda a combinar la eficiencia de las encuestas con la profundidad de las entrevistas de usuario. Recopila datos cuantitativos de muchos participantes mientras buscas obtener información cualitativa a través de preguntas de seguimiento específicas."
+        },
+        "understandAudience": {
+          "title": "Entiende a Tu Audiencia",
+          "description": "Desde simples encuestas de sí/no hasta cuestionarios detallados y conversaciones fluidas, nuestra plataforma impulsada por IA simplifica la obtención de información de la audiencia. Magiscribe combina tecnología inteligente con inteligencia artificial para ofrecer una comprensión más profunda."
+        },
+        "roughDrafts": {
+          "title": "De borradores a diálogos enriquecidos",
+          "description": "Magiscribe produce conversaciones semiestructuradas que te permiten garantizar que se hagan preguntas específicas y, al mismo tiempo, permiten un seguimiento dinámico cuando el encuestado dice algo interesante, de la misma manera que lo haría un entrevistador experto."
+        }
+      },
+      "contact": {
+        "title": "Ponte en Contacto",
+        "subtitle": "¿Tienes una pregunta, quieres programar una demostración o saber cómo Magiscribe puede ayudarte? ¡Contáctanos y te responderemos lo antes posible!"
+      }
+    },
+    "contact": {
+      "title": "Contáctanos",
+      "pageTitle": "Ponte en Contacto",
+      "responseTime": {
+        "title": "Tiempo de Respuesta",
+        "description": "Normalmente respondemos a las consultas en un plazo de 6 a 12 horas durante los días laborables. Para asuntos urgentes, por favor, contáctanos en Discord."
+      }
+    },
+    "faq": {
+      "title": "Preguntas Frecuentes",
+      "subtitle": "Descubre cómo Magiscribe puede convertir el diálogo en descubrimiento",
+      "questions": {
+        "whatIsMagiscribe": {
+          "question": "¿Qué es Magiscribe?",
+          "answer": "Magiscribe es una herramienta fácil de usar que revoluciona la forma en que las organizaciones obtienen información de su audiencia. A diferencia de las encuestas tradicionales o las entrevistas que consumen mucho tiempo, ofrecemos conversaciones dinámicas e interactivas que se adaptan a cada encuestado, proporcionando información más profunda y ahorrándote tiempo valioso. Ya sea que estés realizando una investigación de mercado, recopilando comentarios de clientes o recogiendo opiniones de partes interesadas, Magiscribe facilita la creación de interacciones atractivas y personalizadas a gran escala."
+        },
+        "howDifferent": {
+          "question": "¿En qué se diferencia Magiscribe de las encuestas tradicionales?",
+          "answer": "Mientras que las encuestas tradicionales son estáticas y a menudo pierden contexto crucial, Magiscribe crea conversaciones dinámicas que se adaptan según las respuestas de tus encuestados. Nuestra plataforma combina la profundidad de las entrevistas personales con la escalabilidad de las encuestas, permitiéndote capturar comentarios matizados sin la inversión de tiempo de las entrevistas individuales. Además, nuestro sistema de seguimiento inteligente asegura que nunca pierdas información importante, explorando automáticamente las respuestas interesantes con mayor detalle."
+        },
+        "whoIsItFor": {
+          "question": "¿Para quién es Magiscribe?",
+          "answer": "Magiscribe es perfecto para cualquiera que necesite información significativa de su audiencia, incluidos investigadores de mercado, gerentes de producto, equipos de experiencia del cliente y estrategas de negocios. Nuestra plataforma es particularmente valiosa para organizaciones que desean escalar sus esfuerzos de investigación sin sacrificar la profundidad y la calidad. Ya seas una startup que recopila comentarios de clientes o una empresa que realiza investigaciones de mercado a gran escala, Magiscribe se adapta a tus necesidades."
+        },
+        "whatInsights": {
+          "question": "¿Qué tipo de información puedo recopilar con Magiscribe?",
+          "answer": "Magiscribe es increíblemente versátil. Puedes usarlo para comentarios de clientes, investigación de productos, análisis de mercado, estudios de experiencia de usuario, comentarios de empleados y mucho más. Nuestra plataforma destaca en descubrir el \"porqué\" detrás de las respuestas a través de preguntas de seguimiento inteligentes, ayudándote a recopilar tanto datos cuantitativos como información cualitativa en una sola interacción."
+        },
+        "howEasy": {
+          "question": "¿Qué tan fácil es empezar?",
+          "answer": "Empezar con Magiscribe es simple. Nuestra plataforma ofrece plantillas listas para usar para casos de uso comunes, que puedes personalizar según tus necesidades específicas con solo unos pocos clics. También proporcionamos asistencia impulsada por IA para ayudarte a elaborar las preguntas y los flujos de conversación perfectos. Puedes crear tu primera consulta en minutos y comenzar a recopilar información de inmediato."
+        },
+        "qualityResponses": {
+          "question": "¿Cómo asegura Magiscribe la calidad de las respuestas?",
+          "answer": "Nuestro enfoque de conversación dinámica fomenta naturalmente respuestas más reflexivas y detalladas. Al adaptarnos a las respuestas de cada encuestado y hacer preguntas de seguimiento relevantes, creamos una experiencia atractiva que produce información de mayor calidad."
+        }
+      }
+    },
+    "privacy": {
+      "title": "Política de Privacidad",
+      "sections": {
+        "introduction": {
+          "title": "Introducción",
+          "content": "Hemos implementado esta Política de Privacidad porque tu privacidad, y la de otros usuarios, es importante para nosotros. Esta Política de Privacidad explica nuestras prácticas de información en línea y las opciones que puedes tomar sobre la forma en que tu Información Personal es recopilada y utilizada en conexión con los Servicios. \"Información Personal\" significa cualquier información que pueda ser utilizada para identificar personalmente a un individuo, incluyendo, pero no limitado a, nombres, direcciones de correo electrónico y otra información de contacto."
+        },
+        "termsOfUse": {
+          "title": "Términos de Uso",
+          "content": "Esta Política de Privacidad forma parte de nuestros Términos de Servicio."
+        },
+        "informationWeCollect": {
+          "title": "Información que Recopilamos",
+          "content": "Recopilamos Información Personal de las siguientes maneras:",
+          "accountInfo": {
+            "title": "Información de la Cuenta",
+            "content": "Cuando creas una cuenta a través de los servicios de autenticación de Clerk, recibimos información básica de tu perfil, como tu nombre y dirección de correo electrónico."
+          },
+          "usageInfo": {
+            "title": "Información de Uso",
+            "content": "Recopilamos información sobre cómo utilizas nuestros Servicios, incluidas tus respuestas a consultas, patrones de conversación e interacción con nuestras funciones de IA."
+          },
+          "technicalInfo": {
+            "title": "Información Técnica",
+            "content": "Cuando utilizas nuestros Servicios, podemos recopilar datos técnicos como tu dirección IP, tipo de navegador e información del dispositivo a través de cookies y tecnologías similares."
+          }
+        },
+        "howWeUse": {
+          "title": "Cómo Usamos Tu Información",
+          "content": "Usamos tu Información Personal para:",
+          "items": [
+            "Proveer y mejorar nuestros Servicios",
+            "Generar análisis y mejorar nuestros modelos de IA",
+            "Comunicarnos contigo sobre nuestros Servicios",
+            "Garantizar la seguridad y prevenir el fraude"
+          ]
+        },
+        "dataSharing": {
+          "title": "Uso Compartido de Datos",
+          "content": "Compartimos tu información con:",
+          "items": [
+            "AWS Bedrock (para el procesamiento de IA a través de Claude)",
+            "Clerk (para servicios de autenticación)"
+          ],
+          "note": "Amazon Bedrock no almacena ni registra tus prompts y completaciones. Amazon Bedrock no utiliza tus prompts y completaciones para entrenar ningún modelo de AWS ni los distribuye a terceros."
+        },
+        "dataSecurity": {
+          "title": "Seguridad de los Datos",
+          "content": "Implementamos medidas técnicas y organizativas apropiadas para proteger tu Información Personal. Sin embargo, ningún método de transmisión por Internet es 100% seguro."
+        },
+        "yourRights": {
+          "title": "Tus Derechos",
+          "content": "Tienes derecho a:",
+          "items": [
+            "Acceder a tu Información Personal",
+            "Corregir información inexacta",
+            "Solicitar la eliminación de tu información",
+            "Optar por no participar en cierta recopilación de datos"
+          ]
+        },
+        "changes": {
+          "title": "Cambios a Esta Política",
+          "content": "Podemos actualizar esta Política de Privacidad de vez en cuando. Te notificaremos de cualquier cambio publicando la nueva política en esta página."
+        },
+        "contactUs": {
+          "title": "Contáctanos",
+          "content": "Si tienes alguna pregunta sobre esta Política de Privacidad, por favor contáctanos."
+        }
+      },
+      "description": "Esta política de privacidad rige cómo nosotros, Magiscribe (\"nosotros\", \"nuestro\" o \"nos\"), usamos la Información Personal que recopilamos, recibimos y almacenamos sobre individuos en conexión con el uso de nuestro sitio web y servicios (colectivamente referidos como los \"Servicios\")."
+    },
+    "terms": {
+      "title": "Términos y Condiciones",
+      "pageTitle": "Términos de Servicio",
+      "sections": {
+        "serviceDescription": {
+          "title": "Descripción del Servicio",
+          "content": "Magiscribe proporciona una plataforma para crear y gestionar conversaciones estructuradas a través de nuestro sistema de consultas. Nuestros servicios incluyen, entre otros, la creación, distribución y recopilación de respuestas de consultas. El Servicio utiliza el modelo de IA Claude de Anthropic para diversas funcionalidades. Al utilizar el Servicio, estás sujeto tanto a estos términos como a los términos de servicio aplicables de Anthropic."
+        },
+        "userAccounts": {
+          "title": "Cuentas de Usuario",
+          "content": "Para utilizar el Servicio, debes crear una cuenta utilizando los servicios de autenticación de Clerk. Eres responsable de mantener la confidencialidad de las credenciales de tu cuenta y de todas las actividades que ocurran bajo tu cuenta. Debes notificarnos inmediatamente de cualquier uso no autorizado de tu cuenta. Tu uso de los servicios de autenticación de Clerk también está sujeto a los términos de servicio y la política de privacidad de Clerk."
+        },
+        "privacyData": {
+          "title": "Privacidad y Protección de Datos",
+          "content": "Respetamos tu privacidad y manejamos tus datos de acuerdo con nuestra Política de Privacidad. Al recopilar respuestas a través de consultas, aceptas informar a los encuestados sobre las prácticas de recopilación de datos y obtener los consentimientos necesarios. Reconoces que el Servicio utiliza el modelo de IA Claude de Anthropic y que el procesamiento de datos puede ocurrir a través de los sistemas de Anthropic de acuerdo con sus prácticas de privacidad."
+        },
+        "intellectualProperty": {
+          "title": "Propiedad Intelectual",
+          "content": "Todo el contenido, características y funcionalidad del Servicio son propiedad exclusiva de Magiscribe y están protegidos por las leyes internacionales de derechos de autor. Conservas la propiedad de cualquier contenido que crees utilizando nuestros servicios, pero nos otorgas una licencia para usar y procesar ese contenido para proporcionar y mejorar nuestros servicios."
+        },
+        "prohibitedActivities": {
+          "title": "Actividades Prohibidas",
+          "content": "Los usuarios no pueden usar Magiscribe para fines ilegales o para distribuir contenido dañino. Nos reservamos el derecho de cancelar cuentas que violen estos términos o participen en actividades no autorizadas."
+        },
+        "disclaimerWarranties": {
+          "title": "Exclusión de Garantías",
+          "content": "El Servicio se proporciona \"tal cual\" y \"según disponibilidad\" sin garantías de ningún tipo. No garantizamos que el Servicio será ininterrumpido o libre de errores. No somos responsables de la exactitud, fiabilidad o calidad de ningún contenido o respuesta generada a través del Servicio."
+        },
+        "limitationLiability": {
+          "title": "Limitación de Responsabilidad",
+          "content": "En la máxima medida permitida por la ley, Magiscribe no será responsable de ningún daño indirecto, incidental, especial, consecuente o punitivo que resulte de tu uso o incapacidad para usar el Servicio."
+        },
+        "changesTerms": {
+          "title": "Cambios en los Términos",
+          "content": "Nos reservamos el derecho de modificar estos términos en cualquier momento. Te notificaremos de cualquier cambio publicando los nuevos términos en el Servicio. Tu uso continuado del Servicio después de dichas modificaciones constituye tu aceptación de los nuevos términos."
+        },
+        "governingLaw": {
+          "title": "Ley Aplicable",
+          "content": "Estos términos se regirán e interpretarán de acuerdo con las leyes de los Estados Unidos, sin tener en cuenta sus disposiciones sobre conflictos de leyes. Aceptas someterte a la jurisdicción personal y exclusiva de los tribunales ubicados dentro de los Estados Unidos."
+        },
+        "contactUs": {
+          "title": "Contáctanos",
+          "content": "Si tienes alguna pregunta sobre estos Términos, por favor contáctanos."
+        }
+      },
+      "description": "Al acceder y utilizar Magiscribe (\"Servicio\"), reconoces que has leído, entendido y aceptas estar sujeto a estos Términos de Servicio (\"Acuerdo\"). Si no estás de acuerdo con alguna parte de estos términos, no puedes utilizar nuestros servicios. Este Acuerdo constituye un acuerdo vinculante entre tú (\"Usuario\" o \"tú\") y Magiscribe (\"nosotros,\" \"nos,\" o \"nuestro\")."
+    },
+    "dashboard": {
+      "title": "Panel de Control",
+      "welcome": "¡{{name}}, bienvenido/a a Magiscribe!",
+      "welcomeGeneric": "¡Bienvenido/a a Magiscribe!",
+      "subtitle": "Empieza a convertir el diálogo en descubrimientos.",
+      "yourInquiries": "Tus Consultas",
+      "cards": {
+        "gettingStarted": {
+          "title": "Guía de Inicio",
+          "description": "Aprende cómo empezar con el Creador de Consultas de Magiscribe y comienza a descubrir información."
+        },
+        "contactUs": {
+          "title": "Contáctanos",
+          "description": "¿Tienes algún problema? Contáctanos para obtener ayuda."
+        },
+        "agentLab": {
+          "title": "Laboratorio de Agentes",
+          "description": "Crea y gestiona agentes de IA."
+        }
+      }
+    },
+    "agentLab": {
+      "title": "Laboratorio de Agentes",
+      "agents": {
+        "title": "Agentes",
+        "addAgent": "Agregar Agente",
+        "editAgent": "Editar Agente",
+        "deleteConfirmation": "¿Estás seguro de que quieres eliminar este agente?",
+        "fields": {
+          "name": "Nombre",
+          "description": "Descripción",
+          "capabilities": "Capacidades",
+          "reasoning": "Razonamiento",
+          "llmModel": "Modelo LLM",
+          "reasoningPrompt": "Prompt de Razonamiento",
+          "variablePassThrough": "Paso de Variables",
+          "memoryEnabled": "Memoria Habilitada",
+          "subscriptionFilter": "Filtro de Suscripción",
+          "outputFilter": "Filtro de Salida"
+        }
+      },
+      "playground": {
+        "title": "Área de Pruebas",
+        "subscriptionId": "ID de Suscripción",
+        "voice": "Voz",
+        "agents": "Agentes",
+        "uploadImages": "Subir Imágenes",
+        "uploadedImages": "Imágenes Subidas",
+        "audioOn": "Audio Activado",
+        "audioOff": "Audio Desactivado"
+      },
+      "alerts": {
+        "agentDeleted": "Agente eliminado correctamente",
+        "agentDeleteFailed": "Error al eliminar el agente",
+        "agentCopied": "Agente copiado correctamente",
+        "agentCopyFailed": "Error al copiar el agente",
+        "agentNotFound": "Agente no encontrado",
+        "agentSaved": "Agente guardado correctamente",
+        "agentSaveFailed": "Error al guardar el agente"
+      }
+    },
+    "inquiryBuilder": {
+      "title": "Creador de Consultas",
+      "tabs": {
+        "builder": "Creador",
+        "analysis": "Análisis"
+      }
+    },
+    "userInquiry": {
+      "title": "Consulta de Usuario",
+      "estimatedTime": "Tiempo estimado de finalización: {{time}}",
+      "thankYou": "¡Gracias!",
+      "responsesRecorded": "Tus respuestas han sido registradas.",
+      "makeOwnInquiry": "¿Quieres crear tu propia consulta?",
+      "signUpFree": "Regístrate gratis",
+      "goToBuilder": "Ir al Creador de Gráficos",
+      "loadingInquiry": "Cargando tu consulta...",
+      "inquiryNotFound": "Consulta No Encontrada",
+      "inquiryNotFoundDescription": "La consulta que buscas no existe. Por favor, comprueba la URL e inténtalo de nuevo.",
+      "somethingWentWrong": "Algo Salió Mal",
+      "errorDescription": "Ocurrió un error al cargar la consulta. Por favor, inténtalo de nuevo más tarde.",
+      "errorPersists": "Si el problema persiste, por favor, contacta a soporte en support@magiscribe.com",
+      "receiveEmailCopy": "¿Recibir una copia de tus respuestas por correo electrónico?",
+      "disclaimer": "Ocasionalmente, pueden ocurrir errores. Si notas alguno, por favor, háznoslo saber en support@magiscribe.com"
+    }
+  },
+  "components": {
+    "welcomeModal": {
+      "title": "¡Bienvenido/a a Magiscribe!",
+      "subtitle": "¡{{name}}, estamos emocionados de tenerte aquí!",
+      "description1": "Magiscribe te ayuda a combinar la eficiencia de las encuestas con la profundidad de las entrevistas de usuario. Recopila datos cuantitativos de muchos participantes mientras buscas obtener información cualitativa a través de preguntas de seguimiento específicas.",
+      "description2": "Empieza explorando nuestras funciones o creando tu primera consulta.",
+      "helpText": "¿Necesitas ayuda para empezar? Consulta nuestra guía de usuario o contáctanos en management@magiscribe.com"
+    },
+    "confirmModal": {
+      "title": "Confirmar",
+      "defaultText": "¿Estás seguro de que quieres proceder?",
+      "defaultConfirm": "Eliminar",
+      "defaultCancel": "Cancelar"
+    },
+    "createInquiryModal": {
+      "title": "Crear Consulta",
+      "updateTitle": "Actualizar Consulta",
+      "goals": "Objetivos",
+      "goalsSubtitle": "¿De quién intentas obtener información y qué tipo de información buscas capturar?",
+      "receiveEmailOnResponse": "Recibir Correo al Recibir Respuesta",
+      "receiveEmailSubtitle": "Recibe una alerta por correo electrónico cuando alguien termine tu consulta.",
+      "context": "Contexto (opcional)",
+      "contextSubtitle": "Proporciona cualquier información de fondo adicional. Esto ayuda a Magiscribe a ofrecer a cada encuestado preguntas relevantes.",
+      "advancedSettings": "Configuración Avanzada",
+      "graphTemplate": "Plantilla de Gráfico",
+      "graphTemplateSubtitle": "Selecciona una plantilla para generar un gráfico de conversación",
+      "voiceSubtitle": "Esta será la voz utilizada para leer las respuestas al usuario si tienen el audio habilitado",
+      "previewVoice": "Probar Voz",
+      "titleSubtitle": "Esto se mostrará a las personas a las que envíes la consulta",
+      "goalsRequired": "Por favor, ingresa algunos objetivos para la consulta",
+      "graphGenerated": "¡Gráfico generado correctamente!",
+      "inquirySaved": "¡Consulta guardada correctamente!",
+      "somethingWrong": "¡Algo salió mal!"
+    },
+    "inquiryCard": {
+      "updatedAt": "Actualizado: {{date}}"
+    },
+    "tokenUsage": {
+      "tokensUsed": "Tokens Usados",
+      "unlimited": "Ilimitado"
+    },
+    "integrationManagement": {
+      "title": "Gestionar Integraciones",
+      "addIntegration": "Agregar Integración",
+      "editIntegration": "Editar Integración",
+      "testConnection": "Probar Conexión",
+      "testing": "Probando...",
+      "viewTools": "Ver Herramientas",
+      "loading": "Cargando...",
+      "connectionSuccessful": "¡Prueba de conexión exitosa! 🎉",
+      "connectionFailed": "Prueba de conexión fallida: {{error}}",
+      "toolsLoadFailed": "Error al cargar las herramientas: {{error}}",
+      "nameRequired": "Se requieren el nombre y la URL del servidor",
+      "nameAndUrlRequired": "Se requieren el nombre y la URL del servidor para probar la conexión",
+      "urlValidation": "La URL del servidor debe comenzar con http:// o https://",
+      "fields": {
+        "name": "Nombre",
+        "serverUrl": "URL del Servidor",
+        "description": "Descripción",
+        "headers": "Encabezados"
+      },
+      "placeholders": {
+        "integrationName": "Ej., Mi Integración de Atlassian",
+        "serverUrl": "https://localhost:8080 o http://localhost:8080",
+        "description": "Breve descripción de lo que hace esta integración",
+        "headerName": "Nombre del encabezado (Ej., Authorization)",
+        "headerValue": "Valor del encabezado (Ej., Bearer token123)"
+      },
+      "messages": {
+        "noIntegrations": "Aún no hay integraciones configuradas.",
+        "clickAddToStart": "Haz clic en \"Agregar Integración\" para empezar.",
+        "integrationAdded": "¡Integración agregada y guardada correctamente!",
+        "integrationUpdated": "¡Integración actualizada y guardada correctamente!",
+        "integrationDeleted": "¡Integración eliminada correctamente!",
+        "integrationRemoved": "¡Integración eliminada correctamente!",
+        "saveFailed": "Error al guardar la integración",
+        "saveUpdateFailed": "Error al guardar la actualización de la integración",
+        "saveNewFailed": "Error al guardar la nueva integración",
+        "deleteFailed": "Error al eliminar la integración",
+        "updateFailed": "Error al actualizar la integración",
+        "addNewIntegration": "Agregar Nueva Integración",
+        "update": "Actualizar",
+        "deleteConfirmation": "¿Estás seguro de que quieres eliminar la integración \"{{name}}\"?",
+        "deleteIntegration": "Eliminar Integración",
+        "unknownError": "Error desconocido",
+        "adding": "Agregando...",
+        "updating": "Actualizando...",
+        "currentIntegrations": "Integraciones Actuales ({{count}})",
+        "headersDescription": "Configura los encabezados que se enviarán con las solicitudes al servidor MCP.",
+        "headersExample": "Authorization → Bearer tu-token-aquí"
+      },
+      "tools": {
+        "availableTools": "Herramientas Disponibles - {{name}}",
+        "newIntegration": "Nueva Integración",
+        "foundTools": "Se encontraron {{count}} herramienta{{s}} disponible{{s}}",
+        "noToolsTitle": "No Hay Herramientas Disponibles",
+        "noToolsDescription": "No se encontraron herramientas para esta integración. Esto podría significar:",
+        "noToolsReasons": [
+          "El servidor MCP no está en funcionamiento",
+          "La configuración de la integración es incorrecta",
+          "El servidor no expone ninguna herramienta"
+        ],
+        "toolDetails": "Detalles de la Herramienta",
+        "toolName": "Nombre:",
+        "toolPurpose": "Propósito:",
+        "toolNote": "Esta herramienta se puede ejecutar a través del nodo de Integración en tu flujo de trabajo de consulta."
+      }
+    },
+    "loadingQuotes": {
+      "integration": [
+        "Conectando con sistemas externos... por favor, espera mientras negociamos con las APIs.",
+        "Obteniendo datos de integraciones... nuestro mensajero digital está corriendo muy rápido.",
+        "Sincronizando con servicios de terceros... enseñando a nuestros sistemas a llevarse bien.",
+        "Procesando solicitud de integración... traduciendo entre diferentes idiomas digitales.",
+        "Comunicándonos con herramientas externas... enviando mensajes diplomáticos a otros servidores.",
+        "Ejecutando lógica de integración... nuestra IA está conversando con tus aplicaciones favoritas."
+      ],
+      "question": [
+        "Elaborando la pregunta perfecta... nuestra IA está consultando su diccionario de curiosidades.",
+        "Generando preguntas dinámicas... pensando en algo ingenioso que preguntarte.",
+        "Formulando la consulta... nuestro bot de preguntas está en una sesión de lluvia de ideas.",
+        "Creando preguntas personalizadas... adaptando esto solo para ti.",
+        "Diseñando la siguiente pregunta... nuestra IA se está poniendo su gorra de pensar.",
+        "Preparando preguntas reflexivas... la calidad lleva tiempo, incluso para una IA."
+      ],
+      "information": [
+        "Generando información útil... nuestra IA está preparando su mejor explicación.",
+        "Elaborando contenido informativo... escribiendo algo que valga tu tiempo.",
+        "Preparando información personalizada... adaptando este mensaje solo para ti.",
+        "Creando contenido dinámico... nuestra IA se está poniendo creativa con los detalles.",
+        "Formulando la respuesta perfecta... la información de calidad vale la espera.",
+        "Generando información contextual... asegurándonos de que esto sea relevante para ti."
+      ],
+      "condition": [
+        "Analizando tus respuestas... nuestra IA está reflexionando mucho sobre lo que viene después.",
+        "Procesando condiciones lógicas... determinando el mejor camino a seguir para ti.",
+        "Evaluando el flujo de la conversación... nuestra IA está jugando al detective con tus respuestas.",
+        "Tomando decisiones inteligentes... averiguando hacia dónde debe ir esta conversación.",
+        "Aplicando lógica condicional... nuestra IA está resolviendo el rompecabezas de tus respuestas.",
+        "Determinando los próximos pasos... calculando la ruta perfecta a través de esta consulta."
+      ]
+    }
+  },
+  "emails": {
+    "management": "management@magiscribe.com",
+    "support": "support@magiscribe.com"
+  },
+  "nodes": {
+    "start": {
+      "title": "Inicio",
+      "messageLabel": "Mensaje",
+      "messageSubLabel": "Texto que se mostrará al usuario en la pantalla de inicio",
+      "messagePlaceholder": "Escribe tu texto aquí...",
+      "requireName": "Requerir Nombre",
+      "requireNameSubLabel": "Los usuarios deberán ingresar su nombre.",
+      "requireEmail": "Requerir Correo Electrónico",
+      "requireEmailSubLabel": "Los usuarios deberán proporcionar su correo electrónico."
+    },
+    "question": {
+      "title": "Pregunta",
+      "dynamicGenerationLabel": "Generación Dinámica",
+      "questionTypeLabel": "Tipo de Pregunta",
+      "messageLabel": "Mensaje",
+      "messagePlaceholder": "Escribe tu texto aquí...",
+      "messageSubLabelDynamic": "Prompt para que una IA genere una pregunta",
+      "messageSubLabelStatic": "Pregunta hecha directamente al usuario",
+      "selectableOptionsLabel": "Opciones Seleccionables",
+      "addSelectOption": "Agregar Opción de Selección",
+      "questionTypes": {
+        "openEnded": "Pregunta Abierta",
+        "singleSelect": "Selección Única",
+        "multiSelect": "Selección Múltiple"
+      }
+    },
+    "information": {
+      "title": "Información",
+      "dynamicGenerationLabel": "Generación Dinámica",
+      "messageLabel": "Mensaje",
+      "messagePlaceholder": "Escribe tu texto aquí...",
+      "messageSubLabelDynamic": "Prompt para que una IA genere información",
+      "messageSubLabelStatic": "Información mostrada directamente al usuario"
+    },
+    "condition": {
+      "title": "Condición",
+      "randomLabel": "Aleatorio",
+      "addCondition": "Agregar Condición"
+    },
+    "end": {
+      "title": "Fin"
+    },
+    "integration": {
+      "title": "Integración",
+      "selectIntegrationLabel": "Seleccionar Integración",
+      "selectIntegrationPrompt": "Selecciona una integración...",
+      "selectToolLabel": "Seleccionar Herramienta",
+      "selectToolPrompt": "Selecciona una herramienta...",
+      "configureIntegrations": "Configurar Integraciones"
+    }
+  },
+  "builder": {
+    "graphEditor": "Editor de Gráfico",
+    "untitledInquiry": "Consulta Sin Título",
+    "clearGraph": "Limpiar Gráfico",
+    "redoAction": "rehacer acción",
+    "undoAction": "deshacer acción"
+  },
+  "modals": {
+    "validationErrors": {
+      "title": "Gráfico de Consulta Inválido",
+      "subtitle": "Por favor, aborda los siguientes errores antes de publicar:",
+      "automagicallyFix": "Arreglar Mágicamente"
+    }
+  },
+  "userResponse": {
+    "title": "Tu Respuesta",
+    "submittedOn": "Enviada el {{date}}"
+  },
+  "userGuide": {
+    "title": "Guía de Usuario",
+    "subtitle": "Todo lo que necesitas saber para empezar con Magiscribe",
+    "videoTitle": "Video de Introducción",
+    "faqTitle": "Preguntas Frecuentes",
+    "questions": {
+      "whatAreInquiries": {
+        "question": "¿Qué son las consultas?",
+        "answer": "Las consultas son conversaciones estructuradas que puedes crear para recopilar información de tu audiencia. Piénsalas como encuestas inteligentes que pueden adaptarse y hacer preguntas de seguimiento basadas en las respuestas que las personas proporcionan."
+      },
+      "howToCreateInquiry": {
+        "question": "¿Cómo creo una consulta?",
+        "answer": "Empieza haciendo clic en 'Crear Nueva Consulta' en tu panel de control. Proporciona algunos objetivos (qué información quieres recopilar) y cualquier contexto adicional. Nuestro sistema generará automáticamente un gráfico de conversación para ti, que puedes personalizar según sea necesario."
+      },
+      "howToAchieveStructure": {
+        "question": "¿Cómo puedo lograr una estructura específica para mi conversación?",
+        "answer": "Usa el Editor de Gráficos en la pestaña 'Constructor' para agregar, editar y conectar diferentes nodos. Cada nodo representa un punto en tu conversación - preguntas, información o puntos de decisión. Arrastra para conectar nodos y crear el flujo que deseas."
+      },
+      "whatIsDynamicGeneration": {
+        "question": "¿Qué es la generación dinámica?",
+        "answer": "La generación dinámica permite que la IA cree contenido personalizado basado en las respuestas previas del usuario. En lugar de mostrar texto estático, la IA puede generar preguntas o información que sean más relevantes para el contexto específico de cada encuestado."
+      },
+      "whatAreQuestionTypes": {
+        "question": "¿Qué son los tipos de pregunta?",
+        "answer": "Magiscribe admite tres tipos de pregunta: Pregunta Abierta (el usuario puede escribir cualquier cosa), Selección Única (el usuario elige una opción) y Selección Múltiple (el usuario puede elegir múltiples opciones). El tipo que elijas determina cómo los usuarios pueden responder."
+      },
+      "whatDoNodeTypesDo": {
+        "question": "¿Qué hacen los diferentes tipos de nodos?",
+        "answer": "Los nodos de Inicio capturan información básica del usuario, los nodos de Pregunta recopilan respuestas, los nodos de Información proporcionan detalles, los nodos de Condición crean ramificaciones basadas en respuestas, los nodos de Fin concluyen la conversación, y los nodos de Integración conectan con herramientas externas."
+      },
+      "whatDoEdgesDo": {
+        "question": "¿Qué hacen las conexiones entre nodos?",
+        "answer": "Las conexiones (llamadas aristas) determinan el flujo de tu conversación. Definen qué nodo viene después de otro. Puedes crear flujos lineales simples o conversaciones complejas con ramificaciones que dependen de las respuestas del usuario."
+      },
+      "whatAreGraphRules": {
+        "question": "¿Qué son las reglas de gráfico?",
+        "answer": "Las reglas de gráfico aseguran que tu consulta funcione correctamente. Por ejemplo, cada gráfico debe tener exactamente un nodo de inicio y al menos un nodo de fin. Los nodos deben estar conectados correctamente, y no debería haber elementos desconectados en tu gráfico de conversación."
+      },
+      "howToDistributeInquiry": {
+        "question": "¿Cómo distribuyo mi consulta?",
+        "answer": "Solo permitiremos que distribuyas consultas con gráficos de conversación válidos. Para intentar hacer esto, haz clic en 'Publicar' en la pestaña 'Constructor' de tu consulta. Si tu gráfico es válido, obtendrás un enlace para enviar a las personas. Cualquiera que tenga ese enlace podrá responder directamente a tu consulta. Si tu gráfico no es válido, se mostrará una lista de errores. Puedes intentar dejar que la IA 'Arregle Mágicamente' los errores y luego intentar publicarla nuevamente."
+      },
+      "whatIfChangeGraphAfterPublishing": {
+        "question": "¿Qué pasa si cambio mi gráfico después de publicarlo?",
+        "answer": "Guardaremos cualquier cambio que hagas en el constructor de gráficos en un 'Gráfico Borrador'. Solo actualizaremos la consulta pública que las personas reciben cuando presiones 'Publicar' y todas las verificaciones de validación pasen. ¡Nuestro sistema es lo suficientemente flexible para permitirte agregar o quitar preguntas y ser compatible con versiones anteriores de tu gráfico!"
+      },
+      "areInquiriesAnonymous": {
+        "question": "¿Son anónimas las consultas?",
+        "answer": "Actualmente, cada consulta pone la decisión de si los encuestados deben ser identificados o no en manos del administrador. Puedes marcar las casillas 'Requerir Correo Electrónico' y 'Requerir Nombre' en el nodo de inicio para garantizar que recibas esta importante información demográfica."
+      }
+    }
+  },
+  "media": {
+    "youtubeVideoPlayer": "Reproductor de video de YouTube"
+  },
+  "dates": {
+    "lastUpdated": "10 de diciembre de 2024"
+  }
+}

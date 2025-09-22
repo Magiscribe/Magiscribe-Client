@@ -3,9 +3,10 @@ import { GET_ALL_PROMPTS } from '@/clients/queries';
 import Container from '@/components/container';
 import Button from '@/components/controls/button';
 import ConfirmationModal from '@/components/modals/confirm-modal';
+import { GetAllPromptsQuery } from '@/graphql/graphql';
 import { Prompt } from '@/graphql/types';
 import { useAddAlert } from '@/providers/alert-provider';
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client/react';
 import { motion } from 'motion/react';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -78,7 +79,7 @@ export default function PromptDashboard() {
   const params = useParams();
 
   // Queries
-  const { data, refetch } = useQuery(GET_ALL_PROMPTS, {
+  const { data, refetch } = useQuery<GetAllPromptsQuery>(GET_ALL_PROMPTS, {
     variables: {
       logicalCollection: params.collection,
     },
@@ -89,7 +90,13 @@ export default function PromptDashboard() {
   const navigate = useNavigate();
 
   const handleCopy = async (id: string) => {
-    const selectedItem = data?.getAllPrompts.find((prompt: Prompt) => prompt.id === id) as Prompt;
+    const selectedItem = (data?.getAllPrompts ?? []).find((p): p is Prompt => p !== null && p.id === id);
+
+    if (!selectedItem) {
+      addAlert('Prompt not found', 'error');
+      return;
+    }
+
     const timeStamp = Date.now();
     try {
       const result = await upsertPrompt({
@@ -103,7 +110,7 @@ export default function PromptDashboard() {
         },
       });
 
-      if (result.errors) {
+      if (result.error) {
         addAlert('Error copying prompt', 'error');
         return;
       }
@@ -124,16 +131,18 @@ export default function PromptDashboard() {
       </div>
       <hr className="my-4" />
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 my-8">
-        {data?.getAllPrompts.map((prompt: Prompt, i: number) => (
-          <motion.div
-            key={prompt.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2, delay: 0.05 * i }}
-          >
-            <PromptCard key={prompt.id} prompt={prompt} onUpdate={refetch} onCopy={handleCopy} />
-          </motion.div>
-        ))}
+        {(data?.getAllPrompts ?? [])
+          .filter((p): p is Prompt => p !== null)
+          .map((prompt: Prompt, i: number) => (
+            <motion.div
+              key={prompt.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2, delay: 0.05 * i }}
+            >
+              <PromptCard key={prompt.id} prompt={prompt} onUpdate={refetch} onCopy={handleCopy} />
+            </motion.div>
+          ))}
       </div>
     </Container>
   );

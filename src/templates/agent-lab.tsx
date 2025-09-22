@@ -5,7 +5,7 @@ import Select from '@/components/controls/select';
 import ModalUpsertCollection from '@/components/modals/agents/create-collection-modal';
 import ConfirmationModal from '@/components/modals/confirm-modal';
 import { GetAllCollectionsQuery } from '@/graphql/graphql';
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client/react';
 import { motion } from 'motion/react';
 import { useState } from 'react';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';

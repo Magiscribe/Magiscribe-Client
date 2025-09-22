@@ -27,7 +27,7 @@ import { getAgentIdByName } from '@/utils/agents';
 import { applyGraphChangeset, formatGraph } from '@/utils/graphs/graph-utils';
 import { parseCodeBlocks } from '@/utils/markdown';
 import { removeDeletedImagesFromS3 } from '@/utils/s3';
-import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
+import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client/react';
 import { Edge, Node } from '@xyflow/react';
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
@@ -120,11 +120,15 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
   /**
    * Fetches the inquiry data from the server.
    */
-  useQuery<GetInquiryQuery>(GET_INQUIRY, {
+  const { data: inquiryData } = useQuery<GetInquiryQuery>(GET_INQUIRY, {
     variables: { id },
     skip: !id,
-    onCompleted: ({ getInquiry }) => {
-      if (!getInquiry) return;
+  });
+
+  // Handle inquiry data loading
+  useEffect(() => {
+    if (inquiryData?.getInquiry) {
+      const getInquiry = inquiryData.getInquiry;
       setLastUpdated(new Date(getInquiry.updatedAt));
       if (getInquiry.data.settings) setSettings(getInquiry.data.settings);
       if (getInquiry.data.metadata) setMetadata(getInquiry.data.metadata);
@@ -132,8 +136,8 @@ function InquiryBuilderProvider({ id, children }: InquiryProviderProps) {
       if (getInquiry.data.draftGraph) resetInitialState(getInquiry.data.draftGraph);
       if (getInquiry.userId) setOwners(getInquiry.userId);
       setInitialized(true);
-    },
-  });
+    }
+  }, []);
 
   /**
    * Subscribes to the prediction added subscription to get the generated graph.

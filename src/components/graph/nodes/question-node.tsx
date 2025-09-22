@@ -5,6 +5,7 @@ import Textarea from '@/components/controls/textarea';
 import { faPlus, faQuestionCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import { Handle, NodeProps, Position } from '@xyflow/react';
 import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import NodeContainer from '../elements/node-container';
 import CustomHandle from '../handles/limit-handle';
@@ -27,6 +28,7 @@ type QuestionNodeProps = NodeProps & {
 
 export default function QuestionNode({ id, data }: QuestionNodeProps) {
   const { handleInputChange } = useNodeData<QuestionNodeProps>(id);
+  const { t } = useTranslation();
 
   const handleUpdate = useCallback(
     (updates: Partial<QuestionNodeProps['data']>) => {
@@ -66,9 +68,9 @@ export default function QuestionNode({ id, data }: QuestionNodeProps) {
   };
 
   return (
-    <NodeContainer title="Question" faIcon={faQuestionCircle} id={id}>
+    <NodeContainer title={t('nodes.question.title')} faIcon={faQuestionCircle} id={id}>
       <Input
-        label="Dynamic Generation"
+        label={t('nodes.question.dynamicGenerationLabel')}
         name="dynamic-generation"
         type="checkbox"
         checked={data.dynamicGeneration}
@@ -77,7 +79,7 @@ export default function QuestionNode({ id, data }: QuestionNodeProps) {
       />
 
       <Select
-        label="Question Type"
+        label={t('nodes.question.questionTypeLabel')}
         name="type"
         value={data.type}
         onChange={(e) => handleUpdate({ type: e.target.value as NodeType })}
@@ -85,32 +87,32 @@ export default function QuestionNode({ id, data }: QuestionNodeProps) {
           value,
           label:
             value === NodeType.OpenEnded
-              ? 'Open Ended'
+              ? t('nodes.question.questionTypes.openEnded')
               : value === NodeType.RatingSingle
-                ? 'Single Select'
+                ? t('nodes.question.questionTypes.singleSelect')
                 : value === NodeType.RatingMulti
-                  ? 'Multi Select'
+                  ? t('nodes.question.questionTypes.multiSelect')
                   : value,
         }))}
         className="nodrag"
       />
 
       <Textarea
-        label="Message"
+        label={t('nodes.question.messageLabel')}
         subLabel={
-          data.dynamicGeneration ? 'Prompt for an AI to generate a question' : 'Question asked directly to the user'
+          data.dynamicGeneration ? t('nodes.question.messageSubLabelDynamic') : t('nodes.question.messageSubLabelStatic')
         }
         name="text"
         value={data.text}
         onChange={(e) => handleUpdate({ text: e.target.value })}
-        placeholder="Enter your text here..."
+        placeholder={t('nodes.question.messagePlaceholder')}
         className="resize-none overflow-hidden nodrag"
         rows={3}
       />
 
       {!data.dynamicGeneration && (data.type === NodeType.RatingSingle || data.type === NodeType.RatingMulti) && (
         <div className="flex flex-col gap-4">
-          <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Selectable Options</label>
+          <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('nodes.question.selectableOptionsLabel')}</label>
           {data.ratings?.map((rating, index) => (
             <div key={index} className="flex items-center justify-between gap-2">
               <Input
@@ -129,7 +131,7 @@ export default function QuestionNode({ id, data }: QuestionNodeProps) {
             </div>
           ))}
           <Button onClick={addRating} variant="primary" size="medium" icon={faPlus} className="nodrag mt-2">
-            Add Select Option
+            {t('nodes.question.addSelectOption')}
           </Button>
         </div>
       )}

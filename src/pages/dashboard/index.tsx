@@ -1,31 +1,33 @@
-import bondImage from '@/assets/imgs/cards/bond.webp';
-import roadImage from '@/assets/imgs/cards/road.webp';
-import yellImage from '@/assets/imgs/cards/yell.webp';
+import agentImg from '@/assets/imgs/cards/agent.webp';
+import gettingStartedImg from '@/assets/imgs/cards/getting-started.webp';
+import contactImg from '@/assets/imgs/cards/contact.webp';
 import { REGISTER_USER } from '@/clients/mutations';
 import { GET_INQUIRIES, GET_INQUIRY_RESPONSE_COUNT, IS_USER_REGISTERED } from '@/clients/queries';
 import LinkCard from '@/components/cards/card';
 import GenericHero from '@/components/heroes/generic-hero';
 import CreateInquiry from '@/components/modals/inquiry/create-inquiry-modal';
 import WelcomeModal from '@/components/modals/welcome-modal';
-import { GetInquiriesQuery } from '@/graphql/graphql';
+import { GetInquiriesQuery, GetInquiryResponseCountQuery, IsUserRegisteredQuery } from '@/graphql/graphql';
 import GraphProvider from '@/hooks/graph-state';
 import { useSetTitle } from '@/hooks/title-hook';
 import { InquiryBuilderProvider } from '@/providers/inquiry-builder-provider';
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client/react';
 import { useUser } from '@clerk/clerk-react';
 import clsx from 'clsx';
 import { motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 // Note: We do this to get the subtype that may have less fields than the original Inquiry type.
 type InquiryType = NonNullable<GetInquiriesQuery['getInquiries']>[number];
 
 function InquiryCard({ inquiry }: { inquiry: InquiryType }) {
+  const { t } = useTranslation();
   const settings = inquiry.data.settings;
 
   // Add the response count query
-  const { data: responseCountData } = useQuery(GET_INQUIRY_RESPONSE_COUNT, {
+  const { data: responseCountData } = useQuery<GetInquiryResponseCountQuery>(GET_INQUIRY_RESPONSE_COUNT, {
     variables: { id: inquiry.id },
   });
 
@@ -38,6 +40,9 @@ function InquiryCard({ inquiry }: { inquiry: InquiryType }) {
     month: 'short',
     day: 'numeric',
   });
+
+  const responseCount = responseCountData?.getInquiryResponseCount ?? 0;
+  const responseText = responseCount === 1 ? t('common.labels.response') : t('common.labels.responses');
 
   return (
     <Link to={`/dashboard/inquiry-builder/${inquiry.id}`} className="hover:no-underline">
@@ -52,11 +57,12 @@ function InquiryCard({ inquiry }: { inquiry: InquiryType }) {
       >
         <h3 className="text-lg text-slate-900 dark:text-slate-100 font-semibold">{settings.title}</h3>
         <div className="flex justify-between items-center mt-2">
-          <p className="text-sm text-slate-500 dark:text-slate-400">Updated: {formattedUpdateDate}</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            {t('common.labels.updated')}: {formattedUpdateDate}
+          </p>
           <div className="bg-blue-100 dark:bg-blue-900 px-2 py-1 rounded-full">
             <p className="text-sm text-blue-800 dark:text-blue-200 whitespace-nowrap">
-              {responseCountData?.getInquiryResponseCount ?? 0}{' '}
-              {responseCountData?.getInquiryResponseCount == 1 ? 'response' : 'responses'}
+              {responseCount} {responseText}
             </p>
           </div>
         </div>
@@ -66,14 +72,15 @@ function InquiryCard({ inquiry }: { inquiry: InquiryType }) {
 }
 
 export default function DashboardPage() {
-  useSetTitle()('Dashboard');
+  const { t } = useTranslation();
+  useSetTitle()(t('pages.dashboard.title'));
 
   // States
   const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false);
   const [createFormModal, setCreateFormModal] = useState(false);
 
   // Queries and mutations
-  const { data: registrationData } = useQuery(IS_USER_REGISTERED);
+  const { data: registrationData } = useQuery<IsUserRegisteredQuery>(IS_USER_REGISTERED);
   const { data: inquiriesData } = useQuery<GetInquiriesQuery>(GET_INQUIRIES);
   const [registerUser] = useMutation(REGISTER_USER);
 
@@ -85,30 +92,30 @@ export default function DashboardPage() {
 
   const cardData = [
     {
-      title: 'Getting Started Guide',
-      description: "Learn how to get started with Magiscribe's Inquiry Builder and start uncovering insights.",
+      title: t('pages.dashboard.cards.gettingStarted.title'),
+      description: t('pages.dashboard.cards.gettingStarted.description'),
       to: '/dashboard/user-guide',
       gradient: 'green',
       visible: !isAdmin,
-      backgroundImage: roadImage,
+      backgroundImage: gettingStartedImg,
       span: 1,
     },
     {
-      title: 'Contact Us',
-      description: 'Run into any issues? Contact us for help.',
+      title: t('pages.dashboard.cards.contactUs.title'),
+      description: t('pages.dashboard.cards.contactUs.description'),
       to: '/contact',
       gradient: 'blue',
       visible: !isAdmin,
-      backgroundImage: yellImage,
+      backgroundImage: contactImg,
       span: 1,
     },
     {
-      title: 'Agent Lab',
-      description: 'Build and manage AI agents.',
+      title: t('pages.dashboard.cards.agentLab.title'),
+      description: t('pages.dashboard.cards.agentLab.description'),
       to: '/dashboard/agent-lab',
       gradient: 'orange',
       visible: isAdmin,
-      backgroundImage: bondImage,
+      backgroundImage: agentImg,
       span: 2,
     },
   ];
@@ -134,15 +141,16 @@ export default function DashboardPage() {
     navigate(`/dashboard/inquiry-builder/${id}`);
   };
 
+  const welcomeTitle = user
+    ? t('pages.dashboard.welcome', { name: user.firstName })
+    : t('pages.dashboard.welcomeGeneric');
+
   return (
     <GraphProvider>
       <InquiryBuilderProvider>
         <CreateInquiry open={createFormModal} onClose={() => setCreateFormModal(false)} onSave={onCreateForm} />
 
-        <GenericHero
-          title={user ? `${user.firstName}, welcome to Magiscribe!` : 'Welcome to Magiscribe!'}
-          subtitle="Get started turning dialogue into discoveries."
-        />
+        <GenericHero title={welcomeTitle} subtitle={t('pages.dashboard.subtitle')} />
         <hr className="my-8" />
 
         <div className="space-y-4">
@@ -164,7 +172,7 @@ export default function DashboardPage() {
         </div>
 
         <hr className="my-8" />
-        <h2 className="text-2xl font-semibold text-slate-100 mb-4">Your Inquiries</h2>
+        <h2 className="text-2xl font-semibold text-slate-100 mb-4">{t('pages.dashboard.yourInquiries')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-8">
           {(inquiriesData?.getInquiries ?? []).map((inquiry) => (
             <InquiryCard inquiry={inquiry} key={inquiry.id} />

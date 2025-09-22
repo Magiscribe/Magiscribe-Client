@@ -6,6 +6,7 @@ import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { faMagicWandSparkles } from '@fortawesome/free-solid-svg-icons';
 import { AnimatePresence } from 'motion/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const DEBOUNCE_DELAY_IN_MS = 1000;
 
@@ -24,6 +25,7 @@ export default function InquiryBuilder() {
   // Hooks
   const { graph, initialized, settings, metadata, saveGraph, saveSettings, saveMetadata, saveOwners, owners } =
     useInquiryBuilder();
+  const { t } = useTranslation();
 
   const memoGraph = useMemo(() => ({ nodes: graph.nodes, edges: graph.edges }), [graph.nodes, graph.edges]);
 
@@ -101,7 +103,7 @@ export default function InquiryBuilder() {
                   variant="primary"
                   icon={faMagicWandSparkles}
                 >
-                  Graph Editor
+                  {t('builder.graphEditor')}
                 </Button>
 
                 <AnimatePresence>

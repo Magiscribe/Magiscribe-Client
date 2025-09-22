@@ -5,13 +5,13 @@ import Chart, { ChartProps } from '@/components/chart';
 import Button from '@/components/controls/button';
 import Input from '@/components/controls/input';
 import MarkdownCustom from '@/components/markdown-custom';
-import { AddPredictionMutation, GetInquiryQuery } from '@/graphql/graphql';
+import { AddPredictionMutation, GetInquiryQuery, PredictionAddedSubscription } from '@/graphql/graphql';
 import { useWithLocalStorage } from '@/hooks/local-storage-hook';
 import { useFilteredResponses } from '@/hooks/useFilteredResponses';
 import { getAgentIdByName } from '@/utils/agents';
 import { parseCodeBlocks } from '@/utils/markdown';
 import { minimizeAnalysisData } from '@/utils/analysis-data-minimizer';
-import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client';
+import { useApolloClient, useMutation, useQuery, useSubscription } from '@apollo/client/react';
 import { faPaperPlane, faSpinner, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import clsx from 'clsx';
@@ -56,14 +56,14 @@ const ViaChatTab: React.FC<ViaChatTabProps> = ({ id }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  useSubscription(GRAPHQL_SUBSCRIPTION, {
+  useSubscription<PredictionAddedSubscription>(GRAPHQL_SUBSCRIPTION, {
     variables: { subscriptionId },
     onData: ({ data: subscriptionData }) => {
       const prediction = subscriptionData.data?.predictionAdded;
 
       if (prediction && prediction.type === 'SUCCESS') {
         setLoading(false);
-        parseAndDisplayAnalysisResults(JSON.parse(prediction.result));
+        parseAndDisplayAnalysisResults(JSON.parse(prediction.result ?? ''));
       }
     },
     onError: (error) => {

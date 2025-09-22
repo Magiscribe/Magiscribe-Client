@@ -1,5 +1,6 @@
 import Button from '../controls/button';
 import CustomModal from './modal';
+import { useTranslation } from 'react-i18next';
 
 interface ConfirmationModalProps {
   isOpen: boolean;
@@ -15,18 +16,20 @@ export default function ConfirmationModal({
   onClose,
   onConfirm,
   text = 'item',
-  confirmText = 'Delete',
-  cancelText = 'Cancel',
+  confirmText,
+  cancelText,
 }: ConfirmationModalProps) {
+  const { t } = useTranslation();
+
   return (
-    <CustomModal title="Confirm" open={isOpen} onClose={onClose} size="md">
+    <CustomModal title={t('components.confirmModal.title')} open={isOpen} onClose={onClose} size="md">
       <p>{text}</p>
       <div className="mt-4 flex justify-center space-x-40">
         <Button onClick={onClose} variant="secondary">
-          {cancelText}
+          {cancelText || t('components.confirmModal.defaultCancel')}
         </Button>
         <Button onClick={onConfirm} variant="danger">
-          {confirmText}
+          {confirmText || t('components.confirmModal.defaultConfirm')}
         </Button>
       </div>
     </CustomModal>

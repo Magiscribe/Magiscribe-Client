@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client/react';
 import { GET_INQUIRIES_RESPONSES } from '@/clients/queries';
 import { GetInquiryResponsesQuery } from '@/graphql/graphql';
 import { useAnalysisFilters } from '@/contexts/AnalysisFilterContext';

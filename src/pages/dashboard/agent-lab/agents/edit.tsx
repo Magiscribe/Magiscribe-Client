@@ -8,9 +8,10 @@ import Select from '@/components/controls/select';
 import Textarea from '@/components/controls/textarea';
 import { GetAgentQuery, GetAllCapabilitiesQuery, GetAllModelsQuery, UpsertAgentMutation } from '@/graphql/graphql';
 import { useAddAlert } from '@/providers/alert-provider';
-import { useMutation, useQuery } from '@apollo/client';
-import { useState } from 'react';
+import { useMutation, useQuery } from '@apollo/client/react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 interface Form {
   id: string | null;
@@ -44,6 +45,7 @@ export default function AgentEdit() {
   const addAlert = useAddAlert();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { t } = useTranslation();
 
   // Queries and Mutations
   const { collection } = useParams<{ collection?: string }>();
@@ -55,32 +57,35 @@ export default function AgentEdit() {
     },
   });
 
-  useQuery<GetAgentQuery>(GET_AGENT, {
+  const { data: agentData } = useQuery<GetAgentQuery>(GET_AGENT, {
     skip: !searchParams.has('id'),
     variables: {
       agentId: searchParams.get('id'),
     },
-    onCompleted: (data) => {
-      if (!data.getAgent) return;
+  });
 
+  // Handle agent data loading with useEffect instead of onCompleted
+  useEffect(() => {
+    if (agentData?.getAgent) {
+      const agent = agentData.getAgent;
       setForm({
-        id: data.getAgent.id,
-        name: data.getAgent.name,
-        description: data.getAgent.description,
-        reasoning: data.getAgent.reasoning
+        id: agent.id,
+        name: agent.name,
+        description: agent.description,
+        reasoning: agent.reasoning
           ? {
-              llmModel: data.getAgent.reasoning.llmModel,
-              prompt: data.getAgent.reasoning.prompt,
-              variablePassThrough: data.getAgent.reasoning.variablePassThrough,
+              llmModel: agent.reasoning.llmModel,
+              prompt: agent.reasoning.prompt,
+              variablePassThrough: agent.reasoning.variablePassThrough,
             }
           : null,
-        capabilities: data.getAgent.capabilities.map((capability) => capability.id),
-        memoryEnabled: data.getAgent.memoryEnabled,
-        subscriptionFilter: data.getAgent.subscriptionFilter,
-        outputFilter: data.getAgent.outputFilter,
+        capabilities: agent.capabilities.map((capability) => capability.id),
+        memoryEnabled: agent.memoryEnabled,
+        subscriptionFilter: agent.subscriptionFilter,
+        outputFilter: agent.outputFilter,
       });
-    },
-  });
+    }
+  }, [agentData]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = event.target;
@@ -120,15 +125,16 @@ export default function AgentEdit() {
         },
       });
 
-      if (result.errors) {
-        addAlert('Error saving agent', 'error');
+      if (result.error) {
+        addAlert(t('pages.agentLab.alerts.agentSaveFailed'), 'error');
         return;
       }
 
-      addAlert('Agent saved successfully', 'success');
+      addAlert(t('pages.agentLab.alerts.agentSaved'), 'success');
       navigate('../agents');
     } catch (error) {
       console.error(error);
+      addAlert(t('pages.agentLab.alerts.agentSaveFailed'), 'error');
     }
   };
 
@@ -136,14 +142,21 @@ export default function AgentEdit() {
     <>
       <Container>
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">{form.id ? 'Edit' : 'Add'} Agent</h1>
+          <h1 className="text-3xl font-bold">
+            {form.id ? t('pages.agentLab.agents.editAgent') : t('pages.agentLab.agents.addAgent')}
+          </h1>
         </div>
         <form className="mt-8" onSubmit={handleSave}>
           <div className="mb-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <Input name="name" label="Name" value={form.name} onChange={handleInputChange} />
+            <Input
+              name="name"
+              label={t('pages.agentLab.agents.fields.name')}
+              value={form.name}
+              onChange={handleInputChange}
+            />
             {form.reasoning && (
               <Select
-                label="LLM Model"
+                label={t('pages.agentLab.agents.fields.llmModel')}
                 name="llmModel"
                 value={form.reasoning.llmModel ?? ''}
                 onChange={(e) => {
@@ -166,7 +179,7 @@ export default function AgentEdit() {
           </div>
           <div className="mb-4">
             <ListBoxMultiple
-              label="Capabilities"
+              label={t('pages.agentLab.agents.fields.capabilities')}
               setSelected={(value) =>
                 setForm({
                   ...form,
@@ -184,12 +197,17 @@ export default function AgentEdit() {
           </div>
 
           <div className="mb-4">
-            <Textarea name="description" label="Description" value={form.description} onChange={handleInputChange} />
+            <Textarea
+              name="description"
+              label={t('pages.agentLab.agents.fields.description')}
+              value={form.description}
+              onChange={handleInputChange}
+            />
           </div>
 
           <div className="mb-4 grid grid-cols-1 lg:grid-cols-3 gap-4">
             <Select
-              label="Reasoning"
+              label={t('pages.agentLab.agents.fields.reasoning')}
               name="reasoning"
               value={form.reasoning ? 'true' : 'false'}
               onChange={(e) => {
@@ -206,13 +224,13 @@ export default function AgentEdit() {
                 });
               }}
               options={[
-                { value: 'true', label: 'Enabled' },
-                { value: 'false', label: 'Disabled' },
+                { value: 'true', label: t('common.labels.enabled') },
+                { value: 'false', label: t('common.labels.disabled') },
               ]}
             />
             {form.reasoning && (
               <Select
-                label="Variable Pass Through"
+                label={t('pages.agentLab.agents.fields.variablePassThrough')}
                 name="variablePassThrough"
                 value={form.reasoning.variablePassThrough ? 'true' : 'false'}
                 onChange={(e) => {
@@ -225,14 +243,14 @@ export default function AgentEdit() {
                   });
                 }}
                 options={[
-                  { value: 'true', label: 'Enabled' },
-                  { value: 'false', label: 'Disabled' },
+                  { value: 'true', label: t('common.labels.enabled') },
+                  { value: 'false', label: t('common.labels.disabled') },
                 ]}
               />
             )}
 
             <Select
-              label="Memory Enabled"
+              label={t('pages.agentLab.agents.fields.memoryEnabled')}
               name="memoryEnabled"
               value={form.memoryEnabled ? 'true' : 'false'}
               onChange={(e) => {
@@ -242,8 +260,8 @@ export default function AgentEdit() {
                 });
               }}
               options={[
-                { value: 'true', label: 'Enabled' },
-                { value: 'false', label: 'Disabled' },
+                { value: 'true', label: t('common.labels.enabled') },
+                { value: 'false', label: t('common.labels.disabled') },
               ]}
             />
           </div>
@@ -251,7 +269,7 @@ export default function AgentEdit() {
           {form.reasoning && (
             <Textarea
               name="prompt"
-              label="Reasoning Prompt"
+              label={t('pages.agentLab.agents.fields.reasoningPrompt')}
               value={form.reasoning.prompt ?? ''}
               onChange={handleReasoningChange}
             />
@@ -260,19 +278,19 @@ export default function AgentEdit() {
           <div className="my-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
             <Input
               name="subscriptionFilter"
-              label="Subscription Filter"
+              label={t('pages.agentLab.agents.fields.subscriptionFilter')}
               value={form.subscriptionFilter ?? ''}
               onChange={handleInputChange}
             />
             <Input
               name="outputFilter"
-              label="Output Filter"
+              label={t('pages.agentLab.agents.fields.outputFilter')}
               value={form.outputFilter ?? ''}
               onChange={handleInputChange}
             />
           </div>
 
-          <Button>Save</Button>
+          <Button>{t('common.buttons.save')}</Button>
         </form>
       </Container>
     </>

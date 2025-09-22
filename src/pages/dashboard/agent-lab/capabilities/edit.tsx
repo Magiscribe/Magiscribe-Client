@@ -7,10 +7,17 @@ import ReorderableList from '@/components/controls/list/ReorderableList';
 import Select from '@/components/controls/select';
 import Textarea from '@/components/controls/textarea';
 import CustomModal from '@/components/modals/modal';
-import { Prompt } from '@/graphql/types';
+import {
+  GetAllModelsQuery,
+  GetAllPromptsQuery,
+  GetCapabilityQuery,
+  Prompt,
+  UpsertCapabilityMutation,
+  UpsertPromptMutation,
+} from '@/graphql/graphql';
 import { useAddAlert } from '@/providers/alert-provider';
-import { useMutation, useQuery } from '@apollo/client';
-import { useState } from 'react';
+import { useMutation, useQuery } from '@apollo/client/react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 const OutputReturnMode = [
@@ -72,34 +79,39 @@ export default function CapabilityEdit() {
 
   // Queries and Mutations
   const { collection } = useParams<{ collection?: string }>();
-  const [upsertCapability] = useMutation(ADD_UPDATE_CAPABILITY);
-  const [upsertPrompt] = useMutation(ADD_UPDATE_PROMPT);
-  const { data: prompts } = useQuery(GET_ALL_PROMPTS, {
+  const [upsertCapability] = useMutation<UpsertCapabilityMutation>(ADD_UPDATE_CAPABILITY);
+  const [upsertPrompt] = useMutation<UpsertPromptMutation>(ADD_UPDATE_PROMPT);
+  const { data: prompts } = useQuery<GetAllPromptsQuery>(GET_ALL_PROMPTS, {
     variables: {
       logicalCollection: collection,
     },
   });
-  const { data: models } = useQuery(GET_ALL_MODELS);
-  useQuery(GET_CAPABILITY, {
+  const { data: models } = useQuery<GetAllModelsQuery>(GET_ALL_MODELS);
+  const { data: capabilityData } = useQuery<GetCapabilityQuery>(GET_CAPABILITY, {
     skip: !searchParams.has('id'),
     variables: {
       capabilityId: searchParams.get('id'),
     },
-    onCompleted: (data) => {
+  });
+
+  // Handle capability data loading
+  useEffect(() => {
+    if (capabilityData?.getCapability) {
+      const capability = capabilityData.getCapability;
       setForm({
-        id: data.getCapability.id,
-        name: data.getCapability.name,
-        alias: data.getCapability.alias,
-        description: data.getCapability.description,
-        llmModel: data.getCapability.llmModel,
-        prompts: data.getCapability.prompts,
-        outputMode: data.getCapability.outputMode,
-        subscriptionFilter: data.getCapability.subscriptionFilter,
-        outputFilter: data.getCapability.outputFilter,
+        id: capability.id,
+        name: capability.name,
+        alias: capability.alias,
+        description: capability.description,
+        llmModel: capability.llmModel,
+        prompts: capability.prompts,
+        outputMode: capability.outputMode,
+        subscriptionFilter: capability.subscriptionFilter || '',
+        outputFilter: capability.outputFilter || '',
         newPromptTitle: '',
       });
-    },
-  });
+    }
+  }, [capabilityData]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = event.target;
@@ -136,7 +148,12 @@ export default function CapabilityEdit() {
         },
       });
 
-      if (result.errors) {
+      if (result.error) {
+        addAlert('Error creating prompt', 'error');
+        return;
+      }
+
+      if (!result.data?.upsertPrompt) {
         addAlert('Error creating prompt', 'error');
         return;
       }
@@ -153,7 +170,9 @@ export default function CapabilityEdit() {
   };
 
   const handlePromptAdd = ({ id }: { id: string }) => {
-    const selectedItem = prompts?.getAllPrompts.find((prompt: Prompt) => prompt.id === id);
+    if (!prompts?.getAllPrompts) return;
+
+    const selectedItem = prompts.getAllPrompts.find((prompt) => prompt?.id === id);
     if (selectedItem) {
       setForm({
         ...form,
@@ -180,7 +199,7 @@ export default function CapabilityEdit() {
         },
       });
 
-      if (result.errors) {
+      if (result.error) {
         addAlert('Error saving prompt', 'error');
         return;
       }
@@ -228,7 +247,7 @@ export default function CapabilityEdit() {
         },
       });
 
-      if (result.errors) {
+      if (result.error) {
         addAlert('Error saving capability', 'error');
         return;
       }
@@ -321,29 +340,32 @@ export default function CapabilityEdit() {
             </div>
             <CustomModal title={'Add Item'} size="7xl" open={openPromptModal} onClose={() => setOpenPromptModal(false)}>
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-                {prompts?.getAllPrompts
-                  .filter((item: Prompt) => !form.prompts.find((i) => i.id === item.id))
-                  .map((item: Prompt) => (
-                    <div
-                      key={item.id}
-                      className="bg-slate-100 dark:bg-slate-700 p-2 rounded-lg h-full w-full flex flex-col"
-                    >
-                      <h3 className="text-lg font-bold mb-2">{item.name}</h3>
-                      <p className="grow mb-2">
-                        {item.text.substring(0, 50)}
-                        {item.text.length > 50 ? '...' : ''}
-                      </p>
-                      <Button
-                        type="button"
-                        onClick={() => {
-                          handlePromptAdd({ id: item.id });
-                          setOpenPromptModal(false);
-                        }}
-                      >
-                        Add
-                      </Button>
-                    </div>
-                  ))}
+                {prompts?.getAllPrompts &&
+                  prompts.getAllPrompts
+                    .filter((item) => item && !form.prompts.find((i) => i.id === item.id))
+                    .map((item) =>
+                      item ? (
+                        <div
+                          key={item.id}
+                          className="bg-slate-100 dark:bg-slate-700 p-2 rounded-lg h-full w-full flex flex-col"
+                        >
+                          <h3 className="text-lg font-bold mb-2">{item.name}</h3>
+                          <p className="grow mb-2">
+                            {item.text.substring(0, 50)}
+                            {item.text.length > 50 ? '...' : ''}
+                          </p>
+                          <Button
+                            type="button"
+                            onClick={() => {
+                              handlePromptAdd({ id: item.id });
+                              setOpenPromptModal(false);
+                            }}
+                          >
+                            Add
+                          </Button>
+                        </div>
+                      ) : null,
+                    )}
                 <div
                   key={'newPrompt'}
                   className="bg-slate-100 dark:bg-slate-700 p-2 rounded-lg h-full w-full flex flex-col"

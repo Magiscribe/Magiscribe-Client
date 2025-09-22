@@ -1,6 +1,6 @@
 import { GET_AGENT_WITH_PROMPTS } from '@/clients/queries';
 import { GetAgentWithPromptsQuery } from '@/graphql/graphql';
-import { useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client/react';
 import React, { useEffect, useMemo } from 'react';
 
 import Input from './controls/input';

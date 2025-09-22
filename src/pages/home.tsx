@@ -1,5 +1,6 @@
 import ContactForm from '@/components/forms/contact-form';
 import { motion } from 'motion/react';
+import { useTranslation } from 'react-i18next';
 
 import ContentSection from '../components/content-section';
 import HomeHero from '../components/heroes/home-hero';
@@ -10,6 +11,8 @@ import { SectionTemplate } from '../components/templates/section';
 import { useSetTitle } from '../hooks/title-hook';
 
 function AboutSection() {
+  const { t } = useTranslation();
+
   return (
     <SectionTemplate>
       <motion.h2
@@ -19,7 +22,7 @@ function AboutSection() {
         transition={{ duration: 0.5, delay: 0.25 }}
         viewport={{ once: true }}
       >
-        What is Magiscribe?
+        {t('pages.home.about.title')}
       </motion.h2>
       <div className="w-full mb-4">
         <div className="h-1 mx-auto gradient w-64 opacity-50 my-0 py-0 rounded-t"></div>
@@ -32,12 +35,12 @@ function AboutSection() {
             width="560"
             height="315"
             src="https://www.youtube.com/embed/45l_kHRTmdY?si=DQZnYOwZOL1qih1N"
-            title="YouTube video player"
+            title={t('media.youtubeVideoPlayer')}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           ></iframe>
         }
-        title="Balance Efficiency with Depth"
-        description="Magiscribe helps you combine the efficiency of surveys with the depth of user interviews. Gather quantitative data from many participants while pursuing qualitative insights through targeted follow-up questions."
+        title={t('pages.home.about.balanceEfficiency.title')}
+        description={t('pages.home.about.balanceEfficiency.description')}
         reversed={false}
       />
       <ContentSection
@@ -46,8 +49,8 @@ function AboutSection() {
             <PencilShape />
           </div>
         }
-        title="Understand Your Audience"
-        description="From simple yes-no surveys to in-depth quizzes and free-flowing conversations, our AI-powered platform streamlines audience insights. Magiscribe combines smart technology with artificial intelligence to deliver deeper understanding."
+        title={t('pages.home.about.understandAudience.title')}
+        description={t('pages.home.about.understandAudience.description')}
         reversed
       />
       <ContentSection
@@ -56,8 +59,8 @@ function AboutSection() {
             <SandcastleShape />
           </div>
         }
-        title="From rough drafts to rich dialogues"
-        description="Magiscribe produces semi-structured conversations allowing you to both guarantee particular questions get asked and allow for dynamic follow-up when the respondent says something interesting the same way a skilled interviewer would."
+        title={t('pages.home.about.roughDrafts.title')}
+        description={t('pages.home.about.roughDrafts.description')}
         reversed={false}
       />
     </SectionTemplate>
@@ -65,6 +68,8 @@ function AboutSection() {
 }
 
 function ContactSection() {
+  const { t } = useTranslation();
+
   return (
     <SectionTemplate>
       <motion.h2
@@ -74,7 +79,7 @@ function ContactSection() {
         transition={{ duration: 0.5, delay: 0.25 }}
         viewport={{ once: true }}
       >
-        Get in Touch
+        {t('pages.home.contact.title')}
       </motion.h2>
       <div className="w-full mb-4">
         <div className="h-1 mx-auto gradient w-64 opacity-50 my-0 py-0 rounded-t"></div>
@@ -86,8 +91,7 @@ function ContactSection() {
         transition={{ duration: 0.5, delay: 0.25 }}
         viewport={{ once: true }}
       >
-        Have a question, want to schedule a demo, or learn how Magiscribe can help you? Reach out to us and we'll get
-        back to you as soon as possible!
+        {t('pages.home.contact.subtitle')}
       </motion.h3>
 
       <ContactForm />
@@ -96,7 +100,8 @@ function ContactSection() {
 }
 
 function Home() {
-  useSetTitle()('');
+  const { t } = useTranslation();
+  useSetTitle()(t('pages.home.title'));
 
   return (
     <>

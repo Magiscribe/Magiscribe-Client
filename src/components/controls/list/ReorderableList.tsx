@@ -66,7 +66,7 @@ const ReorderableList = <T extends BaseListItem>({
 }: ReorderableListProps<T>) => {
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const dragControls = useDragControls();
-  const constraintsRef = useRef<HTMLDivElement>(null);
+  const constraintsRef = useRef<HTMLUListElement | null>(null);
 
   const handleEdit = (itemId: string) => {
     setEditingItemId(itemId);

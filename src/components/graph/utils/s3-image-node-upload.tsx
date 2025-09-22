@@ -4,7 +4,7 @@ import { AddMediaAssetMutation, GetMediaAssetQuery } from '@/graphql/graphql';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { ImageMetadata } from '@/types/conversation';
 import { uploadImageToS3 } from '@/utils/s3';
-import { useLazyQuery, useMutation } from '@apollo/client';
+import { useLazyQuery, useMutation } from '@apollo/client/react';
 import { faX } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useState } from 'react';
 

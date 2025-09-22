@@ -7,12 +7,13 @@ import useElevenLabsAudio from '@/hooks/audio-player';
 import { useAddAlert } from '@/providers/alert-provider';
 import { useInquiryBuilder } from '@/providers/inquiry-builder-provider';
 import { VOICE_LINE_SAMPLES } from '@/utils/audio/voice-line-samples';
-import { useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client/react';
 import { faPlay, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Edge, Node } from '@xyflow/react';
 import { AnimatePresence, motion } from 'motion/react';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Button from '../../controls/button';
 import Input from '../../controls/input';
@@ -65,6 +66,7 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
   const [loadingQuote, setLoadingQuote] = useState(conversationGraphLoadingQuotes[0]);
 
   // Hooks
+  const { t } = useTranslation();
   const {
     id,
     settings,
@@ -188,7 +190,7 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
     e.preventDefault();
 
     if (settings.goals.trim() === '' && !(selectedTemplate && !selectedTemplate?.allowGeneration)) {
-      alert('Please enter some goals for the inquiry', 'error');
+      alert(t('components.createInquiryModal.goalsRequired'), 'error');
       return;
     }
 
@@ -202,11 +204,11 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
 
     await saveSettingsAndGraph(
       (id) => {
-        alert('Inquiry saved successfully!', 'success');
+        alert(t('components.createInquiryModal.inquirySaved'), 'success');
         if (onSave) onSave(id as string);
       },
       () => {
-        alert('Something went wrong!', 'error');
+        alert(t('components.createInquiryModal.somethingWrong'), 'error');
       },
     );
   };
@@ -217,11 +219,11 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
    * Render the advanced settings section of the modal.
    */
   const renderAdvancedSettings = () => (
-    <GenericDisclosure title="Advanced Settings" className="mt-4">
+    <GenericDisclosure title={t('components.createInquiryModal.advancedSettings')} className="mt-4">
       <div className="space-y-4">
         <GenericRadioGroup<Template>
-          label="Graph Template"
-          subLabel="Select a template to generate a conversation graph"
+          label={t('components.createInquiryModal.graphTemplate')}
+          subLabel={t('components.createInquiryModal.graphTemplateSubtitle')}
           options={(templates?.getInquiryTemplates ?? []).map((template) => ({ ...template, value: template }))}
           value={selectedTemplate}
           onChange={setSelectedTemplate}
@@ -231,8 +233,8 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
         <div className="space-y-2">
           <Select
             name="voice"
-            label="Voice"
-            subLabel="This will be the voice used to read responses to the user if they have audio enabled"
+            label={t('common.labels.voice')}
+            subLabel={t('components.createInquiryModal.voiceSubtitle')}
             value={settings.voice ?? ''}
             onChange={handleSelectChange('voice')}
             options={
@@ -251,7 +253,7 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
               iconSpin={isVoicePreviewLoading}
               onClick={handlePreviewVoice}
             >
-              Preview Voice
+              {t('components.createInquiryModal.previewVoice')}
             </Button>
           </div>
         </div>
@@ -260,22 +262,27 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
   );
 
   return (
-    <CustomModal size="5xl" open={open} onClose={onClose} title={id ? 'Update Inquiry' : 'Create Inquiry'}>
+    <CustomModal
+      size="5xl"
+      open={open}
+      onClose={onClose}
+      title={id ? t('components.createInquiryModal.updateTitle') : t('components.createInquiryModal.title')}
+    >
       <form className="space-y-4" onSubmit={handleSave}>
         <Input
           name="title"
-          label="Title"
-          placeholder="Inquiry title"
+          label={t('common.labels.title')}
+          placeholder={t('common.forms.placeholders.inquiryTitle')}
           autoFocus
-          subLabel="This will be displayed to the people you are sending the inquiry to"
+          subLabel={t('components.createInquiryModal.titleSubtitle')}
           value={settings.title}
           onChange={handleInputChange('title')}
         />
 
         <Textarea
           name="goals"
-          label="Goals"
-          subLabel="Who are you trying to gain insights from and what type of information are you looking to capture?"
+          label={t('components.createInquiryModal.goals')}
+          subLabel={t('components.createInquiryModal.goalsSubtitle')}
           value={settings.goals}
           onChange={handleInputChange('goals')}
           onKeyDown={handleInputKeyDown}
@@ -283,9 +290,9 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
 
         <Input
           name="email"
-          label="Recieve Email On Response"
+          label={t('components.createInquiryModal.receiveEmailOnResponse')}
           type="checkbox"
-          subLabel="Be alerted via email when someone finishes your inquiry."
+          subLabel={t('components.createInquiryModal.receiveEmailSubtitle')}
           value={String(settings.notifications?.recieveEmailOnResponse)}
           onChange={(e) => {
             setSettings({ ...settings, notifications: { recieveEmailOnResponse: e.target.checked } });
@@ -294,8 +301,8 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
 
         <Textarea
           name="globalContext"
-          label="Context (optional)"
-          subLabel="Provide any additional background information.  This helps Magiscribe to provide each survey respondent with relevant questions."
+          label={t('components.createInquiryModal.context')}
+          subLabel={t('components.createInquiryModal.contextSubtitle')}
           value={settings.context ?? ''}
           onChange={handleInputChange('context')}
           onKeyDown={handleInputKeyDown}
@@ -323,10 +330,11 @@ export default function CreateInquiryModal({ open, onSave, onClose }: ModalUpser
             </AnimatePresence>
           </div>
           <Button type="button" onClick={onClose} variant="transparentPrimary" size="medium" className="ml-2">
-            Cancel
+            {t('common.buttons.cancel')}
           </Button>
           <Button disabled={generatingGraph} onClick={handleSave} variant="primary" size="medium" className="ml-2">
-            {id ? 'Save' : 'Create'} {generatingGraph && <FontAwesomeIcon icon={faSpinner} className="ml-2" spin />}
+            {id ? t('common.buttons.save') : t('common.buttons.create')}{' '}
+            {generatingGraph && <FontAwesomeIcon icon={faSpinner} className="ml-2" spin />}
           </Button>
         </div>
       </form>
